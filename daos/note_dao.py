@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
+
 from sqlalchemy import (
     DateTime,
     Enum as SAEnum,
@@ -15,10 +17,12 @@ from utils.enums import SharePermissionEnum, VisibilityEnum
 from utils.db import Base
 from utils.utils import generate_uuid
 
-from daos.collection_dao import Collection
 from daos.flashcard_dao import Flashcard
 from daos.tag_dao import Tag
-from daos.user_dao import User
+
+if TYPE_CHECKING:
+    from daos.collection_dao import Collection
+    from daos.user_dao import User
 
 
 class Note(Base):
@@ -49,7 +53,14 @@ class Note(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     visibility: Mapped[VisibilityEnum] = mapped_column(
-        SAEnum(VisibilityEnum), nullable=False, server_default=text("'private'")
+        SAEnum(
+            VisibilityEnum,
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+            name="visibilityenum",
+            validate_strings=True,
+        ),
+        nullable=False,
+        server_default=text("'private'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
@@ -93,7 +104,13 @@ class NoteShare(Base):
         primary_key=True,
     )
     permission: Mapped[SharePermissionEnum] = mapped_column(
-        SAEnum(SharePermissionEnum), nullable=False
+        SAEnum(
+            SharePermissionEnum,
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+            name="sharepermissionenum",
+            validate_strings=True,
+        ),
+        nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
