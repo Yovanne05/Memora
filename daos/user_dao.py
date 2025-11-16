@@ -18,7 +18,15 @@ class User(Base):
     display_name: Mapped[str | None] = mapped_column(String(100))
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     role: Mapped[RoleEnum] = mapped_column(
-        SAEnum(RoleEnum), nullable=False, server_default=text("'client'")
+        SAEnum(
+            RoleEnum,
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls],
+            name="roleenum",
+            validate_strings=True,
+        ),
+        nullable=False,
+        server_default=text("'client'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
