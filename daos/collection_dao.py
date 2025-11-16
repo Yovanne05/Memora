@@ -1,0 +1,102 @@
+from datetime import datetime
+from sqlalchemy import (
+    DateTime,
+    Enum as SAEnum,
+    ForeignKey,
+    Index,
+    String,
+    Text,
+    UniqueConstraint,
+    text,
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from utils.enums import SharePermissionEnum, VisibilityEnum
+from utils.db import Base
+from utils.utils import generate_uuid
+
+
+class Collection(Base):
+    __tablename__ = "collections"
+    __table_args__ = (
+        UniqueConstraint(
+            "owner_id",
+            "name",
+            name="uniq_collection_name_per_owner",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=generate_uuid
+    )
+    owner_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    visibility: Mapped[VisibilityEnum] = mapped_column(
+        SAEnum(VisibilityEnum), nullable=False, server_default=text("'private'")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=text("CURRENT_TIMESTAMP"),
+        server_onupdate=text("CURRENT_TIMESTAMP"),
+    )
+
+    owner: Mapped["User"] = relationship(back_populates="collections")
+    notes: Mapped[list["Note"]] = relationship(back_populates="collection")
+    shares: Mapped[list["CollectionShare"]] = relationship(
+        back_populates="collection"
+    )
+    tag_links: Mapped[list["CollectionTag"]] = relationship(
+        back_populates="collection"
+    )
+
+
+class CollectionShare(Base):
+    __tablename__ = "collection_shares"
+    __table_args__ = (Index("idx_collection_shares_user", "user_id"),)
+
+    collection_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("collections.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    permission: Mapped[SharePermissionEnum] = mapped_column(
+        SAEnum(SharePermissionEnum), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
+
+    collection: Mapped["Collection"] = relationship(back_populates="shares")
+    user: Mapped["User"] = relationship(back_populates="collection_shares")
+
+
+class CollectionTag(Base):
+    __tablename__ = "collection_tags"
+    __table_args__ = (Index("idx_collection_tags_tag", "tag_id"),)
+
+    collection_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("collections.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    tag_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("tags.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    collection: Mapped["Collection"] = relationship(back_populates="tag_links")
+    tag: Mapped["Tag"] = relationship(back_populates="collection_links")
