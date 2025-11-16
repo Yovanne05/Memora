@@ -9,3 +9,9 @@ class VisibilityEnum(str, Enum):
 class SharePermissionEnum(str, Enum):
     READ = "read"
     WRITE = "write"
+
+
+class RoleEnum(str, Enum):
+    CLIENT = "client"
+    ADMIN = "admin"
+    SUPER_ADMIN = "super_admin"
