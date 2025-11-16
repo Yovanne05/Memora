@@ -1,9 +1,14 @@
 from datetime import datetime
+
 from sqlalchemy import DateTime, Enum as SAEnum, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from utils.db import Base
 from utils.enums import RoleEnum
 from utils.utils import generate_uuid
+
+from daos.collection_dao import Collection, CollectionShare
+from daos.note_dao import Note, NoteShare
 
 
 class User(Base):

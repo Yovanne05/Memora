@@ -1,8 +1,16 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
+
 from sqlalchemy import DateTime, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from daos.collection_dao import CollectionTag
+
 from utils.db import Base
 from utils.utils import generate_uuid
+
+if TYPE_CHECKING:
+    from daos.note_dao import NoteTag
 
 
 class Tag(Base):
