@@ -8,6 +8,9 @@ from utils.enums import VisibilityEnum
 class NoteFindQuery(BaseModel):
     owner_id: Optional[UUID] = Field(default=None, alias="ownerId")
     collection_id: Optional[UUID] = Field(default=None, alias="collectionId")
+    shared_with_user_id: Optional[UUID] = Field(
+        default=None, alias="sharedWithUserId"
+    )
     visibility: VisibilityEnum | None = None
     title_contains: Optional[str] = Field(default=None, alias="titleContains")
     content_contains: Optional[str] = Field(
@@ -40,6 +43,9 @@ class NoteFindQuery(BaseModel):
             collection_id=str(self.collection_id)
             if self.collection_id
             else None,
+            shared_with_user_id=str(self.shared_with_user_id)
+            if self.shared_with_user_id
+            else None,
             visibility=self.visibility,
             title_contains=self.title_contains,
             content_contains=self.content_contains,
@@ -49,3 +55,4 @@ class NoteFindQuery(BaseModel):
             limit=self.limit,
             offset=self.offset,
         )
+

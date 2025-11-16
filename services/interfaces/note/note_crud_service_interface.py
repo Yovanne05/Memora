@@ -1,9 +1,10 @@
 from typing import List, Optional, Protocol, Tuple
+
 from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
 from repositorys.note_repository import NoteSearchParams
 
 
-class NoteServiceInterface(Protocol):
+class NoteCrudServiceInterface(Protocol):
     def find_many(
         self, params: Optional[NoteSearchParams] = None
     ) -> Tuple[List[NoteDTO], int]:

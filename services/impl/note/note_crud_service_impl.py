@@ -1,4 +1,5 @@
 from typing import List, Optional, Tuple
+
 from domain_services.note_domain_service import apply_note_update
 from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
 from exceptions.note_exception import (
@@ -10,10 +11,12 @@ from exceptions.note_exception import (
 from mappers.note_mapper import dto_to_note, note_to_dto
 from repositorys import collection_repository, note_repository, user_repository
 from repositorys.note_repository import NoteSearchParams
-from services.interfaces.note_service_interface import NoteServiceInterface
+from services.interfaces.note.note_crud_service_interface import (
+    NoteCrudServiceInterface,
+)
 
 
-class NoteService(NoteServiceInterface):
+class NoteCrudService(NoteCrudServiceInterface):
     def find_many(
         self, params: Optional[NoteSearchParams] = None
     ) -> Tuple[List[NoteDTO], int]:
@@ -21,9 +24,7 @@ class NoteService(NoteServiceInterface):
         return [note_to_dto(entity) for entity in entities], total
 
     def find_one(self, note_id: str) -> NoteDTO:
-        note_entity = note_repository.find_one(note_id)
-        if not note_entity:
-            raise NoteNotFound()
+        note_entity = self._get_note_or_raise(note_id)
         return note_to_dto(note_entity)
 
     def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
@@ -45,9 +46,7 @@ class NoteService(NoteServiceInterface):
     def update(
         self, note_id: str, note_update_dto: NoteUpdateDTO
     ) -> NoteDTO:
-        note_entity = note_repository.find_one(note_id)
-        if not note_entity:
-            raise NoteNotFound()
+        note_entity = self._get_note_or_raise(note_id)
 
         if "collection_id" in note_update_dto.model_fields_set:
             new_collection_id = note_update_dto.collection_id
@@ -83,6 +82,12 @@ class NoteService(NoteServiceInterface):
         if not deleted:
             raise NoteNotFound()
 
+    def _get_note_or_raise(self, note_id: str):
+        note_entity = note_repository.find_one(note_id)
+        if not note_entity:
+            raise NoteNotFound()
+        return note_entity
+
     def _ensure_owner_exists(self, owner_id: str) -> None:
         if not user_repository.find_one(owner_id):
             raise NoteOwnerDoesNotExist()
@@ -112,4 +117,4 @@ class NoteService(NoteServiceInterface):
             raise NoteTitleConflict()
 
 
-note_service = NoteService()
+note_crud_service = NoteCrudService()
