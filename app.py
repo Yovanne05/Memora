@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from controllers.note_controller import bp_notes
+from controllers.user_controller import bp_users
 from utils.logger import init_logger
 from utils.swagger import init_swagger
 
@@ -12,6 +13,7 @@ def create_app() -> Flask:
     init_swagger(app)
     init_logger(app)
 
+    app.register_blueprint(bp_users)
     app.register_blueprint(bp_notes)
     
     return app

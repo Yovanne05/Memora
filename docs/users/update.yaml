@@ -1,0 +1,26 @@
+---
+tags:
+  - users
+summary: Mettre à jour un utilisateur
+description: Modifie les champs fournis pour le profil ciblé.
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de l’utilisateur à modifier.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/UserUpdatePayload"
+responses:
+  200:
+    description: Profil mis à jour.
+    schema:
+      $ref: "#/definitions/User"
+  404:
+    description: Utilisateur introuvable.
+  409:
+    description: L’e-mail ou le nom d’utilisateur proposé est déjà utilisé.
