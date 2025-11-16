@@ -1,0 +1,73 @@
+---
+tags:
+  - notes
+summary: Lister les notes
+description: >
+  Retourne la liste paginée des notes en appliquant des filtres facultatifs
+  (propriétaire, collection, visibilité, texte).
+parameters:
+  - in: query
+    name: ownerId
+    type: string
+    format: uuid
+    required: false
+    description: Limite la recherche aux notes appartenant à cet utilisateur.
+  - in: query
+    name: collectionId
+    type: string
+    format: uuid
+    required: false
+    description: Filtre sur une collection précise.
+  - in: query
+    name: visibility
+    type: string
+    enum: ["private", "public"]
+    required: false
+    description: Filtre les notes selon leur niveau de partage.
+  - in: query
+    name: titleContains
+    type: string
+    required: false
+    description: Sous-chaîne à rechercher dans les titres.
+  - in: query
+    name: contentContains
+    type: string
+    required: false
+    description: Sous-chaîne recherchée dans le contenu.
+  - in: query
+    name: ids
+    type: string
+    required: false
+    description: Liste CSV d’identifiants (ex. `uuid1,uuid2`) pour récupérer un sous-ensemble précis.
+  - in: query
+    name: sortBy
+    type: string
+    enum: ["title", "created_at", "updated_at"]
+    default: "created_at"
+    description: Champ utilisé pour trier les résultats.
+  - in: query
+    name: sortDir
+    type: string
+    enum: ["asc", "desc"]
+    default: "desc"
+    description: Ordre de tri.
+  - in: query
+    name: limit
+    type: integer
+    format: int32
+    default: 50
+    minimum: 1
+    maximum: 200
+    description: Nombre maximum d’éléments renvoyés.
+  - in: query
+    name: offset
+    type: integer
+    format: int32
+    default: 0
+    minimum: 0
+    description: Décalage pour la pagination.
+responses:
+  200:
+    description: Liste paginée des notes.
+    schema:
+      $ref: "#/definitions/NoteListResponse"

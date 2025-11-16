@@ -1,0 +1,17 @@
+---
+tags:
+  - notes
+summary: Supprimer une note
+description: Efface définitivement une note et ses éléments associés.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note à supprimer.
+responses:
+  204:
+    description: Note supprimée (aucun contenu).
+  404:
+    description: Note introuvable.

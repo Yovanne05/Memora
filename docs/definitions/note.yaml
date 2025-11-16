@@ -1,0 +1,106 @@
+definitions:
+  Note:
+    type: object
+    description: Représentation complète d'une note dans MEMORA.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique de la note.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      title:
+        type: string
+        description: Titre court affiché dans les listes.
+        example: "Cours de SQL - Chapitre 1"
+      content:
+        type: string
+        description: Contenu riche de la note (Markdown accepté).
+        example: "Rappel sur les jointures INNER/LEFT..."
+      owner_id:
+        type: string
+        format: uuid
+        description: Identifiant du propriétaire de la note.
+        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      collection_id:
+        type: string
+        format: uuid
+        nullable: true
+        description: Collection à laquelle la note appartient (facultatif).
+        example: "3eeaa924-c2e4-49a2-8123-4613ef7f27b9"
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        description: Contrôle qui peut consulter la note.
+        example: "private"
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création.
+        example: "2025-05-12T09:23:41Z"
+      updated_at:
+        type: string
+        format: date-time
+        description: Dernière mise à jour.
+        example: "2025-05-15T16:02:07Z"
+    required: ["id", "title", "content", "owner_id", "visibility", "created_at", "updated_at"]
+
+  NoteCreatePayload:
+    type: object
+    required: ["title", "content", "owner_id"]
+    properties:
+      title:
+        type: string
+        maxLength: 255
+        description: Titre à afficher.
+      content:
+        type: string
+        description: Corps de la note.
+      owner_id:
+        type: string
+        format: uuid
+        description: Identifiant de l’utilisateur qui crée la note.
+      collection_id:
+        type: string
+        format: uuid
+        nullable: true
+        description: Collection cible si la note doit être rangée.
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        default: "private"
+        description: Niveau de partage (private = visible uniquement par le propriétaire).
+
+  NoteUpdatePayload:
+    type: object
+    description: Champs modifiables d’une note.
+    properties:
+      title:
+        type: string
+        maxLength: 255
+        description: Nouveau titre.
+      content:
+        type: string
+        description: Nouveau contenu.
+      collection_id:
+        type: string
+        format: uuid
+        nullable: true
+        description: Nouvelle collection ou null pour détacher la note.
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        description: Nouvelle visibilité.
+
+  NoteListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de notes correspondant au filtre.
+        example: 128
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Note"
+    required: ["total", "items"]

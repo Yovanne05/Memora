@@ -1,0 +1,22 @@
+---
+tags:
+  - notes
+summary: Créer une note
+description: >
+  Enregistre une nouvelle note pour un utilisateur donné. Le titre doit être
+  unique dans la collection ciblée.
+parameters:
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteCreatePayload"
+responses:
+  201:
+    description: Note créée avec succès.
+    schema:
+      $ref: "#/definitions/Note"
+  409:
+    description: Une autre note porte déjà ce titre pour ce propriétaire/collection.
+  422:
+    description: Données invalides ou référence d’utilisateur/de collection inconnue.

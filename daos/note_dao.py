@@ -10,9 +10,15 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from utils.enums import SharePermissionEnum, VisibilityEnum
 from utils.db import Base
 from utils.utils import generate_uuid
+
+from daos.collection_dao import Collection
+from daos.flashcard_dao import Flashcard
+from daos.tag_dao import Tag
+from daos.user_dao import User
 
 
 class Note(Base):
