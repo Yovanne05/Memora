@@ -1,0 +1,23 @@
+---
+tags:
+  - notes
+summary: Révoquer un partage de note
+description: Supprime l'accès d'un utilisateur à la note spécifiée.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Note concernée par la révocation.
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de l'utilisateur à retirer.
+responses:
+  204:
+    description: Partage supprimé.
+  404:
+    description: Note ou partage introuvable.

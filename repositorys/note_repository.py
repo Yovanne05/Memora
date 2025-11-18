@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
-from daos.note_dao import Note
+from daos.note_dao import Note, NoteShare
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -11,6 +11,7 @@ from utils.enums import VisibilityEnum
 class NoteSearchParams:
     owner_id: Optional[str] = None
     collection_id: Optional[str] = None
+    shared_with_user_id: Optional[str] = None
     visibility: VisibilityEnum | None = None
     title_contains: Optional[str] = None
     content_contains: Optional[str] = None
@@ -45,11 +46,15 @@ def find_many(params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], in
     if p.ids:
         filters.append(Note.id.in_(p.ids))
 
-    stmt = (
-        select(Note)
-        .options(joinedload(Note.collection), joinedload(Note.owner))
-        .where(*filters)
+    stmt = select(Note).options(
+        joinedload(Note.collection), joinedload(Note.owner)
     )
+
+    if p.shared_with_user_id:
+        stmt = stmt.join(NoteShare, NoteShare.note_id == Note.id)
+        filters.append(NoteShare.user_id == p.shared_with_user_id)
+
+    stmt = stmt.where(*filters)
 
     sort_map = {
         "title": Note.title,
@@ -82,8 +87,8 @@ def find_one(note_id: str) -> Optional[Note]:
 
 def find_one_by_title(
     owner_id: str,
-    title: str,
     collection_id: str | None,
+    title: str,
 ) -> Optional[Note]:
     stmt = select(Note).where(
         Note.owner_id == owner_id,

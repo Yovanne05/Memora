@@ -104,3 +104,62 @@ definitions:
         items:
           $ref: "#/definitions/Note"
     required: ["total", "items"]
+
+  NoteShare:
+    type: object
+    description: Configuration de partage pour une note.
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note partagée.
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant de l'utilisateur destinataire.
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Niveau d'accès accordé.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du partage.
+    required: ["note_id", "user_id", "permission", "created_at"]
+
+  NoteShareCreatePayload:
+    type: object
+    required: ["user_id"]
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Utilisateur à qui donner accès.
+      permission:
+        type: string
+        enum: ["read", "write"]
+        default: "read"
+        description: Niveau de droit accordé.
+
+  NoteShareUpdatePayload:
+    type: object
+    required: ["permission"]
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Nouveau niveau d'accès.
+
+  NoteShareListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de partages pour la note.
+        example: 2
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/NoteShare"
+    required: ["total", "items"]

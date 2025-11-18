@@ -1,0 +1,32 @@
+---
+tags:
+  - notes
+summary: Mettre à jour une permission de partage
+description: >
+  Permet de modifier le niveau de permission accordé à un utilisateur
+  sur une note déjà partagée.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note.
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de l'utilisateur destinataire.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteShareUpdatePayload"
+responses:
+  200:
+    description: Partage mis à jour.
+    schema:
+      $ref: "#/definitions/NoteShare"
+  404:
+    description: Note ou partage introuvable.
