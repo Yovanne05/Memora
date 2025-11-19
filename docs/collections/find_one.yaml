@@ -1,0 +1,19 @@
+---
+tags:
+  - collections
+summary: Consulter une collection
+description: Retourne le détail complet d’une collection identifiée par son UUID.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la collection.
+responses:
+  200:
+    description: Collection trouvée.
+    schema:
+      $ref: "#/definitions/Collection"
+  404:
+    description: Aucune collection ne correspond à l’identifiant fourni.
