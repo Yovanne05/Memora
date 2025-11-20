@@ -1,0 +1,21 @@
+---
+tags:
+  - collections
+summary: Créer une collection
+description: >
+  Enregistre une nouvelle collection pour un utilisateur donné.
+parameters:
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/CollectionCreatePayload"
+responses:
+  201:
+    description: Collection créée avec succès.
+    schema:
+      $ref: "#/definitions/Collection"
+  409:
+    description: Une autre collection porte déjà ce nom pour ce propriétaire.
+  422:
+    description: Données invalides ou référence d’utilisateur inconnue.

@@ -1,0 +1,146 @@
+---
+tags:
+  - collections
+summary: Lister les collections
+description: >
+  Retourne la liste paginée des collections en appliquant des filtres facultatifs
+  (propriétaire, visibilité, texte).
+parameters:
+  - in: query
+    name: ownerId
+    type: string
+    format: uuid
+    required: false
+    description: Limite la recherche aux collections appartenant à cet utilisateur.
+  - in: query
+    name: visibility
+    type: string
+    enum: ["private", "public"]
+    required: false
+    description: Filtre les collections selon leur niveau de partage.
+  - in: query
+    name: titleContains
+    type: string
+    required: false
+    description: Sous-chaîne à rechercher dans le nom de la collection.
+  - in: query
+    name: ids
+    type: string
+    required: false
+    description: Liste CSV d’identifiants (ex. `uuid1,uuid2`) pour récupérer un sous-ensemble précis.
+  - in: query
+    name: sortBy
+    type: string
+    enum: ["title", "created_at", "updated_at"]
+    default: "created_at"
+    description: Champ utilisé pour trier les résultats.
+  - in: query
+    name: sortDir
+    type: string
+    enum: ["asc", "desc"]
+    default: "desc"
+    description: Ordre de tri.
+  - in: query
+    name: limit
+    type: integer
+    format: int32
+    default: 50
+    minimum: 1
+    maximum: 200
+    description: Nombre maximum d’éléments renvoyés.
+  - in: query
+    name: offset
+    type: integer
+    format: int32
+    default: 0
+    minimum: 0
+    description: Décalage pour la pagination.
+responses:
+  200:
+    description: Liste paginée des collections.
+    schema:
+      $ref: "#/definitions/CollectionListResponse"
+
+definitions:
+  Collection:
+    type: object
+    description: Représentation complète d'une collection MEMORA.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique de la collection.
+      name:
+        type: string
+        description: Nom de la collection.
+        maxLength: 50
+      description:
+        type: string
+        nullable: true
+        description: Description facultative.
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        description: Niveau de partage de la collection.
+      owner_id:
+        type: string
+        format: uuid
+        description: Identifiant du propriétaire.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création.
+      updated_at:
+        type: string
+        format: date-time
+        description: Dernière mise à jour.
+      notes:
+        type: array
+        description: Liste des notes associées à la collection.
+        items:
+          $ref: "#/definitions/Note"
+    required: ["id", "name", "visibility", "owner_id", "created_at", "updated_at"]
+
+  CollectionCreatePayload:
+    type: object
+    required: ["name", "owner_id"]
+    properties:
+      name:
+        type: string
+        maxLength: 50
+      description:
+        type: string
+        nullable: true
+      owner_id:
+        type: string
+        format: uuid
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        default: "private"
+
+  CollectionUpdatePayload:
+    type: object
+    properties:
+      name:
+        type: string
+        maxLength: 50
+      description:
+        type: string
+        nullable: true
+      visibility:
+        type: string
+        enum: ["private", "public"]
+
+  CollectionListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de collections correspondant au filtre.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Collection"
+    required: ["total", "items"]

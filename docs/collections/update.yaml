@@ -1,0 +1,30 @@
+---
+tags:
+  - collections
+summary: Mettre à jour une collection
+description: >
+  Modifie les champs fournis d’une collection existante. Les champs absents ne sont
+  pas altérés.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la collection à modifier.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/CollectionUpdatePayload"
+responses:
+  200:
+    description: Collection mise à jour.
+    schema:
+      $ref: "#/definitions/Collection"
+  404:
+    description: Collection introuvable.
+  409:
+    description: Le nouveau nom est déjà utilisé.
+  422:
+    description: Payload incohérent.

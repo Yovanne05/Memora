@@ -9,3 +9,4 @@ flask_jwt_extended==4.6.0
 pytz
 pymysql
 SQLAlchemy
+cryptography
