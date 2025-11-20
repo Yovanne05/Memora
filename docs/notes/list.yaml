@@ -3,21 +3,27 @@ tags:
   - notes
 summary: Lister les notes
 description: >
-  Retourne la liste paginée des notes en appliquant des filtres facultatifs
-  (propriétaire, collection, visibilité, texte).
+  Retourne la liste paginÃ©e des notes en appliquant des filtres facultatifs
+  (propriÃ©taire, collection, visibilitÃ©, texte).
 parameters:
   - in: query
     name: ownerId
     type: string
     format: uuid
     required: false
-    description: Limite la recherche aux notes appartenant à cet utilisateur.
+    description: Limite la recherche aux notes appartenant Ã  cet utilisateur.
   - in: query
     name: collectionId
     type: string
     format: uuid
     required: false
-    description: Filtre sur une collection précise.
+    description: Filtre sur une collection prÃ©cise.
+  - in: query
+    name: sharedWithUserId
+    type: string
+    format: uuid
+    required: false
+    description: Renvoie uniquement les notes partag?es avec cet utilisateur.
   - in: query
     name: visibility
     type: string
@@ -28,23 +34,23 @@ parameters:
     name: titleContains
     type: string
     required: false
-    description: Sous-chaîne à rechercher dans les titres.
+    description: Sous-chaÃ®ne Ã  rechercher dans les titres.
   - in: query
     name: contentContains
     type: string
     required: false
-    description: Sous-chaîne recherchée dans le contenu.
+    description: Sous-chaÃ®ne recherchÃ©e dans le contenu.
   - in: query
     name: ids
     type: string
     required: false
-    description: Liste CSV d’identifiants (ex. `uuid1,uuid2`) pour récupérer un sous-ensemble précis.
+    description: Liste CSV dâ€™identifiants (ex. `uuid1,uuid2`) pour rÃ©cupÃ©rer un sous-ensemble prÃ©cis.
   - in: query
     name: sortBy
     type: string
     enum: ["title", "created_at", "updated_at"]
     default: "created_at"
-    description: Champ utilisé pour trier les résultats.
+    description: Champ utilisÃ© pour trier les rÃ©sultats.
   - in: query
     name: sortDir
     type: string
@@ -58,16 +64,17 @@ parameters:
     default: 50
     minimum: 1
     maximum: 200
-    description: Nombre maximum d’éléments renvoyés.
+    description: Nombre maximum dâ€™Ã©lÃ©ments renvoyÃ©s.
   - in: query
     name: offset
     type: integer
     format: int32
     default: 0
     minimum: 0
-    description: Décalage pour la pagination.
+    description: DÃ©calage pour la pagination.
 responses:
   200:
-    description: Liste paginée des notes.
+    description: Liste paginÃ©e des notes.
     schema:
       $ref: "#/definitions/NoteListResponse"
+

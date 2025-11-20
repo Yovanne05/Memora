@@ -1,0 +1,21 @@
+---
+tags:
+  - notes
+summary: Lister les partages d'une note
+description: >
+  Retourne les utilisateurs avec lesquels la note est actuellement partagée,
+  ainsi que leur niveau de permission.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+responses:
+  200:
+    description: Liste des partages.
+    schema:
+      $ref: "#/definitions/NoteShareListResponse"
+  404:
+    description: Note introuvable.
