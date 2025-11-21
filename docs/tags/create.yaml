@@ -1,0 +1,18 @@
+---
+tags:
+  - tags
+summary: Creer un tag
+description: Cree un nouveau tag.
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      $ref: "#/definitions/TagCreatePayload"
+responses:
+  201:
+    description: Tag cree.
+    schema:
+      $ref: "#/definitions/Tag"
+  409:
+    description: Conflit sur le nom du tag.

@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from sqlalchemy import Tuple, func, select
 
-from daos.collection_dao import Collection
+from daos.collection_dao import Collection, CollectionTag
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -17,6 +17,7 @@ class CollectionSearchParams :
     visibility : VisibilityEnum | None = None
     title_contains : Optional[str] = None
     ids : Optional[list[str]] = None
+    tag_ids: Optional[list[str]] = None
 
     sort_by : Literal["title", "created_at", "updated_at"] = "created_at"
     sort_dir : Literal["asc", "desc"] = "desc"
@@ -84,6 +85,18 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
         filters.append(Collection.id.in_(param.ids))
 
     request = select(Collection).where(*filters)
+
+    if param.tag_ids:
+        for tag_id in param.tag_ids:
+            tag_exists = (
+                select(1)
+                .where(
+                    CollectionTag.collection_id == Collection.id,
+                    CollectionTag.tag_id == tag_id,
+                )
+                .exists()
+            )
+            request = request.where(tag_exists)
     sort_map = {
         "title": Collection.name,
         "created_at": Collection.created_at,

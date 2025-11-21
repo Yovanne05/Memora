@@ -8,8 +8,10 @@ from dtos.collection_dto import (
     CollectionCreateDTO,
     CollectionUpdateDTO,
 )
+from dtos.tag_assignment_dto import TagAssignmentDTO
 from querys.collection_query import CollectionFindQuery
-from services.impl.collection_service_impl import CollectionService
+from services.impl.collection.collection_service_impl import CollectionService
+from services.impl.collection.collection_tag_service_impl import collection_tag_service
 
 collection_service = CollectionService()
 
@@ -65,3 +67,34 @@ def update(collection_id : UUID) :
 def delete(collection_id : UUID):
     collection_service.delete(str(collection_id))
     return "", HTTPStatus.NO_CONTENT
+
+
+@swag_from("../docs/collections/tags_list.yaml")
+@bp_collections.get("/<uuid:collection_id>/tags")
+def list_collection_tags(collection_id: UUID):
+    tag_dtos = collection_tag_service.list_tags(str(collection_id))
+    return (
+        jsonify(
+            {
+                "items": [dto.model_dump() for dto in tag_dtos],
+                "total": len(tag_dtos),
+            }
+        ),
+        HTTPStatus.OK,
+    )
+
+
+@swag_from("../docs/collections/tags_replace.yaml")
+@bp_collections.put("/<uuid:collection_id>/tags")
+def replace_collection_tags(collection_id: UUID):
+    payload = TagAssignmentDTO.model_validate_json(request.data)
+    tag_dtos = collection_tag_service.replace_tags(str(collection_id), payload)
+    return (
+        jsonify(
+            {
+                "items": [dto.model_dump() for dto in tag_dtos],
+                "total": len(tag_dtos),
+            }
+        ),
+        HTTPStatus.OK,
+    )

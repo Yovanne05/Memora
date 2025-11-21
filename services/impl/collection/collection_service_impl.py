@@ -3,7 +3,7 @@ from dtos.collection_dto import (CollectionCreateDTO, CollectionDTO, CollectionU
 from exceptions.collection_exception import (CollectionNotFound)
 from mappers.collection_mapper import collection_to_dto, dto_to_collection
 from repositorys.collection_repository import CollectionSearchParams
-from services.interfaces.collection_service_interface import (CollectionServiceInterface)
+from services.interfaces.collection.collection_service_interface import (CollectionServiceInterface)
 from typing import List, Optional, Tuple
 from repositorys import collection_repository
 from dtos.collection_dto import (CollectionCreateDTO, CollectionDTO, CollectionUpdateDTO)

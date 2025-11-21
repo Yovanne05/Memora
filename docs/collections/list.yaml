@@ -3,15 +3,15 @@ tags:
   - collections
 summary: Lister les collections
 description: >
-  Retourne la liste paginée des collections en appliquant des filtres facultatifs
-  (propriétaire, visibilité, texte).
+  Retourne la liste paginee des collections en appliquant des filtres facultatifs
+  (proprietaire, visibilite, texte).
 parameters:
   - in: query
     name: ownerId
     type: string
     format: uuid
     required: false
-    description: Limite la recherche aux collections appartenant à cet utilisateur.
+    description: Limite la recherche aux collections appartenant a cet utilisateur.
   - in: query
     name: visibility
     type: string
@@ -22,18 +22,23 @@ parameters:
     name: titleContains
     type: string
     required: false
-    description: Sous-chaîne à rechercher dans le nom de la collection.
+    description: Sous-chaine a rechercher dans le nom de la collection.
   - in: query
     name: ids
     type: string
     required: false
-    description: Liste CSV d’identifiants (ex. `uuid1,uuid2`) pour récupérer un sous-ensemble précis.
+    description: Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
+  - in: query
+    name: tagIds
+    type: string
+    required: false
+    description: Liste CSV d'identifiants de tags; la collection doit contenir tous les tags fournis.
   - in: query
     name: sortBy
     type: string
     enum: ["title", "created_at", "updated_at"]
     default: "created_at"
-    description: Champ utilisé pour trier les résultats.
+    description: Champ utilise pour trier les resultats.
   - in: query
     name: sortDir
     type: string
@@ -47,24 +52,24 @@ parameters:
     default: 50
     minimum: 1
     maximum: 200
-    description: Nombre maximum d’éléments renvoyés.
+    description: Nombre maximum d'elements renvoyes.
   - in: query
     name: offset
     type: integer
     format: int32
     default: 0
     minimum: 0
-    description: Décalage pour la pagination.
+    description: Decalage pour la pagination.
 responses:
   200:
-    description: Liste paginée des collections.
+    description: Liste paginee des collections.
     schema:
       $ref: "#/definitions/CollectionListResponse"
 
 definitions:
   Collection:
     type: object
-    description: Représentation complète d'une collection MEMORA.
+    description: Representation complete d'une collection MEMORA.
     properties:
       id:
         type: string
@@ -85,18 +90,18 @@ definitions:
       owner_id:
         type: string
         format: uuid
-        description: Identifiant du propriétaire.
+        description: Identifiant du proprietaire.
       created_at:
         type: string
         format: date-time
-        description: Date de création.
+        description: Date de creation.
       updated_at:
         type: string
         format: date-time
-        description: Dernière mise à jour.
+        description: Derniere mise a jour.
       notes:
         type: array
-        description: Liste des notes associées à la collection.
+        description: Liste des notes associees a la collection.
         items:
           $ref: "#/definitions/Note"
     required: ["id", "name", "visibility", "owner_id", "created_at", "updated_at"]

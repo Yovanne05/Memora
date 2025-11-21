@@ -1,0 +1,17 @@
+---
+tags:
+  - tags
+summary: Supprimer un tag
+description: Supprime un tag existant.
+parameters:
+  - in: path
+    name: tag_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant du tag.
+responses:
+  204:
+    description: Tag supprime.
+  404:
+    description: Tag introuvable.
