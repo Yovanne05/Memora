@@ -1,0 +1,32 @@
+---
+tags:
+  - collections
+summary: Mettre a jour une permission de partage
+description: >
+  Permet de modifier le niveau de permission accorde a un utilisateur
+  sur une collection deja partagee.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la collection.
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de l'utilisateur destinataire.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/CollectionShareUpdatePayload"
+responses:
+  200:
+    description: Partage mis a jour.
+    schema:
+      $ref: "#/definitions/CollectionShare"
+  404:
+    description: Collection ou partage introuvable.

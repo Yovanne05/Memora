@@ -8,8 +8,15 @@ from dtos.collection_dto import (
     CollectionCreateDTO,
     CollectionUpdateDTO,
 )
+from dtos.collection_share_dto import (
+    CollectionShareCreateDTO,
+    CollectionShareUpdateDTO,
+)
 from querys.collection_query import CollectionFindQuery
-from services.impl.collection_service_impl import CollectionService
+from services.impl.collection.collection_service_impl import CollectionService
+from services.impl.collection.collection_share_service_impl import (
+    collection_share_service,
+)
 
 collection_service = CollectionService()
 
@@ -64,4 +71,46 @@ def update(collection_id : UUID) :
 @bp_collections.delete("/<uuid:collection_id>")
 def delete(collection_id : UUID):
     collection_service.delete(str(collection_id))
+    return "", HTTPStatus.NO_CONTENT
+
+
+@swag_from("../docs/collections/share_list.yaml")
+@bp_collections.get("/<uuid:collection_id>/shares")
+def list_shares(collection_id: UUID):
+    share_dtos = collection_share_service.list_shares(str(collection_id))
+    return (
+        jsonify(
+            {
+                "items": [dto.model_dump() for dto in share_dtos],
+                "total": len(share_dtos),
+            }
+        ),
+        HTTPStatus.OK,
+    )
+
+
+@swag_from("../docs/collections/share_create.yaml")
+@bp_collections.post("/<uuid:collection_id>/shares")
+def share_collection(collection_id: UUID):
+    payload = CollectionShareCreateDTO.model_validate_json(request.data)
+    share_dto = collection_share_service.share_collection(
+        str(collection_id), payload
+    )
+    return jsonify(share_dto.model_dump()), HTTPStatus.CREATED
+
+
+@swag_from("../docs/collections/share_update.yaml")
+@bp_collections.patch("/<uuid:collection_id>/shares/<uuid:user_id>")
+def update_share(collection_id: UUID, user_id: UUID):
+    payload = CollectionShareUpdateDTO.model_validate_json(request.data)
+    share_dto = collection_share_service.update_share(
+        str(collection_id), str(user_id), payload
+    )
+    return jsonify(share_dto.model_dump()), HTTPStatus.OK
+
+
+@swag_from("../docs/collections/share_delete.yaml")
+@bp_collections.delete("/<uuid:collection_id>/shares/<uuid:user_id>")
+def revoke_share(collection_id: UUID, user_id: UUID):
+    collection_share_service.revoke_share(str(collection_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT

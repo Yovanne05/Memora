@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from typing_extensions import Literal
 
-from sqlalchemy import Tuple, func, select
+from sqlalchemy import func, select
 
-from daos.collection_dao import Collection
+from daos.collection_dao import Collection, CollectionTag, CollectionShare
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -17,6 +17,8 @@ class CollectionSearchParams :
     visibility : VisibilityEnum | None = None
     title_contains : Optional[str] = None
     ids : Optional[list[str]] = None
+    tag_ids: Optional[list[str]] = None
+    shared_with_user_id: Optional[str] = None
 
     sort_by : Literal["title", "created_at", "updated_at"] = "created_at"
     sort_dir : Literal["asc", "desc"] = "desc"
@@ -84,6 +86,28 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
         filters.append(Collection.id.in_(param.ids))
 
     request = select(Collection).where(*filters)
+
+    if param.tag_ids:
+        for tag_id in param.tag_ids:
+            tag_exists = (
+                select(1)
+                .where(
+                    CollectionTag.collection_id == Collection.id,
+                    CollectionTag.tag_id == tag_id,
+                )
+                .exists()
+            )
+            request = request.where(tag_exists)
+    request = select(Collection)
+
+    if param.shared_with_user_id:
+        request = request.join(
+            CollectionShare,
+            CollectionShare.collection_id == Collection.id,
+        )
+        filters.append(CollectionShare.user_id == param.shared_with_user_id)
+
+    request = request.where(*filters)
     sort_map = {
         "title": Collection.name,
         "created_at": Collection.created_at,

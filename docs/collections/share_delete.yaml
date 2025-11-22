@@ -1,0 +1,23 @@
+---
+tags:
+  - collections
+summary: Revoquer un partage de collection
+description: Supprime l'acces d'un utilisateur a la collection specifiee.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Collection concernee par la revocation.
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de l'utilisateur a retirer.
+responses:
+  204:
+    description: Partage supprime.
+  404:
+    description: Collection ou partage introuvable.
