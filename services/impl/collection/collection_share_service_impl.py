@@ -21,9 +21,7 @@ from repositorys import (
     collection_share_repository,
     user_repository,
 )
-from services.interfaces.collection.collection_share_service_interface import (
-    CollectionShareServiceInterface,
-)
+from services.interfaces.collection.collection_share_service_interface import CollectionShareServiceInterface
 
 
 class CollectionShareService(CollectionShareServiceInterface):
