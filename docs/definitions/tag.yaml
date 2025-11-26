@@ -1,0 +1,58 @@
+definitions:
+  Tag:
+    type: object
+    description: Representation d'un tag MEMORA.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique du tag.
+      name:
+        type: string
+        description: Nom du tag.
+        maxLength: 100
+      created_at:
+        type: string
+        format: date-time
+        description: Date de creation.
+    required: ["id", "name", "created_at"]
+
+  TagCreatePayload:
+    type: object
+    required: ["name"]
+    properties:
+      name:
+        type: string
+        maxLength: 100
+        description: Nom du tag.
+
+  TagUpdatePayload:
+    type: object
+    properties:
+      name:
+        type: string
+        maxLength: 100
+        description: Nouveau nom du tag.
+
+  TagListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de tags correspondant au filtre.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Tag"
+    required: ["total", "items"]
+
+  TagAssignPayload:
+    type: object
+    properties:
+      tagIds:
+        type: array
+        items:
+          type: string
+          format: uuid
+        description: Liste d'identifiants de tags a associer. Remplace l'ensemble existant.

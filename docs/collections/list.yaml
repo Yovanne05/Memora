@@ -3,15 +3,15 @@ tags:
   - collections
 summary: Lister les collections
 description: >
-  Retourne la liste paginée des collections en appliquant des filtres facultatifs
-  (propriétaire, visibilité, texte).
+  Retourne la liste paginee des collections en appliquant des filtres facultatifs
+  (proprietaire, visibilite, texte).
 parameters:
   - in: query
     name: ownerId
     type: string
     format: uuid
     required: false
-    description: Limite la recherche aux collections appartenant à cet utilisateur.
+    description: Limite la recherche aux collections appartenant a cet utilisateur.
   - in: query
     name: sharedWithUserId
     type: string
@@ -28,7 +28,7 @@ parameters:
     name: titleContains
     type: string
     required: false
-    description: Sous-chaîne à rechercher dans le nom de la collection.
+    description: Sous-chaine a rechercher dans le nom de la collection.
   - in: query
     name: ids
     type: string
@@ -39,7 +39,7 @@ parameters:
     type: string
     enum: ["title", "created_at", "updated_at"]
     default: "created_at"
-    description: Champ utilisé pour trier les résultats.
+    description: Champ utilise pour trier les resultats.
   - in: query
     name: sortDir
     type: string
@@ -53,16 +53,16 @@ parameters:
     default: 50
     minimum: 1
     maximum: 200
-    description: Nombre maximum d’éléments renvoyés.
+    description: Nombre maximum d'elements renvoyes.
   - in: query
     name: offset
     type: integer
     format: int32
     default: 0
     minimum: 0
-    description: Décalage pour la pagination.
+    description: Decalage pour la pagination.
 responses:
   200:
-    description: Liste paginée des collections.
+    description: Liste paginee des collections.
     schema:
       $ref: "#/definitions/CollectionListResponse"

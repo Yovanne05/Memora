@@ -6,9 +6,11 @@ from flasgger import swag_from
 
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
 from dtos.note_share_dto import NoteShareCreateDTO, NoteShareUpdateDTO
+from dtos.tag_assignment_dto import TagAssignmentDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
 from services.impl.note.note_share_service_impl import note_share_service
+from services.impl.note.note_tag_service_impl import note_tag_service
 
 bp_notes = Blueprint("notes", __name__, url_prefix="/notes")
 
@@ -97,3 +99,34 @@ def update_share(note_id: UUID, user_id: UUID):
 def revoke_share(note_id: UUID, user_id: UUID):
     note_share_service.revoke_share(str(note_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT
+
+
+@swag_from("../docs/notes/tags_list.yaml")
+@bp_notes.get("/<uuid:note_id>/tags")
+def list_note_tags(note_id: UUID):
+    tag_dtos = note_tag_service.list_tags(str(note_id))
+    return (
+        jsonify(
+            {
+                "items": [dto.model_dump() for dto in tag_dtos],
+                "total": len(tag_dtos),
+            }
+        ),
+        HTTPStatus.OK,
+    )
+
+
+@swag_from("../docs/notes/tags_replace.yaml")
+@bp_notes.put("/<uuid:note_id>/tags")
+def replace_note_tags(note_id: UUID):
+    payload = TagAssignmentDTO.model_validate_json(request.data)
+    tag_dtos = note_tag_service.replace_tags(str(note_id), payload)
+    return (
+        jsonify(
+            {
+                "items": [dto.model_dump() for dto in tag_dtos],
+                "total": len(tag_dtos),
+            }
+        ),
+        HTTPStatus.OK,
+    )

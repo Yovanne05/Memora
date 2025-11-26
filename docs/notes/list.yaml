@@ -3,27 +3,27 @@ tags:
   - notes
 summary: Lister les notes
 description: >
-  Retourne la liste paginÃ©e des notes en appliquant des filtres facultatifs
-  (propriÃ©taire, collection, visibilitÃ©, texte).
+  Retourne la liste paginee des notes en appliquant des filtres facultatifs
+  (proprietaire, collection, visibilite, texte).
 parameters:
   - in: query
     name: ownerId
     type: string
     format: uuid
     required: false
-    description: Limite la recherche aux notes appartenant Ã  cet utilisateur.
+    description: Limite la recherche aux notes appartenant a cet utilisateur.
   - in: query
     name: collectionId
     type: string
     format: uuid
     required: false
-    description: Filtre sur une collection prÃ©cise.
+    description: Filtre sur une collection precise.
   - in: query
     name: sharedWithUserId
     type: string
     format: uuid
     required: false
-    description: Renvoie uniquement les notes partag?es avec cet utilisateur.
+    description: Renvoie uniquement les notes partagees avec cet utilisateur.
   - in: query
     name: visibility
     type: string
@@ -34,23 +34,28 @@ parameters:
     name: titleContains
     type: string
     required: false
-    description: Sous-chaÃ®ne Ã  rechercher dans les titres.
+    description: Sous-chaine a rechercher dans les titres.
   - in: query
     name: contentContains
     type: string
     required: false
-    description: Sous-chaÃ®ne recherchÃ©e dans le contenu.
+    description: Sous-chaine recherchee dans le contenu.
   - in: query
     name: ids
     type: string
     required: false
-    description: Liste CSV dâ€™identifiants (ex. `uuid1,uuid2`) pour rÃ©cupÃ©rer un sous-ensemble prÃ©cis.
+    description: Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
+  - in: query
+    name: tagIds
+    type: string
+    required: false
+    description: Liste CSV d'identifiants de tags; la note doit contenir tous les tags fournis.
   - in: query
     name: sortBy
     type: string
     enum: ["title", "created_at", "updated_at"]
     default: "created_at"
-    description: Champ utilisÃ© pour trier les rÃ©sultats.
+    description: Champ utilise pour trier les resultats.
   - in: query
     name: sortDir
     type: string
@@ -64,17 +69,16 @@ parameters:
     default: 50
     minimum: 1
     maximum: 200
-    description: Nombre maximum dâ€™Ã©lÃ©ments renvoyÃ©s.
+    description: Nombre maximum d'elements renvoyes.
   - in: query
     name: offset
     type: integer
     format: int32
     default: 0
     minimum: 0
-    description: DÃ©calage pour la pagination.
+    description: Decalage pour la pagination.
 responses:
   200:
-    description: Liste paginÃ©e des notes.
+    description: Liste paginee des notes.
     schema:
       $ref: "#/definitions/NoteListResponse"
-
