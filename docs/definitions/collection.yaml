@@ -1,44 +1,45 @@
+definitions:
   Collection:
     type: object
-    description: Représentation complète d'une collection de notes dans MEMORA.
+    description: Complete representation of a collection in MEMORA.
     properties:
       id:
         type: string
         format: uuid
-        description: Identifiant unique de la collection.
+        description: Unique identifier of the collection.
         example: "2be69704-ec97-4dce-903f-1f1dd01bc172"
       name:
         type: string
-        description: Nom de la collection, unique pour un même propriétaire.
+        description: Collection name, unique per owner.
         example: "Mes cours de maths"
       description:
         type: string
         nullable: true
-        description: Description facultative de la collection.
+        description: Optional description.
         example: "Collection de mes cours de maths"
       visibility:
         type: string
         enum: ["private", "public"]
-        description: Contrôle qui peut voir la collection.
+        description: Who can see the collection.
         example: "private"
       owner_id:
         type: string
         format: uuid
-        description: Identifiant du propriétaire de la collection.
+        description: Identifier of the collection owner.
         example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
       created_at:
         type: string
         format: date-time
-        description: Date de création de la collection.
+        description: Creation date.
         example: "2025-05-12T09:23:41Z"
       updated_at:
         type: string
         format: date-time
-        description: Dernière mise à jour de la collection.
+        description: Last update date.
         example: "2025-05-15T16:02:07Z"
       notes:
         type: array
-        description: Liste des notes rattachées à cette collection.
+        description: Notes linked to this collection.
         items:
           $ref: "#/definitions/Note"
     required:
@@ -52,62 +53,121 @@
 
   CollectionCreatePayload:
     type: object
-    description: Données nécessaires pour créer une nouvelle collection.
+    description: Data needed to create a collection.
     required: ["name", "owner_id"]
     properties:
       name:
         type: string
         maxLength: 50
-        description: Nom de la collection.
+        description: Collection name.
         example: "Mes cours de maths"
       description:
         type: string
         nullable: true
-        description: Description facultative.
+        description: Optional description.
         example: "Collection de mes cours de maths"
       owner_id:
         type: string
         format: uuid
-        description: Identifiant de l’utilisateur qui crée la collection.
+        description: Identifier of the user creating the collection.
         example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
       visibility:
         type: string
         enum: ["private", "public"]
         default: "private"
-        description: Niveau de visibilité de la collection.
+        description: Visibility level.
         example: "private"
 
   CollectionUpdatePayload:
     type: object
-    description: Champs modifiables d’une collection.
+    description: Fields that can be updated on a collection.
     properties:
       name:
         type: string
         maxLength: 50
-        description: Nouveau nom de la collection.
-        example: "Mes cours d'algèbre"
+        description: New name.
+        example: "Mes cours d'algebre"
       description:
         type: string
         nullable: true
-        description: Nouvelle description.
-        example: "Collection mise à jour avec de nouveaux cours en algèbre"
+        description: New description.
+        example: "Collection mise a jour avec de nouveaux cours en algebre"
       visibility:
         type: string
         enum: ["private", "public"]
-        description: Nouvelle visibilité.
+        description: New visibility.
         example: "public"
 
   CollectionListResponse:
     type: object
-    description: Réponse paginée pour la liste des collections.
+    description: Paginated response for collections.
     properties:
       total:
         type: integer
         format: int32
-        description: Nombre total de collections correspondant au filtre.
+        description: Total number of collections matching the filter.
         example: 42
       items:
         type: array
         items:
           $ref: "#/definitions/Collection"
+    required: ["total", "items"]
+
+  CollectionShare:
+    type: object
+    description: Sharing configuration for a collection.
+    properties:
+      collection_id:
+        type: string
+        format: uuid
+        description: Identifier of the shared collection.
+      user_id:
+        type: string
+        format: uuid
+        description: Target user.
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Access level granted.
+      created_at:
+        type: string
+        format: date-time
+        description: Date when the share was created.
+    required: ["collection_id", "user_id", "permission", "created_at"]
+
+  CollectionShareCreatePayload:
+    type: object
+    required: ["user_id"]
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: User to grant access to.
+      permission:
+        type: string
+        enum: ["read", "write"]
+        default: "read"
+        description: Access level to grant.
+
+  CollectionShareUpdatePayload:
+    type: object
+    required: ["permission"]
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: New access level.
+
+  CollectionShareListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Number of shares for the collection.
+        example: 2
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/CollectionShare"
     required: ["total", "items"]
