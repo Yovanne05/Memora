@@ -7,6 +7,7 @@ from uuid import UUID
 
 class CollectionFindQuery(BaseModel) :
     owner_id : Optional[UUID] = Field(default=None, alias = "ownerId")
+    shared_with_user_id: Optional[UUID] = Field(default=None, alias="sharedWithUserId")
     visibility : VisibilityEnum | None = None
     title_contains : Optional[str] = Field(default = None, alias = "titleContains")
     ids : Optional[list[UUID]] = None
@@ -33,6 +34,7 @@ class CollectionFindQuery(BaseModel) :
     def to_params(self) -> CollectionSearchParams :
         return CollectionSearchParams(
             owner_id = str(self.owner_id) if self.owner_id else None,
+            shared_with_user_id=str(self.shared_with_user_id) if self.shared_with_user_id else None,
             visibility = self.visibility,
             title_contains = self.title_contains,
             ids = [str(item) for item in self.ids] if self.ids else None,
