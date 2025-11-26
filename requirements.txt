@@ -10,3 +10,4 @@ pytz
 psycopg2-binary
 SQLAlchemy
 cryptography
+pytest
