@@ -5,10 +5,12 @@ from flask import Blueprint, jsonify, request
 from flasgger import swag_from
 
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
+from dtos.note_link_dto import NoteLinkCreateDTO
 from dtos.note_share_dto import NoteShareCreateDTO, NoteShareUpdateDTO
 from dtos.tag_assignment_dto import TagAssignmentDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
+from services.impl.note.note_link_service_impl import note_link_service
 from services.impl.note.note_share_service_impl import note_share_service
 from services.impl.note.note_tag_service_impl import note_tag_service
 
@@ -98,6 +100,36 @@ def update_share(note_id: UUID, user_id: UUID):
 @bp_notes.delete("/<uuid:note_id>/shares/<uuid:user_id>")
 def revoke_share(note_id: UUID, user_id: UUID):
     note_share_service.revoke_share(str(note_id), str(user_id))
+    return "", HTTPStatus.NO_CONTENT
+
+
+@swag_from("../docs/notes/links_list.yaml")
+@bp_notes.get("/<uuid:note_id>/links")
+def list_links(note_id: UUID):
+    link_dtos = note_link_service.list_links(str(note_id))
+    return (
+        jsonify(
+            {
+                "items": [dto.model_dump() for dto in link_dtos],
+                "total": len(link_dtos),
+            }
+        ),
+        HTTPStatus.OK,
+    )
+
+
+@swag_from("../docs/notes/links_create.yaml")
+@bp_notes.post("/<uuid:note_id>/links")
+def create_link(note_id: UUID):
+    payload = NoteLinkCreateDTO.model_validate_json(request.data)
+    link_dto = note_link_service.create_link(str(note_id), payload)
+    return jsonify(link_dto.model_dump()), HTTPStatus.CREATED
+
+
+@swag_from("../docs/notes/links_delete.yaml")
+@bp_notes.delete("/<uuid:note_id>/links/<uuid:linked_note_id>")
+def delete_link(note_id: UUID, linked_note_id: UUID):
+    note_link_service.delete_link(str(note_id), str(linked_note_id))
     return "", HTTPStatus.NO_CONTENT
 
 

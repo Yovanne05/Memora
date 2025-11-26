@@ -58,7 +58,7 @@ definitions:
       owner_id:
         type: string
         format: uuid
-        description: Identifiant de l’utilisateur qui crée la note.
+        description: Identifiant de l'utilisateur qui crée la note.
       collection_id:
         type: string
         format: uuid
@@ -72,7 +72,7 @@ definitions:
 
   NoteUpdatePayload:
     type: object
-    description: Champs modifiables d’une note.
+    description: Champs modifiables d'une note.
     properties:
       title:
         type: string
@@ -162,4 +162,44 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/NoteShare"
+    required: ["total", "items"]
+
+  NoteLink:
+    type: object
+    description: Lien entre deux notes d'une même collection.
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note de référence utilisée dans la requête.
+      linked_note_id:
+        type: string
+        format: uuid
+        description: Note liée (dans la même collection).
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du lien.
+    required: ["note_id", "linked_note_id", "created_at"]
+
+  NoteLinkCreatePayload:
+    type: object
+    required: ["linked_note_id"]
+    properties:
+      linked_note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note à relier (même collection obligatoire).
+
+  NoteLinkListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de liens pour la note.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/NoteLink"
     required: ["total", "items"]

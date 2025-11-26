@@ -4,12 +4,18 @@ from domain_services.note_domain_service import apply_note_update
 from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
 from exceptions.note_exception import (
     NoteCollectionDoesNotExist,
+    NoteLinkCollectionChangeForbidden,
     NoteNotFound,
     NoteOwnerDoesNotExist,
     NoteTitleConflict,
 )
 from mappers.note_mapper import dto_to_note, note_to_dto
-from repositorys import collection_repository, note_repository, user_repository
+from repositorys import (
+    collection_repository,
+    note_link_repository,
+    note_repository,
+    user_repository,
+)
 from repositorys.note_repository import NoteSearchParams
 from services.interfaces.note.note_crud_service_interface import (
     NoteCrudServiceInterface,
@@ -54,6 +60,8 @@ class NoteCrudService(NoteCrudServiceInterface):
                 self._ensure_collection_allowed(
                     note_entity.owner_id, new_collection_id
                 )
+            if note_entity.collection_id != new_collection_id:
+                self._ensure_collection_change_allowed(note_entity.id)
 
         future_collection_id = (
             note_update_dto.collection_id
@@ -115,6 +123,10 @@ class NoteCrudService(NoteCrudServiceInterface):
         )
         if existing and existing.id != exclude_id:
             raise NoteTitleConflict()
+
+    def _ensure_collection_change_allowed(self, note_id: str) -> None:
+        if note_link_repository.find_by_note(note_id):
+            raise NoteLinkCollectionChangeForbidden()
 
 
 note_crud_service = NoteCrudService()
