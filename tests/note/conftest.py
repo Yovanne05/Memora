@@ -1,12 +1,25 @@
-﻿from datetime import datetime
+from datetime import datetime
+from typing import Optional, Tuple
 
 import config
 import pytest
 
 from app import create_app
-from dtos.note_dto import NoteDTO
-from dtos.note_share_dto import NoteShareDTO
+from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
+from dtos.note_share_dto import (
+    NoteShareCreateDTO,
+    NoteShareDTO,
+    NoteShareUpdateDTO,
+)
+from repositorys.note_repository import NoteSearchParams
+from services.interfaces.note.note_crud_service_interface import (
+    NoteCrudServiceInterface,
+)
+from services.interfaces.note.note_share_service_interface import (
+    NoteShareServiceInterface,
+)
 from utils.enums import SharePermissionEnum, VisibilityEnum
+from controllers import note_controller
 
 NOTE_ID = "11111111-1111-1111-1111-111111111111"
 OWNER_ID = "22222222-2222-2222-2222-222222222222"
@@ -14,24 +27,26 @@ SHARE_USER_ID = "33333333-3333-3333-3333-333333333333"
 COLLECTION_ID = "44444444-4444-4444-4444-444444444444"
 
 
-class StubNoteCrudService:
-    def __init__(self, note):
+class StubNoteCrudService(NoteCrudServiceInterface):
+    def __init__(self, note: NoteDTO):
         self.note = note
-        self.deleted_ids = []
-        self.last_find_params = None
-        self.last_find_one_id = None
-        self.last_create_payload = None
-        self.last_update_payload = None
+        self.deleted_ids: list[str] = []
+        self.last_find_params: Optional[NoteSearchParams] = None
+        self.last_find_one_id: str | None = None
+        self.last_create_payload: NoteCreateDTO | None = None
+        self.last_update_payload: Tuple[str, NoteUpdateDTO] | None = None
 
-    def find_many(self, params):
+    def find_many(
+        self, params: Optional[NoteSearchParams] = None
+    ) -> Tuple[list[NoteDTO], int]:
         self.last_find_params = params
         return [self.note], 1
 
-    def find_one(self, note_id):
+    def find_one(self, note_id: str) -> NoteDTO:
         self.last_find_one_id = note_id
         return self.note
 
-    def create(self, note_create_dto):
+    def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
         self.last_create_payload = note_create_dto
         return self.note.model_copy(
             update={
@@ -43,9 +58,11 @@ class StubNoteCrudService:
             }
         )
 
-    def update(self, note_id, note_update_dto):
+    def update(
+        self, note_id: str, note_update_dto: NoteUpdateDTO
+    ) -> NoteDTO:
         self.last_update_payload = (note_id, note_update_dto)
-        updates = {}
+        updates: dict = {}
         if note_update_dto.title is not None:
             updates["title"] = note_update_dto.title
         if note_update_dto.content is not None:
@@ -56,23 +73,27 @@ class StubNoteCrudService:
             updates["collection_id"] = note_update_dto.collection_id
         return self.note.model_copy(update=updates)
 
-    def delete(self, note_id):
+    def delete(self, note_id: str) -> None:
         self.deleted_ids.append(note_id)
 
 
-class StubNoteShareService:
-    def __init__(self, share):
+class StubNoteShareService(NoteShareServiceInterface):
+    def __init__(self, share: NoteShareDTO):
         self.share = share
-        self.last_list_note_id = None
-        self.last_share_payload = None
-        self.last_update_payload = None
-        self.revoked = None
+        self.last_list_note_id: str | None = None
+        self.last_share_payload: tuple[str, NoteShareCreateDTO] | None = None
+        self.last_update_payload: tuple[
+            str, str, NoteShareUpdateDTO
+        ] | None = None
+        self.revoked: tuple[str, str] | None = None
 
-    def list_shares(self, note_id):
+    def list_shares(self, note_id: str) -> list[NoteShareDTO]:
         self.last_list_note_id = note_id
         return [self.share]
 
-    def share_note(self, note_id, share_dto):
+    def share_note(
+        self, note_id: str, share_dto: NoteShareCreateDTO
+    ) -> NoteShareDTO:
         self.last_share_payload = (note_id, share_dto)
         return self.share.model_copy(
             update={
@@ -82,7 +103,9 @@ class StubNoteShareService:
             }
         )
 
-    def update_share(self, note_id, user_id, share_update_dto):
+    def update_share(
+        self, note_id: str, user_id: str, share_update_dto: NoteShareUpdateDTO
+    ) -> NoteShareDTO:
         self.last_update_payload = (note_id, user_id, share_update_dto)
         return self.share.model_copy(
             update={
@@ -92,7 +115,7 @@ class StubNoteShareService:
             }
         )
 
-    def revoke_share(self, note_id, user_id):
+    def revoke_share(self, note_id: str, user_id: str) -> None:
         self.revoked = (note_id, user_id)
 
 
@@ -130,8 +153,6 @@ def sample_share():
 
 @pytest.fixture
 def client_with_note_stubs(monkeypatch, sample_note, sample_share):
-    from controllers import note_controller
-
     crud_stub = StubNoteCrudService(sample_note)
     share_stub = StubNoteShareService(sample_share)
 
