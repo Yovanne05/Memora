@@ -33,6 +33,9 @@ export function CollectionsFeature() {
   const [tab, setTab] = useState<"mine" | "shared">("mine")
   const [sort, setSort] = useState<"recent" | "alphabetical">("recent")
 
+  const CURRENT_USER_ID = "user-1"  // TODO: remplacer par auth plus tard
+
+
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
 
@@ -55,10 +58,12 @@ export function CollectionsFeature() {
   const filtered = useMemo(() => {
     let list = [...collections]
 
-    // TODO: plus tard filtrer réellement "shared"
     if (tab === "mine") {
-      list = list
+      list = list.filter((c) => c.ownerId === CURRENT_USER_ID)
+    } else if (tab === "shared") {
+      list = list.filter((c) => c.ownerId !== CURRENT_USER_ID)
     }
+
 
     if (search.trim()) {
       const q = search.toLowerCase()
