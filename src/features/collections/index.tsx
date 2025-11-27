@@ -23,6 +23,9 @@ import {
   type CollectionFormValues,
 } from "./components/CollectionEditForm"
 
+import { DeleteCollectionDialog } from "./components/DeleteCollectionDialog"
+import { deleteCollection } from "./api"
+
 export function CollectionsFeature() {
   const { collections, setCollections, loading, error, reload } = useCollections()
 
@@ -32,6 +35,10 @@ export function CollectionsFeature() {
 
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
+
+  const [deleting, setDeleting] = useState<Collection | null>(null)
+  const [deletingLoading, setDeletingLoading] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const { create, loading: creating } = useCreateCollection((created) => {
     setCollections((prev) => [created, ...prev])
@@ -91,6 +98,23 @@ export function CollectionsFeature() {
     })
   }
 
+  const handleConfirmDelete = async () => {
+    if (!deleting) return
+
+    try {
+      setDeletingLoading(true)
+      setDeleteError(null)
+      await deleteCollection(deleting.id)
+      setCollections((prev) => prev.filter((c) => c.id !== deleting.id))
+      setDeleting(null)
+    } catch (err) {
+      console.error(err)
+      setDeleteError("Unable to delete this collection. Please try again.")
+    } finally {
+      setDeletingLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 px-10 py-8">
       <div className="mx-auto w-full max-w-6xl space-y-6">
@@ -125,6 +149,7 @@ export function CollectionsFeature() {
         <CollectionsGrid
           items={filtered}
           onEdit={setEditing}
+          onDelete={setDeleting}
         />
 
         {!loading && !error && filtered.length === 0 && (
@@ -182,6 +207,17 @@ export function CollectionsFeature() {
         </DialogContent>
       </Dialog>
 
+      <DeleteCollectionDialog
+        open={!!deleting}
+        collection={deleting}
+        loading={deletingLoading}
+        error={deleteError ?? undefined}
+        onCancel={() => {
+          setDeleting(null)
+          setDeleteError(null)
+        }}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }
