@@ -60,7 +60,7 @@ def create() :
 
 
 @swag_from("../docs/collections/update.yaml")
-@bp_collections.put("/<uuid:collection_id>")
+@bp_collections.patch("/<uuid:collection_id>")
 def update(collection_id : UUID) :
     payload = CollectionUpdateDTO.model_validate_json(request.data)
     collection = collection_service.update(str(collection_id), payload)
