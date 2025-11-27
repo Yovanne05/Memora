@@ -1,50 +1,23 @@
-from datetime import datetime
+from dataclasses import dataclass, field
+from uuid import uuid4
 
 import config
 import pytest
 
 from app import create_app
-from dtos.collection_share_dto import CollectionShareDTO
-from utils.enums import SharePermissionEnum
-
-COLLECTION_ID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-SHARE_USER_ID = "cccccccc-cccc-cccc-cccc-cccccccccccc"
-
-
-class StubCollectionShareService:
-    def __init__(self, share):
-        self.share = share
-        self.last_list_collection_id = None
-        self.last_share_payload = None
-        self.last_update_payload = None
-        self.revoked = None
-
-    def list_shares(self, collection_id):
-        self.last_list_collection_id = collection_id
-        return [self.share]
-
-    def share_collection(self, collection_id, share_dto):
-        self.last_share_payload = (collection_id, share_dto)
-        return self.share.model_copy(
-            update={
-                "collection_id": collection_id,
-                "user_id": share_dto.user_id,
-                "permission": share_dto.permission,
-            }
-        )
-
-    def update_share(self, collection_id, user_id, share_update_dto):
-        self.last_update_payload = (collection_id, user_id, share_update_dto)
-        return self.share.model_copy(
-            update={
-                "collection_id": collection_id,
-                "user_id": user_id,
-                "permission": share_update_dto.permission,
-            }
-        )
-
-    def revoke_share(self, collection_id, user_id):
-        self.revoked = (collection_id, user_id)
+from daos.user_dao import User
+from dtos.collection_dto import CollectionCreateDTO
+from dtos.collection_share_dto import CollectionShareCreateDTO
+from repositorys import (
+    collection_repository,
+    collection_share_repository,
+    user_repository,
+)
+from services.impl.collection.collection_service_impl import CollectionService
+from services.impl.collection.collection_share_service_impl import (
+    collection_share_service,
+)
+from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 
 @pytest.fixture(autouse=True)
@@ -52,27 +25,91 @@ def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
 
 
-@pytest.fixture
-def sample_share():
-    created = datetime(2024, 1, 3, 12, 0, 0)
-    return CollectionShareDTO(
-        collection_id=COLLECTION_ID,
-        user_id=SHARE_USER_ID,
-        permission=SharePermissionEnum.READ,
-        created_at=created,
+@dataclass
+class CollectionTestData:
+    owner_id: str = field(default_factory=lambda: str(uuid4()))
+    share_user_id: str = field(default_factory=lambda: str(uuid4()))
+    collection_id: str | None = None
+
+    created_users: set[str] = field(default_factory=set)
+    created_collections: set[str] = field(default_factory=set)
+    created_shares: set[tuple[str, str]] = field(default_factory=set)
+
+    collection_name: str = field(
+        default_factory=lambda: f"Integration collection {uuid4().hex[:8]}"
     )
 
+    def bootstrap(self) -> None:
+        self._ensure_user(self.owner_id, label="owner")
+        self._ensure_user(self.share_user_id, label="share-target")
+        self.collection_id = self._create_collection()
+
+    def _ensure_user(self, user_id: str, label: str) -> None:
+        if user_repository.find_one(user_id):
+            return
+
+        unique_suffix = str(uuid4())[:8]
+        user = User(
+            id=user_id,
+            email=f"{label}-{unique_suffix}@example.com",
+            username=f"{label}-{unique_suffix}",
+            display_name=f"{label.capitalize()} user",
+            password_hash="test-password-hash",
+            role=RoleEnum.CLIENT,
+        )
+        user_repository.add(user)
+        self.created_users.add(user_id)
+
+    def _create_collection(self) -> str:
+        dto = CollectionCreateDTO(
+            name=self.collection_name,
+            description="Collection created for collection share tests.",
+            owner_id=self.owner_id,
+            visibility=VisibilityEnum.PRIVATE,
+        )
+        service = CollectionService()
+        created = service.create(dto)
+        self.created_collections.add(created.id)
+        return created.id
+
+    def ensure_share(
+        self, permission: SharePermissionEnum = SharePermissionEnum.READ
+    ):
+        share = collection_share_service.share_collection(
+            self.collection_id,
+            CollectionShareCreateDTO(
+                user_id=self.share_user_id, permission=permission
+            ),
+        )
+        self.created_shares.add((self.collection_id, self.share_user_id))
+        return share
+
+    def track_created_share(self, collection_id: str, user_id: str) -> None:
+        self.created_shares.add((collection_id, user_id))
+
+    def cleanup(self) -> None:
+        for collection_id, user_id in self.created_shares:
+            collection_share_repository.delete(collection_id, user_id)
+
+        for collection_id in self.created_collections:
+            collection_repository.delete(collection_id)
+
+        for user_id in self.created_users:
+            user_repository.delete(user_id)
+
 
 @pytest.fixture
-def client_with_collection_share_stub(monkeypatch, sample_share):
-    from controllers import collection_controller
+def collection_test_data():
+    data = CollectionTestData()
+    data.bootstrap()
+    try:
+        yield data
+    finally:
+        data.cleanup()
 
-    share_stub = StubCollectionShareService(sample_share)
 
-    monkeypatch.setattr(
-        collection_controller, "collection_share_service", share_stub
-    )
-
+@pytest.fixture
+def client_with_collection_data(collection_test_data):
     app = create_app()
     with app.test_client() as client:
-        yield client, share_stub
+        yield client, collection_test_data

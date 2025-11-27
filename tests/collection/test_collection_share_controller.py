@@ -1,61 +1,58 @@
-from conftest import COLLECTION_ID, SHARE_USER_ID
 from utils.enums import SharePermissionEnum
 
 
-def test_list_shares_returns_items(client_with_collection_share_stub):
-    client, share_stub = client_with_collection_share_stub
-    response = client.get(f"/collections/{COLLECTION_ID}/shares")
+def test_list_shares_returns_items(client_with_collection_data):
+    client, data = client_with_collection_data
+    data.ensure_share()
+
+    response = client.get(f"/collections/{data.collection_id}/shares")
 
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["total"] == 1
-    assert payload["items"][0]["user_id"] == SHARE_USER_ID
-    assert share_stub.last_list_collection_id == COLLECTION_ID
+    assert payload["items"][0]["user_id"] == data.share_user_id
 
 
-def test_share_collection_returns_created_share(client_with_collection_share_stub):
-    client, share_stub = client_with_collection_share_stub
+def test_share_collection_returns_created_share(client_with_collection_data):
+    client, data = client_with_collection_data
     payload = {
-        "user_id": SHARE_USER_ID,
+        "user_id": data.share_user_id,
         "permission": SharePermissionEnum.WRITE.value,
     }
 
     response = client.post(
-        f"/collections/{COLLECTION_ID}/shares", json=payload
+        f"/collections/{data.collection_id}/shares", json=payload
     )
 
     assert response.status_code == 201
     body = response.get_json()
-    assert body["collection_id"] == COLLECTION_ID
-    assert body["user_id"] == SHARE_USER_ID
+    assert body["collection_id"] == data.collection_id
+    assert body["user_id"] == data.share_user_id
     assert body["permission"] == SharePermissionEnum.WRITE.value
-    share_call = share_stub.last_share_payload
-    assert share_call[0] == COLLECTION_ID
-    assert share_call[1].permission == SharePermissionEnum.WRITE
+    data.track_created_share(data.collection_id, data.share_user_id)
 
 
-def test_update_share_returns_updated_share(client_with_collection_share_stub):
-    client, share_stub = client_with_collection_share_stub
+def test_update_share_returns_updated_share(client_with_collection_data):
+    client, data = client_with_collection_data
+    data.ensure_share()
     payload = {"permission": SharePermissionEnum.WRITE.value}
 
     response = client.patch(
-        f"/collections/{COLLECTION_ID}/shares/{SHARE_USER_ID}", json=payload
+        f"/collections/{data.collection_id}/shares/{data.share_user_id}",
+        json=payload,
     )
 
     assert response.status_code == 200
     body = response.get_json()
     assert body["permission"] == SharePermissionEnum.WRITE.value
-    update_call = share_stub.last_update_payload
-    assert update_call[0] == COLLECTION_ID
-    assert update_call[1] == SHARE_USER_ID
 
 
-def test_revoke_share_calls_service(client_with_collection_share_stub):
-    client, share_stub = client_with_collection_share_stub
+def test_revoke_share_calls_service(client_with_collection_data):
+    client, data = client_with_collection_data
+    data.ensure_share()
 
     response = client.delete(
-        f"/collections/{COLLECTION_ID}/shares/{SHARE_USER_ID}"
+        f"/collections/{data.collection_id}/shares/{data.share_user_id}"
     )
 
     assert response.status_code == 204
-    assert share_stub.revoked == (COLLECTION_ID, SHARE_USER_ID)

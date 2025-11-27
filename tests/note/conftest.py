@@ -1,209 +1,175 @@
-from datetime import datetime
-from typing import Optional, Tuple
+﻿from dataclasses import dataclass, field
+from uuid import uuid4
 
 import config
 import pytest
+from werkzeug.test import Client
 
 from app import create_app
-from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
-from dtos.note_link_dto import NoteLinkCreateDTO, NoteLinkDTO
-from dtos.note_share_dto import (
-    NoteShareCreateDTO,
-    NoteShareDTO,
-    NoteShareUpdateDTO,
-)
-from repositorys.note_repository import NoteSearchParams
-from services.interfaces.note.note_crud_service_interface import (
-    NoteCrudServiceInterface,
-)
-from services.interfaces.note.note_link_service_interface import (
-    NoteLinkServiceInterface,
-)
-from services.interfaces.note.note_share_service_interface import (
-    NoteShareServiceInterface,
-)
-from utils.enums import SharePermissionEnum, VisibilityEnum
-from controllers import note_controller
-
-NOTE_ID = "11111111-1111-1111-1111-111111111111"
-OWNER_ID = "22222222-2222-2222-2222-222222222222"
-SHARE_USER_ID = "33333333-3333-3333-3333-333333333333"
-COLLECTION_ID = "44444444-4444-4444-4444-444444444444"
-LINKED_NOTE_ID = "55555555-5555-5555-5555-555555555555"
-
-
-class StubNoteCrudService(NoteCrudServiceInterface):
-    def __init__(self, note: NoteDTO):
-        self.note = note
-        self.deleted_ids: list[str] = []
-        self.last_find_params: Optional[NoteSearchParams] = None
-        self.last_find_one_id: str | None = None
-        self.last_create_payload: NoteCreateDTO | None = None
-        self.last_update_payload: Tuple[str, NoteUpdateDTO] | None = None
-
-    def find_many(
-        self, params: Optional[NoteSearchParams] = None
-    ) -> Tuple[list[NoteDTO], int]:
-        self.last_find_params = params
-        return [self.note], 1
-
-    def find_one(self, note_id: str) -> NoteDTO:
-        self.last_find_one_id = note_id
-        return self.note
-
-    def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
-        self.last_create_payload = note_create_dto
-        return self.note.model_copy(
-            update={
-                "title": note_create_dto.title,
-                "content": note_create_dto.content,
-                "owner_id": note_create_dto.owner_id,
-                "collection_id": note_create_dto.collection_id,
-                "visibility": note_create_dto.visibility,
-            }
-        )
-
-    def update(
-        self, note_id: str, note_update_dto: NoteUpdateDTO
-    ) -> NoteDTO:
-        self.last_update_payload = (note_id, note_update_dto)
-        updates: dict = {}
-        if note_update_dto.title is not None:
-            updates["title"] = note_update_dto.title
-        if note_update_dto.content is not None:
-            updates["content"] = note_update_dto.content
-        if note_update_dto.visibility is not None:
-            updates["visibility"] = note_update_dto.visibility
-        if "collection_id" in note_update_dto.model_fields_set:
-            updates["collection_id"] = note_update_dto.collection_id
-        return self.note.model_copy(update=updates)
-
-    def delete(self, note_id: str) -> None:
-        self.deleted_ids.append(note_id)
-
-
-class StubNoteShareService(NoteShareServiceInterface):
-    def __init__(self, share: NoteShareDTO):
-        self.share = share
-        self.last_list_note_id: str | None = None
-        self.last_share_payload: tuple[str, NoteShareCreateDTO] | None = None
-        self.last_update_payload: tuple[
-            str, str, NoteShareUpdateDTO
-        ] | None = None
-        self.revoked: tuple[str, str] | None = None
-
-    def list_shares(self, note_id: str) -> list[NoteShareDTO]:
-        self.last_list_note_id = note_id
-        return [self.share]
-
-    def share_note(
-        self, note_id: str, share_dto: NoteShareCreateDTO
-    ) -> NoteShareDTO:
-        self.last_share_payload = (note_id, share_dto)
-        return self.share.model_copy(
-            update={
-                "note_id": note_id,
-                "user_id": share_dto.user_id,
-                "permission": share_dto.permission,
-            }
-        )
-
-    def update_share(
-        self, note_id: str, user_id: str, share_update_dto: NoteShareUpdateDTO
-    ) -> NoteShareDTO:
-        self.last_update_payload = (note_id, user_id, share_update_dto)
-        return self.share.model_copy(
-            update={
-                "note_id": note_id,
-                "user_id": user_id,
-                "permission": share_update_dto.permission,
-            }
-        )
-
-    def revoke_share(self, note_id: str, user_id: str) -> None:
-        self.revoked = (note_id, user_id)
-
-
-class StubNoteLinkService(NoteLinkServiceInterface):
-    def __init__(self, link: NoteLinkDTO):
-        self.link = link
-        self.last_list_note_id: str | None = None
-        self.last_create_payload: tuple[
-            str, NoteLinkCreateDTO
-        ] | None = None
-        self.deleted: tuple[str, str] | None = None
-
-    def list_links(self, note_id: str) -> list[NoteLinkDTO]:
-        self.last_list_note_id = note_id
-        return [self.link]
-
-    def create_link(
-        self, note_id: str, payload: NoteLinkCreateDTO
-    ) -> NoteLinkDTO:
-        self.last_create_payload = (note_id, payload)
-        return self.link.model_copy(
-            update={
-                "note_id": note_id,
-                "linked_note_id": payload.linked_note_id,
-            }
-        )
-
-    def delete_link(self, note_id: str, linked_note_id: str) -> None:
-        self.deleted = (note_id, linked_note_id)
+from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
 
+@dataclass
+class NoteTestData:
+    client: Client
+    owner_id: str | None = None
+    share_user_id: str | None = None
+    collection_id: str | None = None
+    note_id: str | None = None
+    linked_note_id: str | None = None
+    collection_name: str = field(default_factory=lambda: f"Integration collection {uuid4().hex[:8]}")
+
+    created_user_ids: set[str] = field(default_factory=set)
+    created_collection_ids: set[str] = field(default_factory=set)
+    created_note_ids: set[str] = field(default_factory=set)
+    created_shares: set[tuple[str, str]] = field(default_factory=set)
+    created_links: set[tuple[str, str]] = field(default_factory=set)
+
+    base_slug: str = field(default_factory=lambda: uuid4().hex[:8])
+    linked_slug: str = field(default_factory=lambda: uuid4().hex[:8])
+    base_title: str | None = None
+    linked_title: str | None = None
+    search_term: str | None = None
+
+    def bootstrap(self) -> None:
+        self.base_title = f"Integration note {self.base_slug}"
+        self.linked_title = f"Linked note {self.linked_slug}"
+        self.search_term = self.base_slug
+
+        self.owner_id = self._create_user("owner")
+        self.share_user_id = self._create_user("share-target")
+        self.collection_id = self._create_collection()
+
+        self.note_id = self._create_note(
+            title=self.base_title,
+            content="Primary content used for note controller tests.",
+        )
+        self.linked_note_id = self._create_note(
+            title=self.linked_title,
+            content="Linked note content for relationship tests.",
+        )
+
+    def _create_user(self, label: str) -> str:
+        unique = uuid4().hex[:8]
+        payload = {
+            "email": f"{label}-{self.base_slug}-{unique}@example.com",
+            "password": f"TestPwd-{self.base_slug}-{unique}",
+            "username": f"{label}-{self.base_slug}-{unique}",
+            "display_name": f"{label.capitalize()} user {unique}",
+            "role": RoleEnum.CLIENT.value,
+        }
+        response = self.client.post("/users", json=payload)
+        assert response.status_code == 201, response.get_data(as_text=True)
+        body = response.get_json()
+        self.created_user_ids.add(body["id"])
+        return body["id"]
+
+    def _create_collection(self) -> str:
+        payload = {
+            "name": self.collection_name,
+            "description": f"Collection created for note controller tests {self.base_slug}.",
+            "owner_id": self.owner_id,
+            "visibility": VisibilityEnum.PRIVATE.value,
+        }
+        response = self.client.post("/collections", json=payload)
+        assert response.status_code == 201, response.get_data(as_text=True)
+        body = response.get_json()
+        self.created_collection_ids.add(body["id"])
+        return body["id"]
+
+    def _create_note(self, title: str, content: str) -> str:
+        payload = {
+            "title": title,
+            "content": content,
+            "owner_id": self.owner_id,
+            "collection_id": self.collection_id,
+            "visibility": VisibilityEnum.PRIVATE.value,
+        }
+        response = self.client.post("/notes", json=payload)
+        assert response.status_code == 201, response.get_data(as_text=True)
+        body = response.get_json()
+        self.created_note_ids.add(body["id"])
+        return body["id"]
+
+    def ensure_share(
+        self, permission: SharePermissionEnum = SharePermissionEnum.READ
+    ):
+        response = self.client.post(
+            f"/notes/{self.note_id}/shares",
+            json={
+                "user_id": self.share_user_id,
+                "permission": permission.value,
+            },
+        )
+        assert response.status_code == 201, response.get_data(as_text=True)
+        body = response.get_json()
+        self.created_shares.add((self.note_id, self.share_user_id))
+        return body
+
+    def ensure_link(self):
+        response = self.client.post(
+            f"/notes/{self.note_id}/links",
+            json={"linked_note_id": self.linked_note_id},
+        )
+        assert response.status_code == 201, response.get_data(as_text=True)
+        body = response.get_json()
+        self.created_links.add((self.note_id, self.linked_note_id))
+        return body
+
+    def track_created_note(self, note_id: str) -> None:
+        self.created_note_ids.add(note_id)
+
+    def track_created_share(self, note_id: str, user_id: str) -> None:
+        self.created_shares.add((note_id, user_id))
+
+    def track_created_link(self, note_id: str, linked_note_id: str) -> None:
+        self.created_links.add((note_id, linked_note_id))
+
+    def cleanup(self) -> None:
+        for note_id, linked_note_id in self.created_links:
+            self._delete_if_exists(f"/notes/{note_id}/links/{linked_note_id}")
+
+        for note_id, user_id in self.created_shares:
+            self._delete_if_exists(f"/notes/{note_id}/shares/{user_id}")
+
+        for note_id in self.created_note_ids:
+            self._delete_if_exists(f"/notes/{note_id}")
+
+        for collection_id in self.created_collection_ids:
+            self._delete_if_exists(f"/collections/{collection_id}")
+
+        for user_id in self.created_user_ids:
+            self._delete_if_exists(f"/users/{user_id}")
+
+    def _delete_if_exists(self, path: str) -> None:
+        response = self.client.delete(path)
+        if response.status_code not in (204, 404):
+            raise AssertionError(
+                f"Cleanup failed for {path}: {response.status_code} {response.get_data(as_text=True)}"
+            )
+
 
 @pytest.fixture
-def sample_note():
-    created = datetime(2024, 1, 1, 12, 0, 0)
-    updated = datetime(2024, 1, 2, 12, 0, 0)
-    return NoteDTO(
-        id=NOTE_ID,
-        title="Sample note",
-        content="Some content",
-        visibility=VisibilityEnum.PRIVATE,
-        owner_id=OWNER_ID,
-        collection_id=None,
-        created_at=created,
-        updated_at=updated,
-    )
-
-
-@pytest.fixture
-def sample_share():
-    created = datetime(2024, 1, 3, 12, 0, 0)
-    return NoteShareDTO(
-        note_id=NOTE_ID,
-        user_id=SHARE_USER_ID,
-        permission=SharePermissionEnum.READ,
-        created_at=created,
-    )
-
-
-@pytest.fixture
-def sample_link():
-    created = datetime(2024, 1, 4, 12, 0, 0)
-    return NoteLinkDTO(
-        note_id=NOTE_ID,
-        linked_note_id=LINKED_NOTE_ID,
-        created_at=created,
-    )
-
-
-@pytest.fixture
-def client_with_note_stubs(monkeypatch, sample_note, sample_share, sample_link):
-    crud_stub = StubNoteCrudService(sample_note)
-    share_stub = StubNoteShareService(sample_share)
-    link_stub = StubNoteLinkService(sample_link)
-
-    monkeypatch.setattr(note_controller, "note_crud_service", crud_stub)
-    monkeypatch.setattr(note_controller, "note_share_service", share_stub)
-    monkeypatch.setattr(note_controller, "note_link_service", link_stub)
-
+def app_client():
     app = create_app()
     with app.test_client() as client:
-        yield client, crud_stub, share_stub, link_stub
+        yield client
+
+
+@pytest.fixture
+def note_test_data(app_client):
+    data = NoteTestData(client=app_client)
+    data.bootstrap()
+    try:
+        yield data
+    finally:
+        data.cleanup()
+
+
+@pytest.fixture
+def client_with_note_data(note_test_data):
+    yield note_test_data.client, note_test_data
