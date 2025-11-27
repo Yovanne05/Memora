@@ -1,57 +1,85 @@
+import { useMemo, useState } from "react"
 import { useCollections } from "./hooks"
+import { CollectionsHeader } from "./components/CollectionsHeader"
+import { CollectionsToolbar } from "./components/CollectionsToolbar"
+import { CollectionsGrid } from "./components/CollectionsGrid"
 
 export function CollectionsFeature() {
   const { collections, loading, error, reload } = useCollections()
 
+  const [search, setSearch] = useState("")
+  const [tab, setTab] = useState<"mine" | "shared">("mine")
+  const [sort, setSort] = useState<"recent" | "alphabetical">("recent")
+
+  const filtered = useMemo(() => {
+    let list = [...collections]
+
+    // TODO: plus tard filtrer réellement "shared"
+    if (tab === "mine") {
+      list = list // pour l’instant rien
+    }
+
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          (c.description ?? "").toLowerCase().includes(q)
+      )
+    }
+
+    if (sort === "alphabetical") {
+      list.sort((a, b) => a.name.localeCompare(b.name))
+    } else {
+      // recent = par updatedAt desc
+      list.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )
+    }
+
+    return list
+  }, [collections, search, tab, sort])
+
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-8">
-      <header className="mb-4">
-        <h1 className="text-2xl font-semibold text-slate-900">Collections</h1>
-        <p className="text-sm text-slate-600">
-          Simple list view using mocks/API and hooks.
-        </p>
-      </header>
+    <div className="min-h-screen bg-slate-50 px-10 py-8">
+      <div className="mx-auto w-full max-w-6xl space-y-6">
+        <CollectionsHeader onCreate={() => { /* TODO: open create dialog */ }} />
 
-      {loading && (
-        <p className="text-sm text-slate-500 mb-2">Loading collections…</p>
-      )}
+        <CollectionsToolbar
+          search={search}
+          onSearchChange={setSearch}
+          tab={tab}
+          onTabChange={setTab}
+          sort={sort}
+          onSortChange={setSort}
+        />
 
-      {error && (
-        <p className="mb-3 text-sm text-red-600">
-          {error}{" "}
-          <button
-            type="button"
-            onClick={reload}
-            className="underline underline-offset-2"
-          >
-            Retry
-          </button>
-        </p>
-      )}
+        {loading && (
+          <p className="text-sm text-slate-500">Loading collections…</p>
+        )}
 
-      {!loading && collections.length === 0 && !error && (
-        <p className="text-sm text-slate-500">
-          No collections found. Try adding some in the backend or mocks.
-        </p>
-      )}
+        {error && (
+          <p className="text-sm text-red-600">
+            {error}{" "}
+            <button
+              type="button"
+              onClick={reload}
+              className="underline underline-offset-2"
+            >
+              Retry
+            </button>
+          </p>
+        )}
 
-      <ul className="space-y-2">
-        {collections.map((collection) => (
-          <li
-            key={collection.id}
-            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
-          >
-            <div className="font-medium text-slate-900">
-              {collection.name}
-            </div>
-            {collection.description && (
-              <div className="text-slate-600 text-xs">
-                {collection.description}
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+        <CollectionsGrid items={filtered} />
+
+        {!loading && !error && filtered.length === 0 && (
+          <p className="text-sm text-slate-500">
+            No collections found. Try changing your filters.
+          </p>
+        )}
+      </div>
     </div>
   )
 }
