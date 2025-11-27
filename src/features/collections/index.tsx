@@ -1,4 +1,3 @@
-import React from "react"
 import { useCollections } from "./hooks"
 
 export function CollectionsFeature() {
