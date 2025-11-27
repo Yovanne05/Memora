@@ -10,28 +10,30 @@ import {
 import { Button } from "@/components/ui/button"
 import { FileText, MoreHorizontal, Users } from "lucide-react"
 
+import { useRouter } from "@tanstack/react-router"
+
 interface CollectionCardProps {
   collection: Collection
   onEdit?: (c: Collection) => void
   onDelete?: (c: Collection) => void
-  onOpen?: (c: Collection) => void
 }
 
 export function CollectionCard({
   collection,
   onEdit,
   onDelete,
-  onOpen,
 }: CollectionCardProps) {
   const createdDate = new Date(collection.createdAt).toLocaleDateString(
     "fr-FR",
     { day: "2-digit", month: "short", year: "numeric" }
   )
-
+  
+  const router = useRouter()
   return (
     <Card
       className="flex cursor-pointer flex-col justify-between rounded-2xl border-slate-200 bg-white shadow-sm hover:border-slate-300"
-      onClick={() => onOpen?.(collection)}
+      onClick={() => router.navigate({ to: '/collections/$collectionId', params: { collectionId: collection.id },})
+} 
     >
       <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
         <div className="flex items-center gap-3">

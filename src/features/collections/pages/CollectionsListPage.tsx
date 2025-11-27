@@ -23,7 +23,6 @@ import {
   type CollectionFormValues,
 } from "../components/CollectionEditForm"
 
-import { CollectionsDetailsPage } from "./CollectionsDetailsPage"
 import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
 import { deleteCollection } from "../api"
 
@@ -42,9 +41,6 @@ export function CollectionsListPage() {
   const [deleting, setDeleting] = useState<Collection | null>(null)
   const [deletingLoading, setDeletingLoading] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-
-  // Collection affichée en détail (sans router pour l'instant)
-  const [selected, setSelected] = useState<Collection | null>(null)
 
   const { create, loading: creating } = useCreateCollection((created) => {
     setCollections((prev) => [created, ...prev])
@@ -125,55 +121,44 @@ export function CollectionsListPage() {
   return (
     <div className="min-h-screen bg-slate-50 px-10 py-8">
       <div className="mx-auto w-full max-w-6xl space-y-6">
-        {selected ? (
-          <CollectionsDetailsPage
-            collection={selected}
-            onBack={() => setSelected(null)}
-            onEdit={(c) => setEditing(c)}
-          />
-        ) : (
-          <>
-            <CollectionsHeader onCreate={() => setCreateOpen(true)} />
+        <CollectionsHeader onCreate={() => setCreateOpen(true)} />
 
-            <CollectionsToolbar
-              search={search}
-              onSearchChange={setSearch}
-              tab={tab}
-              onTabChange={setTab}
-              sort={sort}
-              onSortChange={setSort}
-            />
+        <CollectionsToolbar
+          search={search}
+          onSearchChange={setSearch}
+          tab={tab}
+          onTabChange={setTab}
+          sort={sort}
+          onSortChange={setSort}
+        />
 
-            {loading && (
-              <p className="text-sm text-slate-500">Loading collections…</p>
-            )}
+        {loading && (
+          <p className="text-sm text-slate-500">Loading collections…</p>
+        )}
 
-            {error && (
-              <p className="text-sm text-red-600">
-                {error}{" "}
-                <button
-                  type="button"
-                  onClick={reload}
-                  className="underline underline-offset-2"
-                >
-                  Retry
-                </button>
-              </p>
-            )}
+        {error && (
+          <p className="text-sm text-red-600">
+            {error}{" "}
+            <button
+              type="button"
+              onClick={reload}
+              className="underline underline-offset-2"
+            >
+              Retry
+            </button>
+          </p>
+        )}
 
-            <CollectionsGrid
-              items={filtered}
-              onEdit={setEditing}
-              onDelete={setDeleting}
-              onOpen={setSelected}
-            />
+        <CollectionsGrid
+          items={filtered}
+          onEdit={setEditing}
+          onDelete={setDeleting}
+        />
 
-            {!loading && !error && filtered.length === 0 && (
-              <p className="text-sm text-slate-500">
-                No collections found. Try changing your filters.
-              </p>
-            )}
-          </>
+        {!loading && !error && filtered.length === 0 && (
+          <p className="text-sm text-slate-500">
+            No collections found. Try changing your filters.
+          </p>
         )}
       </div>
 

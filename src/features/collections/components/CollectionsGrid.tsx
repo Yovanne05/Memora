@@ -5,14 +5,12 @@ interface CollectionsGridProps {
   items: Collection[]
   onEdit?: (c: Collection) => void
   onDelete?: (c: Collection) => void
-  onOpen?: (c: Collection) => void
 }
 
 export function CollectionsGrid({
   items,
   onEdit,
   onDelete,
-  onOpen,
 }: CollectionsGridProps) {
   return (
     <section className="grid gap-4 md:grid-cols-2">
@@ -22,7 +20,6 @@ export function CollectionsGrid({
           collection={collection}
           onEdit={onEdit}
           onDelete={onDelete}
-          onOpen={onOpen}
         />
       ))}
     </section>
