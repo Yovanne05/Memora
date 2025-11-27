@@ -79,7 +79,7 @@ export async function createCollection(
     const now = new Date().toISOString()
     const mock: Collection = {
       id: generateMockId(),
-      ownerId: "user-mock",
+      ownerId: "user-1", // On force un owner fixe dans les mocks
       name: payload.name,
       description: payload.description ?? "",
       visibility: payload.visibility ?? "private",
