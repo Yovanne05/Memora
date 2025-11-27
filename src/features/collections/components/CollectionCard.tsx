@@ -8,18 +8,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Users, FileText } from "lucide-react"
+import { FileText, MoreHorizontal, Users } from "lucide-react"
 
 interface CollectionCardProps {
   collection: Collection
   onEdit?: (c: Collection) => void
   onDelete?: (c: Collection) => void
+  onOpen?: (c: Collection) => void
 }
 
 export function CollectionCard({
   collection,
   onEdit,
   onDelete,
+  onOpen,
 }: CollectionCardProps) {
   const createdDate = new Date(collection.createdAt).toLocaleDateString(
     "fr-FR",
@@ -27,16 +29,20 @@ export function CollectionCard({
   )
 
   return (
-    <Card className="flex flex-col justify-between rounded-2xl border-slate-200 bg-white shadow-sm">
+    <Card
+      className="flex cursor-pointer flex-col justify-between rounded-2xl border-slate-200 bg-white shadow-sm hover:border-slate-300"
+      onClick={() => onOpen?.(collection)}
+    >
       <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/90 text-white">
             <FileText className="h-5 w-5" />
           </div>
+
           <div>
             <CardTitle className="text-base">{collection.name}</CardTitle>
             {collection.description && (
-              <p className="mt-1 text-xs text-slate-500 line-clamp-2">
+              <p className="mt-1 line-clamp-2 text-xs text-slate-500">
                 {collection.description}
               </p>
             )}
@@ -49,11 +55,16 @@ export function CollectionCard({
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-slate-500 hover:text-slate-900"
+              onClick={(e) => e.stopPropagation()}
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+
+          <DropdownMenuContent
+            align="end"
+            onClick={(e) => e.stopPropagation()}
+          >
             <DropdownMenuItem onClick={() => onEdit?.(collection)}>
               Edit
             </DropdownMenuItem>
@@ -73,6 +84,7 @@ export function CollectionCard({
             <FileText className="h-3 w-3" />
             {collection.notesCount} notes
           </span>
+
           <span className="inline-flex items-center gap-1">
             <Users className="h-3 w-3" />
             {collection.collaboratorsCount} collaborators
@@ -91,7 +103,9 @@ export function CollectionCard({
             {collection.visibility === "public" ? "Public" : "Private"}
           </Badge>
 
-          <span className="text-xs text-slate-400">Created {createdDate}</span>
+          <span className="text-xs text-slate-400">
+            Created {createdDate}
+          </span>
         </div>
       </CardContent>
     </Card>
