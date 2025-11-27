@@ -26,6 +26,7 @@ class NoteTestData:
     created_user_ids: set[str] = field(default_factory=set)
     created_collection_ids: set[str] = field(default_factory=set)
     created_note_ids: set[str] = field(default_factory=set)
+    created_tag_ids: set[str] = field(default_factory=set)
     created_shares: set[tuple[str, str]] = field(default_factory=set)
     created_links: set[tuple[str, str]] = field(default_factory=set)
 
@@ -68,11 +69,49 @@ class NoteTestData:
         self.created_user_ids.add(body["id"])
         return body["id"]
 
-    def _create_collection(self) -> str:
+    def create_user(self, label: str) -> str:
+        return self._create_user(label)
+
+    def create_collection(self, owner_id: str | None = None, name: str | None = None) -> str:
+        return self._create_collection(owner_id=owner_id, name=name)
+
+    def create_note(
+        self,
+        title: str,
+        content: str,
+        collection_id: str | None = None,
+        owner_id: str | None = None,
+        visibility: VisibilityEnum = VisibilityEnum.PRIVATE,
+    ) -> str:
+        return self._create_note(
+            title=title,
+            content=content,
+            collection_id=collection_id,
+            owner_id=owner_id,
+            visibility=visibility,
+        )
+
+    def create_tag(self, name: str | None = None) -> str:
+        tag_name = name or f"tag-{self.base_slug}-{uuid4().hex[:6]}"
+        response = self.client.post("/tags", json={"name": tag_name})
+        assert response.status_code == 201, response.get_data(as_text=True)
+        body = response.get_json()
+        self.created_tag_ids.add(body["id"])
+        return body["id"]
+
+    def replace_tags(self, tag_ids: list[str], note_id: str | None = None):
+        target_note_id = note_id or self.note_id
+        response = self.client.put(
+            f"/notes/{target_note_id}/tags", json={"tagIds": tag_ids}
+        )
+        assert response.status_code == 200, response.get_data(as_text=True)
+        return response.get_json()
+
+    def _create_collection(self, owner_id: str | None = None, name: str | None = None) -> str:
         payload = {
-            "name": self.collection_name,
+            "name": name or f"{self.collection_name}-{uuid4().hex[:4]}",
             "description": f"Collection created for note controller tests {self.base_slug}.",
-            "owner_id": self.owner_id,
+            "owner_id": owner_id if owner_id is not None else self.owner_id,
             "visibility": VisibilityEnum.PRIVATE.value,
         }
         response = self.client.post("/collections", json=payload)
@@ -81,13 +120,22 @@ class NoteTestData:
         self.created_collection_ids.add(body["id"])
         return body["id"]
 
-    def _create_note(self, title: str, content: str) -> str:
+    def _create_note(
+        self,
+        title: str,
+        content: str,
+        collection_id: str | None = None,
+        owner_id: str | None = None,
+        visibility: VisibilityEnum = VisibilityEnum.PRIVATE,
+    ) -> str:
         payload = {
             "title": title,
             "content": content,
-            "owner_id": self.owner_id,
-            "collection_id": self.collection_id,
-            "visibility": VisibilityEnum.PRIVATE.value,
+            "owner_id": owner_id if owner_id is not None else self.owner_id,
+            "collection_id": (
+                collection_id if collection_id is not None else self.collection_id
+            ),
+            "visibility": visibility.value,
         }
         response = self.client.post("/notes", json=payload)
         assert response.status_code == 201, response.get_data(as_text=True)
@@ -138,6 +186,9 @@ class NoteTestData:
 
         for note_id in self.created_note_ids:
             self._delete_if_exists(f"/notes/{note_id}")
+
+        for tag_id in self.created_tag_ids:
+            self._delete_if_exists(f"/tags/{tag_id}")
 
         for collection_id in self.created_collection_ids:
             self._delete_if_exists(f"/collections/{collection_id}")
