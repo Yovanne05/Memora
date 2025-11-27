@@ -6,6 +6,7 @@ import pytest
 
 from app import create_app
 from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
+from dtos.note_link_dto import NoteLinkCreateDTO, NoteLinkDTO
 from dtos.note_share_dto import (
     NoteShareCreateDTO,
     NoteShareDTO,
@@ -14,6 +15,9 @@ from dtos.note_share_dto import (
 from repositorys.note_repository import NoteSearchParams
 from services.interfaces.note.note_crud_service_interface import (
     NoteCrudServiceInterface,
+)
+from services.interfaces.note.note_link_service_interface import (
+    NoteLinkServiceInterface,
 )
 from services.interfaces.note.note_share_service_interface import (
     NoteShareServiceInterface,
@@ -25,6 +29,7 @@ NOTE_ID = "11111111-1111-1111-1111-111111111111"
 OWNER_ID = "22222222-2222-2222-2222-222222222222"
 SHARE_USER_ID = "33333333-3333-3333-3333-333333333333"
 COLLECTION_ID = "44444444-4444-4444-4444-444444444444"
+LINKED_NOTE_ID = "55555555-5555-5555-5555-555555555555"
 
 
 class StubNoteCrudService(NoteCrudServiceInterface):
@@ -119,6 +124,34 @@ class StubNoteShareService(NoteShareServiceInterface):
         self.revoked = (note_id, user_id)
 
 
+class StubNoteLinkService(NoteLinkServiceInterface):
+    def __init__(self, link: NoteLinkDTO):
+        self.link = link
+        self.last_list_note_id: str | None = None
+        self.last_create_payload: tuple[
+            str, NoteLinkCreateDTO
+        ] | None = None
+        self.deleted: tuple[str, str] | None = None
+
+    def list_links(self, note_id: str) -> list[NoteLinkDTO]:
+        self.last_list_note_id = note_id
+        return [self.link]
+
+    def create_link(
+        self, note_id: str, payload: NoteLinkCreateDTO
+    ) -> NoteLinkDTO:
+        self.last_create_payload = (note_id, payload)
+        return self.link.model_copy(
+            update={
+                "note_id": note_id,
+                "linked_note_id": payload.linked_note_id,
+            }
+        )
+
+    def delete_link(self, note_id: str, linked_note_id: str) -> None:
+        self.deleted = (note_id, linked_note_id)
+
+
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
@@ -152,13 +185,25 @@ def sample_share():
 
 
 @pytest.fixture
-def client_with_note_stubs(monkeypatch, sample_note, sample_share):
+def sample_link():
+    created = datetime(2024, 1, 4, 12, 0, 0)
+    return NoteLinkDTO(
+        note_id=NOTE_ID,
+        linked_note_id=LINKED_NOTE_ID,
+        created_at=created,
+    )
+
+
+@pytest.fixture
+def client_with_note_stubs(monkeypatch, sample_note, sample_share, sample_link):
     crud_stub = StubNoteCrudService(sample_note)
     share_stub = StubNoteShareService(sample_share)
+    link_stub = StubNoteLinkService(sample_link)
 
     monkeypatch.setattr(note_controller, "note_crud_service", crud_stub)
     monkeypatch.setattr(note_controller, "note_share_service", share_stub)
+    monkeypatch.setattr(note_controller, "note_link_service", link_stub)
 
     app = create_app()
     with app.test_client() as client:
-        yield client, crud_stub, share_stub
+        yield client, crud_stub, share_stub, link_stub

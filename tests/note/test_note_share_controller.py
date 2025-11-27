@@ -3,7 +3,7 @@ from utils.enums import SharePermissionEnum
 
 
 def test_list_shares_returns_items(client_with_note_stubs):
-    client, _, share_stub = client_with_note_stubs
+    client, _, share_stub, _ = client_with_note_stubs
     # When
     response = client.get(f"/notes/{NOTE_ID}/shares")
     # Then
@@ -15,7 +15,7 @@ def test_list_shares_returns_items(client_with_note_stubs):
 
 
 def test_share_note_returns_created_share(client_with_note_stubs):
-    client, _, share_stub = client_with_note_stubs
+    client, _, share_stub, _ = client_with_note_stubs
     # Given
     payload = {"user_id": SHARE_USER_ID, "permission": SharePermissionEnum.WRITE.value}
     # When
@@ -32,7 +32,7 @@ def test_share_note_returns_created_share(client_with_note_stubs):
 
 
 def test_update_share_returns_updated_share(client_with_note_stubs):
-    client, _, share_stub = client_with_note_stubs
+    client, _, share_stub, _ = client_with_note_stubs
     # Given
     payload = {"permission": SharePermissionEnum.WRITE.value}
     # When
@@ -47,7 +47,7 @@ def test_update_share_returns_updated_share(client_with_note_stubs):
 
 
 def test_revoke_share_calls_service(client_with_note_stubs):
-    client, _, share_stub = client_with_note_stubs
+    client, _, share_stub, _ = client_with_note_stubs
     # When
     response = client.delete(f"/notes/{NOTE_ID}/shares/{SHARE_USER_ID}")
     # Then

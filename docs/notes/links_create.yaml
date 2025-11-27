@@ -1,0 +1,30 @@
+---
+tags:
+  - notes
+summary: Créer un lien entre deux notes
+description: >
+  Lie la note ciblée par l'URL à une autre note de la même collection.
+  Impossible de lier une note à elle-même ou à une note d'une autre collection.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Note de départ.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteLinkCreatePayload"
+responses:
+  201:
+    description: Lien créé.
+    schema:
+      $ref: "#/definitions/NoteLink"
+  404:
+    description: Note introuvable.
+  409:
+    description: Un lien existe déjà entre ces notes.
+  422:
+    description: Notes incompatibles (collections différentes ou même note).

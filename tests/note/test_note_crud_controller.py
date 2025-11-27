@@ -3,7 +3,7 @@ from utils.enums import VisibilityEnum
 
 
 def test_find_many_returns_notes(client_with_note_stubs):
-    client, crud_stub, _ = client_with_note_stubs
+    client, crud_stub, _, _ = client_with_note_stubs
     # Given
     query = {"ownerId": OWNER_ID, "titleContains": "note"}
     # When
@@ -18,7 +18,7 @@ def test_find_many_returns_notes(client_with_note_stubs):
 
 
 def test_find_one_returns_single_note(client_with_note_stubs):
-    client, crud_stub, _ = client_with_note_stubs
+    client, crud_stub, _, _ = client_with_note_stubs
     # When
     response = client.get(f"/notes/{NOTE_ID}")
     # Then
@@ -29,7 +29,7 @@ def test_find_one_returns_single_note(client_with_note_stubs):
 
 
 def test_create_note_returns_created_note(client_with_note_stubs):
-    client, crud_stub, _ = client_with_note_stubs
+    client, crud_stub, _, _ = client_with_note_stubs
     # Given
     payload = {
         "title": "New title",
@@ -50,7 +50,7 @@ def test_create_note_returns_created_note(client_with_note_stubs):
 
 
 def test_update_note_returns_updated_note(client_with_note_stubs):
-    client, crud_stub, _ = client_with_note_stubs
+    client, crud_stub, _, _ = client_with_note_stubs
     # Given
     payload = {
         "title": "Updated title",
@@ -70,7 +70,7 @@ def test_update_note_returns_updated_note(client_with_note_stubs):
 
 
 def test_delete_note_calls_service(client_with_note_stubs):
-    client, crud_stub, _ = client_with_note_stubs
+    client, crud_stub, _, _ = client_with_note_stubs
     # When
     response = client.delete(f"/notes/{NOTE_ID}")
     # Then
