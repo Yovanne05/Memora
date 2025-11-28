@@ -34,7 +34,6 @@ export function NoteCard({ note }: { note: Note }) {
                             onClick={(e) => {
                                 e.preventDefault()
                                 e.stopPropagation()
-                                // action du bouton (ex: ouvrir menu)
                             }}
                         >
                             <LayoutGrid className="h-4 w-4" />

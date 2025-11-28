@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarClock, ExternalLink, Globe, Lock, NotebookPen, Pencil } from "lucide-react";
+import { ArrowLeft, CalendarClock, Globe, Lock, NotebookPen, Pencil } from "lucide-react";
 
 import { useNoteQuery } from "../hooks/useNoteQuery";
 
@@ -57,7 +57,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                         <Skeleton className="h-6 w-24" />
                                     ) : (
                                         <Badge variant="secondary" className="text-xs">
-                                            Collection {note?.collection_id}
+                                            Aucune Collection
                                         </Badge>
                                     )}
                                     {isLoading ? (
@@ -109,11 +109,6 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3">
-                                <Button variant="outline" className="gap-2" asChild>
-                                    <Link to="/app/notes">
-                                        <ExternalLink className="h-4 w-4" /> Preview
-                                    </Link>
-                                </Button>
                                 <Button className="gap-2" variant="secondary" asChild>
                                     <Link to="/app/notes/$id/edit" params={{ id: noteId }}>
                                         <Pencil className="h-4 w-4" /> Edit note
@@ -199,24 +194,6 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     </div>
                                 </>
                             )}
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border border-border/70 bg-muted/50 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="text-lg">Actions rapides</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <Button variant="outline" className="w-full justify-start gap-2" asChild>
-                                <Link to="/app/notes/$id/edit" params={{ id: noteId }}>
-                                    <Pencil className="h-4 w-4" /> Modifier la note
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" className="w-full justify-start gap-2" asChild>
-                                <Link to="/app/notes">
-                                    <ArrowLeft className="h-4 w-4" /> Retour à la liste
-                                </Link>
-                            </Button>
                         </CardContent>
                     </Card>
                 </div>
