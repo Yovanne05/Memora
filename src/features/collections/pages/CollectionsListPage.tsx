@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react"
+import { Plus } from "lucide-react"
+
 import {
   useCollections,
   useCreateCollection,
@@ -7,9 +9,12 @@ import {
 import { CollectionsHeader } from "../components/CollectionsHeader"
 import { CollectionsToolbar } from "../components/CollectionsToolbar"
 import { CollectionsGrid } from "../components/CollectionsGrid"
-
 import type { Collection } from "../models/collection.model"
+import { CollectionEditForm, type CollectionFormValues } from "../components/CollectionEditForm"
+import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
+import { deleteCollection } from "../api/collections.api"
 
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -17,14 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-
-import {
-  CollectionEditForm,
-  type CollectionFormValues,
-} from "../components/CollectionEditForm"
-
-import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
-import { deleteCollection } from "../api/collections.api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const CURRENT_USER_ID = "user-1" // TODO: remplacer par auth plus tard
 
@@ -48,9 +46,7 @@ export function CollectionsListPage() {
   })
 
   const { update, loading: updating } = useUpdateCollection((updated) => {
-    setCollections((prev) =>
-      prev.map((c) => (c.id === updated.id ? updated : c))
-    )
+    setCollections((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
     setEditing(null)
   })
 
@@ -76,8 +72,7 @@ export function CollectionsListPage() {
       list.sort((a, b) => a.name.localeCompare(b.name))
     } else {
       list.sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       )
     }
 
@@ -119,48 +114,58 @@ export function CollectionsListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-10 py-8">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <CollectionsHeader onCreate={() => setCreateOpen(true)} />
-
-        <CollectionsToolbar
-          search={search}
-          onSearchChange={setSearch}
-          tab={tab}
-          onTabChange={setTab}
-          sort={sort}
-          onSortChange={setSort}
-        />
-
-        {loading && (
-          <p className="text-sm text-slate-500">Loading collections…</p>
-        )}
-
-        {error && (
-          <p className="text-sm text-red-600">
-            {error}{" "}
-            <button
-              type="button"
-              onClick={reload}
-              className="underline underline-offset-2"
-            >
-              Retry
-            </button>
-          </p>
-        )}
-
-        <CollectionsGrid
-          items={filtered}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-        />
-
-        {!loading && !error && filtered.length === 0 && (
-          <p className="text-sm text-slate-500">
-            No collections found. Try changing your filters.
-          </p>
-        )}
+    <div className="space-y-6 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <CollectionsHeader />
+        <Button onClick={() => setCreateOpen(true)} size="lg" className="gap-2">
+          <Plus className="h-4 w-4" />
+          New collection
+        </Button>
       </div>
+
+      <CollectionsToolbar
+        search={search}
+        onSearchChange={setSearch}
+        tab={tab}
+        onTabChange={setTab}
+        sort={sort}
+        onSortChange={setSort}
+      />
+
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}{" "}
+          <button
+            type="button"
+            onClick={reload}
+            className="font-medium underline underline-offset-2"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="space-y-3 rounded-lg border bg-card p-4 shadow-sm"
+            >
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
+          ))}
+        </div>
+      ) : filtered.length ? (
+        <CollectionsGrid items={filtered} onEdit={setEditing} onDelete={setDeleting} />
+      ) : (
+        <div className="flex h-40 items-center justify-center rounded-lg border bg-card text-muted-foreground">
+          No collections found. Try changing your filters.
+        </div>
+      )}
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-lg">

@@ -13,7 +13,7 @@ export function CollectionsGrid({
   onDelete,
 }: CollectionsGridProps) {
   return (
-    <section className="grid gap-4 md:grid-cols-2">
+    <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {items.map((collection) => (
         <CollectionCard
           key={collection.id}
