@@ -28,7 +28,7 @@ import { Separator } from "@/components/ui/separator"
 export function AppSidebar() {
     const navigationItems = [
         { title: "Dashboard", icon: LayoutDashboard, url: "#" },
-        { title: "Notes", icon: FileText, url: "./notes" },
+        { title: "Notes", icon: FileText, url: "/app/notes" },
         { title: "Collections", icon: FolderKanban, url: "#" },
         { title: "Knowledge Graph", icon: Network, url: "#" },
         { title: "Search", icon: Search, url: "#" },
