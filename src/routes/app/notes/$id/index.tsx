@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { NoteDetailPage } from '@/features/notes/pages/NoteDetailPage'
 
 export const Route = createFileRoute('/app/notes/$id/')({
   component: RouteComponent,
@@ -6,5 +7,5 @@ export const Route = createFileRoute('/app/notes/$id/')({
 
 function RouteComponent() {
   const { id } = Route.useParams()
-  return <div>Hello note {id}!</div>
+  return <NoteDetailPage noteId={id} />
 }
