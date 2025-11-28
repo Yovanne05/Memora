@@ -1,9 +1,6 @@
+import NotesPage from '@/features/notes/pages/NotesPage'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/app/notes/')({
-  component: RouteComponent,
+  component: NotesPage,
 })
-
-function RouteComponent() {
-  return <div>Hello Notes!</div>
-}
