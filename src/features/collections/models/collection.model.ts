@@ -13,6 +13,7 @@ export interface Collection {
 }
 
 export interface CollectionCreatePayload {
+  ownerId: string
   name: string
   description?: string | null
   visibility?: CollectionVisibility

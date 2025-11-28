@@ -9,10 +9,14 @@ import {
 import { CollectionsHeader } from "../components/CollectionsHeader"
 import { CollectionsToolbar } from "../components/CollectionsToolbar"
 import { CollectionsGrid } from "../components/CollectionsGrid"
-import type { Collection } from "../models/collection.model"
+import { CollectionsListSkeleton } from "../components/CollectionsListSkeleton"
+import { CollectionsEmptyState } from "../components/CollectionsEmptyState"
+import { CollectionsErrorAlert } from "../components/CollectionsErrorAlert"
 import { CollectionEditForm, type CollectionFormValues } from "../components/CollectionEditForm"
 import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
+import { applyCollectionsQuery, type CollectionsSort, type CollectionsTab } from "../lib/collections-query"
 import { deleteCollection } from "../api/collections.api"
+import type { Collection } from "../models/collection.model"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,20 +26,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Skeleton } from "@/components/ui/skeleton"
 
-const CURRENT_USER_ID = "user-1" // TODO: remplacer par auth plus tard
+const CURRENT_USER_ID = "8bfb888a-d099-4faf-9517-ecc7128c918c" // TODO: remplacer par auth plus tard
 
 export function CollectionsListPage() {
   const { collections, setCollections, loading, error, reload } = useCollections()
 
   const [search, setSearch] = useState("")
-  const [tab, setTab] = useState<"mine" | "shared">("mine")
-  const [sort, setSort] = useState<"recent" | "alphabetical">("recent")
+  const [tab, setTab] = useState<CollectionsTab>("mine")
+  const [sort, setSort] = useState<CollectionsSort>("recent")
 
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
-
   const [deleting, setDeleting] = useState<Collection | null>(null)
   const [deletingLoading, setDeletingLoading] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
@@ -50,37 +52,20 @@ export function CollectionsListPage() {
     setEditing(null)
   })
 
-  const filtered = useMemo(() => {
-    let list = [...collections]
-
-    if (tab === "mine") {
-      list = list.filter((c) => c.ownerId === CURRENT_USER_ID)
-    } else if (tab === "shared") {
-      list = list.filter((c) => c.ownerId !== CURRENT_USER_ID)
-    }
-
-    if (search.trim()) {
-      const q = search.toLowerCase()
-      list = list.filter(
-        (c) =>
-          c.name.toLowerCase().includes(q) ||
-          (c.description ?? "").toLowerCase().includes(q)
-      )
-    }
-
-    if (sort === "alphabetical") {
-      list.sort((a, b) => a.name.localeCompare(b.name))
-    } else {
-      list.sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      )
-    }
-
-    return list
-  }, [collections, search, tab, sort])
+  const filtered = useMemo(
+    () =>
+      applyCollectionsQuery(collections, {
+        currentUserId: CURRENT_USER_ID,
+        tab,
+        search,
+        sort,
+      }),
+    [collections, search, sort, tab]
+  )
 
   const handleCreateSubmit = async (values: CollectionFormValues) => {
     await create({
+      ownerId: CURRENT_USER_ID,
       name: values.name,
       description: values.description,
       visibility: values.visibility,
@@ -132,39 +117,14 @@ export function CollectionsListPage() {
         onSortChange={setSort}
       />
 
-      {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}{" "}
-          <button
-            type="button"
-            onClick={reload}
-            className="font-medium underline underline-offset-2"
-          >
-            Retry
-          </button>
-        </div>
-      )}
+      {error && <CollectionsErrorAlert message={error} onRetry={reload} />}
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="space-y-3 rounded-lg border bg-card p-4 shadow-sm"
-            >
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-5/6" />
-            </div>
-          ))}
-        </div>
+        <CollectionsListSkeleton />
       ) : filtered.length ? (
         <CollectionsGrid items={filtered} onEdit={setEditing} onDelete={setDeleting} />
       ) : (
-        <div className="flex h-40 items-center justify-center rounded-lg border bg-card text-muted-foreground">
-          No collections found. Try changing your filters.
-        </div>
+        <CollectionsEmptyState />
       )}
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>

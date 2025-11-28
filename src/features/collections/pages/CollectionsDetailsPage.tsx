@@ -45,12 +45,12 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-6 text-foreground">
       <div className="space-y-8">
         <button
           type="button"
           onClick={() => router.navigate({ to: "/app/collections" })}
-          className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900"
+          className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="h-3 w-3" />
           Collections
@@ -58,11 +58,11 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
 
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-semibold">
               {currentCollection.name}
             </h1>
             {currentCollection.description && (
-              <p className="max-w-2xl text-sm text-slate-500">
+              <p className="max-w-2xl text-sm text-muted-foreground">
                 {currentCollection.description}
               </p>
             )}
@@ -84,18 +84,18 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
-          <h2 className="mb-2 text-sm font-semibold text-slate-900">
+        <div className="rounded-xl border border-border bg-card px-5 py-4">
+          <h2 className="mb-2 text-sm font-semibold">
             Collaborators
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             Collaboration UI will be added later. For now, this collection is owned by you.
           </p>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900">
+            <h2 className="text-sm font-semibold">
               Notes ({currentCollection.notesCount})
             </h2>
           </div>
@@ -104,7 +104,7 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
             <Input placeholder="Search notes..." className="max-w-md" disabled />
           </div>
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Notes list will be implemented later.
           </p>
         </div>

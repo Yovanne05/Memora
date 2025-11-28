@@ -8,14 +8,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Search } from "lucide-react"
+import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
 
 interface CollectionsToolbarProps {
   search: string
   onSearchChange: (value: string) => void
-  tab: "mine" | "shared"
-  onTabChange: (value: "mine" | "shared") => void
-  sort: "recent" | "alphabetical"
-  onSortChange: (value: "recent" | "alphabetical") => void
+  tab: CollectionsTab
+  onTabChange: (value: CollectionsTab) => void
+  sort: CollectionsSort
+  onSortChange: (value: CollectionsSort) => void
 }
 
 export function CollectionsToolbar({

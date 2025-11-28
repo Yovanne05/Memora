@@ -43,8 +43,8 @@ export function CollectionCard({
     >
       <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <FileText className="h-5 w-5" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted">
+            <FileText className="h-5 w-5 text-muted-foreground" />
           </div>
 
           <div className="space-y-1">
