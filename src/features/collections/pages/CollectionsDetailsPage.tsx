@@ -95,9 +95,7 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">
-              Notes ({currentCollection.notesCount})
-            </h2>
+            <h2 className="text-sm font-semibold">Notes</h2>
           </div>
 
           <div className="flex gap-3">

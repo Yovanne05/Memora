@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { FileText, MoreHorizontal, Users } from "lucide-react"
+import { FileText, MoreHorizontal } from "lucide-react"
 import { useRouter } from "@tanstack/react-router"
 
 interface CollectionCardProps {
@@ -96,18 +96,6 @@ export function CollectionCard({
       </CardHeader>
 
       <CardContent className="space-y-3 pt-0">
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <FileText className="h-3.5 w-3.5" />
-            {collection.notesCount} notes
-          </span>
-
-          <span className="inline-flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" />
-            {collection.collaboratorsCount} collaborators
-          </span>
-        </div>
-
         <div className="flex items-center justify-between">
           <Badge
             variant="outline"

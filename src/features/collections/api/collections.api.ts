@@ -3,36 +3,10 @@ import type {
   CollectionCreatePayload,
   CollectionUpdatePayload,
 } from "../models/collection.model"
+import { dtoToCollection } from "../mappers/collection.mapper"
+import type { CollectionDto, CollectionsListDto } from "../dtos/collection.dto"
 
 const API_URL = import.meta.env.VITE_API_URL
-
-function mapCollection(raw: any): Collection {
-  return {
-    id: raw.id,
-    ownerId: raw.owner_id ?? raw.ownerId,
-    name: raw.name,
-    description: raw.description ?? null,
-    visibility: raw.visibility ?? "private",
-    createdAt: raw.created_at ?? raw.createdAt,
-    updatedAt: raw.updated_at ?? raw.updatedAt,
-    notesCount: raw.notes_count ?? raw.notesCount ?? 0,
-    collaboratorsCount: raw.collaborators_count ?? raw.collaboratorsCount ?? 0,
-  }
-}
-
-function mapCollectionList(payload: any): Collection[] {
-  const items = Array.isArray(payload)
-    ? payload
-    : Array.isArray(payload?.items)
-      ? payload.items
-      : null
-
-  if (!items) {
-    throw new Error("Invalid collections response")
-  }
-
-  return items.map(mapCollection)
-}
 
 export async function fetchCollections(): Promise<Collection[]> {
   const res = await fetch(`${API_URL}/collections`)
@@ -41,8 +15,12 @@ export async function fetchCollections(): Promise<Collection[]> {
     throw new Error("Erreur API")
   }
 
-  const data = await res.json()
-  return mapCollectionList(data)
+  const data = (await res.json()) as CollectionsListDto
+  const items = Array.isArray(data) ? data : data?.items
+  if (!items) {
+    throw new Error("Invalid collections response")
+  }
+  return items.map(dtoToCollection)
 }
 
 export async function fetchCollectionById(id: string): Promise<Collection> {
@@ -56,8 +34,8 @@ export async function fetchCollectionById(id: string): Promise<Collection> {
     throw new Error("Erreur API")
   }
 
-  const data = await res.json()
-  return mapCollection(data)
+  const data = (await res.json()) as CollectionDto
+  return dtoToCollection(data)
 }
 
 export async function createCollection(
@@ -80,8 +58,8 @@ export async function createCollection(
     throw new Error("Erreur API")
   }
 
-  const data = await res.json()
-  return mapCollection(data)
+  const data = (await res.json()) as CollectionDto
+  return dtoToCollection(data)
 }
 
 export async function updateCollection(
@@ -98,8 +76,8 @@ export async function updateCollection(
     throw new Error("Erreur API")
   }
 
-  const data = await res.json()
-  return mapCollection(data)
+  const data = (await res.json()) as CollectionDto
+  return dtoToCollection(data)
 }
 
 export async function deleteCollection(id: string): Promise<void> {

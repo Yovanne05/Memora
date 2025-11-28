@@ -8,8 +8,6 @@ export interface Collection {
   visibility: CollectionVisibility
   createdAt: string
   updatedAt: string
-  notesCount: number
-  collaboratorsCount: number
 }
 
 export interface CollectionCreatePayload {
