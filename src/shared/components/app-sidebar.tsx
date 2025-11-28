@@ -8,6 +8,7 @@ import {
     History,
     Settings as SettingsIcon,
     LogOut,
+    FileText,
 } from "lucide-react"
 
 import {
@@ -27,6 +28,7 @@ import { Separator } from "@/components/ui/separator"
 export function AppSidebar() {
     const navigationItems = [
         { title: "Dashboard", icon: LayoutDashboard, url: "#" },
+        { title: "Notes", icon: FileText, url: "./notes" },
         { title: "Collections", icon: FolderKanban, url: "#" },
         { title: "Knowledge Graph", icon: Network, url: "#" },
         { title: "Search", icon: Search, url: "#" },
