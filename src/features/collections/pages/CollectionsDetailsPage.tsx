@@ -49,7 +49,7 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
       <div className="space-y-8">
         <button
           type="button"
-          onClick={() => router.navigate({ to: "/collections" })}
+          onClick={() => router.navigate({ to: "/app/collections" })}
           className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900"
         >
           <ChevronLeft className="h-3 w-3" />

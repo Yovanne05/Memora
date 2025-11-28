@@ -8,69 +8,214 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
-import { Route as CollectionsCollectionIdRouteImport } from './routes/collections.$collectionId'
+import { createFileRoute } from '@tanstack/react-router'
 
-const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
-  id: '/collections/',
-  path: '/collections/',
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteRouteImport } from './routes/app/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppNotesIndexRouteImport } from './routes/app/notes/index'
+import { Route as AppCollectionsIndexRouteImport } from './routes/app/collections/index'
+import { Route as AppNotesIdIndexRouteImport } from './routes/app/notes/$id/index'
+import { Route as AppCollectionsCollectionIdIndexRouteImport } from './routes/app/collections/$collectionId/index'
+import { Route as AppNotesIdEditIndexRouteImport } from './routes/app/notes/$id/edit/index'
+
+const AppIndexLazyRouteImport = createFileRoute('/app/')()
+
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CollectionsCollectionIdRoute = CollectionsCollectionIdRouteImport.update({
-  id: '/collections/$collectionId',
-  path: '/collections/$collectionId',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexLazyRoute = AppIndexLazyRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any).lazy(() => import('./routes/app/index.lazy').then((d) => d.Route))
+const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppCollectionsIndexRoute = AppCollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppNotesIdIndexRoute = AppNotesIdIndexRouteImport.update({
+  id: '/notes/$id/',
+  path: '/notes/$id/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppCollectionsCollectionIdIndexRoute =
+  AppCollectionsCollectionIdIndexRouteImport.update({
+    id: '/collections/$collectionId/',
+    path: '/collections/$collectionId/',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppNotesIdEditIndexRoute = AppNotesIdEditIndexRouteImport.update({
+  id: '/notes/$id/edit/',
+  path: '/notes/$id/edit/',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/collections/$collectionId': typeof CollectionsCollectionIdRoute
-  '/collections': typeof CollectionsIndexRoute
+  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/app/': typeof AppIndexLazyRoute
+  '/app/collections': typeof AppCollectionsIndexRoute
+  '/app/notes': typeof AppNotesIndexRoute
+  '/app/collections/$collectionId': typeof AppCollectionsCollectionIdIndexRoute
+  '/app/notes/$id': typeof AppNotesIdIndexRoute
+  '/app/notes/$id/edit': typeof AppNotesIdEditIndexRoute
 }
 export interface FileRoutesByTo {
-  '/collections/$collectionId': typeof CollectionsCollectionIdRoute
-  '/collections': typeof CollectionsIndexRoute
+  '/': typeof IndexRoute
+  '/app': typeof AppIndexLazyRoute
+  '/app/collections': typeof AppCollectionsIndexRoute
+  '/app/notes': typeof AppNotesIndexRoute
+  '/app/collections/$collectionId': typeof AppCollectionsCollectionIdIndexRoute
+  '/app/notes/$id': typeof AppNotesIdIndexRoute
+  '/app/notes/$id/edit': typeof AppNotesIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/collections/$collectionId': typeof CollectionsCollectionIdRoute
-  '/collections/': typeof CollectionsIndexRoute
+  '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
+  '/app/': typeof AppIndexLazyRoute
+  '/app/collections/': typeof AppCollectionsIndexRoute
+  '/app/notes/': typeof AppNotesIndexRoute
+  '/app/collections/$collectionId/': typeof AppCollectionsCollectionIdIndexRoute
+  '/app/notes/$id/': typeof AppNotesIdIndexRoute
+  '/app/notes/$id/edit/': typeof AppNotesIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/collections/$collectionId' | '/collections'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/'
+    | '/app/collections'
+    | '/app/notes'
+    | '/app/collections/$collectionId'
+    | '/app/notes/$id'
+    | '/app/notes/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/collections/$collectionId' | '/collections'
-  id: '__root__' | '/collections/$collectionId' | '/collections/'
+  to:
+    | '/'
+    | '/app'
+    | '/app/collections'
+    | '/app/notes'
+    | '/app/collections/$collectionId'
+    | '/app/notes/$id'
+    | '/app/notes/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/'
+    | '/app/collections/'
+    | '/app/notes/'
+    | '/app/collections/$collectionId/'
+    | '/app/notes/$id/'
+    | '/app/notes/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  CollectionsCollectionIdRoute: typeof CollectionsCollectionIdRoute
-  CollectionsIndexRoute: typeof CollectionsIndexRoute
+  IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/collections/': {
-      id: '/collections/'
-      path: '/collections'
-      fullPath: '/collections'
-      preLoaderRoute: typeof CollectionsIndexRouteImport
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/collections/$collectionId': {
-      id: '/collections/$collectionId'
-      path: '/collections/$collectionId'
-      fullPath: '/collections/$collectionId'
-      preLoaderRoute: typeof CollectionsCollectionIdRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexLazyRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/notes/': {
+      id: '/app/notes/'
+      path: '/notes'
+      fullPath: '/app/notes'
+      preLoaderRoute: typeof AppNotesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/collections/': {
+      id: '/app/collections/'
+      path: '/collections'
+      fullPath: '/app/collections'
+      preLoaderRoute: typeof AppCollectionsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/notes/$id/': {
+      id: '/app/notes/$id/'
+      path: '/notes/$id'
+      fullPath: '/app/notes/$id'
+      preLoaderRoute: typeof AppNotesIdIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/collections/$collectionId/': {
+      id: '/app/collections/$collectionId/'
+      path: '/collections/$collectionId'
+      fullPath: '/app/collections/$collectionId'
+      preLoaderRoute: typeof AppCollectionsCollectionIdIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/notes/$id/edit/': {
+      id: '/app/notes/$id/edit/'
+      path: '/notes/$id/edit'
+      fullPath: '/app/notes/$id/edit'
+      preLoaderRoute: typeof AppNotesIdEditIndexRouteImport
+      parentRoute: typeof AppRouteRoute
     }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppIndexLazyRoute: typeof AppIndexLazyRoute
+  AppCollectionsIndexRoute: typeof AppCollectionsIndexRoute
+  AppNotesIndexRoute: typeof AppNotesIndexRoute
+  AppCollectionsCollectionIdIndexRoute: typeof AppCollectionsCollectionIdIndexRoute
+  AppNotesIdIndexRoute: typeof AppNotesIdIndexRoute
+  AppNotesIdEditIndexRoute: typeof AppNotesIdEditIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppIndexLazyRoute: AppIndexLazyRoute,
+  AppCollectionsIndexRoute: AppCollectionsIndexRoute,
+  AppNotesIndexRoute: AppNotesIndexRoute,
+  AppCollectionsCollectionIdIndexRoute: AppCollectionsCollectionIdIndexRoute,
+  AppNotesIdIndexRoute: AppNotesIdIndexRoute,
+  AppNotesIdEditIndexRoute: AppNotesIdEditIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  CollectionsCollectionIdRoute: CollectionsCollectionIdRoute,
-  CollectionsIndexRoute: CollectionsIndexRoute,
+  IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

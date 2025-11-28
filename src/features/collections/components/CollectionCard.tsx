@@ -32,8 +32,12 @@ export function CollectionCard({
   return (
     <Card
       className="flex cursor-pointer flex-col justify-between rounded-2xl border-slate-200 bg-white shadow-sm hover:border-slate-300"
-      onClick={() => router.navigate({ to: '/collections/$collectionId', params: { collectionId: collection.id },})
-} 
+      onClick={() =>
+        router.navigate({
+          to: "/app/collections/$collectionId",
+          params: { collectionId: collection.id },
+        })
+      }
     >
       <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
         <div className="flex items-center gap-3">
