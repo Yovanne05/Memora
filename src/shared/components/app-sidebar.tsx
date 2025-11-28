@@ -29,7 +29,7 @@ export function AppSidebar() {
     const navigationItems = [
         { title: "Dashboard", icon: LayoutDashboard, url: "#" },
         { title: "Notes", icon: FileText, url: "/app/notes" },
-        { title: "Collections", icon: FolderKanban, url: "#" },
+        { title: "Collections", icon: FolderKanban, url: "/app/collections" },
         { title: "Knowledge Graph", icon: Network, url: "#" },
         { title: "Search", icon: Search, url: "#" },
         { title: "Revision", icon: GraduationCap, url: "#" },
