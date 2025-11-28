@@ -42,9 +42,8 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
 
-                {/* HEADER */}
-                <div className="px-4 py-4">
-                    <div className="flex items-center gap-2">
+                <div className="px-6 py-6">
+                    <div className="flex items-center gap-4">
                         <BookOpen className="h-5 w-5" />
                         <div>
                             <h1 className="font-semibold text-lg leading-tight">Memora</h1>
@@ -55,9 +54,8 @@ export function AppSidebar() {
                     </div>
                 </div>
 
-                <Separator />
+                <Separator className="-mt-2"/>
 
-                {/* NAVIGATION */}
                 <SidebarGroup>
                     <SidebarGroupLabel>Navigation</SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -76,7 +74,6 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
 
-                {/* ACCOUNT */}
                 <SidebarGroup>
                     <SidebarGroupLabel>Account</SidebarGroupLabel>
                     <SidebarGroupContent>
