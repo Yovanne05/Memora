@@ -13,6 +13,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppNotesIndexRouteImport } from './routes/app/notes/index'
+import { Route as AppNotesIdIndexRouteImport } from './routes/app/notes/$id/index'
+import { Route as AppNotesIdEditIndexRouteImport } from './routes/app/notes/$id/edit/index'
 
 const AppIndexLazyRouteImport = createFileRoute('/app/')()
 
@@ -31,28 +34,65 @@ const AppIndexLazyRoute = AppIndexLazyRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any).lazy(() => import('./routes/app/index.lazy').then((d) => d.Route))
+const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppNotesIdIndexRoute = AppNotesIdIndexRouteImport.update({
+  id: '/notes/$id/',
+  path: '/notes/$id/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppNotesIdEditIndexRoute = AppNotesIdEditIndexRouteImport.update({
+  id: '/notes/$id/edit/',
+  path: '/notes/$id/edit/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/app/': typeof AppIndexLazyRoute
+  '/app/notes': typeof AppNotesIndexRoute
+  '/app/notes/$id': typeof AppNotesIdIndexRoute
+  '/app/notes/$id/edit': typeof AppNotesIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppIndexLazyRoute
+  '/app/notes': typeof AppNotesIndexRoute
+  '/app/notes/$id': typeof AppNotesIdIndexRoute
+  '/app/notes/$id/edit': typeof AppNotesIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/app/': typeof AppIndexLazyRoute
+  '/app/notes/': typeof AppNotesIndexRoute
+  '/app/notes/$id/': typeof AppNotesIdIndexRoute
+  '/app/notes/$id/edit/': typeof AppNotesIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/app/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/'
+    | '/app/notes'
+    | '/app/notes/$id'
+    | '/app/notes/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app'
-  id: '__root__' | '/' | '/app' | '/app/'
+  to: '/' | '/app' | '/app/notes' | '/app/notes/$id' | '/app/notes/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/'
+    | '/app/notes/'
+    | '/app/notes/$id/'
+    | '/app/notes/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -83,15 +123,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexLazyRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/notes/': {
+      id: '/app/notes/'
+      path: '/notes'
+      fullPath: '/app/notes'
+      preLoaderRoute: typeof AppNotesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/notes/$id/': {
+      id: '/app/notes/$id/'
+      path: '/notes/$id'
+      fullPath: '/app/notes/$id'
+      preLoaderRoute: typeof AppNotesIdIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/notes/$id/edit/': {
+      id: '/app/notes/$id/edit/'
+      path: '/notes/$id/edit'
+      fullPath: '/app/notes/$id/edit'
+      preLoaderRoute: typeof AppNotesIdEditIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
 interface AppRouteRouteChildren {
   AppIndexLazyRoute: typeof AppIndexLazyRoute
+  AppNotesIndexRoute: typeof AppNotesIndexRoute
+  AppNotesIdIndexRoute: typeof AppNotesIdIndexRoute
+  AppNotesIdEditIndexRoute: typeof AppNotesIdEditIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppIndexLazyRoute: AppIndexLazyRoute,
+  AppNotesIndexRoute: AppNotesIndexRoute,
+  AppNotesIdIndexRoute: AppNotesIdIndexRoute,
+  AppNotesIdEditIndexRoute: AppNotesIdEditIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
