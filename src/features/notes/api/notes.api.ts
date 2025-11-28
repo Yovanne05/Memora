@@ -41,3 +41,22 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
 
     return res.json();
 }
+
+export interface UpdateNotePayload {
+    title?: string;
+    content?: string;
+    visibility?: "private" | "public";
+}
+
+export async function updateNote(noteId: string, payload: UpdateNotePayload): Promise<Note> {
+    const res = await fetch(`${API_URL}/notes/${noteId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+        throw new Error("Erreur lors de la mise à jour de la note");
+    }
+
+    return res.json();
+}
