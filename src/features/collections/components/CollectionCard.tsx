@@ -1,4 +1,4 @@
-import type { Collection } from "../types"
+import type { Collection } from "../models/collection.model"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {

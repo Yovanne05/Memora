@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { CollectionVisibility } from "../types"
+import type { CollectionVisibility } from "../models/collection.model"
 
 export interface CollectionFormValues {
   name: string

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 
-import { fetchCollectionById } from '@/features/collections/api'
+import { fetchCollectionById } from '@/features/collections/api/collections.api'
 import { CollectionsDetailsPage } from '@/features/collections/pages/CollectionsDetailsPage'
 
 export const Route = createFileRoute('/app/collections/$collectionId/')({

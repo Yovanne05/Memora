@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { useCollections, useUpdateCollection } from "../hooks"
-import type { Collection } from "../types"
+import { useCollections, useUpdateCollection } from "../hooks/useCollections"
+import type { Collection } from "../models/collection.model"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChevronLeft, Edit3, Plus, Share2 } from "lucide-react"

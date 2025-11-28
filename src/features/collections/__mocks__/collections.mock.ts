@@ -1,4 +1,4 @@
-import type { Collection } from "../types"
+import type { Collection } from "../models/collection.model"
 
 function iso(date: string) {
   return new Date(date).toISOString()

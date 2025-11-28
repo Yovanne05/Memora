@@ -2,8 +2,8 @@ import type {
   Collection,
   CollectionCreatePayload,
   CollectionUpdatePayload,
-} from "./types"
-import { MOCK_COLLECTIONS } from "./__mocks__/collections.mock"
+} from "../models/collection.model"
+import { MOCK_COLLECTIONS } from "../__mocks__/collections.mock"
 
 const BASE_URL =
   import.meta.env.VITE_API_URL?.toString().replace(/\/$/, "") ??

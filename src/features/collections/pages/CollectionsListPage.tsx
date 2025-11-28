@@ -3,12 +3,12 @@ import {
   useCollections,
   useCreateCollection,
   useUpdateCollection,
-} from "../hooks"
+} from "../hooks/useCollections"
 import { CollectionsHeader } from "../components/CollectionsHeader"
 import { CollectionsToolbar } from "../components/CollectionsToolbar"
 import { CollectionsGrid } from "../components/CollectionsGrid"
 
-import type { Collection } from "../types"
+import type { Collection } from "../models/collection.model"
 
 import {
   Dialog,
@@ -24,7 +24,7 @@ import {
 } from "../components/CollectionEditForm"
 
 import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
-import { deleteCollection } from "../api"
+import { deleteCollection } from "../api/collections.api"
 
 const CURRENT_USER_ID = "user-1" // TODO: remplacer par auth plus tard
 

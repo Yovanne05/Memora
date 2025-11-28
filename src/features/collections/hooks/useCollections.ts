@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useState } from "react"
-import type { 
-  Collection, 
-  CollectionCreatePayload, 
-  CollectionUpdatePayload
- } from "./types"
+import type {
+  Collection,
+  CollectionCreatePayload,
+  CollectionUpdatePayload,
+} from "../models/collection.model"
 import {
   fetchCollections,
   fetchCollectionById,
   createCollection,
   updateCollection,
   deleteCollection,
-} from "./api"
-
+} from "../api/collections.api"
 
 export function useCollections() {
   const [collections, setCollections] = useState<Collection[]>([])
@@ -44,7 +43,6 @@ export function useCollections() {
     reload,
   }
 }
-
 
 export function useCollection(id?: string) {
   const [collection, setCollection] = useState<Collection | null>(null)
@@ -80,10 +78,7 @@ export function useCollection(id?: string) {
   }
 }
 
-
-export function useCreateCollection(
-  onSuccess?: (created: Collection) => void
-) {
+export function useCreateCollection(onSuccess?: (created: Collection) => void) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -113,10 +108,7 @@ export function useCreateCollection(
   }
 }
 
-
-export function useUpdateCollection(
-  onSuccess?: (updated: Collection) => void
-) {
+export function useUpdateCollection(onSuccess?: (updated: Collection) => void) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -145,7 +137,6 @@ export function useUpdateCollection(
     error,
   }
 }
-
 
 export function useDeleteCollection(onSuccess?: (id: string) => void) {
   const [loading, setLoading] = useState(false)
