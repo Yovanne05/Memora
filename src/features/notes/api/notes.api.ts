@@ -3,6 +3,13 @@ import type { NotesFilters } from "../models/note-filters.model";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export interface CreateNotePayload {
+    title: string;
+    content: string;
+    owner_id: string;
+    visibility: "private" | "public";
+}
+
 export async function fetchNotes({
     page,
     limit,
@@ -66,6 +73,22 @@ export async function updateNote(noteId: string, payload: UpdateNotePayload): Pr
 
     if (!res.ok) {
         throw new Error("Erreur lors de la mise à jour de la note");
+    }
+
+    return res.json();
+}
+
+export async function createNote(payload: CreateNotePayload): Promise<Note> {
+    const res = await fetch(`${API_URL}/notes`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+        throw new Error("Erreur lors de la création de la note");
     }
 
     return res.json();

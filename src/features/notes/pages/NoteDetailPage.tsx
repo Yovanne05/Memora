@@ -52,7 +52,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
         .filter(Boolean);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-6">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <ArrowLeft className="h-4 w-4" />
