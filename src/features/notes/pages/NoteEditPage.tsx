@@ -1,13 +1,26 @@
 import { useMemo, useState } from "react"
-import { Link } from "@tanstack/react-router"
+import { Link, useRouter } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { Check, FileText, Save } from "lucide-react"
+import { Check, FileText, Save, Trash2 } from "lucide-react"
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
 import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
+import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutation"
 import type { Note } from "@/features/notes/models/note.model"
 
 interface NoteEditPageProps {
@@ -25,11 +38,14 @@ function formatTime(dateString?: string) {
 export function NoteEditPage({ noteId }: NoteEditPageProps) {
     const { data: note } = useNoteQuery(noteId)
     const updateNoteMutation = useUpdateNoteMutation()
+    const deleteNoteMutation = useDeleteNoteMutation()
+    const router = useRouter()
 
     const [title, setTitle] = useState<string | undefined>()
     const [content, setContent] = useState<string | undefined>()
     const [visibility, setVisibility] = useState<Note["visibility"] | undefined>()
     const [lastSavedAt, setLastSavedAt] = useState<string | undefined>()
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
     const currentTitle = title ?? note?.title ?? ""
     const currentContent = content ?? note?.content ?? ""
@@ -50,6 +66,14 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
         })
 
         setLastSavedAt(new Date().toISOString())
+    }
+
+    const handleDelete = async () => {
+        if (!noteId) return
+
+        await deleteNoteMutation.mutateAsync(noteId)
+        setIsDeleteDialogOpen(false)
+        router.navigate({ to: "/app/notes" })
     }
 
     return (
@@ -83,6 +107,37 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                                 Cancel
                             </Link>
                         </Button>
+
+                        {/* DELETE BUTTON + MODAL */}
+                        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" className="gap-2" disabled={deleteNoteMutation.isPending}>
+                                    <Trash2 className="h-4 w-4" /> Delete
+                                </Button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Supprimer la note</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Cette action est définitive. La note sera supprimée de façon permanente.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel disabled={deleteNoteMutation.isPending}>
+                                        Annuler
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleDelete}
+                                        disabled={deleteNoteMutation.isPending}
+                                    >
+                                        {deleteNoteMutation.isPending ? "Suppression..." : "Supprimer"}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
                         <Button className="gap-2" onClick={handleSave} disabled={updateNoteMutation.isPending}>
                             <Save className="h-4 w-4" /> Save
                         </Button>
@@ -108,16 +163,13 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                                         {currentVisibility === "public" ? "Publique" : "Privée"}
                                     </p>
                                 </div>
+
                                 <Switch
                                     aria-label="Basculer la visibilité"
                                     checked={currentVisibility === "public"}
                                     onCheckedChange={(checked) => setVisibility(checked ? "public" : "private")}
                                 />
                             </div>
-
-                            <Button className="h-12 gap-2" onClick={handleSave} disabled={updateNoteMutation.isPending}>
-                                <Save className="h-4 w-4" /> Save
-                            </Button>
                         </div>
                     </div>
 

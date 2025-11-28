@@ -42,6 +42,16 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
     return res.json();
 }
 
+export async function deleteNote(noteId: string): Promise<void> {
+    const res = await fetch(`${API_URL}/notes/${noteId}`, {
+        method: "DELETE",
+    });
+
+    if (!res.ok) {
+        throw new Error("Erreur lors de la suppression de la note");
+    }
+}
+
 export interface UpdateNotePayload {
     title?: string;
     content?: string;
