@@ -1,5 +1,13 @@
-import type { Collection } from "../models/collection.model"
-import type { CollectionDto } from "../dtos/collection.dto"
+import type {
+  Collection,
+  CollectionCreate,
+  CollectionUpdate,
+} from "../models/collection.model"
+import type {
+  CollectionDto,
+  CollectionCreateDto,
+  CollectionUpdateDto,
+} from "../dtos/collection.dto"
 
 export function dtoToCollection(dto: CollectionDto): Collection {
   return {
@@ -10,5 +18,22 @@ export function dtoToCollection(dto: CollectionDto): Collection {
     visibility: dto.visibility ?? "private",
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
+  }
+}
+
+export function toCollectionCreateDto(payload: CollectionCreate): CollectionCreateDto {
+  return {
+    owner_id: payload.ownerId,
+    name: payload.name,
+    description: payload.description ?? null,
+    visibility: payload.visibility ?? "private",
+  }
+}
+
+export function toCollectionUpdateDto(payload: CollectionUpdate): CollectionUpdateDto {
+  return {
+    name: payload.name,
+    description: payload.description,
+    visibility: payload.visibility,
   }
 }

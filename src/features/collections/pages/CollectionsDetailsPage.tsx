@@ -1,13 +1,14 @@
 import { useState } from "react"
 import type { CollectionFormValues } from "../components/CollectionEditForm"
 import { CollectionFormDialog } from "../components/CollectionFormDialog"
-import { useCollection, useUpdateCollection } from "../hooks/useCollections"
 import { useCollectionDeletion } from "../hooks/useCollectionDeletion"
 import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChevronLeft, Edit3, Plus, Share2 } from "lucide-react"
 import { useRouter, useParams } from "@tanstack/react-router"
+import { useCollection } from "../hooks/useCollection"
+import { useUpdateCollection } from "../hooks/useUpdateCollection"
 
 function useCollectionFromRoute() {
   const { id } = useParams({ strict: false })
@@ -26,7 +27,7 @@ export function CollectionsDetailsPage() {
   })
 
   if (loading) {
-    return <p className="p-6 text-sm text-muted-foreground">Loading collection…</p>
+    return <p className="p-6 text-sm text-muted-foreground">Loading collection...</p>
   }
 
   if (error || !collection) {

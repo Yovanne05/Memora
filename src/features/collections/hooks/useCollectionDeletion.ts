@@ -1,37 +1,33 @@
 import { useState, useCallback } from "react"
 import type { Collection } from "../models/collection.model"
-import { deleteCollection } from "../api/collections.api"
+import {
+  collectionsService,
+  type CollectionsService,
+} from "../services/collections.service"
+import { useDeleteCollection } from "./useDeleteCollection"
 
 interface UseCollectionDeletionArgs {
   onDeleted?: (id: string) => void
+  service?: CollectionsService
 }
 
-export function useCollectionDeletion({ onDeleted }: UseCollectionDeletionArgs = {}) {
+export function useCollectionDeletion({
+  onDeleted,
+  service = collectionsService,
+}: UseCollectionDeletionArgs = {}) {
   const [target, setTarget] = useState<Collection | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { remove, loading, error, resetError } = useDeleteCollection(onDeleted, service)
 
   const confirmDelete = useCallback(async () => {
     if (!target) return
-
-    try {
-      setLoading(true)
-      setError(null)
-      await deleteCollection(target.id)
-      onDeleted?.(target.id)
-      setTarget(null)
-    } catch (err) {
-      console.error(err)
-      setError("Unable to delete this collection. Please try again.")
-    } finally {
-      setLoading(false)
-    }
-  }, [onDeleted, target])
+    await remove(target.id)
+    setTarget(null)
+  }, [remove, target])
 
   const reset = useCallback(() => {
     setTarget(null)
-    setError(null)
-  }, [])
+    resetError()
+  }, [resetError])
 
   return {
     target,

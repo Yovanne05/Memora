@@ -11,3 +11,16 @@ export interface CollectionDto {
 }
 
 export type CollectionsListDto = CollectionDto[] | { items: CollectionDto[] }
+
+export interface CollectionCreateDto {
+  owner_id: string
+  name: string
+  description?: string | null
+  visibility?: CollectionVisibilityDto
+}
+
+export interface CollectionUpdateDto {
+  name?: string
+  description?: string | null
+  visibility?: CollectionVisibilityDto
+}

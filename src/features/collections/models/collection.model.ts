@@ -10,14 +10,14 @@ export interface Collection {
   updatedAt: string
 }
 
-export interface CollectionCreatePayload {
+export interface CollectionCreate {
   ownerId: string
   name: string
   description?: string | null
   visibility?: CollectionVisibility
 }
 
-export interface CollectionUpdatePayload {
+export interface CollectionUpdate {
   name?: string
   description?: string | null
   visibility?: CollectionVisibility

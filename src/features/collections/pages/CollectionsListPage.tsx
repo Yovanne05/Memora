@@ -1,11 +1,5 @@
 import { useMemo, useState } from "react"
 import { Plus } from "lucide-react"
-
-import {
-  useCollections,
-  useCreateCollection,
-  useUpdateCollection,
-} from "../hooks/useCollections"
 import { CollectionsHeader } from "../components/CollectionsHeader"
 import { CollectionsToolbar } from "../components/CollectionsToolbar"
 import { CollectionsGrid } from "../components/CollectionsGrid"
@@ -21,6 +15,9 @@ import { useCollectionDeletion } from "../hooks/useCollectionDeletion"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 
 import { Button } from "@/components/ui/button"
+import { useCollections } from "../hooks/useCollectionsList"
+import { useCreateCollection } from "../hooks/useCreateCollection"
+import { useUpdateCollection } from "../hooks/useUpdateCollection"
 
 export function CollectionsListPage() {
   const { userId } = useCurrentUser()
