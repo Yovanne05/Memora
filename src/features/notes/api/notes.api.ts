@@ -41,3 +41,32 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
 
     return res.json();
 }
+
+export async function deleteNote(noteId: string): Promise<void> {
+    const res = await fetch(`${API_URL}/notes/${noteId}`, {
+        method: "DELETE",
+    });
+
+    if (!res.ok) {
+        throw new Error("Erreur lors de la suppression de la note");
+    }
+}
+
+export interface UpdateNotePayload {
+    title?: string;
+    content?: string;
+    visibility?: "private" | "public";
+}
+
+export async function updateNote(noteId: string, payload: UpdateNotePayload): Promise<Note> {
+    const res = await fetch(`${API_URL}/notes/${noteId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+        throw new Error("Erreur lors de la mise à jour de la note");
+    }
+
+    return res.json();
+}

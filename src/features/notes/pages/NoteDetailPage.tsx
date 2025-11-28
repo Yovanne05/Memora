@@ -1,11 +1,26 @@
+import { useState } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, CalendarClock, Globe, Lock, NotebookPen, Pencil, Trash2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarClock, Globe, Lock, NotebookPen, Pencil } from "lucide-react";
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation";
 import { useNoteQuery } from "../hooks/useNoteQuery";
 
 const formatDate = (date: string) =>
@@ -26,6 +41,10 @@ const formatDateTime = (date: string) =>
 
 export function NoteDetailPage({ noteId }: { noteId: string }) {
     const { data: note, isLoading, isError, error } = useNoteQuery(noteId);
+
+    const deleteNoteMutation = useDeleteNoteMutation();
+    const router = useRouter();
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const paragraphs = note?.content
         .split(/\n+/)
@@ -60,11 +79,16 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                             Aucune Collection
                                         </Badge>
                                     )}
+
                                     {isLoading ? (
                                         <Skeleton className="h-6 w-20" />
                                     ) : (
                                         <Badge variant="outline" className="flex items-center gap-1 text-xs capitalize">
-                                            {note?.visibility === "public" ? <Globe className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+                                            {note?.visibility === "public" ? (
+                                                <Globe className="h-3.5 w-3.5" />
+                                            ) : (
+                                                <Lock className="h-3.5 w-3.5" />
+                                            )}
                                             {note?.visibility} note
                                         </Badge>
                                     )}
@@ -77,7 +101,9 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     </div>
                                 ) : (
                                     <>
-                                        <h1 className="text-4xl font-semibold leading-tight tracking-tight">{note?.title}</h1>
+                                        <h1 className="text-4xl font-semibold leading-tight tracking-tight">
+                                            {note?.title}
+                                        </h1>
                                         <p className="max-w-3xl text-base text-muted-foreground leading-relaxed line-clamp-3">
                                             {paragraphs?.[0] ?? ""}
                                         </p>
@@ -93,13 +119,17 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                             Owned by {note?.owner_id}
                                         </span>
                                     )}
+
                                     <Separator orientation="vertical" className="h-4" />
+
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
                                         <span>Created {note && formatDate(note.created_at)}</span>
                                     )}
+
                                     <Separator orientation="vertical" className="h-4" />
+
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
@@ -114,6 +144,45 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                         <Pencil className="h-4 w-4" /> Edit note
                                     </Link>
                                 </Button>
+
+                                {/* Delete Button + Dialog */}
+                                <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            variant="destructive"
+                                            className="gap-2"
+                                            disabled={deleteNoteMutation.isPending || isLoading}
+                                        >
+                                            <Trash2 className="h-4 w-4" /> Delete
+                                        </Button>
+                                    </AlertDialogTrigger>
+
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Supprimer la note</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Cette action est définitive. La note sera supprimée de façon permanente.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel disabled={deleteNoteMutation.isPending}>
+                                                Annuler
+                                            </AlertDialogCancel>
+
+                                            <AlertDialogAction
+                                                onClick={async () => {
+                                                    await deleteNoteMutation.mutateAsync(noteId);
+                                                    setIsDeleteDialogOpen(false);
+                                                    router.navigate({ to: "/app/notes" });
+                                                }}
+                                                disabled={deleteNoteMutation.isPending}
+                                            >
+                                                {deleteNoteMutation.isPending ? "Suppression..." : "Supprimer"}
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </div>
                         </div>
                     </CardContent>
@@ -126,6 +195,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                         <CardTitle className="text-xl">Content</CardTitle>
                         <p className="text-sm text-muted-foreground">Full details of the selected note.</p>
                     </CardHeader>
+
                     <CardContent className="space-y-4 text-base leading-relaxed text-muted-foreground">
                         {isLoading && (
                             <div className="space-y-3">
@@ -137,7 +207,9 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                         )}
 
                         {isError && !isLoading && (
-                            <p className="text-destructive">{error?.message ?? "Impossible de charger la note."}</p>
+                            <p className="text-destructive">
+                                {error?.message ?? "Impossible de charger la note."}
+                            </p>
                         )}
 
                         {!isLoading && !isError && paragraphs?.length ? (
@@ -161,6 +233,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                         <CardHeader>
                             <CardTitle className="text-lg">Details</CardTitle>
                         </CardHeader>
+
                         <CardContent className="space-y-3 text-sm text-muted-foreground">
                             {isLoading ? (
                                 <div className="space-y-2">
@@ -175,6 +248,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                         <span className="text-foreground">Owner</span>
                                         <span className="text-muted-foreground">{note?.owner_id}</span>
                                     </div>
+
                                     <div className="flex items-center gap-2">
                                         <Globe className="h-4 w-4" />
                                         <span className="text-foreground">Visibility</span>
@@ -182,11 +256,13 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                             {note?.visibility}
                                         </Badge>
                                     </div>
+
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
                                         <span className="text-foreground">Created</span>
                                         <span>{note && formatDateTime(note.created_at)}</span>
                                     </div>
+
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
                                         <span className="text-foreground">Updated</span>
