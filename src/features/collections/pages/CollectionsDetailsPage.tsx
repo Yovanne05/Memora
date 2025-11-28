@@ -1,43 +1,49 @@
 import { useState } from "react"
-import { useCollections, useUpdateCollection } from "../hooks/useCollections"
-import type { Collection } from "../models/collection.model"
+import type { CollectionFormValues } from "../components/CollectionEditForm"
+import { CollectionFormDialog } from "../components/CollectionFormDialog"
+import { useCollection, useUpdateCollection } from "../hooks/useCollections"
+import { useCollectionDeletion } from "../hooks/useCollectionDeletion"
+import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChevronLeft, Edit3, Plus, Share2 } from "lucide-react"
-import {
-  CollectionEditForm,
-  type CollectionFormValues,
-} from "../components/CollectionEditForm"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { useRouter } from "@tanstack/react-router"
+import { useRouter, useParams } from "@tanstack/react-router"
 
-interface CollectionDetailsPageProps {
-  collection: Collection
+function useCollectionFromRoute() {
+  const { id } = useParams({ strict: false })
+  const { collection, loading, error, reload } = useCollection(id)
+  return { collection, loading, error, reload }
 }
 
-export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProps) {
+export function CollectionsDetailsPage() {
   const router = useRouter()
-  const { setCollections } = useCollections()
-
-  const [currentCollection, setCurrentCollection] = useState<Collection>(collection)
+  const { collection, loading, error, reload } = useCollectionFromRoute()
   const [isEditing, setIsEditing] = useState(false)
 
-  const { update, loading: updating } = useUpdateCollection((updated) => {
-    setCollections((prev) =>
-      prev.map((c) => (c.id === updated.id ? updated : c))
-    )
-    setCurrentCollection(updated)
-    setIsEditing(false)
+  const updateHook = useUpdateCollection(() => setIsEditing(false))
+  const deletion = useCollectionDeletion({
+    onDeleted: () => router.navigate({ to: "/app/collections" }),
   })
 
+  if (loading) {
+    return <p className="p-6 text-sm text-muted-foreground">Loading collection…</p>
+  }
+
+  if (error || !collection) {
+    return (
+      <div className="p-6">
+        <p className="mb-3 text-sm text-red-600">
+          {error ?? "Collection not found."}
+        </p>
+        <Button variant="outline" onClick={reload}>
+          Retry
+        </Button>
+      </div>
+    )
+  }
+
   const handleEditSubmit = async (values: CollectionFormValues) => {
-    await update(currentCollection.id, {
+    await updateHook.update(collection.id, {
       name: values.name,
       description: values.description,
       visibility: values.visibility,
@@ -58,12 +64,10 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
 
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold">
-              {currentCollection.name}
-            </h1>
-            {currentCollection.description && (
+            <h1 className="text-2xl font-semibold">{collection.name}</h1>
+            {collection.description && (
               <p className="max-w-2xl text-sm text-muted-foreground">
-                {currentCollection.description}
+                {collection.description}
               </p>
             )}
           </div>
@@ -81,13 +85,20 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
               <Plus className="mr-1.5 h-4 w-4" />
               New Note
             </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              type="button"
+              onClick={() => deletion.setTarget(collection)}
+              disabled={deletion.loading}
+            >
+              Delete
+            </Button>
           </div>
         </div>
 
         <div className="rounded-xl border border-border bg-card px-5 py-4">
-          <h2 className="mb-2 text-sm font-semibold">
-            Collaborators
-          </h2>
+          <h2 className="mb-2 text-sm font-semibold">Collaborators</h2>
           <p className="text-xs text-muted-foreground">
             Collaboration UI will be added later. For now, this collection is owned by you.
           </p>
@@ -108,28 +119,29 @@ export function CollectionsDetailsPage({ collection }: CollectionDetailsPageProp
         </div>
       </div>
 
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Edit collection</DialogTitle>
-            <DialogDescription>
-              Update the name, description or visibility of this collection.
-            </DialogDescription>
-          </DialogHeader>
+      <CollectionFormDialog
+        mode="edit"
+        open={isEditing}
+        loading={updateHook.loading}
+        initial={{
+          name: collection.name,
+          description: collection.description ?? "",
+          visibility: collection.visibility,
+        }}
+        onSubmit={handleEditSubmit}
+        onClose={() => setIsEditing(false)}
+      />
 
-          <CollectionEditForm
-            mode="edit"
-            initial={{
-              name: currentCollection.name,
-              description: currentCollection.description ?? "",
-              visibility: currentCollection.visibility,
-            }}
-            loading={updating}
-            onSubmit={handleEditSubmit}
-            onCancel={() => setIsEditing(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      <DeleteCollectionDialog
+        open={!!deletion.target}
+        collection={deletion.target}
+        loading={deletion.loading}
+        error={deletion.error ?? undefined}
+        onCancel={deletion.reset}
+        onConfirm={deletion.confirmDelete}
+      />
     </div>
   )
 }
+
+export default CollectionsDetailsPage

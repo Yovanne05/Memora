@@ -12,25 +12,22 @@ import { CollectionsGrid } from "../components/CollectionsGrid"
 import { CollectionsListSkeleton } from "../components/CollectionsListSkeleton"
 import { CollectionsEmptyState } from "../components/CollectionsEmptyState"
 import { CollectionsErrorAlert } from "../components/CollectionsErrorAlert"
-import { CollectionEditForm, type CollectionFormValues } from "../components/CollectionEditForm"
+import { CollectionFormDialog } from "../components/CollectionFormDialog"
+import type { CollectionFormValues } from "../components/CollectionEditForm"
 import { DeleteCollectionDialog } from "../components/DeleteCollectionDialog"
 import { applyCollectionsQuery, type CollectionsSort, type CollectionsTab } from "../lib/collections-query"
-import { deleteCollection } from "../api/collections.api"
 import type { Collection } from "../models/collection.model"
+import { useCollectionDeletion } from "../hooks/useCollectionDeletion"
+import { useCurrentUser } from "@/hooks/useCurrentUser"
 
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-
-const CURRENT_USER_ID = "8bfb888a-d099-4faf-9517-ecc7128c918c" // TODO: remplacer par auth plus tard
 
 export function CollectionsListPage() {
+  const { userId } = useCurrentUser()
   const { collections, setCollections, loading, error, reload } = useCollections()
+  const deletion = useCollectionDeletion({
+    onDeleted: (id) => setCollections((prev) => prev.filter((c) => c.id !== id)),
+  })
 
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<CollectionsTab>("mine")
@@ -38,9 +35,6 @@ export function CollectionsListPage() {
 
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
-  const [deleting, setDeleting] = useState<Collection | null>(null)
-  const [deletingLoading, setDeletingLoading] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const { create, loading: creating } = useCreateCollection((created) => {
     setCollections((prev) => [created, ...prev])
@@ -55,17 +49,17 @@ export function CollectionsListPage() {
   const filtered = useMemo(
     () =>
       applyCollectionsQuery(collections, {
-        currentUserId: CURRENT_USER_ID,
+        currentUserId: userId,
         tab,
         search,
         sort,
       }),
-    [collections, search, sort, tab]
+    [collections, search, sort, tab, userId]
   )
 
   const handleCreateSubmit = async (values: CollectionFormValues) => {
     await create({
-      ownerId: CURRENT_USER_ID,
+      ownerId: userId,
       name: values.name,
       description: values.description,
       visibility: values.visibility,
@@ -79,23 +73,6 @@ export function CollectionsListPage() {
       description: values.description,
       visibility: values.visibility,
     })
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!deleting) return
-
-    try {
-      setDeletingLoading(true)
-      setDeleteError(null)
-      await deleteCollection(deleting.id)
-      setCollections((prev) => prev.filter((c) => c.id !== deleting.id))
-      setDeleting(null)
-    } catch (err) {
-      console.error(err)
-      setDeleteError("Unable to delete this collection. Please try again.")
-    } finally {
-      setDeletingLoading(false)
-    }
   }
 
   return (
@@ -122,69 +99,45 @@ export function CollectionsListPage() {
       {loading ? (
         <CollectionsListSkeleton />
       ) : filtered.length ? (
-        <CollectionsGrid items={filtered} onEdit={setEditing} onDelete={setDeleting} />
+        <CollectionsGrid
+          items={filtered}
+          onEdit={setEditing}
+          onDelete={deletion.setTarget}
+        />
       ) : (
         <CollectionsEmptyState />
       )}
 
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>New collection</DialogTitle>
-            <DialogDescription>
-              Create a new space to group related notes.
-            </DialogDescription>
-          </DialogHeader>
+      <CollectionFormDialog
+        mode="create"
+        open={createOpen}
+        loading={creating}
+        onSubmit={handleCreateSubmit}
+        onClose={() => setCreateOpen(false)}
+      />
 
-          <CollectionEditForm
-            mode="create"
-            loading={creating}
-            onSubmit={handleCreateSubmit}
-            onCancel={() => setCreateOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={!!editing}
-        onOpenChange={(open) => {
-          if (!open) setEditing(null)
-        }}
-      >
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Edit collection</DialogTitle>
-            <DialogDescription>
-              Update the name, description or visibility of this collection.
-            </DialogDescription>
-          </DialogHeader>
-
-          {editing && (
-            <CollectionEditForm
-              mode="edit"
-              initial={{
-                name: editing.name,
-                description: editing.description ?? "",
-                visibility: editing.visibility,
-              }}
-              loading={updating}
-              onSubmit={handleEditSubmit}
-              onCancel={() => setEditing(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {editing && (
+        <CollectionFormDialog
+          mode="edit"
+          open={!!editing}
+          loading={updating}
+          initial={{
+            name: editing.name,
+            description: editing.description ?? "",
+            visibility: editing.visibility,
+          }}
+          onSubmit={handleEditSubmit}
+          onClose={() => setEditing(null)}
+        />
+      )}
 
       <DeleteCollectionDialog
-        open={!!deleting}
-        collection={deleting}
-        loading={deletingLoading}
-        error={deleteError ?? undefined}
-        onCancel={() => {
-          setDeleting(null)
-          setDeleteError(null)
-        }}
-        onConfirm={handleConfirmDelete}
+        open={!!deletion.target}
+        collection={deletion.target}
+        loading={deletion.loading}
+        error={deletion.error ?? undefined}
+        onCancel={deletion.reset}
+        onConfirm={deletion.confirmDelete}
       />
     </div>
   )
