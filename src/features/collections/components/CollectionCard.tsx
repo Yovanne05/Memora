@@ -32,8 +32,8 @@ export function CollectionCard({
 
   const handleNavigate = () =>
     router.navigate({
-      to: "/app/collections/$collectionId",
-      params: { collectionId: collection.id },
+      to: "/app/collections/$id",
+      params: { id: collection.id },
     })
 
   return (
