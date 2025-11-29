@@ -11,6 +11,8 @@ import {
     FileText,
 } from "lucide-react"
 
+import { Link } from "@tanstack/react-router"
+
 import {
     Sidebar,
     SidebarContent,
@@ -63,12 +65,19 @@ export function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navigationItems.map((item) => (
-                                <SidebarMenuItem key={item.title}>
+                                <SidebarMenuItem key={`${item.title}-${item.url}`}>
                                     <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon className="h-4 w-4" />
-                                            <span>{item.title}</span>
-                                        </a>
+                                        {item.url && item.url.startsWith("/") ? (
+                                            <Link to={item.url} className="inline-flex items-center gap-2">
+                                                <item.icon className="h-4 w-4" />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        ) : (
+                                            <a href={item.url} className="inline-flex items-center gap-2">
+                                                <item.icon className="h-4 w-4" />
+                                                <span>{item.title}</span>
+                                            </a>
+                                        )}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -81,12 +90,19 @@ export function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {accountItems.map((item) => (
-                                <SidebarMenuItem key={item.title}>
+                                <SidebarMenuItem key={`${item.title}-${item.url}`}>
                                     <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon className="h-4 w-4" />
-                                            <span>{item.title}</span>
-                                        </a>
+                                        {item.url && item.url.startsWith("/") ? (
+                                            <Link to={item.url} className="inline-flex items-center gap-2">
+                                                <item.icon className="h-4 w-4" />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        ) : (
+                                            <a href={item.url} className="inline-flex items-center gap-2">
+                                                <item.icon className="h-4 w-4" />
+                                                <span>{item.title}</span>
+                                            </a>
+                                        )}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -101,7 +117,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            <a href="#">
+                            <a href="#" className="inline-flex items-center gap-2">
                                 <LogOut className="h-4 w-4" />
                                 <span>Déconnexion</span>
                             </a>

@@ -46,7 +46,7 @@ export function CollectionEditForm({
   const isFormDisabled = loading || isSubmitting
 
   const handleFormSubmit = (data: CollectionFormInput) => {
-    onSubmit({
+    return onSubmit({
       name: data.name,
       description: data.description ?? undefined,
       visibility: data.visibility,
