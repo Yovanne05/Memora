@@ -90,7 +90,7 @@ export function CollectionEditForm({
             disabled={isFormDisabled}
             error={errors.visibility}
             placeholder="Choisir la visibilité"
-            helperText="Les collections privées ne sont visibles que par vous. Les collections publiques peuvent être partagées."
+            helperText="Les collections privées ne sont visibles que par vous."
             options={[
               { value: "private", label: "Privée" },
               { value: "public", label: "Publique" },
