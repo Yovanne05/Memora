@@ -1,15 +1,15 @@
-import { ApiError, TimeoutError, NetworkError } from "./errors";
+import { ApiError } from "./errors";
+import { addInterceptor, applyInterceptors } from "./interceptors";
+import { isRetryable, getRetryDelay, delay } from "./retry-strategy";
+import { parseError, normalizeError } from "./error-handler";
+import { requestWithTimeout } from "./timeout";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
 const DEFAULT_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
-const RETRY_DELAY_MULTIPLIER = 2; // backoff
-
-const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504];
-
-const RETRYABLE_METHODS = ["GET", "HEAD", "OPTIONS", "DELETE"];
+const DEFAULT_RETRY_DELAY = 1000; // 1 second
+const DEFAULT_RETRY_MULTIPLIER = 2; // Exponential backoff
 
 export interface HttpClient {
   get<T>(path: string): Promise<T>;
@@ -18,68 +18,12 @@ export interface HttpClient {
   delete<T>(path: string): Promise<T>;
 }
 
-function isIdempotent(method: string): boolean {
-  return RETRYABLE_METHODS.includes(method.toUpperCase());
-}
-
-function isRetryable(error: unknown, method: string, retries: number): boolean {
-  if (!isIdempotent(method)) {
-    if (retries > 0) {
-      console.warn(
-        `Non-idempotent method ${method.toUpperCase()} failed, not retrying. ` +
-          `Retry mechanism is disabled for non-idempotent requests to prevent duplicate operations.`
-      );
-    }
-    return false;
-  }
-
-  if (error instanceof ApiError) {
-    return RETRYABLE_STATUS_CODES.includes(error.status);
-  }
-
-  if (error instanceof TimeoutError || error instanceof NetworkError) {
-    return true;
-  }
-
-  return false;
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function requestWithTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number
-): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new TimeoutError("Request timeout")), timeoutMs)
-    ),
-  ]);
-}
-
-async function parseError(response: Response): Promise<string> {
-  try {
-    const data = (await response.json()) as {
-      message?: string;
-      error?: string;
-    };
-    return (
-      data?.message ||
-      data?.error ||
-      `Request failed with status ${response.status}`
-    );
-  } catch {
-    return `Request failed with status ${response.status}`;
-  }
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
+    const config = await applyInterceptors(init || {});
+
     const response = await requestWithTimeout(
-      fetch(`${API_URL}${path}`, init),
+      fetch(`${API_URL}${path}`, config),
       DEFAULT_TIMEOUT
     );
 
@@ -93,15 +37,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
     return (await response.json()) as T;
   } catch (error) {
-    if (error instanceof TimeoutError) {
-      throw error;
-    }
-
-    if (error instanceof Error && error.message.includes("fetch")) {
-      throw new NetworkError("Network request failed", error);
-    }
-
-    throw error;
+    normalizeError(error);
   }
 }
 
@@ -117,8 +53,11 @@ async function requestWithRetry<T>(
     const method = init?.method || "GET";
 
     if (retries > 0 && isRetryable(error, method, retries)) {
-      const backoffDelay =
-        RETRY_DELAY * Math.pow(RETRY_DELAY_MULTIPLIER, attempt - 1);
+      const backoffDelay = getRetryDelay(
+        attempt,
+        DEFAULT_RETRY_DELAY,
+        DEFAULT_RETRY_MULTIPLIER
+      );
       await delay(backoffDelay);
       return requestWithRetry<T>(path, init, retries - 1, attempt + 1);
     }
@@ -150,3 +89,5 @@ export function createHttpClient(): HttpClient {
 }
 
 export const httpClient = createHttpClient();
+
+export { addInterceptor };
