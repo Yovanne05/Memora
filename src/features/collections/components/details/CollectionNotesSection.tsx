@@ -1,6 +1,5 @@
 import { useMemo, useCallback, useState } from "react"
 import { useParams } from "@tanstack/react-router"
-import { Input } from "@/components/ui/input"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { CollectionNotesHeader } from "./CollectionNotesHeader"
@@ -15,7 +14,6 @@ export function CollectionNotesSection() {
 
   // Notes dans la collection
   const { data, isLoading } = useNotesQuery(0, 20, { collectionId: id })
-  const notes = (data?.items ?? []) as Note[]
 
   // Notes dispo à ajouter
   const { data: allData } = useNotesQuery(0, 100, {})
@@ -32,6 +30,7 @@ export function CollectionNotesSection() {
   const { mutateAsync, isPending } = updateNoteMutation
 
   const [selected, setSelected] = useState("")
+  const [search, setSearch] = useState("")
 
   const handleAddExisting = useCallback(
     async (noteId?: string) => {
@@ -64,26 +63,33 @@ export function CollectionNotesSection() {
     },
     [handleAddExisting]
   )
+  
+  const filteredNotes = useMemo(() => {
+    const notes = (data?.items ?? []) as Note[]
+
+    if (!search.trim()) return notes
+    const q = search.toLowerCase()
+
+    return notes.filter(
+      (n) =>
+        n.title.toLowerCase().includes(q) ||
+        (n.content ?? "").toLowerCase().includes(q)
+    )
+  }, [data, search])
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <CollectionNotesHeader
         availableNotes={availableNotes}
         selected={selected}
         isAdding={isPending}
         onSelectNote={handleSelectNote}
+        searchValue={search}
+        onSearchChange={setSearch}
       />
 
-      <div>
-        <Input
-          placeholder="Rechercher des notes..."
-          className="max-w-md"
-          disabled
-        />
-      </div>
-
       <CollectionNotesGrid
-        notes={notes}
+        notes={filteredNotes}
         isLoading={isLoading}
         isUpdating={isPending}
         onRemoveFromCollection={handleRemoveFromCollection}

@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Search } from "lucide-react"
-import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
+import type { CollectionsSort, CollectionsTab } from "../../lib/collections-query"
 
 interface CollectionsToolbarProps {
   search: string
