@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import type { CollectionFormValues } from "../components/CollectionEditForm"
 import { CollectionFormDialog } from "../components/CollectionFormDialog"
 import { useCollectionDeletion } from "../hooks/useCollectionDeletion"
@@ -9,9 +9,10 @@ import { ChevronLeft, Edit3, Plus, Share2 } from "lucide-react"
 import { useRouter, useParams } from "@tanstack/react-router"
 import { useCollection } from "../hooks/useCollection"
 import { useUpdateCollection } from "../hooks/useUpdateCollection"
+import { Skeleton } from "@/components/ui/skeleton"
 
 function useCollectionFromRoute() {
-  const { id } = useParams({ strict: false })
+  const { id } = useParams({ from: "/app/collections/$id/" })
   const { collection, loading, error, reload } = useCollection(id)
   return { collection, loading, error, reload }
 }
@@ -26,29 +27,68 @@ export function CollectionsDetailsPage() {
     onDeleted: () => router.navigate({ to: "/app/collections" }),
   })
 
+  const handleBackClick = useCallback(() => {
+    router.navigate({ to: "/app/collections" })
+  }, [router])
+
+  const handleEditClick = useCallback(() => setIsEditing(true), [])
+
+  const initialValues = useMemo(
+    () => ({
+      name: collection?.name ?? "",
+      description: collection?.description ?? "",
+      visibility: collection?.visibility ?? "private",
+    }),
+    [collection]
+  )
+
+  const handleEditSubmit = useCallback(
+    async (values: CollectionFormValues) => {
+      if (!collection || updateHook.loading) return
+      try {
+        await updateHook.update(collection.id, {
+          name: values.name,
+          description: values.description,
+          visibility: values.visibility,
+        })
+        await reload()
+      } catch (err) {
+        console.error("Failed to update collection", err)
+      }
+    },
+    [collection, reload, updateHook]
+  )
+
+  const isDeleting = deletion.loading
+
   if (loading) {
-    return <p className="p-6 text-sm text-muted-foreground">Loading collection...</p>
+    return (
+      <div className="space-y-4 p-6">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-4 w-96" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    )
   }
 
   if (error || !collection) {
+    console.error("Collection loading failed:", error)
     return (
       <div className="p-6">
         <p className="mb-3 text-sm text-red-600">
           {error ?? "Collection not found."}
         </p>
-        <Button variant="outline" onClick={reload}>
-          Retry
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={reload}>
+            Retry
+          </Button>
+          <Button variant="ghost" onClick={handleBackClick}>
+            Back to collections
+          </Button>
+        </div>
       </div>
     )
-  }
-
-  const handleEditSubmit = async (values: CollectionFormValues) => {
-    await updateHook.update(collection.id, {
-      name: values.name,
-      description: values.description,
-      visibility: values.visibility,
-    })
   }
 
   return (
@@ -56,10 +96,11 @@ export function CollectionsDetailsPage() {
       <div className="space-y-8">
         <button
           type="button"
-          onClick={() => router.navigate({ to: "/app/collections" })}
+          onClick={handleBackClick}
           className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          aria-label="Back to collections"
         >
-          <ChevronLeft className="h-3 w-3" />
+          <ChevronLeft className="h-3 w-3" aria-hidden="true" />
           Collections
         </button>
 
@@ -74,16 +115,23 @@ export function CollectionsDetailsPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" type="button" onClick={() => setIsEditing(true)}>
-              <Edit3 className="mr-1.5 h-4 w-4" />
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={handleEditClick}
+              disabled={isDeleting}
+              aria-label="Edit collection"
+            >
+              <Edit3 className="mr-1.5 h-4 w-4" aria-hidden="true" />
               Edit
             </Button>
-            <Button variant="outline" size="sm" type="button">
-              <Share2 className="mr-1.5 h-4 w-4" />
+            <Button variant="outline" size="sm" type="button" disabled title="Coming soon">
+              <Share2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
               Share
             </Button>
-            <Button size="sm" type="button">
-              <Plus className="mr-1.5 h-4 w-4" />
+            <Button size="sm" type="button" disabled={isDeleting}>
+              <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
               New Note
             </Button>
             <Button
@@ -91,7 +139,8 @@ export function CollectionsDetailsPage() {
               size="sm"
               type="button"
               onClick={() => deletion.setTarget(collection)}
-              disabled={deletion.loading}
+              disabled={isDeleting}
+              aria-label="Delete collection"
             >
               Delete
             </Button>
@@ -124,11 +173,7 @@ export function CollectionsDetailsPage() {
         mode="edit"
         open={isEditing}
         loading={updateHook.loading}
-        initial={{
-          name: collection.name,
-          description: collection.description ?? "",
-          visibility: collection.visibility,
-        }}
+        initial={initialValues}
         onSubmit={handleEditSubmit}
         onClose={() => setIsEditing(false)}
       />

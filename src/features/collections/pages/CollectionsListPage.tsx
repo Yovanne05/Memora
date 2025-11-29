@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Plus } from "lucide-react"
 import { CollectionsHeader } from "../components/CollectionsHeader"
 import { CollectionsToolbar } from "../components/CollectionsToolbar"
@@ -43,41 +43,61 @@ export function CollectionsListPage() {
     setEditing(null)
   })
 
-  const filtered = useMemo(
-    () =>
-      applyCollectionsQuery(collections, {
-        currentUserId: userId,
-        tab,
-        search,
-        sort,
-      }),
-    [collections, search, sort, tab, userId]
+  const filtered = useMemo(() => {
+    if (!userId) return []
+    return applyCollectionsQuery(collections, {
+      currentUserId: userId,
+      tab,
+      search,
+      sort,
+    })
+  }, [collections, search, sort, tab, userId])
+
+  const handleCreateSubmit = useCallback(
+    async (values: CollectionFormValues) => {
+      try {
+        await create({
+          ownerId: userId,
+          name: values.name,
+          description: values.description,
+          visibility: values.visibility,
+        })
+      } catch (err) {
+        console.error("Failed to create collection", err)
+      }
+    },
+    [create, userId]
   )
 
-  const handleCreateSubmit = async (values: CollectionFormValues) => {
-    await create({
-      ownerId: userId,
-      name: values.name,
-      description: values.description,
-      visibility: values.visibility,
-    })
-  }
+  const handleEditSubmit = useCallback(
+    async (values: CollectionFormValues) => {
+      if (!editing) return
+      try {
+        await update(editing.id, {
+          name: values.name,
+          description: values.description,
+          visibility: values.visibility,
+        })
+      } catch (err) {
+        console.error("Failed to update collection", err)
+      }
+    },
+    [editing, update]
+  )
 
-  const handleEditSubmit = async (values: CollectionFormValues) => {
-    if (!editing) return
-    await update(editing.id, {
-      name: values.name,
-      description: values.description,
-      visibility: values.visibility,
-    })
-  }
+  const handleCreateClick = useCallback(() => setCreateOpen(true), [])
 
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <CollectionsHeader />
-        <Button onClick={() => setCreateOpen(true)} size="lg" className="gap-2">
-          <Plus className="h-4 w-4" />
+        <Button
+          onClick={handleCreateClick}
+          size="lg"
+          className="gap-2"
+          aria-label="Create new collection"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
           New collection
         </Button>
       </div>
