@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,8 +39,8 @@ export function CollectionEditForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch,
     setValue,
+    control,
   } = useForm<CollectionFormInput>({
     resolver: zodResolver(collectionFormSchema),
     defaultValues: {
@@ -58,8 +58,8 @@ export function CollectionEditForm({
     [initial, mode]
   )
 
-  const nameValue = watch("name")
-  const visibilityValue = watch("visibility")
+  const nameValue = useWatch({ control, name: "name" })
+  const visibilityValue = useWatch({ control, name: "visibility" })
 
   const handleFormSubmit = (data: CollectionFormInput) => {
     onSubmit({
