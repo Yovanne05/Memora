@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button"
 import { FormInput } from "@/components/ui/form-input"
 import { FormTextarea } from "@/components/ui/form-textarea"
 import { FormSelect } from "@/components/ui/form-select"
-import type { CollectionVisibility } from "../models/collection.model"
-import { collectionFormSchema, type CollectionFormInput } from "../schemas/collection.schema"
+import type { CollectionVisibility } from "../../models/collection.model"
+import { collectionFormSchema, type CollectionFormInput } from "../../schemas/collection.schema"
+
 
 export interface CollectionFormValues {
   name: string

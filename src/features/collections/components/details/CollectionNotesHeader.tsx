@@ -1,5 +1,5 @@
 import { FormSelect } from "@/components/ui/form-select"
-import type { AvailableNoteOption } from "../types/note.types"
+import type { AvailableNoteOption } from "../../types/note.types"
 
 type CollectionNotesHeaderProps = {
   availableNotes: AvailableNoteOption[]

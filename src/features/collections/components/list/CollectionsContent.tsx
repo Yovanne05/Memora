@@ -2,7 +2,7 @@ import { CollectionsGrid } from "./CollectionsGrid"
 import { CollectionsListSkeleton } from "./CollectionsListSkeleton"
 import { CollectionsEmptyState } from "./CollectionsEmptyState"
 import { CollectionsErrorAlert } from "./CollectionsErrorAlert"
-import type { Collection } from "../models/collection.model"
+import type { Collection } from "../../models/collection.model"
 
 interface CollectionsContentProps {
   loading: boolean

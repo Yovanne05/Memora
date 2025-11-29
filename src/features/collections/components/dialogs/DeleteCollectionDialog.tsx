@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import type { Collection } from "../models/collection.model"
+import type { Collection } from "../../models/collection.model"
 
 interface DeleteCollectionDialogProps {
   open: boolean

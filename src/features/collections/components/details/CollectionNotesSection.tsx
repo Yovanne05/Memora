@@ -7,7 +7,7 @@ import { CollectionNotesHeader } from "./CollectionNotesHeader"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
 import type { Note } from "@/features/notes/models/note.model"
 import { CollectionNotesGrid } from "./CollectionNotesGrid"
-import type { AvailableNoteOption } from "../types/note.types"
+import type { AvailableNoteOption } from "../../types/note.types"
 
 export function CollectionNotesSection() {
   const { id } = useParams({ from: "/app/collections/$id/" })

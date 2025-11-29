@@ -1,4 +1,4 @@
-import type { Collection } from "../models/collection.model"
+import type { Collection } from "../../models/collection.model"
 import { CollectionCard } from "./CollectionCard"
 
 interface CollectionsGridProps {

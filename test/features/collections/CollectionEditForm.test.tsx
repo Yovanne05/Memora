@@ -1,7 +1,7 @@
+import { CollectionEditForm } from '@/features/collections/components/forms/CollectionEditForm'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
-import { CollectionEditForm } from '@/features/collections/components/CollectionEditForm'
 
 describe('CollectionEditForm', () => {
   test('submits values and uses default visibility', async () => {

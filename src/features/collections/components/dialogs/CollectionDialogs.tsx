@@ -1,7 +1,7 @@
-import type { CollectionFormValues } from "./CollectionEditForm"
-import { CollectionFormDialog } from "./CollectionFormDialog"
 import { DeleteCollectionDialog } from "./DeleteCollectionDialog"
-import type { Collection } from "../models/collection.model"
+import type { Collection } from "../../models/collection.model"
+import type { CollectionFormValues } from "../forms/CollectionEditForm"
+import { CollectionFormDialog } from "./CollectionFormDialog"
 
 interface CollectionDialogsProps {
   createOpen: boolean

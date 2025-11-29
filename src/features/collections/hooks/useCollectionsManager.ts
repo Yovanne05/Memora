@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import type { CollectionFormValues } from "../components/CollectionEditForm";
 import type { Collection } from "../models/collection.model";
 import type { CollectionsSort, CollectionsTab } from "../lib/collections-query";
 import { applyCollectionsQuery } from "../lib/collections-query";
@@ -10,6 +9,7 @@ import {
   useUpdateCollectionMutation,
   useDeleteCollectionMutation,
 } from "@/features/collections/hooks/useCollectionsQuery";
+import type { CollectionFormValues } from "../components/forms/CollectionEditForm";
 
 export function useCollectionsManager() {
   const { userId } = useCurrentUser();
