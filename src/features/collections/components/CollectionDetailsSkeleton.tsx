@@ -1,12 +1,11 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { SkeletonHeader, SkeletonSection } from "@/components/ui/skeleton-card"
 
 export function CollectionDetailsSkeleton() {
   return (
-    <div className="space-y-4 p-6">
-      <Skeleton className="h-8 w-64" />
-      <Skeleton className="h-4 w-96" />
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-32 w-full" />
+    <div className="space-y-8 p-6">
+      <SkeletonHeader />
+      <SkeletonSection titleHeight="h-6" contentLines={4} />
+      <SkeletonSection titleHeight="h-6" contentLines={3} />
     </div>
   )
 }
