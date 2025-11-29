@@ -5,5 +5,5 @@ export const Route = createLazyFileRoute('/app/')({
 })
 
 function RouteComponent() {
-    return <div>Hello World!</div>
+    return <div>Bienvenue dans Memora !</div>
 }

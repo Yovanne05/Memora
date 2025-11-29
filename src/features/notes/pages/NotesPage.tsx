@@ -26,17 +26,17 @@ import type { NotesFilters } from "../models/note-filters.model";
 import { useCreateNoteMutation } from "../hooks/useCreateNoteMutation";
 
 const sortOptions = [
-    { label: "Last Modified", value: { sortBy: "updated_at", sortDir: "desc" } },
-    { label: "Oldest Modified", value: { sortBy: "updated_at", sortDir: "asc" } },
-    { label: "Title A-Z", value: { sortBy: "title", sortDir: "asc" } },
-    { label: "Title Z-A", value: { sortBy: "title", sortDir: "desc" } },
-    { label: "Newest", value: { sortBy: "created_at", sortDir: "desc" } },
+    { label: "Modifiées récemment", value: { sortBy: "updated_at", sortDir: "desc" } },
+    { label: "Modifiées en premier", value: { sortBy: "updated_at", sortDir: "asc" } },
+    { label: "Titre A-Z", value: { sortBy: "title", sortDir: "asc" } },
+    { label: "Titre Z-A", value: { sortBy: "title", sortDir: "desc" } },
+    { label: "Plus récentes", value: { sortBy: "created_at", sortDir: "desc" } },
 ] as const;
 
 const visibilityFilters = [
-    { label: "All notes", value: undefined },
-    { label: "Shared", value: "public" },
-    { label: "Private", value: "private" },
+    { label: "Toutes les notes", value: undefined },
+    { label: "Partagées", value: "public" },
+    { label: "Privées", value: "private" },
 ];
 
 export default function NotesPage() {
@@ -65,7 +65,7 @@ export default function NotesPage() {
                 option.value.sortBy === filters.sortBy &&
                 option.value.sortDir === filters.sortDir
         );
-        return match?.label ?? "Last Modified";
+        return match?.label ?? "Modifiées récemment";
     }, [filters.sortBy, filters.sortDir]);
 
     const handleSearch = () => {
@@ -92,8 +92,8 @@ export default function NotesPage() {
     const handleCreateNote = async () => {
         try {
             const note = await createNoteMutation.mutateAsync({
-                title: `New Note ${Date.now()}`,
-                content: `Hello New Note ${Date.now()}`,
+                title: `Nouvelle note ${Date.now()}`,
+                content: `Bonjour nouvelle note ${Date.now()}`,
                 visibility: "private",
                 owner_id: "820437a5-ff21-4100-9859-9631efc66be7",
             });
@@ -111,7 +111,7 @@ export default function NotesPage() {
         <div className="space-y-6 p-6">
             <header className="flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-semibold tracking-tight">All Notes</h1>
+                    <h1 className="text-3xl font-semibold tracking-tight">Toutes les notes</h1>
                     <p className="text-sm text-muted-foreground">{total} notes</p>
                 </div>
 
@@ -122,7 +122,7 @@ export default function NotesPage() {
                     disabled={createNoteMutation.isPending}
                 >
                     <Plus className="h-4 w-4" />
-                    {createNoteMutation.isPending ? "Creating..." : "New Note"}
+                    {createNoteMutation.isPending ? "Création..." : "Nouvelle note"}
                 </Button>
             </header>
 
@@ -132,7 +132,7 @@ export default function NotesPage() {
                         <div className="relative w-full min-w-[260px] flex-1 lg:w-80">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
-                                placeholder="Search notes..."
+                                placeholder="Rechercher des notes..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -144,11 +144,11 @@ export default function NotesPage() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="gap-2">
                                     <SlidersHorizontal className="h-4 w-4" />
-                                    Sort by {activeSortLabel}
+                                    Trier par {activeSortLabel}
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
-                                <DropdownMenuLabel>Sort</DropdownMenuLabel>
+                                <DropdownMenuLabel>Tri</DropdownMenuLabel>
                                 {sortOptions.map((option) => (
                                     <DropdownMenuItem
                                         key={option.label}
@@ -165,11 +165,11 @@ export default function NotesPage() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="gap-2">
                                     <LayoutGrid className="h-4 w-4" />
-                                    Visibility
+                                    Visibilité
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
-                                <DropdownMenuLabel>Visibility</DropdownMenuLabel>
+                                <DropdownMenuLabel>Visibilité</DropdownMenuLabel>
                                 {visibilityFilters.map((option) => (
                                     <DropdownMenuItem
                                         key={option.label}
@@ -211,21 +211,21 @@ export default function NotesPage() {
                         size="sm"
                         onClick={() => handleVisibilityChange(undefined)}
                     >
-                        All Notes
+                        Toutes les notes
                     </Button>
                     <Button
                         variant={filters.visibility === "public" ? "secondary" : "outline"}
                         size="sm"
                         onClick={() => handleVisibilityChange("public")}
                     >
-                        Shared notes
+                        Notes partagées
                     </Button>
                     <Button
                         variant={filters.visibility === "private" ? "secondary" : "outline"}
                         size="sm"
                         onClick={() => handleVisibilityChange("private")}
                     >
-                        Private notes
+                        Notes privées
                     </Button>
                     <Separator orientation="vertical" className="hidden h-6 lg:block" />
                     <Button
@@ -234,11 +234,11 @@ export default function NotesPage() {
                         onClick={resetFilters}
                         className="text-muted-foreground"
                     >
-                        Reset
+                        Réinitialiser
                     </Button>
                     <Button size="sm" onClick={handleSearch} className="gap-2">
                         <Search className="h-4 w-4" />
-                        Apply search
+                        Appliquer la recherche
                     </Button>
                 </div>
             </div>
@@ -270,7 +270,7 @@ export default function NotesPage() {
                 )
             ) : (
                 <div className="flex h-48 items-center justify-center rounded-lg border text-muted-foreground">
-                    No notes found. Try adjusting your filters.
+                    Aucune note trouvée. Essayez d'ajuster vos filtres.
                 </div>
             )}
 

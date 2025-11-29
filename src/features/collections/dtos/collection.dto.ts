@@ -1,26 +1,38 @@
-export type CollectionVisibilityDto = "private" | "public"
+import { z } from 'zod'
 
-export interface CollectionDto {
-  id: string
-  owner_id: string
-  name: string
-  description?: string | null
-  visibility?: CollectionVisibilityDto
-  created_at: string
-  updated_at: string
-}
+export const collectionVisibilitySchema = z.enum(['private', 'public'])
 
-export type CollectionsListDto = CollectionDto[] | { items: CollectionDto[] }
+export const collectionDtoSchema = z.object({
+  id: z.uuid(),
+  owner_id: z.uuid(),
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).nullable().optional(),
+  visibility: collectionVisibilitySchema.default('private'),
+  created_at: z.iso.datetime(),
+  updated_at: z.iso.datetime(),
+})
 
-export interface CollectionCreateDto {
-  owner_id: string
-  name: string
-  description?: string | null
-  visibility?: CollectionVisibilityDto
-}
+export const collectionsListDtoSchema = z.union([
+  z.array(collectionDtoSchema),
+  z.object({ items: z.array(collectionDtoSchema) })
+])
 
-export interface CollectionUpdateDto {
-  name?: string
-  description?: string | null
-  visibility?: CollectionVisibilityDto
-}
+export const collectionCreateDtoSchema = z.object({
+  owner_id: z.uuid(),
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).nullable().optional(),
+  visibility: collectionVisibilitySchema.optional(),
+})
+
+export const collectionUpdateDtoSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).nullable().optional(),
+  visibility: collectionVisibilitySchema.optional(),
+})
+
+
+export type CollectionVisibilityDto = z.infer<typeof collectionVisibilitySchema>
+export type CollectionDto = z.infer<typeof collectionDtoSchema>
+export type CollectionsListDto = z.infer<typeof collectionsListDtoSchema>
+export type CollectionCreateDto = z.infer<typeof collectionCreateDtoSchema>
+export type CollectionUpdateDto = z.infer<typeof collectionUpdateDtoSchema>

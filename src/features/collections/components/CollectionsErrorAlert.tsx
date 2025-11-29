@@ -13,7 +13,7 @@ export function CollectionsErrorAlert({ message, onRetry }: CollectionsErrorAler
           onClick={onRetry}
           className="font-medium underline underline-offset-2"
         >
-          Retry
+          Réessayer
         </button>
       )}
     </div>

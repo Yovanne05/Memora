@@ -1,65 +1,91 @@
-const API_URL = import.meta.env.VITE_API_URL
+import { ApiError } from "./errors";
+import { addInterceptor, applyInterceptors } from "./interceptors";
+import { isRetryable, getRetryDelay, delay } from "./retry-strategy";
+import { parseError, normalizeError } from "./error-handler";
+import { requestWithTimeout } from "./timeout";
+import { config } from "./config";
 
-export class ApiError extends Error {
-  status: number
-
-  constructor(message: string, status: number) {
-    super(message)
-    this.name = "ApiError"
-    this.status = status
-  }
-}
+const DEFAULT_TIMEOUT = 10000; // 10 seconds
+const DEFAULT_RETRIES = 3;
+const DEFAULT_RETRY_DELAY = 1000; // 1 second
+const DEFAULT_RETRY_MULTIPLIER = 2; // Exponential backoff
 
 export interface HttpClient {
-  get<T>(path: string): Promise<T>
-  post<T, B = unknown>(path: string, body?: B): Promise<T>
-  patch<T, B = unknown>(path: string, body?: B): Promise<T>
-  delete<T>(path: string): Promise<T>
-}
-
-async function parseError(response: Response): Promise<string> {
-  try {
-    const data = (await response.json()) as { message?: string; error?: string }
-    return data?.message || data?.error || `Request failed with status ${response.status}`
-  } catch {
-    return `Request failed with status ${response.status}`
-  }
+  get<T>(path: string): Promise<T>;
+  post<T, B = unknown>(path: string, body?: B): Promise<T>;
+  patch<T, B = unknown>(path: string, body?: B): Promise<T>;
+  delete<T>(path: string): Promise<T>;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, init)
+  try {
+    const requestConfig = await applyInterceptors(init || {});
+    const response = await requestWithTimeout(
+      fetch(`${config.apiUrl}${path}`, requestConfig),
+      DEFAULT_TIMEOUT
+    );
 
-  if (!response.ok) {
-    throw new ApiError(await parseError(response), response.status)
+    if (!response.ok) {
+      throw new ApiError(await parseError(response), response.status);
+    }
+
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    normalizeError(error);
   }
+}
 
-  if (response.status === 204) {
-    return undefined as T
+async function requestWithRetry<T>(
+  path: string,
+  init?: RequestInit,
+  retries: number = DEFAULT_RETRIES,
+  attempt: number = 1
+): Promise<T> {
+  try {
+    return await request<T>(path, init);
+  } catch (error) {
+    const method = init?.method || "GET";
+
+    if (retries > 0 && isRetryable(error, method, retries)) {
+      const backoffDelay = getRetryDelay(
+        attempt,
+        DEFAULT_RETRY_DELAY,
+        DEFAULT_RETRY_MULTIPLIER
+      );
+      await delay(backoffDelay);
+      return requestWithRetry<T>(path, init, retries - 1, attempt + 1);
+    }
+
+    throw error;
   }
-
-  return (await response.json()) as T
 }
 
 export function createHttpClient(): HttpClient {
   return {
-    get: (path) => request(path, { method: "GET" }),
+    get: (path) => requestWithRetry(path, { method: "GET" }),
     post: (path, body) =>
-      request(path, {
+      requestWithRetry(path, {
         method: "POST",
         headers: body ? { "Content-Type": "application/json" } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       }),
     patch: (path, body) =>
-      request(path, {
+      requestWithRetry(path, {
         method: "PATCH",
         headers: body ? { "Content-Type": "application/json" } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       }),
     delete: (path) =>
-      request(path, {
+      requestWithRetry(path, {
         method: "DELETE",
       }),
-  }
+  };
 }
 
-export const httpClient = createHttpClient()
+export const httpClient = createHttpClient();
+
+export { addInterceptor };

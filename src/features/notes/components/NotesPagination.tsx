@@ -1,16 +1,16 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 
 export function NotesPagination({
     page,
     maxPage,
     setPage,
 }: {
-    page: number;
-    maxPage: number;
-    setPage: (p: number) => void;
+    page: number
+    maxPage: number
+    setPage: (p: number) => void
 }) {
     return (
-        <div className="flex justify-center items-center gap-4 mt-6">
+        <div className="mt-6 flex items-center justify-center gap-4">
             <Button
                 variant="outline"
                 disabled={page === 0}
@@ -31,5 +31,5 @@ export function NotesPagination({
                 Suivant
             </Button>
         </div>
-    );
+    )
 }

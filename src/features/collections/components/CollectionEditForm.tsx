@@ -1,19 +1,15 @@
-import { useMemo, useState, type FormEvent } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { FormInput } from "@/components/ui/form-input"
+import { FormTextarea } from "@/components/ui/form-textarea"
+import { FormSelect } from "@/components/ui/form-select"
 import type { CollectionVisibility } from "../models/collection.model"
+import { collectionFormSchema, type CollectionFormInput } from "../schemas/collection.schema"
 
 export interface CollectionFormValues {
   name: string
-  description?: string | null
+  description?: string
   visibility: CollectionVisibility
 }
 
@@ -21,7 +17,7 @@ interface CollectionEditFormProps {
   mode: "create" | "edit"
   initial?: CollectionFormValues
   loading?: boolean
-  onSubmit: (values: CollectionFormValues) => void
+  onSubmit: (values: CollectionFormValues) => void | Promise<void>
   onCancel?: () => void
 }
 
@@ -32,84 +28,75 @@ export function CollectionEditForm({
   onSubmit,
   onCancel,
 }: CollectionEditFormProps) {
-  const [name, setName] = useState<string>(initial?.name ?? "")
-  const [description, setDescription] = useState<string>(initial?.description ?? "")
-  const [visibility, setVisibility] = useState<CollectionVisibility>(
-    initial?.visibility ?? "private"
-  )
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    control,
+  } = useForm<CollectionFormInput>({
+    resolver: zodResolver(collectionFormSchema),
+    defaultValues: {
+      name: initial?.name ?? "",
+      description: initial?.description ?? "",
+      visibility: initial?.visibility ?? "private",
+    },
+  })
 
-  const formKey = useMemo(
-    () =>
-      initial
-        ? `${initial.name ?? ""}-${initial.description ?? ""}-${initial.visibility}-${mode}`
-        : `create-${mode}`,
-    [initial, mode]
-  )
+  const isEdit = mode === "edit"
+  const isFormDisabled = loading || isSubmitting
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    const trimmedName = name.trim()
-    if (!trimmedName) return
-
-    const trimmedDescription = description.trim()
-
-    onSubmit({
-      name: trimmedName,
-      description: trimmedDescription ? trimmedDescription : undefined,
-      visibility,
+  const handleFormSubmit = (data: CollectionFormInput) => {
+    return onSubmit({
+      name: data.name,
+      description: data.description ?? undefined,
+      visibility: data.visibility,
     })
   }
 
-  const isEdit = mode === "edit"
-
   return (
-    <form key={formKey} onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       {/* Name */}
-      <div className="space-y-2">
-        <Label htmlFor="collection-name">Collection name</Label>
-        <Input
-          id="collection-name"
-          placeholder="e.g. Computer Science Fundamentals"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-        />
-      </div>
+      <FormInput
+        id="collection-name"
+        label="Nom de la collection"
+        placeholder="ex. Fondamentaux de l'informatique"
+        disabled={isFormDisabled}
+        error={errors.name}
+        {...register("name")}
+      />
 
       {/* Description */}
-      <div className="space-y-2">
-        <Label htmlFor="collection-description">Description</Label>
-        <textarea
-          id="collection-description"
-          rows={3}
-          className="w-full resize-none rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
-          placeholder="Describe what this collection is about..."
-          value={description ?? ""}
-          onChange={(e) => setDescription(e.target.value)}
-          disabled={loading}
-        />
-      </div>
+      <FormTextarea
+        id="collection-description"
+        label="Description"
+        rows={3}
+        placeholder="Décrivez l'objectif de cette collection..."
+        disabled={isFormDisabled}
+        error={errors.description}
+        {...register("description")}
+      />
 
       {/* Visibility */}
-      <div className="space-y-2">
-        <Label>Visibility</Label>
-        <Select
-          disabled={loading}
-          value={visibility}
-          onValueChange={(v) => setVisibility(v as CollectionVisibility)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select visibility" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="private">Private</SelectItem>
-            <SelectItem value="public">Public</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-slate-500">
-          Private collections are only visible to you. Public ones can be shared.
-        </p>
-      </div>
+      <Controller
+        name="visibility"
+        control={control}
+        render={({ field }) => (
+          <FormSelect
+            id="collection-visibility"
+            label="Visibilité"
+            value={field.value || "private"}
+            onValueChange={field.onChange}
+            disabled={isFormDisabled}
+            error={errors.visibility}
+            placeholder="Choisir la visibilité"
+            helperText="Les collections privées ne sont visibles que par vous. Les collections publiques peuvent être partagées."
+            options={[
+              { value: "private", label: "Privée" },
+              { value: "public", label: "Publique" },
+            ]}
+          />
+        )}
+      />
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
@@ -118,13 +105,13 @@ export function CollectionEditForm({
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={loading}
+            disabled={isFormDisabled}
           >
-            Cancel
+            Annuler
           </Button>
         )}
-        <Button type="submit" disabled={loading || !name.trim()}>
-          {isEdit ? "Save changes" : "Save collection"}
+        <Button type="submit" disabled={isFormDisabled}>
+          {isEdit ? "Enregistrer les modifications" : "Créer la collection"}
         </Button>
       </div>
     </form>

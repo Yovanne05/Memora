@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Link, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, CalendarClock, Globe, Lock, NotebookPen, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react"
+import { Link, useRouter } from "@tanstack/react-router"
+import { ArrowLeft, CalendarClock, Globe, Lock, NotebookPen, Pencil, Trash2 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import {
     AlertDialog,
@@ -18,38 +18,38 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"
 
-import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation";
-import { useNoteQuery } from "../hooks/useNoteQuery";
+import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation"
+import { useNoteQuery } from "../hooks/useNoteQuery"
 
 const formatDate = (date: string) =>
-    new Intl.DateTimeFormat("en", {
+    new Intl.DateTimeFormat("fr-FR", {
         year: "numeric",
         month: "short",
         day: "numeric",
-    }).format(new Date(date));
+    }).format(new Date(date))
 
 const formatDateTime = (date: string) =>
-    new Intl.DateTimeFormat("en", {
+    new Intl.DateTimeFormat("fr-FR", {
         year: "numeric",
         month: "long",
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-    }).format(new Date(date));
+    }).format(new Date(date))
 
 export function NoteDetailPage({ noteId }: { noteId: string }) {
-    const { data: note, isLoading, isError, error } = useNoteQuery(noteId);
+    const { data: note, isLoading, isError, error } = useNoteQuery(noteId)
 
-    const deleteNoteMutation = useDeleteNoteMutation();
-    const router = useRouter();
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const deleteNoteMutation = useDeleteNoteMutation()
+    const router = useRouter()
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
     const paragraphs = note?.content
         .split(/\n+/)
         .map((block) => block.trim())
-        .filter(Boolean);
+        .filter(Boolean)
 
     return (
         <div className="space-y-6 p-6">
@@ -63,12 +63,12 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                     {isLoading ? (
                         <Skeleton className="h-4 w-32" />
                     ) : (
-                        <span className="text-foreground font-medium">{note?.title}</span>
+                        <span className="font-medium text-foreground">{note?.title}</span>
                     )}
                 </div>
 
                 <Card className="border border-border/70 shadow-sm">
-                    <CardContent className="p-6 space-y-4">
+                    <CardContent className="space-y-4 p-6">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div className="space-y-3">
                                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
@@ -76,7 +76,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                         <Skeleton className="h-6 w-24" />
                                     ) : (
                                         <Badge variant="secondary" className="text-xs">
-                                            Aucune Collection
+                                            Aucune collection
                                         </Badge>
                                     )}
 
@@ -89,7 +89,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                             ) : (
                                                 <Lock className="h-3.5 w-3.5" />
                                             )}
-                                            {note?.visibility} note
+                                            {note?.visibility === "public" ? "note publique" : "note privée"}
                                         </Badge>
                                     )}
                                 </div>
@@ -104,7 +104,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                         <h1 className="text-4xl font-semibold leading-tight tracking-tight">
                                             {note?.title}
                                         </h1>
-                                        <p className="max-w-3xl text-base text-muted-foreground leading-relaxed line-clamp-3">
+                                        <p className="max-w-3xl text-base leading-relaxed text-muted-foreground line-clamp-3">
                                             {paragraphs?.[0] ?? ""}
                                         </p>
                                     </>
@@ -116,7 +116,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     ) : (
                                         <span className="flex items-center gap-2">
                                             <NotebookPen className="h-4 w-4" />
-                                            Owned by {note?.owner_id}
+                                            Propriétaire {note?.owner_id}
                                         </span>
                                     )}
 
@@ -125,7 +125,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
-                                        <span>Created {note && formatDate(note.created_at)}</span>
+                                        <span>Créée le {note && formatDate(note.created_at)}</span>
                                     )}
 
                                     <Separator orientation="vertical" className="h-4" />
@@ -133,7 +133,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
-                                        <span>Updated {note && formatDate(note.updated_at)}</span>
+                                        <span>Mise à jour le {note && formatDate(note.updated_at)}</span>
                                     )}
                                 </div>
                             </div>
@@ -141,7 +141,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                             <div className="flex flex-wrap items-center gap-3">
                                 <Button className="gap-2" variant="secondary" asChild>
                                     <Link to="/app/notes/$id/edit" params={{ id: noteId }}>
-                                        <Pencil className="h-4 w-4" /> Edit note
+                                        <Pencil className="h-4 w-4" /> Modifier la note
                                     </Link>
                                 </Button>
 
@@ -153,7 +153,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                             className="gap-2"
                                             disabled={deleteNoteMutation.isPending || isLoading}
                                         >
-                                            <Trash2 className="h-4 w-4" /> Delete
+                                            <Trash2 className="h-4 w-4" /> Supprimer
                                         </Button>
                                     </AlertDialogTrigger>
 
@@ -172,9 +172,9 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
 
                                             <AlertDialogAction
                                                 onClick={async () => {
-                                                    await deleteNoteMutation.mutateAsync(noteId);
-                                                    setIsDeleteDialogOpen(false);
-                                                    router.navigate({ to: "/app/notes" });
+                                                    await deleteNoteMutation.mutateAsync(noteId)
+                                                    setIsDeleteDialogOpen(false)
+                                                    router.navigate({ to: "/app/notes" })
                                                 }}
                                                 disabled={deleteNoteMutation.isPending}
                                             >
@@ -192,8 +192,8 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
             <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
                 <Card className="border border-border/70 shadow-sm">
                     <CardHeader className="space-y-1">
-                        <CardTitle className="text-xl">Content</CardTitle>
-                        <p className="text-sm text-muted-foreground">Full details of the selected note.</p>
+                        <CardTitle className="text-xl">Contenu</CardTitle>
+                        <p className="text-sm text-muted-foreground">Tous les détails de la note sélectionnée.</p>
                     </CardHeader>
 
                     <CardContent className="space-y-4 text-base leading-relaxed text-muted-foreground">
@@ -231,7 +231,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                 <div className="space-y-4">
                     <Card className="border border-border/70 shadow-sm">
                         <CardHeader>
-                            <CardTitle className="text-lg">Details</CardTitle>
+                            <CardTitle className="text-lg">Détails</CardTitle>
                         </CardHeader>
 
                         <CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -245,27 +245,27 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                 <>
                                     <div className="flex items-center gap-2">
                                         <NotebookPen className="h-4 w-4" />
-                                        <span className="text-foreground">Owner</span>
+                                        <span className="text-foreground">Propriétaire</span>
                                         <span className="text-muted-foreground">{note?.owner_id}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <Globe className="h-4 w-4" />
-                                        <span className="text-foreground">Visibility</span>
+                                        <span className="text-foreground">Visibilité</span>
                                         <Badge variant="outline" className="capitalize">
-                                            {note?.visibility}
+                                            {note?.visibility === "public" ? "Publique" : "Privée"}
                                         </Badge>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
-                                        <span className="text-foreground">Created</span>
+                                        <span className="text-foreground">Créée</span>
                                         <span>{note && formatDateTime(note.created_at)}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
-                                        <span className="text-foreground">Updated</span>
+                                        <span className="text-foreground">Mise à jour</span>
                                         <span>{note && formatDateTime(note.updated_at)}</span>
                                     </div>
                                 </>
@@ -275,5 +275,5 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
