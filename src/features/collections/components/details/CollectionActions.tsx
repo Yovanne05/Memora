@@ -1,4 +1,4 @@
-import { Edit3, Plus, Share2, Trash2 } from "lucide-react"
+import { Edit3, Share2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface CollectionActionsProps {
@@ -34,15 +34,6 @@ export function CollectionActions({
       >
         <Share2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
         Partager
-      </Button>
-      <Button
-        size="sm"
-        type="button"
-        disabled
-        aria-label="Créer une nouvelle note"
-      >
-        <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
-        Nouvelle note
       </Button>
       <Button
         variant="destructive"

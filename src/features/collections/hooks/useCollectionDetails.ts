@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from "react"
 import { useRouter } from "@tanstack/react-router"
-import type { CollectionFormValues } from "../components/CollectionEditForm"
 import { useCollection } from "./useCollection"
 import { useUpdateCollection } from "./useUpdateCollection"
 import { useCollectionDeletion } from "./useCollectionDeletion"
+import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
 
 export function useCollectionDetails(id: string) {
   const router = useRouter()

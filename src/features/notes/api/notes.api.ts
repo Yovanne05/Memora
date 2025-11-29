@@ -8,6 +8,7 @@ export interface CreateNotePayload {
     content: string;
     owner_id: string;
     visibility: "private" | "public";
+    collection_id?: string;
 }
 
 export async function fetchNotes({
@@ -63,6 +64,7 @@ export interface UpdateNotePayload {
     title?: string;
     content?: string;
     visibility?: "private" | "public";
+    collection_id?: string | null;
 }
 
 export async function updateNote(noteId: string, payload: UpdateNotePayload): Promise<Note> {

@@ -8,8 +8,8 @@ import {
 import {
   CollectionEditForm,
   type CollectionFormValues,
-} from "./CollectionEditForm"
-import type { CollectionVisibility } from "../models/collection.model"
+} from "../forms/CollectionEditForm"
+import type { CollectionVisibility } from "../../models/collection.model"
 
 type FormMode = "create" | "edit"
 

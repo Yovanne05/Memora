@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { CollectionsHeader } from "../components/CollectionsHeader"
-import { CollectionsToolbar } from "../components/CollectionsToolbar"
-import { CollectionsContent } from "../components/CollectionsContent"
-import { CollectionDialogs } from "../components/CollectionDialogs"
+import { CollectionsHeader } from "../components/list/CollectionsHeader"
+import { CollectionsContent } from "../components/list/CollectionsContent"
+import { CollectionDialogs } from "../components/dialogs/CollectionDialogs"
 import { useCollectionsManager } from "../hooks/useCollectionsManager"
+import { CollectionsToolbar } from "../components/list/CollectionsToolbar"
 
 export function CollectionsListPage() {
   const manager = useCollectionsManager()

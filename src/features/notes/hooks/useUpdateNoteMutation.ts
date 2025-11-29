@@ -11,8 +11,8 @@ export function useUpdateNoteMutation() {
         mutationFn: ({ noteId, payload }: { noteId: string; payload: UpdateNotePayload }) =>
             updateNote(noteId, payload),
         onSuccess: (data: Note) => {
-            queryClient.setQueryData(["note", data.id], data)
             queryClient.invalidateQueries({ queryKey: ["notes"] })
+            queryClient.setQueryData(["note", data.id], data)
         },
     })
 }
