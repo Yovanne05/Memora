@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 import { useNotesQuery } from "../hooks/useNotesQuery";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { NoteCard } from "../components/NoteCard";
 import { NotesPagination } from "../components/NotesPagination";
 import type { NotesFilters } from "../models/note-filters.model";
@@ -54,6 +55,7 @@ export default function NotesPage() {
 
     const { data, isLoading } = useNotesQuery(page, limit, filters);
     const createNoteMutation = useCreateNoteMutation();
+    const { userId } = useCurrentUser();
 
     const total = data?.total ?? 0;
     const notes = data?.items ?? [];
@@ -95,7 +97,7 @@ export default function NotesPage() {
                 title: `Nouvelle note ${Date.now()}`,
                 content: `Bonjour nouvelle note ${Date.now()}`,
                 visibility: "private",
-                owner_id: "820437a5-ff21-4100-9859-9631efc66be7",
+                owner_id: userId,
             });
 
             router.navigate({
