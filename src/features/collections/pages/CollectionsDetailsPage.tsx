@@ -63,7 +63,7 @@ export function CollectionsDetailsPage() {
       <CollectionFormDialog
         mode="edit"
         open={details.isEditing}
-        loading={details.updateHook.loading}
+        isPending={details.updateHook.loading}
         initial={details.initialValues}
         onSubmit={details.handlers.onEdit}
         onClose={() => details.setIsEditing(false)}

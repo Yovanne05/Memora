@@ -81,7 +81,7 @@ export function useCollectionsManager() {
 
   return {
     collections: filtered,
-    isPending: collectionsQuery.isPending,
+    loading: collectionsQuery.isPending,
     error: collectionsQuery.error,
 
     filters: {
@@ -98,7 +98,7 @@ export function useCollectionsManager() {
       open: () => setCreateOpen(true),
       close: () => setCreateOpen(false),
       submit: handleCreate,
-      isPending: createMutation.isPending,
+      loading: createMutation.isPending,
       error: createMutation.error,
     },
 
@@ -107,7 +107,7 @@ export function useCollectionsManager() {
       open: setEditing,
       close: () => setEditing(null),
       submit: handleEdit,
-      isPending: updateMutation.isPending,
+      loading: updateMutation.isPending,
       error: updateMutation.error,
     },
 
@@ -119,7 +119,7 @@ export function useCollectionsManager() {
         deleteMutation.reset();
       },
       confirm: handleDelete,
-      isPending: deleteMutation.isPending,
+      loading: deleteMutation.isPending,
       error: deleteMutation.error,
     },
 

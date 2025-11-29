@@ -34,7 +34,7 @@ export function CollectionsListPage() {
       />
 
       <CollectionsContent
-        loading={manager.isPending}
+        loading={manager.loading}
         error={manager.error?.message ?? null}
         collections={manager.collections}
         onRetry={manager.refetch}
@@ -44,16 +44,16 @@ export function CollectionsListPage() {
 
       <CollectionDialogs
         createOpen={manager.create.isOpen}
-        creating={manager.create.isPending}
+        creating={manager.create.loading}
         onCreateSubmit={manager.create.submit}
         onCreateClose={manager.create.close}
         editing={manager.edit.target}
-        updating={manager.edit.isPending}
+        updating={manager.edit.loading}
         onEditSubmit={manager.edit.submit}
         onEditClose={manager.edit.close}
         deletion={{
           target: manager.deletion.target,
-          loading: manager.deletion.isPending,
+          loading: manager.deletion.loading,
           error: manager.deletion.error?.message ?? null,
           reset: manager.deletion.close,
           confirmDelete: manager.deletion.confirm,

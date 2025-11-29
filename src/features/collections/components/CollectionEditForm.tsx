@@ -1,22 +1,15 @@
-import { useMemo } from "react"
-import { useForm, useWatch } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { FormInput } from "@/components/ui/form-input"
+import { FormTextarea } from "@/components/ui/form-textarea"
+import { FormSelect } from "@/components/ui/form-select"
 import type { CollectionVisibility } from "../models/collection.model"
 import { collectionFormSchema, type CollectionFormInput } from "../schemas/collection.schema"
 
 export interface CollectionFormValues {
   name: string
-  description?: string | null
+  description?: string
   visibility: CollectionVisibility
 }
 
@@ -24,7 +17,7 @@ interface CollectionEditFormProps {
   mode: "create" | "edit"
   initial?: CollectionFormValues
   loading?: boolean
-  onSubmit: (values: CollectionFormValues) => void
+  onSubmit: (values: CollectionFormValues) => void | Promise<void>
   onCancel?: () => void
 }
 
@@ -39,27 +32,18 @@ export function CollectionEditForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setValue,
     control,
   } = useForm<CollectionFormInput>({
     resolver: zodResolver(collectionFormSchema),
     defaultValues: {
       name: initial?.name ?? "",
-      description: initial?.description ?? null,
+      description: initial?.description ?? "",
       visibility: initial?.visibility ?? "private",
     },
   })
 
-  const formKey = useMemo(
-    () =>
-      initial
-        ? `${initial.name ?? ""}-${initial.description ?? ""}-${initial.visibility}-${mode}`
-        : `create-${mode}`,
-    [initial, mode]
-  )
-
-  const nameValue = useWatch({ control, name: "name" })
-  const visibilityValue = useWatch({ control, name: "visibility" })
+  const isEdit = mode === "edit"
+  const isFormDisabled = loading || isSubmitting
 
   const handleFormSubmit = (data: CollectionFormInput) => {
     onSubmit({
@@ -69,67 +53,50 @@ export function CollectionEditForm({
     })
   }
 
-  const isEdit = mode === "edit"
-  const isFormDisabled = loading || isSubmitting
-
   return (
-    <form key={formKey} onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       {/* Name */}
-      <div className="space-y-2">
-        <Label htmlFor="collection-name">Nom de la collection</Label>
-        <Input
-          id="collection-name"
-          placeholder="ex. Fondamentaux de l'informatique"
-          disabled={isFormDisabled}
-          {...register("name")}
-          aria-describedby={errors.name ? "name-error" : undefined}
-        />
-        {errors.name && (
-          <span id="name-error" className="text-sm text-red-500" role="alert">
-            {errors.name.message}
-          </span>
-        )}
-      </div>
+      <FormInput
+        id="collection-name"
+        label="Nom de la collection"
+        placeholder="ex. Fondamentaux de l'informatique"
+        disabled={isFormDisabled}
+        error={errors.name}
+        {...register("name")}
+      />
 
       {/* Description */}
-      <div className="space-y-2">
-        <Label htmlFor="collection-description">Description</Label>
-        <textarea
-          id="collection-description"
-          rows={3}
-          className="w-full resize-none rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
-          placeholder="Décrivez l'objectif de cette collection..."
-          disabled={isFormDisabled}
-          {...register("description")}
-          aria-describedby={errors.description ? "description-error" : undefined}
-        />
-        {errors.description && (
-          <span id="description-error" className="text-sm text-red-500" role="alert">
-            {errors.description.message}
-          </span>
-        )}
-      </div>
+      <FormTextarea
+        id="collection-description"
+        label="Description"
+        rows={3}
+        placeholder="Décrivez l'objectif de cette collection..."
+        disabled={isFormDisabled}
+        error={errors.description}
+        {...register("description")}
+      />
 
       {/* Visibility */}
-      <div className="space-y-2">
-        <Label>Visibilité</Label>
-        <Select
-          disabled={isFormDisabled}
-          value={visibilityValue}
-          onValueChange={(v) => setValue("visibility", v as CollectionVisibility)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Choisir la visibilité" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="private">Privée</SelectItem>
-            <SelectItem value="public">Publique</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-slate-500">
-          Les collections privées ne sont visibles que par vous. Les collections publiques peuvent être partagées.
-        </p>
-      </div>
+      <Controller
+        name="visibility"
+        control={control}
+        render={({ field }) => (
+          <FormSelect
+            id="collection-visibility"
+            label="Visibilité"
+            value={field.value || "private"}
+            onValueChange={field.onChange}
+            disabled={isFormDisabled}
+            error={errors.visibility}
+            placeholder="Choisir la visibilité"
+            helperText="Les collections privées ne sont visibles que par vous. Les collections publiques peuvent être partagées."
+            options={[
+              { value: "private", label: "Privée" },
+              { value: "public", label: "Publique" },
+            ]}
+          />
+        )}
+      />
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
@@ -143,8 +110,8 @@ export function CollectionEditForm({
             Annuler
           </Button>
         )}
-        <Button type="submit" disabled={isFormDisabled || !nameValue.trim()}>
-          {isEdit ? "Enregistrer les modifications" : "Enregistrer la collection"}
+        <Button type="submit" disabled={isFormDisabled}>
+          {isEdit ? "Enregistrer les modifications" : "Créer la collection"}
         </Button>
       </div>
     </form>

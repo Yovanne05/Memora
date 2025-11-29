@@ -3,8 +3,7 @@ import { addInterceptor, applyInterceptors } from "./interceptors";
 import { isRetryable, getRetryDelay, delay } from "./retry-strategy";
 import { parseError, normalizeError } from "./error-handler";
 import { requestWithTimeout } from "./timeout";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { config } from "./config";
 
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
 const DEFAULT_RETRIES = 3;
@@ -20,10 +19,9 @@ export interface HttpClient {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
-    const config = await applyInterceptors(init || {});
-
+    const requestConfig = await applyInterceptors(init || {});
     const response = await requestWithTimeout(
-      fetch(`${API_URL}${path}`, config),
+      fetch(`${config.apiUrl}${path}`, requestConfig),
       DEFAULT_TIMEOUT
     );
 

@@ -16,7 +16,7 @@ type FormMode = "create" | "edit"
 interface BaseProps {
   mode: FormMode
   open: boolean
-  loading?: boolean
+  isPending?: boolean
   onSubmit: (values: CollectionFormValues) => Promise<void> | void
   onClose: () => void
 }
@@ -29,7 +29,7 @@ interface EditProps extends BaseProps {
   mode: "edit"
   initial: {
     name: string
-    description: string
+    description?: string
     visibility: CollectionVisibility
   }
 }
@@ -37,7 +37,7 @@ interface EditProps extends BaseProps {
 type CollectionFormDialogProps = CreateProps | EditProps
 
 export function CollectionFormDialog(props: CollectionFormDialogProps) {
-  const { mode, open, loading = false, onSubmit, onClose } = props
+  const { mode, open, isPending = false, onSubmit, onClose } = props
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -55,7 +55,7 @@ export function CollectionFormDialog(props: CollectionFormDialogProps) {
 
         <CollectionEditForm
           mode={mode}
-          loading={loading}
+          loading={isPending}
           initial={mode === "edit" ? props.initial : undefined}
           onSubmit={onSubmit}
           onCancel={onClose}

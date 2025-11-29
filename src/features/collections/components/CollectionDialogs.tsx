@@ -39,7 +39,7 @@ export function CollectionDialogs({
       <CollectionFormDialog
         mode="create"
         open={createOpen}
-        loading={creating}
+        isPending={creating}
         onSubmit={onCreateSubmit}
         onClose={onCreateClose}
       />
@@ -48,7 +48,7 @@ export function CollectionDialogs({
         <CollectionFormDialog
           mode="edit"
           open={!!editing}
-          loading={updating}
+          isPending={updating}
           initial={{
             name: editing.name,
             description: editing.description ?? "",
