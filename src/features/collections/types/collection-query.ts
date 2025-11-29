@@ -7,6 +7,7 @@ export type CollectionsFilters = Record<string, QueryParamValue> & {
   titleContains?: string
   ids?: string
   tagIds?: string 
+  onlyWithNotes?: boolean
   sortBy?: "title" | "created_at" | "updated_at"
   sortDir?: "asc" | "desc"
 }

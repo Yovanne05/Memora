@@ -8,6 +8,7 @@ import type {
   CollectionCreateDto,
   CollectionUpdateDto,
 } from "../dtos/collection.dto"
+import { dtoToNote } from "@/features/notes/mappers/note.mapper"
 
 export function dtoToCollection(dto: CollectionDto): Collection {
   return {
@@ -16,6 +17,7 @@ export function dtoToCollection(dto: CollectionDto): Collection {
     name: dto.name,
     description: dto.description ?? null,
     visibility: dto.visibility ?? "private",
+    notes: dto.notes.map(dtoToNote),
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
   }

@@ -22,7 +22,7 @@ export function CollectionNotesSection() {
     const allNotes = (allData?.items ?? []) as Note[]
 
     return allNotes
-      .filter((n) => n.owner_id === userId && !n.collection_id)
+      .filter((n) => n.ownerId === userId && !n.collectionId)
       .map((n) => ({ id: n.id, title: n.title }))
   }, [allData, userId])
 
@@ -63,7 +63,7 @@ export function CollectionNotesSection() {
     },
     [handleAddExisting]
   )
-  
+
   const filteredNotes = useMemo(() => {
     const notes = (data?.items ?? []) as Note[]
 

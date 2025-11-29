@@ -2,8 +2,8 @@ import { collectionsService } from "@/features/collections/services/collections.
 
 export function createVisualizationService() {
   return {
-    async listCollectionWithNote() {
-      return collectionsService.list()
+    async listPublicCollections() {
+      return collectionsService.list({ visibility: "public", onlyWithNotes: true } )
     }
   }
 }
