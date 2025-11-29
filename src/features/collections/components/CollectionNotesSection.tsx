@@ -1,138 +1,93 @@
 import { useMemo, useCallback, useState } from "react"
 import { useParams } from "@tanstack/react-router"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { NoteCard } from "@/features/notes/components/NoteCard"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
-import { FormSelect } from "@/components/ui/form-select"
+import { CollectionNotesHeader } from "./CollectionNotesHeader"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
-import { Button } from "@/components/ui/button" // 👈 ajout
+import type { Note } from "@/features/notes/models/note.model"
+import { CollectionNotesGrid } from "./CollectionNotesGrid"
+import type { AvailableNoteOption } from "../types/note.types"
 
 export function CollectionNotesSection() {
   const { id } = useParams({ from: "/app/collections/$id/" })
   const { userId } = useCurrentUser()
 
-  // Notes actuellement dans cette collection
+  // Notes dans la collection
   const { data, isLoading } = useNotesQuery(0, 20, { collectionId: id })
-  const notes = data?.items ?? []
+  const notes = (data?.items ?? []) as Note[]
 
-  // Notes disponibles à ajouter (appartenant à l'user, sans collection)
+  // Notes dispo à ajouter
   const { data: allData } = useNotesQuery(0, 100, {})
-  const allNotes = allData?.items ?? []
-  const availableNotes = allNotes.filter(
-    (n) => n.owner_id === userId && !n.collection_id
-  )
+
+  const availableNotes: AvailableNoteOption[] = useMemo(() => {
+    const allNotes = (allData?.items ?? []) as Note[]
+
+    return allNotes
+      .filter((n) => n.owner_id === userId && !n.collection_id)
+      .map((n) => ({ id: n.id, title: n.title }))
+  }, [allData, userId])
 
   const updateNoteMutation = useUpdateNoteMutation()
+  const { mutateAsync, isPending } = updateNoteMutation
+
   const [selected, setSelected] = useState("")
 
   const handleAddExisting = useCallback(
     async (noteId?: string) => {
       if (!noteId) return
       try {
-        await updateNoteMutation.mutateAsync({
-          noteId,
-          payload: { collection_id: id },
-        })
+        await mutateAsync({ noteId, payload: { collection_id: id } })
       } catch (err) {
         console.error("Failed to add note to collection", err)
       }
     },
-    [id, updateNoteMutation]
+    [id, mutateAsync]
   )
 
   const handleRemoveFromCollection = useCallback(
     async (noteId: string) => {
       try {
-        await updateNoteMutation.mutateAsync({
-          noteId,
-          payload: { collection_id: null },
-        })
+        await mutateAsync({ noteId, payload: { collection_id: null } })
       } catch (err) {
         console.error("Failed to remove note from collection", err)
       }
     },
-    [updateNoteMutation]
+    [mutateAsync]
   )
 
-  const total = data?.total ?? 0
-
-  const header = useMemo(() => {
-    return (
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Notes</h2>
-        <div className="flex items-center gap-2">
-          <FormSelect
-            id="add-note"
-            label="Nouvelle note"
-            placeholder={
-              updateNoteMutation.isPending ? "Ajout..." : "Sélectionner une note"
-            }
-            options={availableNotes.map((n) => ({
-              value: n.id,
-              label: n.title,
-            }))}
-            value={selected}
-            onValueChange={(val) => {
-              setSelected(val)
-              handleAddExisting(val)
-              setSelected("")
-            }}
-            disabled={
-              updateNoteMutation.isPending || availableNotes.length === 0
-            }
-          />
-        </div>
-      </div>
-    )
-  }, [availableNotes, handleAddExisting, updateNoteMutation.isPending, selected])
+  const handleSelectNote = useCallback(
+    (val: string) => {
+      setSelected(val)
+      handleAddExisting(val)
+      setSelected("")
+    },
+    [handleAddExisting]
+  )
 
   return (
     <div className="space-y-3">
-      {header}
+      <CollectionNotesHeader
+        availableNotes={availableNotes}
+        selected={selected}
+        isAdding={isPending}
+        onSelectNote={handleSelectNote}
+      />
 
       <div>
-        <Input placeholder="Rechercher des notes..." className="max-w-md" disabled />
+        <Input
+          placeholder="Rechercher des notes..."
+          className="max-w-md"
+          disabled
+        />
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="space-y-3 rounded-lg border p-4">
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-4 w-full" />
-            </div>
-          ))}
-        </div>
-      ) : total ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {notes.map((note) => (
-            <div
-              key={note.id}
-              className="space-y-2 rounded-lg border p-3 transition hover:shadow-sm"
-            >
-              <NoteCard note={note} />
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveFromCollection(note.id)}
-                  disabled={updateNoteMutation.isPending}
-                >
-                  Retirer de la collection
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-xs text-muted-foreground">
-          Aucune note dans cette collection.
-        </p>
-      )}
+      <CollectionNotesGrid
+        notes={notes}
+        isLoading={isLoading}
+        isUpdating={isPending}
+        onRemoveFromCollection={handleRemoveFromCollection}
+      />
     </div>
   )
 }
