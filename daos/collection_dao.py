@@ -64,7 +64,7 @@ class Collection(Base):
     )
 
     owner: Mapped["User"] = relationship(back_populates="collections")
-    notes: Mapped[list["Note"]] = relationship(back_populates="collection")
+    notes: Mapped[list["Note"]] = relationship(back_populates="collection", lazy="selectin")
     shares: Mapped[list["CollectionShare"]] = relationship(
         back_populates="collection"
     )

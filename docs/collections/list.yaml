@@ -32,7 +32,21 @@ parameters:
     name: ids
     type: string
     required: false
-    description: Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
+    description: >
+      Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
+  - in: query
+    name: tagIds
+    type: string
+    required: false
+    description: >
+      Liste CSV d'identifiants de tags (ex. `uuid1,uuid2`) pour filtrer sur les tags associes.
+  - in: query
+    name: onlyWithNotes
+    type: boolean
+    required: false
+    default: false
+    description: >
+      Si `true`, ne renvoie que les collections qui possedent au moins une note.
   - in: query
     name: sortBy
     type: string

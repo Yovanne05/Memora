@@ -12,6 +12,7 @@ class CollectionFindQuery(BaseModel) :
     title_contains : Optional[str] = Field(default = None, alias = "titleContains")
     ids : Optional[list[UUID]] = None
     tag_ids : Optional[list[UUID]] = Field(default=None, alias="tagIds")
+    only_with_notes : bool = Field(default = False, alias = "onlyWithNotes")
 
     sort_by : Literal["title", "created_at", "updated_at"] = Field(
         default = "created_at", alias = "sortBy"
@@ -37,6 +38,7 @@ class CollectionFindQuery(BaseModel) :
             shared_with_user_id=str(self.shared_with_user_id) if self.shared_with_user_id else None,
             visibility = self.visibility,
             title_contains = self.title_contains,
+            only_with_notes = self.only_with_notes,
             ids = [str(item) for item in self.ids] if self.ids else None,
             tag_ids=[str(item) for item in self.tag_ids] if self.tag_ids else None,
             sort_by = self.sort_by,
