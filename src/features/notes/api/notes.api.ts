@@ -64,7 +64,7 @@ export interface UpdateNotePayload {
     title?: string;
     content?: string;
     visibility?: "private" | "public";
-    collection_id?: string;
+    collection_id?: string | null;
 }
 
 export async function updateNote(noteId: string, payload: UpdateNotePayload): Promise<Note> {

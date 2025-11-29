@@ -7,18 +7,22 @@ import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { FormSelect } from "@/components/ui/form-select"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
+import { Button } from "@/components/ui/button" // 👈 ajout
 
 export function CollectionNotesSection() {
   const { id } = useParams({ from: "/app/collections/$id/" })
   const { userId } = useCurrentUser()
 
-  // Notes currently in this collection
+  // Notes actuellement dans cette collection
   const { data, isLoading } = useNotesQuery(0, 20, { collectionId: id })
   const notes = data?.items ?? []
 
+  // Notes disponibles à ajouter (appartenant à l'user, sans collection)
   const { data: allData } = useNotesQuery(0, 100, {})
   const allNotes = allData?.items ?? []
-  const availableNotes = allNotes.filter((n) => n.owner_id === userId && !n.collection_id)
+  const availableNotes = allNotes.filter(
+    (n) => n.owner_id === userId && !n.collection_id
+  )
 
   const updateNoteMutation = useUpdateNoteMutation()
   const [selected, setSelected] = useState("")
@@ -27,12 +31,29 @@ export function CollectionNotesSection() {
     async (noteId?: string) => {
       if (!noteId) return
       try {
-        await updateNoteMutation.mutateAsync({ noteId, payload: { collection_id: id } })
+        await updateNoteMutation.mutateAsync({
+          noteId,
+          payload: { collection_id: id },
+        })
       } catch (err) {
         console.error("Failed to add note to collection", err)
       }
     },
     [id, updateNoteMutation]
+  )
+
+  const handleRemoveFromCollection = useCallback(
+    async (noteId: string) => {
+      try {
+        await updateNoteMutation.mutateAsync({
+          noteId,
+          payload: { collection_id: null },
+        })
+      } catch (err) {
+        console.error("Failed to remove note from collection", err)
+      }
+    },
+    [updateNoteMutation]
   )
 
   const total = data?.total ?? 0
@@ -45,15 +66,22 @@ export function CollectionNotesSection() {
           <FormSelect
             id="add-note"
             label="Nouvelle note"
-            placeholder={updateNoteMutation.isPending ? "Ajout..." : "Sélectionner une note"}
-            options={availableNotes.map((n) => ({ value: n.id, label: n.title }))}
+            placeholder={
+              updateNoteMutation.isPending ? "Ajout..." : "Sélectionner une note"
+            }
+            options={availableNotes.map((n) => ({
+              value: n.id,
+              label: n.title,
+            }))}
             value={selected}
             onValueChange={(val) => {
               setSelected(val)
               handleAddExisting(val)
               setSelected("")
             }}
-            disabled={updateNoteMutation.isPending || availableNotes.length === 0}
+            disabled={
+              updateNoteMutation.isPending || availableNotes.length === 0
+            }
           />
         </div>
       </div>
@@ -81,11 +109,29 @@ export function CollectionNotesSection() {
       ) : total ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {notes.map((note) => (
-            <NoteCard key={note.id} note={note} />
+            <div
+              key={note.id}
+              className="space-y-2 rounded-lg border p-3 transition hover:shadow-sm"
+            >
+              <NoteCard note={note} />
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveFromCollection(note.id)}
+                  disabled={updateNoteMutation.isPending}
+                >
+                  Retirer de la collection
+                </Button>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-muted-foreground">Aucune note dans cette collection.</p>
+        <p className="text-xs text-muted-foreground">
+          Aucune note dans cette collection.
+        </p>
       )}
     </div>
   )
