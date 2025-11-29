@@ -34,13 +34,13 @@ export function DeleteCollectionDialog({
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Delete collection</DialogTitle>
+          <DialogTitle>Supprimer la collection</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete{" "}
+            Cette action est irréversible. Elle supprimera définitivement{" "}
             <span className="font-medium text-slate-900">
-              {collection?.name ?? "this collection"}
+              {collection?.name ?? "cette collection"}
             </span>{" "}
-            and all of its notes and flashcards.
+            ainsi que toutes ses notes et cartes mémoire.
           </DialogDescription>
         </DialogHeader>
 
@@ -57,7 +57,7 @@ export function DeleteCollectionDialog({
             onClick={onCancel}
             disabled={loading}
           >
-            Cancel
+            Annuler
           </Button>
           <Button
             type="button"
@@ -65,7 +65,7 @@ export function DeleteCollectionDialog({
             onClick={onConfirm}
             disabled={loading}
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? "Suppression..." : "Supprimer"}
           </Button>
         </div>
       </DialogContent>

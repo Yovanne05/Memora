@@ -11,7 +11,7 @@ export function AppHeader() {
             <div className="relative w-full max-w-full md:max-w-1/3">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
                 <Input
-                    placeholder="Search notes, collections..."
+                    placeholder="Rechercher des notes, des collections..."
                     className="pl-10"
                 />
             </div>

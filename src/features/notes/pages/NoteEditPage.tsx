@@ -29,7 +29,7 @@ interface NoteEditPageProps {
 
 function formatTime(dateString?: string) {
     if (!dateString) return "--:--"
-    return new Intl.DateTimeFormat("en", {
+    return new Intl.DateTimeFormat("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
     }).format(new Date(dateString))
@@ -87,24 +87,24 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                         <FileText className="h-4 w-4" /> Notes
                     </Link>
                     <span className="text-muted-foreground">/</span>
-                    <span className="rounded-full bg-muted px-3 py-1 text-foreground">Edit Note</span>
+                    <span className="rounded-full bg-muted px-3 py-1 text-foreground">Modifier la note</span>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="space-y-1">
-                        <h1 className="text-3xl font-semibold tracking-tight">{currentTitle || "Edit your note"}</h1>
+                        <h1 className="text-3xl font-semibold tracking-tight">{currentTitle || "Modifiez votre note"}</h1>
                         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-foreground">
-                                <Check className="h-4 w-4" /> Saved {savedTime}
+                                <Check className="h-4 w-4" /> Enregistrée {savedTime}
                             </div>
-                            <span className="rounded-full bg-muted px-3 py-1 text-foreground">Updated</span>
+                            <span className="rounded-full bg-muted px-3 py-1 text-foreground">Mise à jour</span>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                         <Button variant="secondary" className="gap-2" asChild>
                             <Link to="/app/notes/$id" params={{ id: noteId }}>
-                                Cancel
+                                Annuler
                             </Link>
                         </Button>
 
@@ -112,7 +112,7 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" className="gap-2" disabled={deleteNoteMutation.isPending}>
-                                    <Trash2 className="h-4 w-4" /> Delete
+                                    <Trash2 className="h-4 w-4" /> Supprimer
                                 </Button>
                             </AlertDialogTrigger>
 
@@ -139,7 +139,7 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                         </AlertDialog>
 
                         <Button className="gap-2" onClick={handleSave} disabled={updateNoteMutation.isPending}>
-                            <Save className="h-4 w-4" /> Save
+                            <Save className="h-4 w-4" /> Enregistrer
                         </Button>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                         <Input
                             value={currentTitle}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Note title"
+                            placeholder="Titre de la note"
                             className="h-12 text-lg"
                         />
 
@@ -176,7 +176,7 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                     <textarea
                         value={currentContent}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="Start writing your note..."
+                        placeholder="Commencez à rédiger votre note..."
                         className="min-h-[360px] w-full rounded-md border border-input bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     />
                 </CardContent>

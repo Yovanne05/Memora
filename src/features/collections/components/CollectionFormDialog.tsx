@@ -44,12 +44,12 @@ export function CollectionFormDialog(props: CollectionFormDialogProps) {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "New collection" : "Edit collection"}
+            {mode === "create" ? "Nouvelle collection" : "Modifier la collection"}
           </DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "Create a new space to group related notes."
-              : "Update the name, description or visibility of this collection."}
+              ? "Créez un nouvel espace pour regrouper des notes liées."
+              : "Mettez à jour le nom, la description ou la visibilité de cette collection."}
           </DialogDescription>
         </DialogHeader>
 

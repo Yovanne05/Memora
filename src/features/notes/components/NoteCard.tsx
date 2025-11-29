@@ -41,7 +41,7 @@ export function NoteCard({ note }: { note: Note }) {
                     </div>
 
                     <div className="flex flex-wrap gap-2 text-xs">
-                        <Badge variant="secondary">Aucune Collection</Badge>
+                        <Badge variant="secondary">Aucune collection</Badge>
                     </div>
                 </CardHeader>
 
@@ -51,11 +51,11 @@ export function NoteCard({ note }: { note: Note }) {
                     <div className="flex flex-wrap items-center gap-3 text-xs">
                         <span className="flex items-center gap-1">
                             <Eye className="h-3.5 w-3.5" />
-                            {note.visibility === "public" ? "Shared" : "Private"}
+                            {note.visibility === "public" ? "Partagée" : "Privée"}
                         </span>
 
                         <span className="flex items-center gap-1">
-                            Updated on {formatDate(note.updated_at)}
+                            Mis à jour le {formatDate(note.updated_at)}
                         </span>
                     </div>
                 </CardContent>

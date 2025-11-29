@@ -27,17 +27,17 @@ import { Separator } from "@/components/ui/separator"
 
 export function AppSidebar() {
     const navigationItems = [
-        { title: "Dashboard", icon: LayoutDashboard, url: "#" },
+        { title: "Tableau de bord", icon: LayoutDashboard, url: "#" },
         { title: "Notes", icon: FileText, url: "/app/notes" },
         { title: "Collections", icon: FolderKanban, url: "/app/collections" },
-        { title: "Knowledge Graph", icon: Network, url: "#" },
-        { title: "Search", icon: Search, url: "#" },
-        { title: "Revision", icon: GraduationCap, url: "#" },
-        { title: "Journal & Stats", icon: History, url: "#" },
+        { title: "Graphe de connaissances", icon: Network, url: "#" },
+        { title: "Recherche", icon: Search, url: "#" },
+        { title: "Révision", icon: GraduationCap, url: "#" },
+        { title: "Journal et stats", icon: History, url: "#" },
     ]
 
     const accountItems = [
-        { title: "Settings", icon: SettingsIcon, url: "#" },
+        { title: "Paramètres", icon: SettingsIcon, url: "#" },
     ]
 
     return (
@@ -50,7 +50,7 @@ export function AppSidebar() {
                         <div>
                             <h1 className="font-semibold text-lg leading-tight">Memora</h1>
                             <p className="text-sm text-muted-foreground -mt-1">
-                                Knowledge base
+                                Base de connaissances
                             </p>
                         </div>
                     </div>
@@ -77,7 +77,7 @@ export function AppSidebar() {
                 </SidebarGroup>
 
                 <SidebarGroup>
-                    <SidebarGroupLabel>Account</SidebarGroupLabel>
+                    <SidebarGroupLabel>Compte</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {accountItems.map((item) => (
@@ -103,7 +103,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                             <a href="#">
                                 <LogOut className="h-4 w-4" />
-                                <span>Logout</span>
+                                <span>Déconnexion</span>
                             </a>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

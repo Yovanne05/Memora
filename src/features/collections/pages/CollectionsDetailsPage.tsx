@@ -77,14 +77,14 @@ export function CollectionsDetailsPage() {
     return (
       <div className="p-6">
         <p className="mb-3 text-sm text-red-600">
-          {error ?? "Collection not found."}
+          {error ?? "Collection introuvable."}
         </p>
         <div className="flex gap-2">
           <Button variant="outline" onClick={reload}>
-            Retry
+            Réessayer
           </Button>
           <Button variant="ghost" onClick={handleBackClick}>
-            Back to collections
+            Retour aux collections
           </Button>
         </div>
       </div>
@@ -98,7 +98,7 @@ export function CollectionsDetailsPage() {
           type="button"
           onClick={handleBackClick}
           className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-          aria-label="Back to collections"
+          aria-label="Retour aux collections"
         >
           <ChevronLeft className="h-3 w-3" aria-hidden="true" />
           Collections
@@ -121,18 +121,18 @@ export function CollectionsDetailsPage() {
               type="button"
               onClick={handleEditClick}
               disabled={isDeleting}
-              aria-label="Edit collection"
+              aria-label="Modifier la collection"
             >
               <Edit3 className="mr-1.5 h-4 w-4" aria-hidden="true" />
-              Edit
+              Modifier
             </Button>
-            <Button variant="outline" size="sm" type="button" disabled title="Coming soon">
+            <Button variant="outline" size="sm" type="button" disabled title="Bientôt disponible">
               <Share2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
-              Share
+              Partager
             </Button>
             <Button size="sm" type="button" disabled={isDeleting}>
               <Plus className="mr-1.5 h-4 w-4" aria-hidden="true" />
-              New Note
+              Nouvelle note
             </Button>
             <Button
               variant="destructive"
@@ -140,17 +140,17 @@ export function CollectionsDetailsPage() {
               type="button"
               onClick={() => deletion.setTarget(collection)}
               disabled={isDeleting}
-              aria-label="Delete collection"
+              aria-label="Supprimer la collection"
             >
-              Delete
+              Supprimer
             </Button>
           </div>
         </div>
 
         <div className="rounded-xl border border-border bg-card px-5 py-4">
-          <h2 className="mb-2 text-sm font-semibold">Collaborators</h2>
+          <h2 className="mb-2 text-sm font-semibold">Collaborateurs</h2>
           <p className="text-xs text-muted-foreground">
-            Collaboration UI will be added later. For now, this collection is owned by you.
+            L'interface de collaboration arrivera plus tard. Pour l'instant, cette collection vous appartient.
           </p>
         </div>
 
@@ -160,11 +160,11 @@ export function CollectionsDetailsPage() {
           </div>
 
           <div className="flex gap-3">
-            <Input placeholder="Search notes..." className="max-w-md" disabled />
+            <Input placeholder="Rechercher des notes..." className="max-w-md" disabled />
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Notes list will be implemented later.
+            La liste des notes sera ajoutée plus tard.
           </p>
         </div>
       </div>

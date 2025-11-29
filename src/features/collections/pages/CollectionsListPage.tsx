@@ -95,10 +95,10 @@ export function CollectionsListPage() {
           onClick={handleCreateClick}
           size="lg"
           className="gap-2"
-          aria-label="Create new collection"
+          aria-label="Créer une nouvelle collection"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          New collection
+          Nouvelle collection
         </Button>
       </div>
 

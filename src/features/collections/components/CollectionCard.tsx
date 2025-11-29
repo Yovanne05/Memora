@@ -80,7 +80,7 @@ export function CollectionCard({
                 onEdit?.(collection)
               }}
             >
-              Edit
+              Modifier
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer text-destructive focus:text-destructive"
@@ -89,7 +89,7 @@ export function CollectionCard({
                 onDelete?.(collection)
               }}
             >
-              Delete
+              Supprimer
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -105,10 +105,10 @@ export function CollectionCard({
                 : "border-border bg-muted text-foreground"
             }
           >
-            {collection.visibility === "public" ? "Public" : "Private"}
+            {collection.visibility === "public" ? "Publique" : "Privée"}
           </Badge>
 
-          <span className="text-xs text-muted-foreground">Created {createdDate}</span>
+          <span className="text-xs text-muted-foreground">Créée le {createdDate}</span>
         </div>
       </CardContent>
     </Card>

@@ -5,7 +5,7 @@ export function CollectionsHeader() {
         Collections
       </h1>
       <p className="text-sm text-muted-foreground">
-        Organize your notes into focused learning spaces.
+        Organisez vos notes en espaces d'apprentissage ciblés.
       </p>
     </header>
   )

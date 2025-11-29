@@ -33,7 +33,7 @@ export function CollectionsToolbar({
         <div className="relative w-full min-w-60 lg:w-80">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search collections..."
+            placeholder="Rechercher des collections..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9"
@@ -49,8 +49,8 @@ export function CollectionsToolbar({
             className="w-full md:w-auto"
           >
             <TabsList className="grid h-9 grid-cols-2">
-              <TabsTrigger value="mine">My Collections</TabsTrigger>
-              <TabsTrigger value="shared">Shared with me</TabsTrigger>
+              <TabsTrigger value="mine">Mes collections</TabsTrigger>
+              <TabsTrigger value="shared">Partagées avec moi</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -59,10 +59,10 @@ export function CollectionsToolbar({
             onValueChange={(value: "recent" | "alphabetical") => onSortChange(value)}
           >
             <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder="Trier par" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="recent">Most recent</SelectItem>
+              <SelectItem value="recent">Plus récentes</SelectItem>
               <SelectItem value="alphabetical">A-Z</SelectItem>
             </SelectContent>
           </Select>

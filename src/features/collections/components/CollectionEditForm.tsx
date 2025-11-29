@@ -66,10 +66,10 @@ export function CollectionEditForm({
     <form key={formKey} onSubmit={handleSubmit} className="space-y-4">
       {/* Name */}
       <div className="space-y-2">
-        <Label htmlFor="collection-name">Collection name</Label>
+        <Label htmlFor="collection-name">Nom de la collection</Label>
         <Input
           id="collection-name"
-          placeholder="e.g. Computer Science Fundamentals"
+          placeholder="ex. Fondamentaux de l'informatique"
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={loading}
@@ -83,7 +83,7 @@ export function CollectionEditForm({
           id="collection-description"
           rows={3}
           className="w-full resize-none rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
-          placeholder="Describe what this collection is about..."
+          placeholder="Décrivez l'objectif de cette collection..."
           value={description ?? ""}
           onChange={(e) => setDescription(e.target.value)}
           disabled={loading}
@@ -92,22 +92,22 @@ export function CollectionEditForm({
 
       {/* Visibility */}
       <div className="space-y-2">
-        <Label>Visibility</Label>
+        <Label>Visibilité</Label>
         <Select
           disabled={loading}
           value={visibility}
           onValueChange={(v) => setVisibility(v as CollectionVisibility)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select visibility" />
+            <SelectValue placeholder="Choisir la visibilité" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="private">Private</SelectItem>
-            <SelectItem value="public">Public</SelectItem>
+            <SelectItem value="private">Privée</SelectItem>
+            <SelectItem value="public">Publique</SelectItem>
           </SelectContent>
         </Select>
         <p className="text-xs text-slate-500">
-          Private collections are only visible to you. Public ones can be shared.
+          Les collections privées ne sont visibles que par vous. Les collections publiques peuvent être partagées.
         </p>
       </div>
 
@@ -120,11 +120,11 @@ export function CollectionEditForm({
             onClick={onCancel}
             disabled={loading}
           >
-            Cancel
+            Annuler
           </Button>
         )}
         <Button type="submit" disabled={loading || !name.trim()}>
-          {isEdit ? "Save changes" : "Save collection"}
+          {isEdit ? "Enregistrer les modifications" : "Enregistrer la collection"}
         </Button>
       </div>
     </form>
