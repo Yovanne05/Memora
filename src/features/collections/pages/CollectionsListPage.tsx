@@ -14,7 +14,7 @@ export function CollectionsListPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <CollectionsHeader />
         <Button
-          onClick={manager.handlers.openCreate}
+          onClick={manager.create.open}
           size="lg"
           className="gap-2"
           aria-label="Créer une nouvelle collection"
@@ -25,33 +25,39 @@ export function CollectionsListPage() {
       </div>
 
       <CollectionsToolbar
-        search={manager.search}
-        onSearchChange={manager.setSearch}
-        tab={manager.tab}
-        onTabChange={manager.setTab}
-        sort={manager.sort}
-        onSortChange={manager.setSort}
+        search={manager.filters.search}
+        onSearchChange={manager.filters.setSearch}
+        tab={manager.filters.tab}
+        onTabChange={manager.filters.setTab}
+        sort={manager.filters.sort}
+        onSortChange={manager.filters.setSort}
       />
 
       <CollectionsContent
-        loading={manager.loading}
-        error={manager.error}
+        loading={manager.isPending}
+        error={manager.error?.message ?? null}
         collections={manager.collections}
-        onRetry={manager.reload}
-        onEdit={manager.handlers.startEdit}
-        onDelete={manager.deletion.setTarget}
+        onRetry={manager.refetch}
+        onEdit={manager.edit.open}
+        onDelete={manager.deletion.open}
       />
 
       <CollectionDialogs
-        createOpen={manager.createOpen}
-        creating={manager.creating}
-        onCreateSubmit={manager.handlers.create}
-        onCreateClose={manager.handlers.closeCreate}
-        editing={manager.editing}
-        updating={manager.updating}
-        onEditSubmit={manager.handlers.edit}
-        onEditClose={manager.handlers.cancelEdit}
-        deletion={manager.deletion}
+        createOpen={manager.create.isOpen}
+        creating={manager.create.isPending}
+        onCreateSubmit={manager.create.submit}
+        onCreateClose={manager.create.close}
+        editing={manager.edit.target}
+        updating={manager.edit.isPending}
+        onEditSubmit={manager.edit.submit}
+        onEditClose={manager.edit.close}
+        deletion={{
+          target: manager.deletion.target,
+          loading: manager.deletion.isPending,
+          error: manager.deletion.error?.message ?? null,
+          reset: manager.deletion.close,
+          confirmDelete: manager.deletion.confirm,
+        }}
       />
     </div>
   )

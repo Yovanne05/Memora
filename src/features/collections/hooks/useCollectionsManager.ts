@@ -1,112 +1,128 @@
-import { useMemo, useState } from "react"
-import type { CollectionFormValues } from "../components/CollectionEditForm"
-import type { Collection } from "../models/collection.model"
-import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
-import { applyCollectionsQuery } from "../lib/collections-query"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
-import { useCollections } from "./useCollectionsList"
-import { useCreateCollection } from "./useCreateCollection"
-import { useUpdateCollection } from "./useUpdateCollection"
-import { useCollectionDeletion } from "./useCollectionDeletion"
+import { useCallback, useMemo, useState } from "react";
+import type { CollectionFormValues } from "../components/CollectionEditForm";
+import type { Collection } from "../models/collection.model";
+import type { CollectionsSort, CollectionsTab } from "../lib/collections-query";
+import { applyCollectionsQuery } from "../lib/collections-query";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import {
+  useCollectionsQuery,
+  useCreateCollectionMutation,
+  useUpdateCollectionMutation,
+  useDeleteCollectionMutation,
+} from "@/features/collections/hooks/useCollectionsQuery";
 
 export function useCollectionsManager() {
-  const { userId } = useCurrentUser()
-  const { collections, setCollections, loading, error, reload } = useCollections()
+  const { userId } = useCurrentUser();
 
   // UI State
-  const [search, setSearch] = useState("")
-  const [tab, setTab] = useState<CollectionsTab>("mine")
-  const [sort, setSort] = useState<CollectionsSort>("recent")
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editing, setEditing] = useState<Collection | null>(null)
+  const [search, setSearch] = useState("");
+  const [tab, setTab] = useState<CollectionsTab>("mine");
+  const [sort, setSort] = useState<CollectionsSort>("recent");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editing, setEditing] = useState<Collection | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Collection | null>(null);
 
-  // Operations
-  const { create, loading: creating } = useCreateCollection((created) => {
-    setCollections((prev) => [created, ...prev])
-    setCreateOpen(false)
-  })
+  // React Query hooks with callbacks
+  const collectionsQuery = useCollectionsQuery();
+  const createMutation = useCreateCollectionMutation({
+    onSuccess: () => setCreateOpen(false),
+  });
+  const updateMutation = useUpdateCollectionMutation({
+    onSuccess: () => setEditing(null),
+  });
+  const deleteMutation = useDeleteCollectionMutation({
+    onSuccess: () => setDeleteTarget(null),
+  });
 
-  const { update, loading: updating } = useUpdateCollection((updated) => {
-    setCollections((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
-    setEditing(null)
-  })
-
-  const deletion = useCollectionDeletion({
-    onDeleted: (id) => setCollections((prev) => prev.filter((c) => c.id !== id)),
-  })
-
-  // Computed
+  // Filtered collections
   const filtered = useMemo(() => {
-    if (!userId) return []
-    return applyCollectionsQuery(collections, {
+    if (!userId || !collectionsQuery.data) return [];
+    return applyCollectionsQuery(collectionsQuery.data, {
       currentUserId: userId,
       tab,
       search,
       sort,
-    })
-  }, [collections, search, sort, tab, userId])
+    });
+  }, [collectionsQuery.data, search, sort, tab, userId]);
 
-  // Handlers
-  const handlers = useMemo(
-    () => ({
-      create: async (values: CollectionFormValues) => {
-        try {
-          await create({
-            ownerId: userId!,
-            name: values.name,
-            description: values.description,
-            visibility: values.visibility,
-          })
-        } catch (err) {
-          console.error("Failed to create collection", err)
-        }
-      },
-      edit: async (values: CollectionFormValues) => {
-        if (!editing) return
-        try {
-          await update(editing.id, {
-            name: values.name,
-            description: values.description,
-            visibility: values.visibility,
-          })
-        } catch (err) {
-          console.error("Failed to update collection", err)
-        }
-      },
-      openCreate: () => setCreateOpen(true),
-      closeCreate: () => setCreateOpen(false),
-      startEdit: (collection: Collection) => setEditing(collection),
-      cancelEdit: () => setEditing(null),
-    }),
-    [create, update, editing, userId]
-  )
+  // Handlers with useCallback
+  const handleCreate = useCallback(
+    async (values: CollectionFormValues) => {
+      if (!userId) return;
+      await createMutation.mutateAsync({
+        ownerId: userId,
+        name: values.name,
+        description: values.description,
+        visibility: values.visibility,
+      });
+    },
+    [userId, createMutation]
+  );
+
+  const handleEdit = useCallback(
+    async (values: CollectionFormValues) => {
+      if (!editing) return;
+      await updateMutation.mutateAsync({
+        id: editing.id,
+        data: {
+          name: values.name,
+          description: values.description,
+          visibility: values.visibility,
+        },
+      });
+    },
+    [editing, updateMutation]
+  );
+
+  const handleDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteMutation.mutateAsync(deleteTarget.id);
+  }, [deleteTarget, deleteMutation]);
 
   return {
-    // Data
     collections: filtered,
-    loading,
-    error,
-    userId,
+    isPending: collectionsQuery.isPending,
+    error: collectionsQuery.error,
 
-    // UI State
-    search,
-    setSearch,
-    tab,
-    setTab,
-    sort,
-    setSort,
+    filters: {
+      search,
+      setSearch,
+      tab,
+      setTab,
+      sort,
+      setSort,
+    },
 
-    // Modals
-    createOpen,
-    editing,
-    deletion,
+    create: {
+      isOpen: createOpen,
+      open: () => setCreateOpen(true),
+      close: () => setCreateOpen(false),
+      submit: handleCreate,
+      isPending: createMutation.isPending,
+      error: createMutation.error,
+    },
 
-    // Operations
-    creating,
-    updating,
+    edit: {
+      target: editing,
+      open: setEditing,
+      close: () => setEditing(null),
+      submit: handleEdit,
+      isPending: updateMutation.isPending,
+      error: updateMutation.error,
+    },
 
-    // Actions
-    handlers,
-    reload,
-  }
+    deletion: {
+      target: deleteTarget,
+      open: setDeleteTarget,
+      close: () => {
+        setDeleteTarget(null);
+        deleteMutation.reset();
+      },
+      confirm: handleDelete,
+      isPending: deleteMutation.isPending,
+      error: deleteMutation.error,
+    },
+
+    refetch: collectionsQuery.refetch,
+  };
 }
