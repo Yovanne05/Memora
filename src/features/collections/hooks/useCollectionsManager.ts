@@ -8,7 +8,7 @@ import {
   useCreateCollectionMutation,
   useUpdateCollectionMutation,
   useDeleteCollectionMutation,
-} from "@/features/collections/hooks/useCollectionsQuery";
+} from "@/features/collections/hooks/useAllCollectionsQuery";
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm";
 
 export function useCollectionsManager() {

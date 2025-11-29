@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import type { Collection, CollectionUpdate } from '@/features/collections/models/collection.model'
-import { collectionsQueryKeys } from './useCollectionsQuery'
+import { collectionsQueryKeys } from './useAllCollectionsQuery'
 
 export function useCollectionQuery(id: string | undefined) {
   return useQuery({
