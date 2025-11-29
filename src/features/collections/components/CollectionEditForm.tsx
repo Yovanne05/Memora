@@ -1,4 +1,6 @@
-import { useMemo, useState, type FormEvent } from "react"
+import { useMemo } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { CollectionVisibility } from "../models/collection.model"
+import { collectionFormSchema, type CollectionFormInput } from "../schemas/collection.schema"
 
 export interface CollectionFormValues {
   name: string
@@ -32,11 +35,20 @@ export function CollectionEditForm({
   onSubmit,
   onCancel,
 }: CollectionEditFormProps) {
-  const [name, setName] = useState<string>(initial?.name ?? "")
-  const [description, setDescription] = useState<string>(initial?.description ?? "")
-  const [visibility, setVisibility] = useState<CollectionVisibility>(
-    initial?.visibility ?? "private"
-  )
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm<CollectionFormInput>({
+    resolver: zodResolver(collectionFormSchema),
+    defaultValues: {
+      name: initial?.name ?? "",
+      description: initial?.description ?? null,
+      visibility: initial?.visibility ?? "private",
+    },
+  })
 
   const formKey = useMemo(
     () =>
@@ -46,34 +58,37 @@ export function CollectionEditForm({
     [initial, mode]
   )
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    const trimmedName = name.trim()
-    if (!trimmedName) return
+  const nameValue = watch("name")
+  const visibilityValue = watch("visibility")
 
-    const trimmedDescription = description.trim()
-
+  const handleFormSubmit = (data: CollectionFormInput) => {
     onSubmit({
-      name: trimmedName,
-      description: trimmedDescription ? trimmedDescription : undefined,
-      visibility,
+      name: data.name,
+      description: data.description ?? undefined,
+      visibility: data.visibility,
     })
   }
 
   const isEdit = mode === "edit"
+  const isFormDisabled = loading || isSubmitting
 
   return (
-    <form key={formKey} onSubmit={handleSubmit} className="space-y-4">
+    <form key={formKey} onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="collection-name">Nom de la collection</Label>
         <Input
           id="collection-name"
           placeholder="ex. Fondamentaux de l'informatique"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
+          disabled={isFormDisabled}
+          {...register("name")}
+          aria-describedby={errors.name ? "name-error" : undefined}
         />
+        {errors.name && (
+          <span id="name-error" className="text-sm text-red-500" role="alert">
+            {errors.name.message}
+          </span>
+        )}
       </div>
 
       {/* Description */}
@@ -84,19 +99,24 @@ export function CollectionEditForm({
           rows={3}
           className="w-full resize-none rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
           placeholder="Décrivez l'objectif de cette collection..."
-          value={description ?? ""}
-          onChange={(e) => setDescription(e.target.value)}
-          disabled={loading}
+          disabled={isFormDisabled}
+          {...register("description")}
+          aria-describedby={errors.description ? "description-error" : undefined}
         />
+        {errors.description && (
+          <span id="description-error" className="text-sm text-red-500" role="alert">
+            {errors.description.message}
+          </span>
+        )}
       </div>
 
       {/* Visibility */}
       <div className="space-y-2">
         <Label>Visibilité</Label>
         <Select
-          disabled={loading}
-          value={visibility}
-          onValueChange={(v) => setVisibility(v as CollectionVisibility)}
+          disabled={isFormDisabled}
+          value={visibilityValue}
+          onValueChange={(v) => setValue("visibility", v as CollectionVisibility)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Choisir la visibilité" />
@@ -118,12 +138,12 @@ export function CollectionEditForm({
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={loading}
+            disabled={isFormDisabled}
           >
             Annuler
           </Button>
         )}
-        <Button type="submit" disabled={loading || !name.trim()}>
+        <Button type="submit" disabled={isFormDisabled || !nameValue.trim()}>
           {isEdit ? "Enregistrer les modifications" : "Enregistrer la collection"}
         </Button>
       </div>
