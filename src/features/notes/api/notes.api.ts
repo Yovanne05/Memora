@@ -51,8 +51,9 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
     if (!res.ok) {
         throw new Error("Erreur API");
     }
-
-    return res.json();
+    
+    const data = await res.json();
+    return dtoToNote(data);
 }
 
 export async function deleteNote(noteId: string): Promise<void> {
@@ -81,8 +82,8 @@ export async function updateNote(noteId: string, payload: UpdateNotePayload): Pr
     if (!res.ok) {
         throw new Error("Erreur lors de la mise à jour de la note");
     }
-
-    return res.json();
+    const data = await res.json();
+    return dtoToNote(data);
 }
 
 export async function createNote(payload: CreateNotePayload): Promise<Note> {
@@ -98,5 +99,6 @@ export async function createNote(payload: CreateNotePayload): Promise<Note> {
         throw new Error("Erreur lors de la création de la note");
     }
 
-    return res.json();
+    const data = await res.json();
+    return dtoToNote(data);
 }
