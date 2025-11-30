@@ -1,16 +1,17 @@
-import { CollectionCard } from "@/features/collections/components/list/CollectionCard"
 import type { Collection } from "@/features/collections/models/collection.model"
-import { useRouter } from "@tanstack/react-router";
+import { CollectionCard } from "@/features/collections/components/list/CollectionCard"
 
 interface VisualizationCollectionsListProps {
   collections: Collection[]
+  selectedId?: string
+  onSelect: (c: Collection) => void
 }
 
 export function VisualizationCollectionsList({
   collections,
+  selectedId,
+  onSelect,
 }: VisualizationCollectionsListProps) {
-  const router = useRouter();
-
   if (!collections.length) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -19,17 +20,21 @@ export function VisualizationCollectionsList({
     )
   }
 
-  const handleVisualizationClick = (collection: Collection) => {
-    router.navigate({
-      to: "/app/visualization/collections/$id",
-      params: { id: collection.id },
-    });
-  }
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="space-y-2">
       {collections.map((collection) => (
-        <CollectionCard key={collection.id} collection={collection} onCardClick={handleVisualizationClick} />
+        <div
+          key={collection.id}
+          className={
+            "rounded-md border p-1" +
+            (collection.id === selectedId ? " border-primary bg-primary/5" : " border-transparent")
+          }
+        >
+          <CollectionCard
+            collection={collection}
+            onCardClick={onSelect}
+          />
+        </div>
       ))}
     </div>
   )
