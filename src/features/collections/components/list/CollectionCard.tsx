@@ -1,45 +1,58 @@
-import type { Collection } from "../models/collection.model"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import type { Collection } from "../../models/collection.model";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { FileText, MoreHorizontal } from "lucide-react"
-import { useRouter } from "@tanstack/react-router"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { FileText, MoreHorizontal } from "lucide-react";
+import { useRouter } from "@tanstack/react-router";
 
 interface CollectionCardProps {
-  collection: Collection
-  onEdit?: (c: Collection) => void
-  onDelete?: (c: Collection) => void
+  collection: Collection;
+  onEdit?: (c: Collection) => void;
+  onDelete?: (c: Collection) => void;
+  onCardClick?: (c: Collection) => void;
 }
 
 export function CollectionCard({
   collection,
   onEdit,
   onDelete,
+  onCardClick,
 }: CollectionCardProps) {
-  const createdDate = new Date(collection.createdAt).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  })
+  const createdDate = new Date(collection.createdAt).toLocaleDateString(
+    "fr-FR",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }
+  );
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleNavigate = () =>
     router.navigate({
       to: "/app/collections/$id",
       params: { id: collection.id },
-    })
+    });
+
+  const handleCardClick = () => {
+    if (onCardClick) {
+      onCardClick(collection);
+    } else {
+      handleNavigate();
+    }
+  };
 
   return (
     <Card
       className="group flex h-full cursor-pointer flex-col justify-between border border-border bg-card text-card-foreground shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-      onClick={handleNavigate}
+      onClick={handleCardClick}
     >
       <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
         <div className="flex items-start gap-3">
@@ -69,15 +82,12 @@ export function CollectionCard({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent
-            align="end"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={(e) => {
-                e.stopPropagation()
-                onEdit?.(collection)
+                e.stopPropagation();
+                onEdit?.(collection);
               }}
             >
               Modifier
@@ -85,8 +95,8 @@ export function CollectionCard({
             <DropdownMenuItem
               className="cursor-pointer text-destructive focus:text-destructive"
               onClick={(e) => {
-                e.stopPropagation()
-                onDelete?.(collection)
+                e.stopPropagation();
+                onDelete?.(collection);
               }}
             >
               Supprimer
@@ -108,9 +118,11 @@ export function CollectionCard({
             {collection.visibility === "public" ? "Publique" : "Privée"}
           </Badge>
 
-          <span className="text-xs text-muted-foreground">Créée le {createdDate}</span>
+          <span className="text-xs text-muted-foreground">
+            Créée le {createdDate}
+          </span>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

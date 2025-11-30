@@ -29,7 +29,7 @@ export function CollectionNotesHeader({
           className="max-w-md"
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
-          disabled={availableNotes.length !== 0}
+          disabled={availableNotes.length === 0}
         />
       </div>
 

@@ -55,7 +55,7 @@ export function NoteCard({ note }: { note: Note }) {
                         </span>
 
                         <span className="flex items-center gap-1">
-                            Mis à jour le {formatDate(note.updated_at)}
+                            Mis à jour le {formatDate(note.updatedAt)}
                         </span>
                     </div>
                 </CardContent>
