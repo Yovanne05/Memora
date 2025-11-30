@@ -4,10 +4,12 @@ import ReactFlow, {
   Background,
   Controls,
   MiniMap,
+  Handle,
   MarkerType,
   type Node,
   type Edge,
   type NodeProps,
+  Position,
 } from "reactflow"
 import "reactflow/dist/style.css"
 import { useCollectionVisualizationQuery } from "../hook/useCollectionVisualizationQuery"
@@ -23,14 +25,31 @@ type CustomNodeData = {
 
 // Composant pour un nœud personnalisé
 const CustomNode = ({ data }: NodeProps<CustomNodeData>) => {
+  const connections = data.connections ?? 0
+
   return (
-    <div className="px-4 py-3 shadow-lg rounded-lg bg-white border-2 border-blue-400 hover:border-blue-600 transition-colors">
+    <div className="group relative px-4 py-3 shadow-lg rounded-lg bg-white border-2 border-blue-400 hover:border-blue-600 transition-colors">
+      {/* Handle d'entrée (gauche) */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-2! h-2! bg-blue-500! opacity-0 group-hover:opacity-100 transition-opacity"
+      />
+
+      {/* Handle de sortie (droite) */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-2! h-2! bg-blue-500! opacity-0 group-hover:opacity-100 transition-opacity"
+      />
+
       <div className="flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-blue-500" />
         <div className="text-sm font-semibold text-gray-800">{data.title}</div>
       </div>
+
       <div className="text-xs text-gray-500 mt-1">
-        {data.connections} connexion{data.connections > 1 ? "s" : ""}
+        {connections} connexion{connections > 1 ? "s" : ""}
       </div>
     </div>
   )
