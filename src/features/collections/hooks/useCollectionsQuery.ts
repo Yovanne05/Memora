@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import type { Collection, CollectionCreate, CollectionUpdate } from '@/features/collections/models/collection.model'
 
-const COLLECTIONS_QUERY_KEYS = {
+export const COLLECTIONS_QUERY_KEYS = {
   all: ['collections'] as const,
   lists: () => [...COLLECTIONS_QUERY_KEYS.all, 'list'] as const,
   list: (filters: Record<string, unknown> = {}) => [
@@ -13,7 +13,8 @@ const COLLECTIONS_QUERY_KEYS = {
   detail: (id: string) => [...COLLECTIONS_QUERY_KEYS.details(), id] as const,
 }
 
-export function useCollectionsQuery() {
+
+export function useCollectionsListQuery() {
   return useQuery({
     queryKey: COLLECTIONS_QUERY_KEYS.list(),
     queryFn: () => collectionsService.list(),
@@ -22,96 +23,106 @@ export function useCollectionsQuery() {
   })
 }
 
-export function useCreateCollectionMutation(options?: { onSuccess?: () => void }) {
+export function useCollectionQuery(id: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: COLLECTIONS_QUERY_KEYS.detail(id),
+    queryFn: () => collectionsService.get(id),
+    enabled: options?.enabled !== false && !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  })
+}
+
+
+interface MutationCallbacks<TData = void> {
+  onSuccess?: (data: TData) => void
+  onError?: (error: Error) => void
+}
+
+
+export function useCreateCollectionMutation(callbacks?: MutationCallbacks<Collection>) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: CollectionCreate) => collectionsService.create(data),
     onSuccess: (newCollection) => {
-      // Update the collections list in cache
       queryClient.setQueryData(
         COLLECTIONS_QUERY_KEYS.list(),
         (old: Collection[] | undefined) => [newCollection, ...(old ?? [])]
       )
 
-      // Invalidate to ensure consistency
       queryClient.invalidateQueries({
         queryKey: COLLECTIONS_QUERY_KEYS.lists(),
       })
 
-      // Call the provided onSuccess callback
-      options?.onSuccess?.()
+      callbacks?.onSuccess?.(newCollection)
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Failed to create collection:', error)
+      callbacks?.onError?.(error)
     },
   })
 }
 
-export function useUpdateCollectionMutation(options?: { onSuccess?: () => void }) {
+export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collection>) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: CollectionUpdate }) =>
       collectionsService.update(id, data),
     onSuccess: (updated) => {
-      // Update the collections list in cache
       queryClient.setQueryData(
         COLLECTIONS_QUERY_KEYS.list(),
         (old: Collection[] | undefined) =>
           old?.map((c) => (c.id === updated.id ? updated : c)) ?? []
       )
 
-      // Update the detail cache if it exists
       queryClient.setQueryData(
         COLLECTIONS_QUERY_KEYS.detail(updated.id),
         updated
       )
 
-      // Invalidate to ensure consistency
       queryClient.invalidateQueries({
         queryKey: COLLECTIONS_QUERY_KEYS.lists(),
       })
+      queryClient.invalidateQueries({
+        queryKey: COLLECTIONS_QUERY_KEYS.detail(updated.id),
+      })
 
-      // Call the provided onSuccess callback
-      options?.onSuccess?.()
+      callbacks?.onSuccess?.(updated)
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Failed to update collection:', error)
+      callbacks?.onError?.(error)
     },
   })
 }
 
-export function useDeleteCollectionMutation(options?: { onSuccess?: () => void }) {
+export function useDeleteCollectionMutation(callbacks?: MutationCallbacks<void>) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: string) => collectionsService.remove(id),
     onSuccess: (_, id) => {
-      // Remove from the collections list in cache
       queryClient.setQueryData(
         COLLECTIONS_QUERY_KEYS.list(),
         (old: Collection[] | undefined) =>
           old?.filter((c) => c.id !== id) ?? []
       )
 
-      // Remove the detail cache
       queryClient.removeQueries({
         queryKey: COLLECTIONS_QUERY_KEYS.detail(id),
       })
 
-      // Invalidate to ensure consistency
       queryClient.invalidateQueries({
         queryKey: COLLECTIONS_QUERY_KEYS.lists(),
       })
 
-      // Call the provided onSuccess callback
-      options?.onSuccess?.()
+      callbacks?.onSuccess?.()
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Failed to delete collection:', error)
+      callbacks?.onError?.(error)
     },
   })
 }
-
-export const collectionsQueryKeys = COLLECTIONS_QUERY_KEYS

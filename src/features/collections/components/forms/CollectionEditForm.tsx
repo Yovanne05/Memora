@@ -1,3 +1,4 @@
+import { memo, useCallback, useMemo } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -6,7 +7,6 @@ import { FormTextarea } from "@/components/ui/form-textarea"
 import { FormSelect } from "@/components/ui/form-select"
 import type { CollectionVisibility } from "../../models/collection.model"
 import { collectionFormSchema, type CollectionFormInput } from "../../schemas/collection.schema"
-
 
 export interface CollectionFormValues {
   name: string
@@ -22,13 +22,27 @@ interface CollectionEditFormProps {
   onCancel?: () => void
 }
 
-export function CollectionEditForm({
+const VISIBILITY_OPTIONS: { value: string; label: string }[] = [
+  { value: "private", label: "Privée" },
+  { value: "public", label: "Publique" },
+]
+
+export const CollectionEditForm = memo(function CollectionEditForm({
   mode,
   initial,
   loading = false,
   onSubmit,
   onCancel,
 }: CollectionEditFormProps) {
+  const defaultValues = useMemo(
+    () => ({
+      name: initial?.name ?? "",
+      description: initial?.description ?? "",
+      visibility: initial?.visibility ?? "private" as CollectionVisibility,
+    }),
+    [initial]
+  )
+
   const {
     register,
     handleSubmit,
@@ -36,27 +50,27 @@ export function CollectionEditForm({
     control,
   } = useForm<CollectionFormInput>({
     resolver: zodResolver(collectionFormSchema),
-    defaultValues: {
-      name: initial?.name ?? "",
-      description: initial?.description ?? "",
-      visibility: initial?.visibility ?? "private",
-    },
+    defaultValues,
   })
 
   const isEdit = mode === "edit"
   const isFormDisabled = loading || isSubmitting
 
-  const handleFormSubmit = (data: CollectionFormInput) => {
-    return onSubmit({
-      name: data.name,
-      description: data.description ?? undefined,
-      visibility: data.visibility,
-    })
-  }
+  const handleFormSubmit = useCallback(
+    (data: CollectionFormInput) => {
+      return onSubmit({
+        name: data.name,
+        description: data.description ?? undefined,
+        visibility: data.visibility,
+      })
+    },
+    [onSubmit]
+  )
+
+  const submitButtonText = isEdit ? "Enregistrer les modifications" : "Créer la collection"
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      {/* Name */}
       <FormInput
         id="collection-name"
         label="Nom de la collection"
@@ -66,7 +80,6 @@ export function CollectionEditForm({
         {...register("name")}
       />
 
-      {/* Description */}
       <FormTextarea
         id="collection-description"
         label="Description"
@@ -77,7 +90,6 @@ export function CollectionEditForm({
         {...register("description")}
       />
 
-      {/* Visibility */}
       <Controller
         name="visibility"
         control={control}
@@ -91,15 +103,11 @@ export function CollectionEditForm({
             error={errors.visibility}
             placeholder="Choisir la visibilité"
             helperText="Les collections privées ne sont visibles que par vous."
-            options={[
-              { value: "private", label: "Privée" },
-              { value: "public", label: "Publique" },
-            ]}
+            options={VISIBILITY_OPTIONS}
           />
         )}
       />
 
-      {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
         {onCancel && (
           <Button
@@ -112,9 +120,9 @@ export function CollectionEditForm({
           </Button>
         )}
         <Button type="submit" disabled={isFormDisabled}>
-          {isEdit ? "Enregistrer les modifications" : "Créer la collection"}
+          {submitButtonText}
         </Button>
       </div>
     </form>
   )
-}
+})

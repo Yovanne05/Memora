@@ -1,15 +1,15 @@
-import { useCallback, useMemo, useState } from "react";
-import type { Collection } from "../models/collection.model";
-import type { CollectionsSort, CollectionsTab } from "../lib/collections-query";
-import { applyCollectionsQuery } from "../lib/collections-query";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useCallback, useMemo, useState } from "react"
+import type { Collection } from "../models/collection.model"
+import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
+import { applyCollectionsQuery } from "../lib/collections-query"
+import { useCurrentUser } from "@/hooks/useCurrentUser"
 import {
-  useCollectionsQuery,
+  useCollectionsListQuery,
   useCreateCollectionMutation,
   useUpdateCollectionMutation,
   useDeleteCollectionMutation,
-} from "@/features/collections/hooks/useAllCollectionsQuery";
-import type { CollectionFormValues } from "../components/forms/CollectionEditForm";
+} from "./useCollectionsQuery"
+import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
 
 export function useCollectionsManager() {
   const { userId } = useCurrentUser();
@@ -22,19 +22,17 @@ export function useCollectionsManager() {
   const [editing, setEditing] = useState<Collection | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Collection | null>(null);
 
-  // React Query hooks with callbacks
-  const collectionsQuery = useCollectionsQuery();
+  const collectionsQuery = useCollectionsListQuery()
   const createMutation = useCreateCollectionMutation({
     onSuccess: () => setCreateOpen(false),
-  });
+  })
   const updateMutation = useUpdateCollectionMutation({
     onSuccess: () => setEditing(null),
-  });
+  })
   const deleteMutation = useDeleteCollectionMutation({
     onSuccess: () => setDeleteTarget(null),
-  });
+  })
 
-  // Filtered collections
   const filtered = useMemo(() => {
     if (!userId || !collectionsQuery.data) return [];
     return applyCollectionsQuery(collectionsQuery.data, {
@@ -45,7 +43,6 @@ export function useCollectionsManager() {
     });
   }, [collectionsQuery.data, search, sort, tab, userId]);
 
-  // Handlers with useCallback
   const handleCreate = useCallback(
     async (values: CollectionFormValues) => {
       if (!userId) return;
