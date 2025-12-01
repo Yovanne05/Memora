@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { VisualizationCollectionsList } from "../components/VisualizationCollectionsList"
 import type { Collection } from "@/features/collections/models/collection.model"
-import { usePublicCollectionsQuery } from "../hook/usePublicCollectionsQuery"
+import { usePublicCollectionsQuery } from "../hooks/usePublicCollectionsQuery"
 import { CollectionVisualizationView } from "../components/CollectionVisualizationView"
 
 export function VisualizationPage() {
