@@ -116,7 +116,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     ) : (
                                         <span className="flex items-center gap-2">
                                             <NotebookPen className="h-4 w-4" />
-                                            Propriétaire {note?.owner_id}
+                                            Propriétaire {note?.ownerId}
                                         </span>
                                     )}
 
@@ -125,7 +125,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
-                                        <span>Créée le {note && formatDate(note.created_at)}</span>
+                                        <span>Créée le {note && formatDate(note.createdAt)}</span>
                                     )}
 
                                     <Separator orientation="vertical" className="h-4" />
@@ -133,7 +133,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
-                                        <span>Mise à jour le {note && formatDate(note.updated_at)}</span>
+                                        <span>Mise à jour le {note && formatDate(note.updatedAt)}</span>
                                     )}
                                 </div>
                             </div>
@@ -246,7 +246,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     <div className="flex items-center gap-2">
                                         <NotebookPen className="h-4 w-4" />
                                         <span className="text-foreground">Propriétaire</span>
-                                        <span className="text-muted-foreground">{note?.owner_id}</span>
+                                        <span className="text-muted-foreground">{note?.ownerId}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
@@ -260,13 +260,13 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
                                         <span className="text-foreground">Créée</span>
-                                        <span>{note && formatDateTime(note.created_at)}</span>
+                                        <span>{note && formatDateTime(note.createdAt)}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
                                         <span className="text-foreground">Mise à jour</span>
-                                        <span>{note && formatDateTime(note.updated_at)}</span>
+                                        <span>{note && formatDateTime(note.updatedAt)}</span>
                                     </div>
                                 </>
                             )}

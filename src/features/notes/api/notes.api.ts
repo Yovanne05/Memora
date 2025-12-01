@@ -1,5 +1,6 @@
 import type { Note, PaginatedNotes } from "../models/note.model";
 import type { NotesFilters } from "../models/note-filters.model";
+import { dtoToNote } from "../mappers/note.mapper";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -32,8 +33,12 @@ export async function fetchNotes({
 
     const res = await fetch(`${API_URL}/notes?${params.toString()}`);
     if (!res.ok) throw new Error("Erreur API");
-
-    return res.json();
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : data?.items ?? []
+    return {
+        total: data?.total ?? 0,
+        items: items.map(dtoToNote)
+    }
 }
 
 export async function fetchNoteById(noteId: string): Promise<Note> {
@@ -46,8 +51,9 @@ export async function fetchNoteById(noteId: string): Promise<Note> {
     if (!res.ok) {
         throw new Error("Erreur API");
     }
-
-    return res.json();
+    
+    const data = await res.json();
+    return dtoToNote(data);
 }
 
 export async function deleteNote(noteId: string): Promise<void> {
@@ -76,8 +82,8 @@ export async function updateNote(noteId: string, payload: UpdateNotePayload): Pr
     if (!res.ok) {
         throw new Error("Erreur lors de la mise à jour de la note");
     }
-
-    return res.json();
+    const data = await res.json();
+    return dtoToNote(data);
 }
 
 export async function createNote(payload: CreateNotePayload): Promise<Note> {
@@ -93,5 +99,6 @@ export async function createNote(payload: CreateNotePayload): Promise<Note> {
         throw new Error("Erreur lors de la création de la note");
     }
 
-    return res.json();
+    const data = await res.json();
+    return dtoToNote(data);
 }

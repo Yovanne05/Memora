@@ -10,13 +10,14 @@ import {
   toCollectionUpdateDto,
 } from "../mappers/collection.mapper"
 import { httpClient, type HttpClient } from "@/lib/http-client"
-import type { CollectionsService } from "./collections.service.interface"
+import type { ICollectionsService } from "./collections.service.interface"
 import type { CollectionCreate, CollectionUpdate } from "../models/collection.model"
+import type { CollectionsListParams } from "../types/paginated-collection"
 
-export function createCollectionsService(client: HttpClient = httpClient): CollectionsService {
+export function createCollectionsService(client: HttpClient = httpClient): ICollectionsService {
   return {
-    async list() {
-      const data = await client.get<CollectionsListDto>("/collections")
+    async list(params?: CollectionsListParams) {
+      const data = await client.get<CollectionsListDto>("/collections", { params })
       const items = Array.isArray(data) ? data : data?.items ?? []
       return items.map(dtoToCollection)
     },
@@ -45,4 +46,4 @@ export function createCollectionsService(client: HttpClient = httpClient): Colle
 }
 
 export const collectionsService = createCollectionsService()
-export type { CollectionsService } from "./collections.service.interface"
+export type { ICollectionsService as CollectionsService } from "./collections.service.interface"

@@ -51,7 +51,7 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
     const currentContent = content ?? note?.content ?? ""
     const currentVisibility = visibility ?? note?.visibility ?? "private"
 
-    const savedTime = useMemo(() => formatTime(lastSavedAt ?? note?.updated_at), [note, lastSavedAt])
+    const savedTime = useMemo(() => formatTime(lastSavedAt ?? note?.updatedAt), [note, lastSavedAt])
 
     const handleSave = async () => {
         if (!noteId) return

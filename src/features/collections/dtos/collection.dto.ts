@@ -1,3 +1,4 @@
+import { noteDtoSchema } from '@/features/notes/dto/note.dto'
 import { z } from 'zod'
 
 export const collectionVisibilitySchema = z.enum(['private', 'public'])
@@ -8,6 +9,7 @@ export const collectionDtoSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).nullable().optional(),
   visibility: collectionVisibilitySchema.default('private'),
+  notes: z.array(noteDtoSchema),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
 })

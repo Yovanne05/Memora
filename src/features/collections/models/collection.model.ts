@@ -1,3 +1,4 @@
+import type { Note } from "@/features/notes/models/note.model"
 export type CollectionVisibility = "private" | "public"
 
 export interface Collection {
@@ -6,6 +7,7 @@ export interface Collection {
   name: string
   description?: string | null
   visibility: CollectionVisibility
+  notes: Note[]
   createdAt: string
   updatedAt: string
 }

@@ -32,7 +32,7 @@ export function AppSidebar() {
         { title: "Tableau de bord", icon: LayoutDashboard, url: "#" },
         { title: "Notes", icon: FileText, url: "/app/notes" },
         { title: "Collections", icon: FolderKanban, url: "/app/collections" },
-        { title: "Graphe de connaissances", icon: Network, url: "#" },
+        { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
         { title: "Recherche", icon: Search, url: "#" },
         { title: "Révision", icon: GraduationCap, url: "#" },
         { title: "Journal et stats", icon: History, url: "#" },

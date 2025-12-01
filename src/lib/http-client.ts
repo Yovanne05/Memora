@@ -11,10 +11,39 @@ const DEFAULT_RETRY_DELAY = 1000; // 1 second
 const DEFAULT_RETRY_MULTIPLIER = 2; // Exponential backoff
 
 export interface HttpClient {
-  get<T>(path: string): Promise<T>;
-  post<T, B = unknown>(path: string, body?: B): Promise<T>;
-  patch<T, B = unknown>(path: string, body?: B): Promise<T>;
-  delete<T>(path: string): Promise<T>;
+  get<T>(path: string, options?: HttpRequestOptions): Promise<T>;
+  post<T, B = unknown>(path: string, body?: B, options?: HttpRequestOptions): Promise<T>;
+  patch<T, B = unknown>(path: string, body?: B, options?: HttpRequestOptions): Promise<T>;
+  delete<T>(path: string, options?: HttpRequestOptions): Promise<T>;
+}
+
+export interface HttpRequestOptions {
+  params?: Record<string, string | number | boolean | Array<string | number | boolean> | null | undefined>;
+}
+
+function buildPathWithParams(path: string, params?: HttpRequestOptions["params"]): string {
+  if (!params) return path;
+
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null) continue;
+
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        if (v === undefined || v === null) continue;
+        searchParams.append(key, String(v));
+      }
+    } else {
+      searchParams.append(key, String(value));
+    }
+  }
+
+  const query = searchParams.toString();
+  if (!query) return path;
+
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}${query}`;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -66,21 +95,27 @@ async function requestWithRetry<T>(
 
 export function createHttpClient(): HttpClient {
   return {
-    get: (path) => requestWithRetry(path, { method: "GET" }),
-    post: (path, body) =>
-      requestWithRetry(path, {
+    get: (path, options) =>
+      requestWithRetry(buildPathWithParams(path, options?.params), {
+        method: "GET",
+      }),
+
+    post: (path, body, options) =>
+      requestWithRetry(buildPathWithParams(path, options?.params), {
         method: "POST",
         headers: body ? { "Content-Type": "application/json" } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       }),
-    patch: (path, body) =>
-      requestWithRetry(path, {
+
+    patch: (path, body, options) =>
+      requestWithRetry(buildPathWithParams(path, options?.params), {
         method: "PATCH",
         headers: body ? { "Content-Type": "application/json" } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       }),
-    delete: (path) =>
-      requestWithRetry(path, {
+
+    delete: (path, options) =>
+      requestWithRetry(buildPathWithParams(path, options?.params), {
         method: "DELETE",
       }),
   };
