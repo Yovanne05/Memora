@@ -7,8 +7,8 @@ import type {
 } from "../types/visualization.type";
 import {
   calculateLayeredLayout,
-  determineConnectionDirection,
   calculateEdgeOffset,
+  groupEdgesByConnection,
 } from "../lib/layoutEngine";
 
 interface UseVisualizationLayoutResult {
@@ -66,44 +66,55 @@ export function useVisualizationLayout(
   const edges = useMemo<Edge[]>(() => {
     if (!data || nodes.length === 0) return [];
 
-    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const positions = nodes.reduce<Record<string, { x: number; y: number }>>(
+      (acc, node) => {
+        acc[node.id] = node.position;
+        return acc;
+      },
+      {}
+    );
 
-    return data.edges.map((edge, index) => {
-      const sourceNode = nodeById.get(edge.sourceId);
-      const targetNode = nodeById.get(edge.targetId);
+    const validNodeIds = new Set(nodes.map((node) => node.id));
+    const validEdges = data.edges.filter((edge) => {
+      const isValid =
+        validNodeIds.has(edge.sourceId) && validNodeIds.has(edge.targetId);
 
-      const baseEdge: Edge = {
-        id: `e${edge.sourceId}-${edge.targetId}-${index}`,
-        source: edge.sourceId,
-        target: edge.targetId,
-        type: "smoothstep",
-        style: { stroke: "#3b82f6", strokeWidth: 2 },
-      };
-
-      // Si les nœuds n'existent pas, retourner l'arête de base
-      if (!sourceNode || !targetNode) {
-        return baseEdge;
+      if (!isValid) {
+        console.warn("Arete ignoree", edge);
       }
 
-      // Direction optimale de connexion
-      const { sourceSide, targetSide } = determineConnectionDirection(
-        sourceNode.position,
-        targetNode.position
-      );
-
-      // Evite la superposition des arêtes
-      const offset = calculateEdgeOffset(index);
-
-      return {
-        ...baseEdge,
-        sourceHandle: `${sourceSide}-source`,
-        targetHandle: `${targetSide}-target`,
-        pathOptions: {
-          offset,
-          borderRadius: 16,
-        },
-      };
+      return isValid;
     });
+
+    const edgeGroups = groupEdgesByConnection(validEdges, positions);
+    const reactFlowEdges: Edge[] = [];
+
+    edgeGroups.forEach((group) => {
+      const totalEdgesInGroup = group.edgeIndices.length;
+
+      group.edgeIndices.forEach((_, localIndex) => {
+        const offset = calculateEdgeOffset(localIndex, totalEdgesInGroup);
+
+        reactFlowEdges.push({
+          id:
+            totalEdgesInGroup === 1
+              ? `e${group.sourceId}-${group.targetId}`
+              : `e${group.sourceId}-${group.targetId}-${localIndex}`,
+          source: group.sourceId,
+          target: group.targetId,
+          type: "smoothstep",
+          sourceHandle: `${group.sourceSide}-source`,
+          targetHandle: `${group.targetSide}-target`,
+          style: { stroke: "#3b82f6", strokeWidth: 2 },
+          pathOptions: {
+            offset,
+            borderRadius: 16,
+          },
+        });
+      });
+    });
+
+    return reactFlowEdges;
   }, [data, nodes]);
 
   return {
