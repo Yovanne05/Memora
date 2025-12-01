@@ -1,10 +1,11 @@
 import type { Collection } from "@/features/collections/models/collection.model"
 import { CollectionCard } from "@/features/collections/components/list/CollectionCard"
+import { cn } from "@/lib/utils"
 
 interface VisualizationCollectionsListProps {
   collections: Collection[]
   selectedId?: string
-  onSelect: (c: Collection) => void
+  onSelect: (collection: Collection) => void
 }
 
 export function VisualizationCollectionsList({
@@ -22,20 +23,24 @@ export function VisualizationCollectionsList({
 
   return (
     <div className="space-y-2">
-      {collections.map((collection) => (
-        <div
-          key={collection.id}
-          className={
-            "rounded-md border p-1" +
-            (collection.id === selectedId ? " border-primary bg-primary/5" : " border-transparent")
-          }
-        >
-          <CollectionCard
-            collection={collection}
-            onCardClick={onSelect}
-          />
-        </div>
-      ))}
+      {collections.map((collection) => {
+        const isSelected = collection.id === selectedId
+
+        return (
+          <div
+            key={collection.id}
+            className={cn(
+              "rounded-md border p-1",
+              isSelected ? "border-primary bg-primary/5" : "border-transparent"
+            )}
+          >
+            <CollectionCard
+              collection={collection}
+              onCardClick={onSelect}
+            />
+          </div>
+        )
+      })}
     </div>
   )
 }

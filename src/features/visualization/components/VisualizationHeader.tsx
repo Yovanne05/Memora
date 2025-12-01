@@ -1,6 +1,6 @@
 interface VisualizationHeaderProps {
-  notesCount: number;
-  connectionsCount: number;
+  notesCount: number
+  connectionsCount: number
 }
 
 export function VisualizationHeader({
@@ -12,11 +12,15 @@ export function VisualizationHeader({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">Visualisation des Notes</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {notesCount} notes • {connectionsCount} connexions
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            <span aria-label={`${notesCount} notes`}>{notesCount} notes</span>
+            {" • "}
+            <span aria-label={`${connectionsCount} connexions`}>
+              {connectionsCount} connexions
+            </span>
           </p>
         </div>
       </div>
     </div>
-  );
+  )
 }

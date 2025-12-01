@@ -1,81 +1,62 @@
-import { useCallback } from "react";
-import type { MouseEvent } from "react";
-import ReactFlow, { Background, Controls, MiniMap, type Node } from "reactflow";
-import "reactflow/dist/style.css";
-import { useCollectionVisualizationQuery } from "../hooks/useCollectionVisualizationQuery";
-import { useVisualizationLayout } from "../hooks/useVisualizationLayout";
-import { CustomNode, type CustomNodeData } from "./CustomNode";
-import { VisualizationHeader } from "./VisualizationHeader";
-import { VisualizationLegend } from "./VisualizationLegend";
+import { useCallback } from "react"
+import type { MouseEvent } from "react"
+import ReactFlow, { Background, Controls, MiniMap, type Node } from "reactflow"
+import "reactflow/dist/style.css"
+import { useCollectionVisualizationQuery } from "../hooks/useCollectionVisualizationQuery"
+import { useVisualizationLayout } from "../hooks/useVisualizationLayout"
+import { CustomNode, type CustomNodeData } from "./CustomNode"
+import { VisualizationHeader } from "./VisualizationHeader"
+import { VisualizationLegend } from "./VisualizationLegend"
+import { getNodeColorByConnections } from "../constants/visualization.constants"
+import { EmptyState } from "./EmptyState"
+import { LoadingState } from "./LoadingState"
+import { ErrorState } from "./ErrorState"
 
 interface CollectionVisualizationViewProps {
-  collectionId?: string;
+  collectionId?: string
 }
 
 const nodeTypes = {
   custom: CustomNode,
-};
+}
 
-/**
- * Vue principale de la visualisation de collection
- * Composant container qui orchestre l'affichage du graphe de notes
- */
 export function CollectionVisualizationView({
   collectionId,
 }: CollectionVisualizationViewProps) {
   const { data, isLoading, isError } =
-    useCollectionVisualizationQuery(collectionId);
+    useCollectionVisualizationQuery(collectionId)
 
-  const { nodes, edges } = useVisualizationLayout(data);
+  const { nodes, edges } = useVisualizationLayout(data)
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
-      console.log("Note sélectionnée:", node);
+      console.log("Note sélectionnée:", node)
     },
     []
-  );
+  )
 
-  // État : Aucune collection sélectionnée
   if (!collectionId) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        Sélectionnez une collection à gauche pour afficher la visualisation.
-      </div>
-    );
+      <EmptyState message="Sélectionnez une collection à gauche pour afficher la visualisation." />
+    )
   }
 
-  // État : Chargement
   if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">
-            Chargement de la visualisation...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingState message="Chargement de la visualisation..." />
   }
 
-  // État : Erreur
   if (isError || !data) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-destructive">
-        Erreur lors du chargement de la visualisation.
-      </div>
-    );
+    return <ErrorState message="Erreur lors du chargement de la visualisation." />
   }
 
-  // État : Visualisation prête
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="flex h-full w-full flex-col">
       <VisualizationHeader
         notesCount={data.nodes.length}
         connectionsCount={data.edges.length}
       />
 
-      <div className="flex-1 relative min-h-[400px]">
+      <div className="relative min-h-[400px] flex-1">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -87,9 +68,9 @@ export function CollectionVisualizationView({
           nodesConnectable={false}
         >
           <Background gap={16} />
-          <Controls className="border rounded-lg shadow-lg" />
+          <Controls className="rounded-lg border shadow-lg" />
           <MiniMap
-            className="border rounded-lg shadow-lg"
+            className="rounded-lg border shadow-lg"
             nodeColor={getNodeColor}
           />
         </ReactFlow>
@@ -97,16 +78,10 @@ export function CollectionVisualizationView({
 
       <VisualizationLegend />
     </div>
-  );
+  )
 }
 
-/**
- * Détermine la couleur d'un nœud dans la minimap selon son nombre de connexions
- */
 function getNodeColor(node: Node): string {
-  const connections = (node.data as CustomNodeData | undefined)?.connections ?? 0;
-
-  if (connections > 3) return "#3b82f6";
-  if (connections > 1) return "#60a5fa";
-  return "#93c5fd";
+  const connections = (node.data as CustomNodeData | undefined)?.connections ?? 0
+  return getNodeColorByConnections(connections)
 }

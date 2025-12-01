@@ -3,17 +3,19 @@ import { VisualizationCollectionsList } from "../components/VisualizationCollect
 import type { Collection } from "@/features/collections/models/collection.model"
 import { usePublicCollectionsQuery } from "../hooks/usePublicCollectionsQuery"
 import { CollectionVisualizationView } from "../components/CollectionVisualizationView"
+import { LoadingState } from "../components/LoadingState"
+import { ErrorState } from "../components/ErrorState"
 
 export function VisualizationPage() {
   const { data, isLoading, isError } = usePublicCollectionsQuery()
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null)
 
   if (isLoading) {
-    return <div>Chargement des collections...</div>
+    return <LoadingState message="Chargement des collections..." />
   }
 
   if (isError) {
-    return <div>Erreur lors du chargement des collections.</div>
+    return <ErrorState message="Erreur lors du chargement des collections." />
   }
 
   const collections = data ?? []
@@ -24,20 +26,18 @@ export function VisualizationPage() {
 
   return (
     <div className="flex h-full gap-4">
-      {/* Colonne gauche : liste des collections */}
-      <div className="w-80 shrink-0 border-r pr-4">
+      <aside className="w-80 shrink-0 border-r pr-4" aria-label="Liste des collections">
         <h1 className="mb-3 text-lg font-semibold">Collections publiques</h1>
         <VisualizationCollectionsList
           collections={collections}
           selectedId={selectedCollection?.id}
           onSelect={handleSelect}
         />
-      </div>
+      </aside>
 
-      {/* Colonne droite : graphe de la collection sélectionnée */}
-      <div className="flex-1">
+      <main className="flex-1" aria-label="Visualisation de la collection">
         <CollectionVisualizationView collectionId={selectedCollection?.id} />
-      </div>
+      </main>
     </div>
   )
 }
