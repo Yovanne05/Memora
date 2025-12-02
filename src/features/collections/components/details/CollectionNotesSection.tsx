@@ -2,7 +2,7 @@ import { useMemo, useCallback, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { CollectionNotesHeader } from "./CollectionNotesHeader";
+import { CollectionNotesHeader, type NotesSort } from "./CollectionNotesHeader";
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation";
 import type { Note } from "@/features/notes/models/note.model";
 import { CollectionNotesGrid } from "./CollectionNotesGrid";
@@ -31,6 +31,7 @@ export function CollectionNotesSection() {
 
   const [selected, setSelected] = useState("");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<NotesSort>("recent");
 
   const handleAddExisting = useCallback(
     async (noteId?: string) => {
@@ -67,15 +68,31 @@ export function CollectionNotesSection() {
   const filteredNotes = useMemo(() => {
     const notes: Note[] = data?.items ?? [];
 
-    if (!search.trim()) return notes;
-    const q = search.toLowerCase();
+    // Filter by search
+    let filtered = notes;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      filtered = notes.filter(
+        (n) =>
+          n.title.toLowerCase().includes(q) ||
+          (n.content ?? "").toLowerCase().includes(q)
+      );
+    }
 
-    return notes.filter(
-      (n) =>
-        n.title.toLowerCase().includes(q) ||
-        (n.content ?? "").toLowerCase().includes(q)
-    );
-  }, [data, search]);
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+      if (sort === "alphabetical") {
+        return a.title.localeCompare(b.title);
+      }
+      if (sort === "oldest") {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      // recent
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    return sorted;
+  }, [data, search, sort]);
 
   return (
     <div className="space-y-4">
@@ -86,6 +103,8 @@ export function CollectionNotesSection() {
         onSelectNote={handleSelectNote}
         searchValue={search}
         onSearchChange={setSearch}
+        sortValue={sort}
+        onSortChange={setSort}
       />
 
       <CollectionNotesGrid
