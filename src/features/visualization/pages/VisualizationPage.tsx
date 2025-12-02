@@ -25,8 +25,8 @@ export function VisualizationPage() {
   }
 
   return (
-    <div className="flex h-full gap-4">
-      <aside className="w-80 shrink-0 border-r pr-4" aria-label="Liste des collections">
+    <div className="flex h-[calc(100vh-8rem)] gap-4">
+      <aside className="w-80 shrink-0 border-r pr-4 overflow-y-auto" aria-label="Liste des collections">
         <h1 className="mb-3 text-lg font-semibold">Collections publiques</h1>
         <VisualizationCollectionsList
           collections={collections}
@@ -35,7 +35,7 @@ export function VisualizationPage() {
         />
       </aside>
 
-      <main className="flex-1" aria-label="Visualisation de la collection">
+      <main className="flex-1 min-h-0" aria-label="Visualisation de la collection">
         <CollectionVisualizationView collectionId={selectedCollection?.id} />
       </main>
     </div>
