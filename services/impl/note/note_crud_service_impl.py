@@ -1,14 +1,15 @@
 from typing import List, Optional, Tuple
 
-from domain_services.note_domain_service import apply_note_update
-from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
-from exceptions.note_exception import (
-    NoteCollectionDoesNotExist,
-    NoteLinkCollectionChangeForbidden,
-    NoteNotFound,
-    NoteOwnerDoesNotExist,
-    NoteTitleConflict,
+from domain_services.note_domain_service import (
+    apply_note_update,
+    ensure_collection_allowed,
+    ensure_collection_change_allowed,
+    ensure_note_exists,
+    ensure_owner_exists,
+    ensure_unique_title,
 )
+from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
+from exceptions.note_exception import NoteNotFound
 from mappers.note_mapper import dto_to_note, note_to_dto
 from repositorys import (
     collection_repository,
@@ -30,20 +31,26 @@ class NoteCrudService(NoteCrudServiceInterface):
         return [note_to_dto(entity) for entity in entities], total
 
     def find_one(self, note_id: str) -> NoteDTO:
-        note_entity = self._get_note_or_raise(note_id)
+        note_entity = note_repository.find_one(note_id)
+        ensure_note_exists(note_entity)
         return note_to_dto(note_entity)
 
     def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
-        self._ensure_owner_exists(note_create_dto.owner_id)
+        user_entity = user_repository.find_one(note_create_dto.owner_id)
+        ensure_owner_exists(user_entity)
+
         if note_create_dto.collection_id:
-            self._ensure_collection_allowed(
-                note_create_dto.owner_id, note_create_dto.collection_id
+            collection_entity = collection_repository.find_for_owner(
+                note_create_dto.collection_id, note_create_dto.owner_id
             )
-        self._ensure_unique_title(
+            ensure_collection_allowed(collection_entity)
+
+        existing_note = note_repository.find_one_by_title(
             note_create_dto.owner_id,
             note_create_dto.collection_id,
             note_create_dto.title,
         )
+        ensure_unique_title(existing_note)
 
         entity = dto_to_note(note_create_dto)
         saved = note_repository.add(entity)
@@ -52,16 +59,19 @@ class NoteCrudService(NoteCrudServiceInterface):
     def update(
         self, note_id: str, note_update_dto: NoteUpdateDTO
     ) -> NoteDTO:
-        note_entity = self._get_note_or_raise(note_id)
+        note_entity = note_repository.find_one(note_id)
+        ensure_note_exists(note_entity)
 
         if "collection_id" in note_update_dto.model_fields_set:
             new_collection_id = note_update_dto.collection_id
             if new_collection_id:
-                self._ensure_collection_allowed(
-                    note_entity.owner_id, new_collection_id
+                collection_entity = collection_repository.find_for_owner(
+                    new_collection_id, note_entity.owner_id
                 )
+                ensure_collection_allowed(collection_entity)
             if note_entity.collection_id != new_collection_id:
-                self._ensure_collection_change_allowed(note_entity.id)
+                note_links = note_link_repository.find_by_note(note_entity.id)
+                ensure_collection_change_allowed(note_links)
 
         future_collection_id = (
             note_update_dto.collection_id
@@ -74,12 +84,12 @@ class NoteCrudService(NoteCrudServiceInterface):
             else note_entity.title
         )
 
-        self._ensure_unique_title(
+        existing_note = note_repository.find_one_by_title(
             note_entity.owner_id,
             future_collection_id,
             future_title,
-            note_entity.id,
         )
+        ensure_unique_title(existing_note, note_entity.id)
 
         updated_entity = apply_note_update(note_entity, note_update_dto)
         saved = note_repository.update(updated_entity)
@@ -89,44 +99,6 @@ class NoteCrudService(NoteCrudServiceInterface):
         deleted = note_repository.delete(note_id)
         if not deleted:
             raise NoteNotFound()
-
-    def _get_note_or_raise(self, note_id: str):
-        note_entity = note_repository.find_one(note_id)
-        if not note_entity:
-            raise NoteNotFound()
-        return note_entity
-
-    def _ensure_owner_exists(self, owner_id: str) -> None:
-        if not user_repository.find_one(owner_id):
-            raise NoteOwnerDoesNotExist()
-
-    def _ensure_collection_allowed(
-        self, owner_id: str, collection_id: str
-    ) -> None:
-        collection = collection_repository.find_for_owner(
-            collection_id, owner_id
-        )
-        if not collection:
-            raise NoteCollectionDoesNotExist()
-
-    def _ensure_unique_title(
-        self,
-        owner_id: str,
-        collection_id: str | None,
-        title: str,
-        exclude_id: str | None = None,
-    ) -> None:
-        existing = note_repository.find_one_by_title(
-            owner_id,
-            collection_id,
-            title,
-        )
-        if existing and existing.id != exclude_id:
-            raise NoteTitleConflict()
-
-    def _ensure_collection_change_allowed(self, note_id: str) -> None:
-        if note_link_repository.find_by_note(note_id):
-            raise NoteLinkCollectionChangeForbidden()
 
 
 note_crud_service = NoteCrudService()
