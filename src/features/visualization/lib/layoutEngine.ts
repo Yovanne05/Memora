@@ -13,7 +13,6 @@ import {
   assignRemainingLevels,
 } from "./layout/levelCalculator"
 import { groupNodesByLevel, calculatePositions } from "./layout/positionCalculator"
-import { refineLayeredPositions } from "./layout/positionRefiner"
 export type { LayoutNode, LayoutEdge, NodePosition, LayoutConfig } from "./layout/types"
 export type { EdgeGroup } from "./layout/types"
 export {

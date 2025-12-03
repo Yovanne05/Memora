@@ -32,7 +32,35 @@ const DEFAULT_FORCE_CONFIG: Required<
 > = {
   width: 1000,
   height: 800,
-  iterations: 250,
+  iterations: 300,
+}
+
+/**
+ * Calcule les paramètres adaptatifs du force layout en fonction de la taille du graphe
+ */
+function calculateForceParameters(nodeCount: number, edgeCount: number) {
+  // Nombre d'itérations adaptatif : plus de nœuds = plus d'itérations
+  const iterations = Math.min(600, Math.max(300, nodeCount * 8 + edgeCount * 2))
+
+  // Distance entre les nœuds : augmente avec la taille du graphe
+  const linkDistance = nodeCount > 30 ? 150 + Math.log10(nodeCount) * 30 : 200
+
+  // Force de liaison : plus faible pour les gros graphes pour plus de flexibilité
+  const linkStrength = nodeCount > 30 ? 0.3 : 0.5
+
+  // Force de répulsion : plus forte pour les gros graphes pour éviter les clusters
+  const chargeStrength = -Math.min(600, 350 + nodeCount * 3)
+
+  // Rayon de collision : légèrement adaptatif
+  const collideRadius = nodeCount > 50 ? 95 : 110
+
+  return {
+    iterations,
+    linkDistance,
+    linkStrength,
+    chargeStrength,
+    collideRadius,
+  }
 }
 
 /**
@@ -48,10 +76,14 @@ export function calculateForceDirectedLayout(
     return {}
   }
 
-  const { width, height, iterations } = {
+  const { width, height } = {
     ...DEFAULT_FORCE_CONFIG,
     ...config,
   }
+
+  // Calculer les paramètres adaptatifs selon la taille du graphe
+  const forceParams = calculateForceParameters(nodes.length, edges.length)
+  const iterations = config.iterations ?? forceParams.iterations
 
   const initialPositions = config.initialPositions ?? {}
 
@@ -76,13 +108,13 @@ export function calculateForceDirectedLayout(
     simulationLinks
   )
     .id((node) => node.id)
-    .distance(200)
-    .strength(0.5)
+    .distance(forceParams.linkDistance)
+    .strength(forceParams.linkStrength)
 
   const simulation = forceSimulation(simulationNodes)
     .force("link", linkForce)
-    .force("charge", forceManyBody().strength(-450))
-    .force("collide", forceCollide().radius(110))
+    .force("charge", forceManyBody().strength(forceParams.chargeStrength))
+    .force("collide", forceCollide().radius(forceParams.collideRadius).strength(0.8))
     .force("center", forceCenter(0, 0))
 
   simulation.stop()
