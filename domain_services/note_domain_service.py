@@ -28,6 +28,9 @@ def apply_note_update(note_entity: Note, note_update_dto: NoteUpdateDTO) -> Note
     if "collection_id" in note_update_dto.model_fields_set:
         note_entity.collection_id = note_update_dto.collection_id
 
+    if note_update_dto.tags is not None:
+        note_entity.tags = note_update_dto.tags
+
     return note_entity
 
 

@@ -13,6 +13,7 @@ def note_to_dto(note_entity: Note) -> NoteDTO:
             "owner_username": note_entity.owner.username,
             "collection_id": note_entity.collection_id,
             "collection_name": note_entity.collection.name if note_entity.collection else None,
+            "tags": note_entity.tags,
             "created_at": note_entity.created_at,
             "updated_at": note_entity.updated_at,
         }
@@ -26,4 +27,5 @@ def dto_to_note(note_create_dto: NoteCreateDTO) -> Note:
         owner_id=note_create_dto.owner_id,
         collection_id=note_create_dto.collection_id,
         visibility=note_create_dto.visibility,
+        tags=note_create_dto.tags,
     )

@@ -55,6 +55,7 @@ CREATE TABLE notes (
     title          VARCHAR(255) NOT NULL,
     content        TEXT NOT NULL,
     visibility     visibility_enum NOT NULL DEFAULT 'private',
+    tags           TEXT[] DEFAULT '{}',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_notes_collection

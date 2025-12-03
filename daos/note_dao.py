@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    ARRAY,
     DateTime,
     Enum as SAEnum,
     ForeignKey,
@@ -60,6 +61,11 @@ class Note(Base):
         ),
         nullable=False,
         server_default=text("'private'"),
+    )
+    tags: Mapped[list[str]] = mapped_column(
+        ARRAY(String),
+        nullable=False,
+        server_default=text("'{}'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")

@@ -41,6 +41,12 @@ definitions:
         enum: ["private", "public"]
         description: Contrôle qui peut consulter la note.
         example: "private"
+      tags:
+        type: array
+        description: Tags associés à cette note.
+        items:
+          type: string
+        example: ["SQL", "bases de données", "chapitre 1"]
       created_at:
         type: string
         format: date-time
@@ -78,6 +84,12 @@ definitions:
         enum: ["private", "public"]
         default: "private"
         description: Niveau de partage (private = visible uniquement par le propriétaire).
+      tags:
+        type: array
+        description: Tags à associer à la note.
+        items:
+          type: string
+        example: ["SQL", "bases de données"]
 
   NoteUpdatePayload:
     type: object
@@ -99,6 +111,12 @@ definitions:
         type: string
         enum: ["private", "public"]
         description: Nouvelle visibilité.
+      tags:
+        type: array
+        description: Nouveaux tags pour la note.
+        items:
+          type: string
+        example: ["SQL", "avancé"]
 
   NoteListResponse:
     type: object
