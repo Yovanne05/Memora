@@ -116,7 +116,6 @@ export function transformEdgesToReactFlow(
         id: edgeId,
         source: originalEdge.sourceId,
         target: originalEdge.targetId,
-        type: "custom",
         sourceHandle: `${group.sourceSide}-source`,
         targetHandle: `${group.targetSide}-target`,
         style: {

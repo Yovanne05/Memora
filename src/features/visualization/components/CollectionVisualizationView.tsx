@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import type { MouseEvent } from "react"
 import ReactFlow, { Background, Controls, MiniMap, type Node } from "reactflow"
 import "reactflow/dist/style.css"
@@ -29,6 +29,8 @@ export function CollectionVisualizationView({
     useCollectionVisualizationQuery(collectionId)
 
   const { nodes, edges, orphanNodeIds } = useVisualizationLayout(data)
+
+  const memoizedNodeTypes = useMemo(() => nodeTypes, [])
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
@@ -69,7 +71,7 @@ export function CollectionVisualizationView({
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          nodeTypes={nodeTypes}
+          nodeTypes={memoizedNodeTypes}
           onNodeClick={onNodeClick}
           fitView
           className="bg-muted/30"
