@@ -16,18 +16,18 @@ export function useCreateNoteMutation(options?: { onSuccess?: () => void }) {
     mutationFn: (payload: NoteCreateInput) => {
       const ownerId = payload.ownerId ?? userId
       if (!ownerId) {
-        throw new Error("Impossible de creer la note : utilisateur non authentifie")
+        throw new Error("Impossible de créer la note : utilisateur non authentifié.")
       }
       return notesService.create({ ...payload, ownerId })
     },
     onSuccess: (data: Note) => {
-      toast.success("Note cree")
+      toast.success("Note créée avec succès.")
       queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
       queryClient.setQueryData(NOTES_QUERY_KEYS.detail(data.id), data)
       options?.onSuccess?.()
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Impossible de creer la note"
+      const message = error instanceof Error ? error.message : "La création de la note a échoué."
       toast.error(message)
     },
   })

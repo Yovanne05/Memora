@@ -49,14 +49,16 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
   return (
     <div className="space-y-6 p-6">
       <header className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <Link
-          to="/app/notes"
-          className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground hover:text-foreground"
-        >
-          <FileText className="h-4 w-4" /> Notes
+        <FileText className="h-4 w-4" />
+        <Link to="/app/notes" className="hover:text-foreground">
+          Notes
         </Link>
         <span className="text-muted-foreground">/</span>
-        <span className="rounded-full bg-muted px-3 py-1 text-foreground">Modifier la note</span>
+        <Link to="/app/notes/$id" params={{ id: noteId }} className="hover:text-foreground">
+          {note.title}
+        </Link>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium text-foreground">Modifier</span>
       </header>
 
       <NoteEditForm
@@ -87,4 +89,3 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
     </div>
   )
 }
-
