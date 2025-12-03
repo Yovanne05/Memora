@@ -32,4 +32,6 @@ class CollectionDTO(BaseModel) :
     created_at : datetime
     updated_at : datetime
     notes : List[NoteDTO] = Field(default_factory = list)
+    edges : List = Field(default_factory = list)
+    nodes : List = Field(default_factory = list)
     model_config = ConfigDict(from_attributes = True)
