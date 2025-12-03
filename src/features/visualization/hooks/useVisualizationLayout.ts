@@ -56,7 +56,7 @@ export function useVisualizationLayout(
       layeredPositions
     )
     const positions =
-      shouldApplyForceLayout(data, nodeConnections) && data.edges.length > 0
+      shouldApplyForceLayout(data)
         ? calculateForceDirectedLayout(data.nodes, data.edges, {
             width: Math.max(800, data.nodes.length * 160),
             height: Math.max(600, data.nodes.length * 140),
@@ -146,50 +146,28 @@ export function useVisualizationLayout(
 
 /**
  * Détermine si le force layout doit être appliqué pour un graphe donné
- * Critères améliorés pour une meilleure décision
+ * Le nouveau force layout avec clustering est maintenant préféré pour mieux organiser les notes
  */
-function shouldApplyForceLayout(
-  data: CollectionVisualization,
-  nodeConnections: NodeConnectionsMap
-): boolean {
+function shouldApplyForceLayout(data: CollectionVisualization): boolean {
   const totalNodes = data.nodes.length
   const totalEdges = data.edges.length
 
-  // Toujours utiliser le force layout pour très petits graphes (≤3 nœuds)
-  if (totalNodes <= 3) {
-    return totalEdges > 0
+  // Ne pas utiliser force layout s'il n'y a pas d'arêtes (graphe non connecté)
+  if (totalEdges === 0) {
+    return false
   }
 
-  // Pour les petits graphes (4-8 nœuds), vérifier la complexité
-  if (totalNodes <= 8) {
-    const maxConnections = Object.values(nodeConnections).reduce(
-      (max, value) => Math.max(max, value),
-      0
-    )
-    // Appliquer si au moins un nœud a ≥3 connexions ou beaucoup d'edges
-    return maxConnections >= 3 || totalEdges >= totalNodes * 0.8
+  // Pour les très petits graphes (≤2 nœuds), layout simple suffit
+  if (totalNodes <= 2) {
+    return false
   }
 
-  // Pour les graphes moyens (9-20 nœuds), critères modérés
-  if (totalNodes <= 20) {
-    const avgConnections = totalEdges > 0 ? (totalEdges * 2) / totalNodes : 0
-    const maxConnections = Object.values(nodeConnections).reduce(
-      (max, value) => Math.max(max, value),
-      0
-    )
-
-    // Appliquer si connexions moyennes ≥2 ou max ≥4
-    return avgConnections >= 2 || maxConnections >= 4 || totalEdges >= totalNodes
+  // Pour les petits graphes (3-6 nœuds), utiliser si au moins quelques connexions
+  if (totalNodes <= 6) {
+    return totalEdges >= 2
   }
 
-  // Pour les gros graphes (21-50 nœuds), plus sélectif
-  if (totalNodes <= 50) {
-    const avgConnections = totalEdges > 0 ? (totalEdges * 2) / totalNodes : 0
-    // Appliquer si suffisamment dense
-    return avgConnections >= 1.8 || totalEdges >= totalNodes * 1.2
-  }
-
-  // Pour les très gros graphes (>50 nœuds), toujours appliquer le force layout
-  // car il gère mieux la complexité et évite les chevauchements
+  // Pour les graphes moyens à grands (7+ nœuds), toujours utiliser le force layout amélioré
+  // car il gère mieux le clustering et l'organisation des notes connectées
   return true
 }
