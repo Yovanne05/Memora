@@ -1,4 +1,4 @@
-import type { NoteCreateDto, NoteDto, NoteUpdateDto } from "../dto/note.dto"
+import type { NoteCreateDto, NoteDto, NoteUpdateDto } from "../dtos/note.dto"
 import type { Note, NoteCreate, NoteUpdate } from "../models/note.model"
 
 
