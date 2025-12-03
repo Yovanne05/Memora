@@ -1,5 +1,5 @@
 export function useCurrentUser() {
   // TODO: remplacer par un vrai hook d'authentification
-  const userId = "9aeef51e-a08e-4a63-a9ee-692d4668d932"
+  const userId = "8bfb888a-d099-4faf-9517-ecc7128c918c"
   return { userId }
 }

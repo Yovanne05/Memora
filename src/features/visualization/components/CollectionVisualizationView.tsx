@@ -8,6 +8,7 @@ import { CustomNode, type CustomNodeData } from "./CustomNode"
 import { VisualizationHeader } from "./VisualizationHeader"
 import { VisualizationLegend } from "./VisualizationLegend"
 import { getNodeColorByConnections } from "../constants/visualization.constants"
+import { getNodeColorForMiniMap } from "../lib/dataTransformers"
 import { EmptyState } from "./EmptyState"
 import { LoadingState } from "./LoadingState"
 import { ErrorState } from "./ErrorState"
@@ -30,8 +31,13 @@ export function CollectionVisualizationView({
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
-      console.log("Note sélectionnée:", node)
+      console.log("[Visualization] Note sélectionnée:", node)
     },
+    []
+  )
+
+  const getMiniMapNodeColor = useCallback(
+    (node: Node) => getNodeColorForMiniMap(node, getNodeColorByConnections),
     []
   )
 
@@ -71,7 +77,7 @@ export function CollectionVisualizationView({
           <Controls className="rounded-lg border shadow-lg" />
           <MiniMap
             className="rounded-lg border shadow-lg"
-            nodeColor={getNodeColor}
+            nodeColor={getMiniMapNodeColor}
           />
         </ReactFlow>
       </div>
@@ -79,9 +85,4 @@ export function CollectionVisualizationView({
       <VisualizationLegend />
     </div>
   )
-}
-
-function getNodeColor(node: Node): string {
-  const connections = (node.data as CustomNodeData | undefined)?.connections ?? 0
-  return getNodeColorByConnections(connections)
 }

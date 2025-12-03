@@ -1,24 +1,22 @@
-import { Handle, Position, type NodeProps } from "reactflow";
-import { NODE_COLORS } from "../constants/visualization.constants";
+import { Position, type NodeProps } from "reactflow"
+import { NodeHandle } from "./NodeHandle"
+import { NodeContent } from "./NodeContent"
 
 export interface CustomNodeData {
-  title: string;
-  connections: number;
+  title: string
+  connections: number
 }
 
 const HANDLE_POSITIONS = [
-  { position: Position.Top, suffix: "top" },
-  { position: Position.Right, suffix: "right" },
-  { position: Position.Bottom, suffix: "bottom" },
-  { position: Position.Left, suffix: "left" },
-] as const;
-
-const HANDLE_CLASS =
-  "h-2! w-2! bg-blue-500! opacity-0 transition-opacity group-hover:opacity-100";
+  { position: Position.Top, side: "top" },
+  { position: Position.Right, side: "right" },
+  { position: Position.Bottom, side: "bottom" },
+  { position: Position.Left, side: "left" },
+] as const
 
 export function CustomNode({ data }: NodeProps<CustomNodeData>) {
-  const connections = data.connections ?? 0;
-  const connectionText = `${connections} connexion${connections !== 1 ? "s" : ""}`;
+  const connections = data.connections ?? 0
+  const connectionText = `${connections} connexion${connections !== 1 ? "s" : ""}`
 
   return (
     <div
@@ -26,37 +24,11 @@ export function CustomNode({ data }: NodeProps<CustomNodeData>) {
       role="article"
       aria-label={`Note: ${data.title}, ${connectionText}`}
     >
-      {HANDLE_POSITIONS.map(({ position, suffix }) => (
-        <div key={suffix}>
-          <Handle
-            type="source"
-            position={position}
-            id={`${suffix}-source`}
-            className={HANDLE_CLASS}
-            aria-hidden="true"
-          />
-          <Handle
-            type="target"
-            position={position}
-            id={`${suffix}-target`}
-            className={HANDLE_CLASS}
-            aria-hidden="true"
-          />
-        </div>
+      {HANDLE_POSITIONS.map(({ position, side }) => (
+        <NodeHandle key={side} position={position} side={side} />
       ))}
 
-      <div className="flex items-center gap-2">
-        <div
-          className="h-2 w-2 rounded-full"
-          style={{ backgroundColor: NODE_COLORS.DEFAULT }}
-          aria-hidden="true"
-        />
-        <div className="text-sm font-semibold text-gray-800">{data.title}</div>
-      </div>
-
-      <div className="mt-1 text-xs text-gray-500" aria-label={connectionText}>
-        {connectionText}
-      </div>
+      <NodeContent title={data.title} connections={connections} />
     </div>
-  );
+  )
 }

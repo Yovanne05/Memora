@@ -1,3 +1,6 @@
+import type { Node, Edge } from "reactflow"
+import type { CustomNodeData } from "../components/CustomNode"
+
 export interface VisualizationNode {
   id: string;
   title: string;
@@ -14,24 +17,6 @@ export interface CollectionVisualization {
   edges: VisualizationEdge[];
 }
 
-/**
- * Statistiques d'un nœud dans le graphe de visualisation
- */
-export interface NodeStats {
-  id: string;
-  connections: number;
-}
-
-/**
- * Calcul des connexions pour chaque nœud
- */
 export type NodeConnectionsMap = Record<string, number>;
-
-/**
- * Props pour les états de chargement de la visualisation
- */
-export interface VisualizationState {
-  isLoading: boolean;
-  isError: boolean;
-  data?: CollectionVisualization;
-}
+export type ReactFlowNode = Node<CustomNodeData>
+export type ReactFlowEdge = Edge
