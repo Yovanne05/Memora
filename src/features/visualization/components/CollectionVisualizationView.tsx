@@ -7,6 +7,7 @@ import { useVisualizationLayout } from "../hooks/useVisualizationLayout"
 import { CustomNode, type CustomNodeData } from "./CustomNode"
 import { VisualizationHeader } from "./VisualizationHeader"
 import { VisualizationLegend } from "./VisualizationLegend"
+import { OrphanNotesZone } from "./OrphanNotesZone"
 import { getNodeColorByConnections } from "../constants/visualization.constants"
 import { getNodeColorForMiniMap } from "../lib/dataTransformers"
 import { EmptyState } from "./EmptyState"
@@ -27,7 +28,7 @@ export function CollectionVisualizationView({
   const { data, isLoading, isError } =
     useCollectionVisualizationQuery(collectionId)
 
-  const { nodes, edges } = useVisualizationLayout(data)
+  const { nodes, edges, orphanNodeIds } = useVisualizationLayout(data)
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
@@ -55,10 +56,12 @@ export function CollectionVisualizationView({
     return <ErrorState message="Erreur lors du chargement de la visualisation." />
   }
 
+  const connectedNotesCount = data.nodes.length - orphanNodeIds.size
+
   return (
     <div className="flex h-full w-full flex-col">
       <VisualizationHeader
-        notesCount={data.nodes.length}
+        notesCount={connectedNotesCount}
         connectionsCount={data.edges.length}
       />
 
@@ -83,6 +86,8 @@ export function CollectionVisualizationView({
       </div>
 
       <VisualizationLegend />
+
+      {data && <OrphanNotesZone data={data} orphanNodeIds={orphanNodeIds} />}
     </div>
   )
 }

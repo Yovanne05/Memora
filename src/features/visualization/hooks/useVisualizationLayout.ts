@@ -13,6 +13,7 @@ interface UseVisualizationLayoutResult {
   nodes: ReactFlowNode[]
   edges: ReactFlowEdge[]
   nodeConnections: NodeConnectionsMap
+  orphanNodeIds: Set<string>
 }
 
 /**
@@ -31,9 +32,9 @@ export function useVisualizationLayout(
 ): UseVisualizationLayoutResult {
   const nodeConnections = useNodeConnections(data)
 
-  const positions = useNodePositions(data)
+  const { positions, orphanNodeIds } = useNodePositions(data)
 
-  const nodes = useReactFlowNodes(data, positions, nodeConnections)
+  const nodes = useReactFlowNodes(data, positions, nodeConnections, orphanNodeIds)
 
   const edges = useReactFlowEdges(data, nodes)
 
@@ -41,5 +42,6 @@ export function useVisualizationLayout(
     nodes,
     edges,
     nodeConnections,
+    orphanNodeIds,
   }
 }

@@ -13,27 +13,38 @@ import {
 
 export function useNodePositions(
   data?: CollectionVisualization
-): Record<string, NodePosition> {
-  return useMemo<Record<string, NodePosition>>(() => {
-    if (!data) return {}
+): { positions: Record<string, NodePosition>; orphanNodeIds: Set<string> } {
+  return useMemo(() => {
+    if (!data)
+      return { positions: {}, orphanNodeIds: new Set<string>() }
 
-    const layeredPositions = calculateLayeredLayout(data.nodes, data.edges)
+    const { positions: layeredPositions, orphanNodes } = calculateLayeredLayout(
+      data.nodes,
+      data.edges
+    )
 
     const refinedPositions = refineLayeredPositions(
-      data.nodes,
+      data.nodes.filter((node) => !orphanNodes.has(node.id)),
       data.edges,
       layeredPositions
     )
 
     if (shouldApplyForceLayout(data)) {
-      const dimensions = calculateCanvasDimensions(data.nodes.length)
-      return calculateForceDirectedLayout(data.nodes, data.edges, {
-        width: dimensions.width,
-        height: dimensions.height,
-        initialPositions: refinedPositions,
-      })
+      const dimensions = calculateCanvasDimensions(
+        data.nodes.length - orphanNodes.size
+      )
+      const forcePositions = calculateForceDirectedLayout(
+        data.nodes.filter((node) => !orphanNodes.has(node.id)),
+        data.edges,
+        {
+          width: dimensions.width,
+          height: dimensions.height,
+          initialPositions: refinedPositions,
+        }
+      )
+      return { positions: forcePositions, orphanNodeIds: orphanNodes }
     }
 
-    return refinedPositions
+    return { positions: refinedPositions, orphanNodeIds: orphanNodes }
   }, [data])
 }

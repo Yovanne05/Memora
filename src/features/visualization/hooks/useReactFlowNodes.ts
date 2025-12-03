@@ -10,10 +10,16 @@ import { transformNodesToReactFlow } from "../lib/dataTransformers"
 export function useReactFlowNodes(
   data: CollectionVisualization | undefined,
   positions: Record<string, NodePosition>,
-  connections: NodeConnectionsMap
+  connections: NodeConnectionsMap,
+  orphanNodeIds: Set<string>
 ): ReactFlowNode[] {
   return useMemo<ReactFlowNode[]>(() => {
     if (!data) return []
-    return transformNodesToReactFlow(data, positions, connections)
-  }, [data, positions, connections])
+    // Filtrer les nœuds orphelins pour le graphe ReactFlow
+    const filteredData = {
+      ...data,
+      nodes: data.nodes.filter((node) => !orphanNodeIds.has(node.id)),
+    }
+    return transformNodesToReactFlow(filteredData, positions, connections)
+  }, [data, positions, connections, orphanNodeIds])
 }

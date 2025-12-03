@@ -23,22 +23,14 @@ export {
 export { calculateForceDirectedLayout } from "./layout/forceLayout"
 export { refineLayeredPositions } from "./layout/positionRefiner"
 
-/**
- * Calcule les positions des nœuds
- * 
- * @param nodes - Liste des nœuds à positionner
- * @param edges - Liste des connexions entre nœuds
- * @param config - Configuration des espacements
- * @returns Map des positions pour chaque nœud
- */
 export function calculateLayeredLayout(
   nodes: LayoutNode[],
   edges: LayoutEdge[],
   config: LayoutConfig = {}
-): Record<string, NodePosition> {
+): { positions: Record<string, NodePosition>; orphanNodes: Set<string> } {
   const { verticalGap, horizontalGap } = { ...DEFAULT_LAYOUT_CONFIG, ...config }
 
-  if (!nodes.length) return {}
+  if (!nodes.length) return { positions: {}, orphanNodes: new Set() }
 
   const nodeIds = new Set(nodes.map((node) => node.id))
   const validEdges = validateEdges(edges, nodeIds)
@@ -47,11 +39,15 @@ export function calculateLayeredLayout(
 
   const orphanNodes = findOrphanNodes(nodes, inDegree, outAdj)
 
+  const connectedNodes = nodes.filter((node) => !orphanNodes.has(node.id))
+
   const levels: NodeLevels = {}
-  const queue = initializeQueue(nodes, inDegree, orphanNodes, levels)
+  const queue = initializeQueue(connectedNodes, inDegree, new Set(), levels)
   propagateLevels(queue, outAdj, levels)
-  assignRemainingLevels(nodes, levels, orphanNodes)
+  assignRemainingLevels(connectedNodes, levels, new Set())
 
   const nodesByLevel = groupNodesByLevel(levels)
-  return calculatePositions(nodesByLevel, verticalGap, horizontalGap)
+  const positions = calculatePositions(nodesByLevel, verticalGap, horizontalGap)
+
+  return { positions, orphanNodes }
 }
