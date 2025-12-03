@@ -8,7 +8,9 @@ import type {
 import {
   calculateLayeredLayout,
   calculateEdgeOffset,
+  calculateForceDirectedLayout,
   groupEdgesByConnection,
+  refineLayeredPositions,
 } from "../lib/layoutEngine"
 import { REACT_FLOW_STYLES } from "../constants/visualization.constants"
 
@@ -47,7 +49,20 @@ export function useVisualizationLayout(
   const nodes = useMemo<Node<CustomNodeData>[]>(() => {
     if (!data) return []
 
-    const positions = calculateLayeredLayout(data.nodes, data.edges)
+    const layeredPositions = calculateLayeredLayout(data.nodes, data.edges)
+    const refinedPositions = refineLayeredPositions(
+      data.nodes,
+      data.edges,
+      layeredPositions
+    )
+    const positions =
+      shouldApplyForceLayout(data, nodeConnections) && data.edges.length > 0
+        ? calculateForceDirectedLayout(data.nodes, data.edges, {
+            width: Math.max(800, data.nodes.length * 160),
+            height: Math.max(600, data.nodes.length * 140),
+            initialPositions: refinedPositions,
+          })
+        : refinedPositions
 
     return data.nodes.map((node) => {
       const position = positions[node.id] ?? { x: 0, y: 0 }
@@ -93,17 +108,18 @@ export function useVisualizationLayout(
     edgeGroups.forEach((group) => {
       const totalEdgesInGroup = group.edgeIndices.length
 
-      group.edgeIndices.forEach((_, localIndex) => {
+      group.edgeIndices.forEach((originalEdgeIndex, localIndex) => {
+        const originalEdge = validEdges[originalEdgeIndex]
         const offset = calculateEdgeOffset(localIndex, totalEdgesInGroup)
 
         reactFlowEdges.push({
           id:
             totalEdgesInGroup === 1
-              ? `e${group.sourceId}-${group.targetId}`
-              : `e${group.sourceId}-${group.targetId}-${localIndex}`,
-          source: group.sourceId,
-          target: group.targetId,
-          type: "smoothstep",
+              ? `e${originalEdge.sourceId}-${originalEdge.targetId}`
+              : `e${originalEdge.sourceId}-${originalEdge.targetId}-${localIndex}`,
+          source: originalEdge.sourceId,
+          target: originalEdge.targetId,
+          type: "custom",
           sourceHandle: `${group.sourceSide}-source`,
           targetHandle: `${group.targetSide}-target`,
           style: {
@@ -126,4 +142,21 @@ export function useVisualizationLayout(
     edges,
     nodeConnections,
   }
+}
+
+function shouldApplyForceLayout(
+  data: CollectionVisualization,
+  nodeConnections: NodeConnectionsMap
+): boolean {
+  const totalNodes = data.nodes.length
+  if (totalNodes <= 6) {
+    return false
+  }
+
+  const maxConnections = Object.values(nodeConnections).reduce(
+    (max, value) => Math.max(max, value),
+    0
+  )
+
+  return maxConnections >= 3 || data.edges.length >= totalNodes
 }
