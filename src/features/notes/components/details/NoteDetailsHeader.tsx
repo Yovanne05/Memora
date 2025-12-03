@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { ChevronLeft, Globe, Lock, NotebookPen, Pencil, Trash2 } from "lucide-react"
+import { FileText, Globe, Lock, NotebookPen, Pencil, Trash2 } from "lucide-react"
 import type { Note } from "../../models/note.model"
 
 interface NoteDetailsHeaderProps {
@@ -24,7 +24,7 @@ export function NoteDetailsHeader({ note, onEdit, onDelete, isDeleting }: NoteDe
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <ChevronLeft className="h-4 w-4" />
+        <FileText className="h-4 w-4" />
         <Link to="/app/notes" className="hover:text-foreground">
           Notes
         </Link>
@@ -76,4 +76,3 @@ export function NoteDetailsHeader({ note, onEdit, onDelete, isDeleting }: NoteDe
     </div>
   )
 }
-

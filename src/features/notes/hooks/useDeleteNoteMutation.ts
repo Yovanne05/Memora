@@ -10,13 +10,13 @@ export function useDeleteNoteMutation(options?: { onSuccess?: () => void }) {
   return useMutation({
     mutationFn: (noteId: string) => notesService.remove(noteId),
     onSuccess: (_, noteId) => {
-      toast.success("Note supprimee")
+      toast.success("Note supprimée avec succès.")
       queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
       queryClient.removeQueries({ queryKey: NOTES_QUERY_KEYS.detail(noteId) })
       options?.onSuccess?.()
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Impossible de supprimer la note"
+      const message = error instanceof Error ? error.message : "La suppression de la note a échoué."
       toast.error(message)
     },
   })

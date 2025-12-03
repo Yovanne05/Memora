@@ -12,13 +12,13 @@ export function useUpdateNoteMutation(options?: { onSuccess?: () => void }) {
     mutationFn: ({ noteId, payload }: { noteId: string; payload: NoteUpdate }) =>
       notesService.update(noteId, payload),
     onSuccess: (data: Note) => {
-      toast.success("Note mise a jour")
+      toast.success("Note mise à jour.")
       queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
       queryClient.setQueryData(NOTES_QUERY_KEYS.detail(data.id), data)
       options?.onSuccess?.()
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Impossible de mettre a jour la note"
+      const message = error instanceof Error ? error.message : "La mise à jour de la note a échoué."
       toast.error(message)
     },
   })
