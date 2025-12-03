@@ -2,8 +2,8 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { PanelLeft } from 'lucide-react'
 
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/shared/components/app-sidebar"
 import { Button } from '@/components/ui/button'
+import { AppSidebar } from "@/components/app-sidebar"
 
 export const Route = createFileRoute('/app')({
   component: RouteComponent,
