@@ -13,6 +13,7 @@ import { getNodeColorForMiniMap } from "../lib/dataTransformers"
 import { EmptyState } from "./EmptyState"
 import { LoadingState } from "./LoadingState"
 import { ErrorState } from "./ErrorState"
+import { useNodeSelection } from "../hooks/useNodeSelection"
 
 interface CollectionVisualizationViewProps {
   collectionId?: string
@@ -29,15 +30,24 @@ export function CollectionVisualizationView({
     useCollectionVisualizationQuery(collectionId)
 
   const { nodes, edges, orphanNodeIds } = useVisualizationLayout(data)
+  const { styledNodes, styledEdges, selectNode, clearSelection } = useNodeSelection(
+    nodes,
+    edges
+  )
 
   const memoizedNodeTypes = useMemo(() => nodeTypes, [])
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
+      selectNode(node.id)
       console.log("[Visualization] Note sélectionnée:", node)
     },
-    []
+    [selectNode]
   )
+
+  const onPaneClick = useCallback(() => {
+    clearSelection()
+  }, [clearSelection])
 
   const getMiniMapNodeColor = useCallback(
     (node: Node) => getNodeColorForMiniMap(node, getNodeColorByConnections),
@@ -69,10 +79,11 @@ export function CollectionVisualizationView({
 
       <div className="relative min-h-[400px] flex-1">
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={styledNodes}
+          edges={styledEdges}
           nodeTypes={memoizedNodeTypes}
           onNodeClick={onNodeClick}
+          onPaneClick={onPaneClick}
           fitView
           className="bg-muted/30"
           nodesDraggable={true}
