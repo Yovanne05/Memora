@@ -1,3 +1,4 @@
 export const config = {
-  apiUrl: import.meta.env.VITE_API_URL
+  apiUrl: import.meta.env.VITE_API_URL,
+  userHook: import.meta.env.VITE_USER_HOOK
 }

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { NoteCard } from "@/features/notes/components/NoteCard"
+import { NoteCard } from "@/features/notes/components/list/NoteCard"
 import type { Note } from "@/features/notes/models/note.model"
 import { X, FileX } from "lucide-react"
 

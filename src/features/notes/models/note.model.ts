@@ -25,8 +25,3 @@ export interface NoteUpdate {
   content?: string
   visibility?: NoteVisibility
 }
-
-export interface PaginatedNotes {
-    items: Note[];
-    total: number;
-}

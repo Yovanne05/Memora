@@ -6,7 +6,7 @@ export type CollectionsFilters = Record<string, QueryParamValue> & {
   visibility?: "private" | "public"
   titleContains?: string
   ids?: string
-  tagIds?: string 
+  tagIds?: string
   onlyWithNotes?: boolean
   sortBy?: "title" | "created_at" | "updated_at"
   sortDir?: "asc" | "desc"
