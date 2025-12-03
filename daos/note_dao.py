@@ -72,9 +72,9 @@ class Note(Base):
     )
 
     collection: Mapped["Collection | None"] = relationship(
-        back_populates="notes"
+        back_populates="notes", lazy="selectin"
     )
-    owner: Mapped["User"] = relationship(back_populates="notes")
+    owner: Mapped["User"] = relationship(back_populates="notes", lazy="selectin")
     shares: Mapped[list["NoteShare"]] = relationship(back_populates="note")
     flashcards: Mapped[list["Flashcard"]] = relationship(back_populates="note")
     outgoing_links: Mapped[list["NoteLink"]] = relationship(

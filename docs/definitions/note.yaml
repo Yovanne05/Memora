@@ -21,12 +21,21 @@ definitions:
         format: uuid
         description: Identifiant du propriétaire de la note.
         example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      owner_username:
+        type: string
+        description: Nom d'utilisateur du propriétaire (chargé automatiquement).
+        example: "jean.dupont"
       collection_id:
         type: string
         format: uuid
         nullable: true
         description: Collection à laquelle la note appartient (facultatif).
         example: "3eeaa924-c2e4-49a2-8123-4613ef7f27b9"
+      collection_name:
+        type: string
+        nullable: true
+        description: Nom de la collection (chargé automatiquement si collection_id est défini).
+        example: "Mes cours de maths"
       visibility:
         type: string
         enum: ["private", "public"]
@@ -42,7 +51,7 @@ definitions:
         format: date-time
         description: Dernière mise à jour.
         example: "2025-05-15T16:02:07Z"
-    required: ["id", "title", "content", "owner_id", "visibility", "created_at", "updated_at"]
+    required: ["id", "title", "content", "owner_id", "owner_username", "visibility", "created_at", "updated_at"]
 
   NoteCreatePayload:
     type: object

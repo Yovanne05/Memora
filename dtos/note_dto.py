@@ -28,7 +28,9 @@ class NoteDTO(BaseModel):
     content: str
     visibility: VisibilityEnum
     owner_id: str
+    owner_username: str
     collection_id: str | None = None
+    collection_name: str | None = None
     created_at: datetime
     updated_at: datetime
 
