@@ -7,8 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Search, Filter, X } from "lucide-react"
 import type { CollectionsSort, CollectionsTab } from "../../lib/collections-query"
+import type { CollectionVisibility } from "../../models/collection.model"
 
 interface CollectionsToolbarProps {
   search: string
@@ -17,6 +20,10 @@ interface CollectionsToolbarProps {
   onTabChange: (value: CollectionsTab) => void
   sort: CollectionsSort
   onSortChange: (value: CollectionsSort) => void
+  visibilityFilter?: CollectionVisibility
+  onVisibilityFilterChange: (value: CollectionVisibility | undefined) => void
+  showFilters: boolean
+  onToggleFilters: () => void
 }
 
 export function CollectionsToolbar({
@@ -26,7 +33,13 @@ export function CollectionsToolbar({
   onTabChange,
   sort,
   onSortChange,
+  visibilityFilter,
+  onVisibilityFilterChange,
+  showFilters,
+  onToggleFilters,
 }: CollectionsToolbarProps) {
+  const activeFiltersCount = visibilityFilter ? 1 : 0
+
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -56,7 +69,7 @@ export function CollectionsToolbar({
 
           <Select
             value={sort}
-            onValueChange={(value: "recent" | "alphabetical") => onSortChange(value)}
+            onValueChange={(value: CollectionsSort) => onSortChange(value)}
           >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Trier par" />
@@ -64,10 +77,71 @@ export function CollectionsToolbar({
             <SelectContent>
               <SelectItem value="recent">Plus récentes</SelectItem>
               <SelectItem value="alphabetical">A-Z</SelectItem>
+              <SelectItem value="notes-count">Nombre de notes</SelectItem>
             </SelectContent>
           </Select>
+
+          <Button
+            variant={showFilters ? "default" : "outline"}
+            size="sm"
+            onClick={onToggleFilters}
+            className="relative"
+          >
+            <Filter className="h-4 w-4 mr-2" />
+            Filtres
+            {activeFiltersCount > 0 && (
+              <Badge
+                variant="secondary"
+                className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center"
+              >
+                {activeFiltersCount}
+              </Badge>
+            )}
+          </Button>
         </div>
       </div>
+
+      {showFilters && (
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t">
+          <div className="text-sm font-medium text-muted-foreground">Visibilité :</div>
+          <div className="flex gap-2">
+            <Button
+              variant={visibilityFilter === "private" ? "default" : "outline"}
+              size="sm"
+              onClick={() =>
+                onVisibilityFilterChange(
+                  visibilityFilter === "private" ? undefined : "private"
+                )
+              }
+            >
+              Privée
+            </Button>
+            <Button
+              variant={visibilityFilter === "public" ? "default" : "outline"}
+              size="sm"
+              onClick={() =>
+                onVisibilityFilterChange(
+                  visibilityFilter === "public" ? undefined : "public"
+                )
+              }
+            >
+              Publique
+            </Button>
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onVisibilityFilterChange(undefined)}
+              className="ml-auto"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Réinitialiser
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

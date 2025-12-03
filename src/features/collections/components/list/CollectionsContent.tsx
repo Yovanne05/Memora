@@ -11,6 +11,9 @@ interface CollectionsContentProps {
   onRetry: () => void
   onEdit: (collection: Collection) => void
   onDelete: (collection: Collection) => void
+  isSelected?: (id: string) => boolean
+  onToggleSelection?: (id: string) => void
+  selectionMode?: boolean
 }
 
 export function CollectionsContent({
@@ -20,6 +23,9 @@ export function CollectionsContent({
   onRetry,
   onEdit,
   onDelete,
+  isSelected,
+  onToggleSelection,
+  selectionMode = false,
 }: CollectionsContentProps) {
   if (error) {
     return <CollectionsErrorAlert message={error} onRetry={onRetry} />
@@ -38,6 +44,9 @@ export function CollectionsContent({
       items={collections}
       onEdit={onEdit}
       onDelete={onDelete}
+      isSelected={isSelected}
+      onToggleSelection={onToggleSelection}
+      selectionMode={selectionMode}
     />
   )
 }

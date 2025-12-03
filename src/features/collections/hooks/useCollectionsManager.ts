@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
-import type { Collection } from "../models/collection.model"
+import type { Collection, CollectionVisibility } from "../models/collection.model"
 import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
 import { applyCollectionsQuery } from "../lib/collections-query"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
@@ -18,6 +18,8 @@ export function useCollectionsManager() {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<CollectionsTab>("mine");
   const [sort, setSort] = useState<CollectionsSort>("recent");
+  const [visibilityFilter, setVisibilityFilter] = useState<CollectionVisibility | undefined>(undefined);
+  const [showFilters, setShowFilters] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Collection | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Collection | null>(null);
@@ -40,8 +42,9 @@ export function useCollectionsManager() {
       tab,
       search,
       sort,
+      visibilityFilter,
     });
-  }, [collectionsQuery.data, search, sort, tab, userId]);
+  }, [collectionsQuery.data, search, sort, tab, userId, visibilityFilter]);
 
   const handleCreate = useCallback(
     async (values: CollectionFormValues) => {
@@ -88,6 +91,10 @@ export function useCollectionsManager() {
       setTab,
       sort,
       setSort,
+      visibilityFilter,
+      setVisibilityFilter,
+      showFilters,
+      setShowFilters,
     },
 
     create: {
