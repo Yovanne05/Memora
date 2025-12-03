@@ -25,6 +25,14 @@ def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
 
 
+@pytest.fixture(scope="session", autouse=True)
+def ensure_test_app_schema():
+    """Create the in-memory schema once so repository calls succeed."""
+    app = create_app()
+    with app.app_context():
+        return
+
+
 @dataclass
 class CollectionTestData:
     owner_id: str = field(default_factory=lambda: str(uuid4()))
