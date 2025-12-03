@@ -22,6 +22,8 @@ interface CollectionCardProps {
   isSelected?: boolean
   onToggleSelection?: (id: string) => void
   selectionMode?: boolean
+  compact?: boolean
+  readOnly?: boolean
 }
 
 export const CollectionCard = memo(function CollectionCard({
@@ -32,6 +34,8 @@ export const CollectionCard = memo(function CollectionCard({
   isSelected = false,
   onToggleSelection,
   selectionMode = false,
+  compact = false,
+  readOnly = false,
 }: CollectionCardProps) {
   const router = useRouter()
 
@@ -78,7 +82,7 @@ export const CollectionCard = memo(function CollectionCard({
       }`}
       onClick={handleCardClick}
     >
-      <CardHeader className="flex flex-row items-start justify-between gap-3 pb-2">
+      <CardHeader className={`flex flex-row items-start justify-between gap-3 ${compact ? "pb-1" : "pb-2"}`}>
         <div className="flex items-start gap-3 flex-1">
           {selectionMode && (
             <div onClick={handleCheckboxChange} className="pt-1">
@@ -86,21 +90,21 @@ export const CollectionCard = memo(function CollectionCard({
             </div>
           )}
 
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted shrink-0">
-            <FileText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <div className={`flex items-center justify-center rounded-lg border border-border bg-muted shrink-0 ${compact ? "h-8 w-8" : "h-10 w-10"}`}>
+            <FileText className={`text-muted-foreground ${compact ? "h-4 w-4" : "h-5 w-5"}`} aria-hidden="true" />
           </div>
 
           <div className="space-y-1 flex-1 min-w-0">
-            <CardTitle className="text-base">{collection.name}</CardTitle>
+            <CardTitle className={compact ? "text-sm" : "text-base"}>{collection.name}</CardTitle>
             {collection.description && (
-              <p className="line-clamp-2 text-sm text-muted-foreground">
+              <p className={`line-clamp-2 text-muted-foreground ${compact ? "text-xs" : "text-sm"}`}>
                 {collection.description}
               </p>
             )}
           </div>
         </div>
 
-        {!selectionMode && (
+        {!selectionMode && !readOnly && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -132,7 +136,7 @@ export const CollectionCard = memo(function CollectionCard({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-3 pt-0">
+      <CardContent className={`space-y-3 ${compact ? "pt-0 pb-2" : "pt-0"}`}>
         <div className="flex items-center justify-between gap-2">
           <Badge
             variant="outline"
@@ -147,9 +151,11 @@ export const CollectionCard = memo(function CollectionCard({
           </div>
         </div>
 
-        <div className="text-xs text-muted-foreground">
-          Créée le {formatCollectionDate(collection.createdAt)}
-        </div>
+        {!compact && (
+          <div className="text-xs text-muted-foreground">
+            Créée le {formatCollectionDate(collection.createdAt)}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -22,7 +22,7 @@ export function VisualizationCollectionsList({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto pr-2">
       {collections.map((collection) => {
         const isSelected = collection.id === selectedId
 
@@ -37,6 +37,8 @@ export function VisualizationCollectionsList({
             <CollectionCard
               collection={collection}
               onCardClick={onSelect}
+              compact
+              readOnly
             />
           </div>
         )
