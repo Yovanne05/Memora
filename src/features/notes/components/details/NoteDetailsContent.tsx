@@ -21,12 +21,6 @@ export function NoteDetailsContent({ note, paragraphs }: NoteDetailsContentProps
   return (
     <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
       <Card className="border border-border/70 shadow-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-xl">Contenu</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Tous les détails de la note sélectionnée.
-          </p>
-        </CardHeader>
 
         <CardContent className="space-y-4 text-base leading-relaxed text-foreground">
           {paragraphs.length ? (
