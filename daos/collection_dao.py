@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    ARRAY,
     DateTime,
     Enum as SAEnum,
     ForeignKey,
@@ -19,7 +20,6 @@ from utils.utils import generate_uuid
 
 if TYPE_CHECKING:
     from daos.note_dao import Note
-    from daos.tag_dao import Tag
     from daos.user_dao import User
 
 
@@ -53,6 +53,11 @@ class Collection(Base):
         nullable=False,
         server_default=text("'private'"),
     )
+    tags: Mapped[list[str]] = mapped_column(
+        ARRAY(String),
+        nullable=False,
+        server_default=text("'{}'"),
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )
@@ -66,9 +71,6 @@ class Collection(Base):
     owner: Mapped["User"] = relationship(back_populates="collections")
     notes: Mapped[list["Note"]] = relationship(back_populates="collection", lazy="selectin")
     shares: Mapped[list["CollectionShare"]] = relationship(
-        back_populates="collection"
-    )
-    tag_links: Mapped[list["CollectionTag"]] = relationship(
         back_populates="collection"
     )
 
@@ -102,22 +104,3 @@ class CollectionShare(Base):
 
     collection: Mapped["Collection"] = relationship(back_populates="shares")
     user: Mapped["User"] = relationship(back_populates="collection_shares")
-
-
-class CollectionTag(Base):
-    __tablename__ = "collection_tags"
-    __table_args__ = (Index("idx_collection_tags_tag", "tag_id"),)
-
-    collection_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("collections.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
-    tag_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("tags.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
-
-    collection: Mapped["Collection"] = relationship(back_populates="tag_links")
-    tag: Mapped["Tag"] = relationship(back_populates="collection_links")

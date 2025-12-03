@@ -27,6 +27,12 @@ definitions:
         format: uuid
         description: Identifier of the collection owner.
         example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      tags:
+        type: array
+        description: Tags associated with this collection.
+        items:
+          type: string
+        example: ["mathématiques", "algèbre", "université"]
       created_at:
         type: string
         format: date-time
@@ -47,6 +53,7 @@ definitions:
       - name
       - visibility
       - owner_id
+      - tags
       - created_at
       - updated_at
       - notes
@@ -77,6 +84,12 @@ definitions:
         default: "private"
         description: Visibility level.
         example: "private"
+      tags:
+        type: array
+        description: Tags to associate with the collection.
+        items:
+          type: string
+        example: ["mathématiques", "université"]
 
   CollectionUpdatePayload:
     type: object
@@ -97,6 +110,12 @@ definitions:
         enum: ["private", "public"]
         description: New visibility.
         example: "public"
+      tags:
+        type: array
+        description: New tags for the collection.
+        items:
+          type: string
+        example: ["algèbre", "licence"]
 
   CollectionListResponse:
     type: object

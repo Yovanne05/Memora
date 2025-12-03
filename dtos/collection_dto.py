@@ -12,12 +12,14 @@ class CollectionCreateDTO(BaseModel) :
     description : str | None = None
     owner_id : str = Field(min_length = 1, max_length = 36)
     visibility : VisibilityEnum = VisibilityEnum.PRIVATE
+    tags : List[str] = Field(default_factory = list)
 
 
 class CollectionUpdateDTO(BaseModel) :
     name : str | None = Field(default = None, min_length = 1, max_length = 50)
     description : str | None = None
     visibility : VisibilityEnum | None = None
+    tags : List[str] | None = None
 
 
 class CollectionDTO(BaseModel) :
@@ -26,6 +28,7 @@ class CollectionDTO(BaseModel) :
     description : str | None = None
     visibility : VisibilityEnum
     owner_id : str
+    tags : List[str] = Field(default_factory = list)
     created_at : datetime
     updated_at : datetime
     notes : List[NoteDTO] = Field(default_factory = list)

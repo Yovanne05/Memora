@@ -11,4 +11,7 @@ def apply_collection_update(collection_entity : Collection, collection_update_dt
     if collection_update_dto.visibility is not None :
         collection_entity.visibility = collection_update_dto.visibility
 
+    if collection_update_dto.tags is not None :
+        collection_entity.tags = collection_update_dto.tags
+
     return collection_entity
