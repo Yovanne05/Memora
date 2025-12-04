@@ -27,23 +27,27 @@ export function CollectionsDetailsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 text-foreground">
-      <div className="space-y-8">
+    <div className="w-full space-y-8 text-foreground">
+      <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-linear-to-br from-card via-card to-muted/30 px-6 py-8 shadow-sm md:px-8 md:py-10">
         <button
           type="button"
           onClick={details.handlers.onBack}
-          className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           aria-label="Retour aux collections"
         >
-          <ChevronLeft className="h-3 w-3" aria-hidden="true" />
-          Collections
+          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          Retour aux collections
         </button>
 
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold">{details.collection.name}</h1>
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+                {details.collection.name}
+              </h1>
+            </div>
             {details.collection.description && (
-              <p className="max-w-2xl text-sm text-muted-foreground">
+              <p className="max-w-3xl text-base text-muted-foreground leading-relaxed">
                 {details.collection.description}
               </p>
             )}
@@ -57,8 +61,10 @@ export function CollectionsDetailsPage() {
         </div>
       </div>
 
-      <CollectionCollaboratorsSection />
-      <CollectionNotesSection />
+      <div className="space-y-6">
+        <CollectionCollaboratorsSection />
+        <CollectionNotesSection />
+      </div>
 
       <CollectionFormDialog
         mode="edit"
