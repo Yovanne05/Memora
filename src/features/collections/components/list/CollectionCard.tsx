@@ -1,15 +1,15 @@
 import { memo, useCallback } from "react"
 import type { Collection } from "../../models/collection.model"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
 import { FileText, MoreHorizontal, Files } from "lucide-react"
 import { useRouter } from "@tanstack/react-router"
 import { formatCollectionDate, getVisibilityLabel, getVisibilityBadgeClasses } from "../../lib/collection-format.utils"

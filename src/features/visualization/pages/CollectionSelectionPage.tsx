@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { usePublicCollectionsQuery } from "../hooks/usePublicCollectionsQuery";
 import { CollectionCard } from "@/features/collections/components/list/CollectionCard";
 import { CollectionsListSkeleton } from "@/features/collections/components/list/CollectionsListSkeleton";
-import { CollectionsErrorAlert } from "@/features/collections/components/list/CollectionsErrorAlert";
+import { ErrorState } from "@/components/ui/error-state";
 import type { Collection } from "@/features/collections/models/collection.model";
 
 
@@ -51,7 +51,7 @@ export function CollectionSelectionPage() {
       {isLoading ? (
         <CollectionsListSkeleton />
       ) : isError ? (
-        <CollectionsErrorAlert message=""/>
+        <ErrorState message="Erreur lors du chargement des collections publiques" />
       ) : filteredCollections.length === 0 ? (
         <div className="flex h-48 items-center justify-center rounded-lg border text-muted-foreground">
           {searchTerm ? (

@@ -3,7 +3,10 @@ import { CollectionsContent } from "../components/list/CollectionsContent"
 import { CollectionDialogs } from "../components/dialogs/CollectionDialogs"
 import { CollectionsBulkActions } from "../components/list/CollectionsBulkActions"
 import { CollectionsPageActions } from "../components/list/CollectionsPageActions"
-import { useCollectionsManager } from "../hooks/useCollectionsManager"
+import { useCollectionsFilters } from "../hooks/useCollectionsFilters"
+import { useCollectionCreate } from "../hooks/useCollectionCreate"
+import { useCollectionEdit } from "../hooks/useCollectionEdit"
+import { useCollectionDelete } from "../hooks/useCollectionDelete"
 import { useCollectionsSelection } from "../hooks/useCollectionsSelection"
 import { useCollectionsBulkActions } from "../hooks/useCollectionsBulkActions"
 import { useCollectionsKeyboardShortcuts } from "../hooks/useCollectionsKeyboardShortcuts"
@@ -11,22 +14,25 @@ import { CollectionsToolbar } from "../components/list/CollectionsToolbar"
 import { useRef } from "react"
 
 export function CollectionsListPage() {
-  const manager = useCollectionsManager()
+  const filters = useCollectionsFilters()
+  const create = useCollectionCreate()
+  const edit = useCollectionEdit()
+  const deletion = useCollectionDelete()
   const selection = useCollectionsSelection()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const bulkActions = useCollectionsBulkActions({
     selectedIds: selection.selectedIds,
-    collections: manager.collections,
+    collections: filters.collections,
     onSuccess: selection.exitSelectionMode,
   })
 
   useCollectionsKeyboardShortcuts({
-    onNewCollection: manager.create.open,
-    onToggleFilters: () => manager.filters.setShowFilters(!manager.filters.showFilters),
+    onNewCollection: create.open,
+    onToggleFilters: () => filters.setShowFilters(!filters.showFilters),
     onToggleSelectionMode: selection.toggleSelectionMode,
     onSearch: () => searchInputRef.current?.focus(),
-    disabled: manager.create.isOpen || !!manager.edit.target || !!manager.deletion.target,
+    disabled: create.isOpen || !!edit.target || !!deletion.target,
   })
 
   return (
@@ -36,31 +42,31 @@ export function CollectionsListPage() {
         <CollectionsPageActions
           selectionMode={selection.selectionMode}
           onToggleSelectionMode={selection.toggleSelectionMode}
-          onCreateClick={manager.create.open}
+          onCreateClick={create.open}
         />
       </div>
 
       <CollectionsToolbar
         ref={searchInputRef}
-        search={manager.filters.search}
-        onSearchChange={manager.filters.setSearch}
-        tab={manager.filters.tab}
-        onTabChange={manager.filters.setTab}
-        sort={manager.filters.sort}
-        onSortChange={manager.filters.setSort}
-        visibilityFilter={manager.filters.visibilityFilter}
-        onVisibilityFilterChange={manager.filters.setVisibilityFilter}
-        showFilters={manager.filters.showFilters}
-        onToggleFilters={() => manager.filters.setShowFilters(!manager.filters.showFilters)}
+        search={filters.search}
+        onSearchChange={filters.setSearch}
+        tab={filters.tab}
+        onTabChange={filters.setTab}
+        sort={filters.sort}
+        onSortChange={filters.setSort}
+        visibilityFilter={filters.visibilityFilter}
+        onVisibilityFilterChange={filters.setVisibilityFilter}
+        showFilters={filters.showFilters}
+        onToggleFilters={() => filters.setShowFilters(!filters.showFilters)}
       />
 
       <CollectionsContent
-        loading={manager.loading}
-        error={manager.error?.message ?? null}
-        collections={manager.collections}
-        onRetry={manager.refetch}
-        onEdit={manager.edit.open}
-        onDelete={manager.deletion.open}
+        loading={filters.loading}
+        error={filters.error?.message ?? null}
+        collections={filters.collections}
+        onRetry={filters.refetch}
+        onEdit={edit.open}
+        onDelete={deletion.open}
         isSelected={selection.isSelected}
         onToggleSelection={selection.toggleSelection}
         selectionMode={selection.selectionMode}
@@ -75,20 +81,20 @@ export function CollectionsListPage() {
       />
 
       <CollectionDialogs
-        createOpen={manager.create.isOpen}
-        creating={manager.create.loading}
-        onCreateSubmit={manager.create.submit}
-        onCreateClose={manager.create.close}
-        editing={manager.edit.target}
-        updating={manager.edit.loading}
-        onEditSubmit={manager.edit.submit}
-        onEditClose={manager.edit.close}
+        createOpen={create.isOpen}
+        creating={create.loading}
+        onCreateSubmit={create.submit}
+        onCreateClose={create.close}
+        editing={edit.target}
+        updating={edit.loading}
+        onEditSubmit={edit.submit}
+        onEditClose={edit.close}
         deletion={{
-          target: manager.deletion.target,
-          loading: manager.deletion.loading,
-          error: manager.deletion.error?.message ?? null,
-          reset: manager.deletion.close,
-          confirmDelete: manager.deletion.confirm,
+          target: deletion.target,
+          loading: deletion.loading,
+          error: deletion.error?.message ?? null,
+          reset: deletion.close,
+          confirmDelete: deletion.confirm,
         }}
       />
     </div>

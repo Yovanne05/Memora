@@ -1,7 +1,5 @@
-import { CollectionsGrid } from "./CollectionsGrid"
+import { CollectionCard } from "./CollectionCard"
 import { CollectionsListSkeleton } from "./CollectionsListSkeleton"
-import { CollectionsEmptyState } from "./CollectionsEmptyState"
-import { CollectionsErrorAlert } from "./CollectionsErrorAlert"
 import type { Collection } from "../../models/collection.model"
 
 interface CollectionsContentProps {
@@ -28,7 +26,18 @@ export function CollectionsContent({
   selectionMode = false,
 }: CollectionsContentProps) {
   if (error) {
-    return <CollectionsErrorAlert message={error} onRetry={onRetry} />
+    return (
+      <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {error}{" "}
+        <button
+          type="button"
+          onClick={onRetry}
+          className="font-medium underline underline-offset-2"
+        >
+          Réessayer
+        </button>
+      </div>
+    )
   }
 
   if (loading) {
@@ -36,17 +45,26 @@ export function CollectionsContent({
   }
 
   if (!collections.length) {
-    return <CollectionsEmptyState />
+    return (
+      <div className="flex h-40 items-center justify-center rounded-lg border bg-card text-muted-foreground">
+        Aucune collection trouvée. Essayez de modifier vos filtres.
+      </div>
+    )
   }
 
   return (
-    <CollectionsGrid
-      items={collections}
-      onEdit={onEdit}
-      onDelete={onDelete}
-      isSelected={isSelected}
-      onToggleSelection={onToggleSelection}
-      selectionMode={selectionMode}
-    />
+    <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {collections.map((collection) => (
+        <CollectionCard
+          key={collection.id}
+          collection={collection}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          isSelected={isSelected?.(collection.id)}
+          onToggleSelection={onToggleSelection}
+          selectionMode={selectionMode}
+        />
+      ))}
+    </section>
   )
 }

@@ -5,7 +5,7 @@ import { usePublicCollectionsQuery } from "../hooks/usePublicCollectionsQuery"
 import { useSidebarState } from "../hooks/useSidebarState"
 import { CollectionVisualizationView } from "../components/CollectionVisualizationView"
 import { LoadingState } from "../components/LoadingState"
-import { ErrorState } from "../components/ErrorState"
+import { ErrorState } from "@/components/ui/error-state"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
