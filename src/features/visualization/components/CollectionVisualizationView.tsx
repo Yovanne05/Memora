@@ -20,6 +20,7 @@ import type { Note } from "../../notes/models/note.model"
 
 interface CollectionVisualizationViewProps {
   collectionId?: string
+  onBack?: () => void
 }
 
 const nodeTypes = {
@@ -28,6 +29,7 @@ const nodeTypes = {
 
 export function CollectionVisualizationView({
   collectionId,
+  onBack,
 }: CollectionVisualizationViewProps) {
   const { data, isLoading, isError } =
     useCollectionVisualizationQuery(collectionId)
@@ -127,6 +129,7 @@ export function CollectionVisualizationView({
       <VisualizationHeader
         notesCount={connectedNotesCount}
         connectionsCount={data.edges.length}
+        onBack={onBack}
       />
 
       <div className="relative min-h-[400px] flex-1">
