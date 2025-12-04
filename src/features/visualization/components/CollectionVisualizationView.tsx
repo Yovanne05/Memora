@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import type { MouseEvent } from "react"
 import ReactFlow, { Background, Controls, MiniMap, type Node } from "reactflow"
 import "reactflow/dist/style.css"
@@ -14,6 +14,8 @@ import { EmptyState } from "./EmptyState"
 import { LoadingState } from "./LoadingState"
 import { ErrorState } from "./ErrorState"
 import { useNodeSelection } from "../hooks/useNodeSelection"
+import { NoteDetailsModal } from "../../notes/components/NoteDetailsModal"
+import { useNoteQuery } from "../../notes/hooks/useNoteQuery"
 
 interface CollectionVisualizationViewProps {
   collectionId?: string
@@ -30,23 +32,41 @@ export function CollectionVisualizationView({
     useCollectionVisualizationQuery(collectionId)
 
   const { nodes, edges, orphanNodeIds } = useVisualizationLayout(data)
-  const { styledNodes, styledEdges, selectNode, clearSelection } = useNodeSelection(
+  const { selectedNodeId, styledNodes, styledEdges, selectNode, clearSelection } = useNodeSelection(
     nodes,
     edges
   )
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const { data: selectedNote } = useNoteQuery(selectedNodeId ?? "")
 
   const memoizedNodeTypes = useMemo(() => nodeTypes, [])
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
-      selectNode(node.id)
-      console.log("[Visualization] Note sélectionnée:", node)
+      // Si le nœud est déjà sélectionné, ouvrir le modal (deuxième clic)
+      if (selectedNodeId === node.id) {
+        setModalOpen(true)
+        console.log("[Visualization] Ouverture du modal pour:", node)
+      } else {
+        // Premier clic : sélectionner et mettre en surbrillance
+        selectNode(node.id)
+        console.log("[Visualization] Note sélectionnée:", node)
+      }
     },
-    [selectNode]
+    [selectNode, selectedNodeId]
   )
 
   const onPaneClick = useCallback(() => {
     clearSelection()
+    setModalOpen(false)
+  }, [clearSelection])
+
+  const handleModalClose = useCallback((open: boolean) => {
+    setModalOpen(open)
+    if (!open) {
+      clearSelection()
+    }
   }, [clearSelection])
 
   const getMiniMapNodeColor = useCallback(
@@ -101,6 +121,12 @@ export function CollectionVisualizationView({
       <VisualizationLegend />
 
       {data && <OrphanNotesZone data={data} orphanNodeIds={orphanNodeIds} />}
+
+      <NoteDetailsModal
+        note={selectedNote ?? null}
+        open={modalOpen}
+        onOpenChange={handleModalClose}
+      />
     </div>
   )
 }

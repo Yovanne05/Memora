@@ -13,7 +13,18 @@ const formatDate = (date: string) =>
         day: "numeric",
     }).format(new Date(date))
 
-export function NoteCard({ note }: { note: Note }) {
+interface NoteCardProps {
+    note: Note
+    onPreview?: (note: Note) => void
+}
+
+export function NoteCard({ note, onPreview }: NoteCardProps) {
+    const handlePreviewClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        onPreview?.(note)
+    }
+
     return (
         <Link
             to="/app/notes/$id"
@@ -27,17 +38,17 @@ export function NoteCard({ note }: { note: Note }) {
                             {note.title}
                         </CardTitle>
 
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground"
-                            onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                            }}
-                        >
-                            <LayoutGrid className="h-4 w-4" />
-                        </Button>
+                        {onPreview && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                onClick={handlePreviewClick}
+                                title="Aperçu rapide"
+                            >
+                                <LayoutGrid className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap gap-2 text-xs">

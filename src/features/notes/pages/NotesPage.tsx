@@ -25,6 +25,8 @@ import { NoteCard } from "../components/NoteCard";
 import { NotesPagination } from "../components/NotesPagination";
 import type { NotesFilters } from "../models/note-filters.model";
 import { useCreateNoteMutation } from "../hooks/useCreateNoteMutation";
+import { NoteDetailsModal } from "../components/NoteDetailsModal";
+import type { Note } from "../models/note.model";
 
 const sortOptions = [
     { label: "Modifiées récemment", value: { sortBy: "updated_at", sortDir: "desc" } },
@@ -52,6 +54,9 @@ export default function NotesPage() {
         sortBy: "updated_at",
         sortDir: "desc",
     });
+
+    const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
 
     const { data, isLoading } = useNotesQuery(page, limit, filters);
     const createNoteMutation = useCreateNoteMutation();
@@ -106,6 +111,18 @@ export default function NotesPage() {
             });
         } catch (error) {
             console.error("Failed to create note", error);
+        }
+    };
+
+    const handleNotePreview = (note: Note) => {
+        setSelectedNote(note);
+        setModalOpen(true);
+    };
+
+    const handleModalClose = (open: boolean) => {
+        setModalOpen(open);
+        if (!open) {
+            setSelectedNote(null);
         }
     };
 
@@ -260,13 +277,13 @@ export default function NotesPage() {
                 view === "grid" ? (
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                         {notes.map((note) => (
-                            <NoteCard key={note.id} note={note} />
+                            <NoteCard key={note.id} note={note} onPreview={handleNotePreview} />
                         ))}
                     </div>
                 ) : (
                     <div className="space-y-3">
                         {notes.map((note) => (
-                            <NoteCard key={note.id} note={note} />
+                            <NoteCard key={note.id} note={note} onPreview={handleNotePreview} />
                         ))}
                     </div>
                 )
@@ -277,6 +294,12 @@ export default function NotesPage() {
             )}
 
             <NotesPagination page={page} maxPage={maxPage} setPage={setPage} />
+
+            <NoteDetailsModal
+                note={selectedNote}
+                open={modalOpen}
+                onOpenChange={handleModalClose}
+            />
         </div>
     );
 }
