@@ -25,7 +25,7 @@ import { NoteCard } from "../components/NoteCard";
 import { NotesPagination } from "../components/NotesPagination";
 import type { NotesFilters } from "../models/note-filters.model";
 import { useCreateNoteMutation } from "../hooks/useCreateNoteMutation";
-import { NoteDetailsModal } from "../components/NoteDetailsModal";
+import { NoteSidebar } from "../components/NoteSidebar";
 import type { Note } from "../models/note.model";
 
 const sortOptions = [
@@ -56,7 +56,7 @@ export default function NotesPage() {
     });
 
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-    const [modalOpen, setModalOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const { data, isLoading } = useNotesQuery(page, limit, filters);
     const createNoteMutation = useCreateNoteMutation();
@@ -116,14 +116,12 @@ export default function NotesPage() {
 
     const handleNotePreview = (note: Note) => {
         setSelectedNote(note);
-        setModalOpen(true);
+        setSidebarOpen(true);
     };
 
-    const handleModalClose = (open: boolean) => {
-        setModalOpen(open);
-        if (!open) {
-            setSelectedNote(null);
-        }
+    const handleSidebarClose = () => {
+        setSidebarOpen(false);
+        setSelectedNote(null);
     };
 
     return (
@@ -295,10 +293,10 @@ export default function NotesPage() {
 
             <NotesPagination page={page} maxPage={maxPage} setPage={setPage} />
 
-            <NoteDetailsModal
+            <NoteSidebar
                 note={selectedNote}
-                open={modalOpen}
-                onOpenChange={handleModalClose}
+                open={sidebarOpen}
+                onClose={handleSidebarClose}
             />
         </div>
     );

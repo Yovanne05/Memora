@@ -14,8 +14,9 @@ import { EmptyState } from "./EmptyState"
 import { LoadingState } from "./LoadingState"
 import { ErrorState } from "./ErrorState"
 import { useNodeSelection } from "../hooks/useNodeSelection"
-import { NoteDetailsModal } from "../../notes/components/NoteDetailsModal"
+import { NoteSidebar } from "../../notes/components/NoteSidebar"
 import { useNoteQuery } from "../../notes/hooks/useNoteQuery"
+import type { Note } from "../../notes/models/note.model"
 
 interface CollectionVisualizationViewProps {
   collectionId?: string
@@ -37,17 +38,45 @@ export function CollectionVisualizationView({
     edges
   )
 
-  const [modalOpen, setModalOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const { data: selectedNote } = useNoteQuery(selectedNodeId ?? "")
+
+  // Get related notes (notes connected to the selected note via edges)
+  const relatedNotes = useMemo(() => {
+    if (!selectedNodeId || !data) return []
+
+    const connectedNodeIds = new Set<string>()
+    data.edges.forEach((edge) => {
+      if (edge.sourceId === selectedNodeId) {
+        connectedNodeIds.add(edge.targetId)
+      } else if (edge.targetId === selectedNodeId) {
+        connectedNodeIds.add(edge.sourceId)
+      }
+    })
+
+    // Return the connected nodes with their basic info
+    return data.nodes
+      .filter((node) => connectedNodeIds.has(node.id))
+      .map((node) => ({
+        id: node.id,
+        title: node.title,
+        content: "",
+        visibility: "private" as const,
+        ownerId: "",
+        collectionId: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as Note))
+  }, [selectedNodeId, data])
 
   const memoizedNodeTypes = useMemo(() => nodeTypes, [])
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
-      // Si le nœud est déjà sélectionné, ouvrir le modal (deuxième clic)
+      // Si le nœud est déjà sélectionné, ouvrir le sidebar (deuxième clic)
       if (selectedNodeId === node.id) {
-        setModalOpen(true)
-        console.log("[Visualization] Ouverture du modal pour:", node)
+        setSidebarOpen(true)
+        console.log("[Visualization] Ouverture du sidebar pour:", node)
       } else {
         // Premier clic : sélectionner et mettre en surbrillance
         selectNode(node.id)
@@ -59,15 +88,18 @@ export function CollectionVisualizationView({
 
   const onPaneClick = useCallback(() => {
     clearSelection()
-    setModalOpen(false)
+    setSidebarOpen(false)
   }, [clearSelection])
 
-  const handleModalClose = useCallback((open: boolean) => {
-    setModalOpen(open)
-    if (!open) {
-      clearSelection()
-    }
+  const handleSidebarClose = useCallback(() => {
+    setSidebarOpen(false)
+    clearSelection()
   }, [clearSelection])
+
+  const handleRelatedNoteClick = useCallback((noteId: string) => {
+    selectNode(noteId)
+    // Keep sidebar open to show the new note
+  }, [selectNode])
 
   const getMiniMapNodeColor = useCallback(
     (node: Node) => getNodeColorForMiniMap(node, getNodeColorByConnections),
@@ -122,10 +154,12 @@ export function CollectionVisualizationView({
 
       {data && <OrphanNotesZone data={data} orphanNodeIds={orphanNodeIds} />}
 
-      <NoteDetailsModal
+      <NoteSidebar
         note={selectedNote ?? null}
-        open={modalOpen}
-        onOpenChange={handleModalClose}
+        open={sidebarOpen}
+        onClose={handleSidebarClose}
+        relatedNotes={relatedNotes}
+        onNoteClick={handleRelatedNoteClick}
       />
     </div>
   )

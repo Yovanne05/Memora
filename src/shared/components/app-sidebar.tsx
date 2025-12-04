@@ -9,6 +9,7 @@ import {
     Settings as SettingsIcon,
     LogOut,
     FileText,
+    PanelLeft,
 } from "lucide-react"
 
 import { Link } from "@tanstack/react-router"
@@ -23,11 +24,15 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarFooter,
+    useSidebar,
 } from "@/components/ui/sidebar"
 
 import { Separator } from "@/components/ui/separator"
+import { ModeToggle } from "./mode-toggle"
 
 export function AppSidebar() {
+    const { toggleSidebar } = useSidebar()
+
     const navigationItems = [
         { title: "Tableau de bord", icon: LayoutDashboard, url: "#" },
         { title: "Notes", icon: FileText, url: "/app/notes" },
@@ -115,6 +120,17 @@ export function AppSidebar() {
             <SidebarFooter>
                 <Separator className="mb-2" />
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <div className="flex items-center justify-between px-2 py-2">
+                            <SidebarMenuButton onClick={toggleSidebar} className="flex items-center gap-2">
+                                <PanelLeft className="h-4 w-4" />
+                                <span>Réduire</span>
+                            </SidebarMenuButton>
+                            <div className="flex items-center gap-2">
+                                <ModeToggle />
+                            </div>
+                        </div>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
                             <a href="#" className="inline-flex items-center gap-2">
