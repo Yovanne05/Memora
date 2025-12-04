@@ -17,7 +17,7 @@ const formatDateTime = (date: string) =>
     minute: "2-digit",
   }).format(new Date(date))
 
-export function NoteDetailsContent({ note, paragraphs }: NoteDetailsContentProps) {
+export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsContentProps>) {
   return (
     <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
       <Card className="border border-border/70 shadow-sm">

@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react"
 import type { NotesFilters } from "../types/note-query"
 import { useNotesQuery } from "./useNotesQuery"
-import type { Note } from "../models/note.model"
 
 export type NotesView = "grid" | "list"
 export type NotesSort = "recent" | "oldest" | "title-asc" | "title-desc"
@@ -45,7 +44,7 @@ export function useNotesManager(initialLimit = 12) {
   const maxPage = Math.max(0, Math.ceil(total / limit) - 1)
 
   return {
-    data: items as Note[],
+    data: items,
     total,
     page,
     maxPage,

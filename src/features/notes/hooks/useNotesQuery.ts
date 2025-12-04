@@ -16,7 +16,6 @@ export function useNotesQuery(page: number, limit: number, filters: NotesFilters
   return useQuery<PaginatedNotes>({
     queryKey: NOTES_QUERY_KEYS.list({ page, limit, filters }),
     retry: 1,
-    staleTime: 5 * 60 * 1000,
     queryFn: () => notesService.list({ ...filters, limit, offset: page * limit }),
     placeholderData: keepPreviousData,
   })

@@ -4,11 +4,11 @@ export function NotesPagination({
   page,
   maxPage,
   setPage,
-}: {
+}: Readonly<{
   page: number
   maxPage: number
   setPage: (p: number) => void
-}) {
+}>) {
   return (
     <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
       <Button

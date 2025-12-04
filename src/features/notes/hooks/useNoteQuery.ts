@@ -9,6 +9,5 @@ export function useNoteQuery(noteId: string) {
     queryFn: () => notesService.get(noteId),
     retry: 1,
     enabled: Boolean(noteId),
-    staleTime: 2 * 60 * 1000,
   })
 }

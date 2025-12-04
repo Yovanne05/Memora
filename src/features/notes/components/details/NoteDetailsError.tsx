@@ -7,7 +7,7 @@ interface NoteDetailsErrorProps {
   onRetry?: () => void
 }
 
-export function NoteDetailsError({ message, onRetry }: NoteDetailsErrorProps) {
+export function NoteDetailsError({ message, onRetry }: Readonly<NoteDetailsErrorProps>) {
   return (
     <div className="p-6">
       <Card className="border border-destructive/40 bg-destructive/5">

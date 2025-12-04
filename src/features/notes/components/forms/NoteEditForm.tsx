@@ -18,7 +18,7 @@ interface NoteEditFormProps {
   onCancel?: () => void
 }
 
-export function NoteEditForm({ note, loading = false, onSubmit, onCancel }: NoteEditFormProps) {
+export function NoteEditForm({ note, loading = false, onSubmit, onCancel }: Readonly<NoteEditFormProps>) {
   const [title, setTitle] = useState(note?.title ?? "")
   const [content, setContent] = useState(note?.content ?? "")
   const [visibility, setVisibility] = useState<NoteVisibility>(note?.visibility ?? "private")
