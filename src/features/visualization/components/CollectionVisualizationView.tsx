@@ -76,18 +76,13 @@ export function CollectionVisualizationView({
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
-      // Si le nœud est déjà sélectionné, ouvrir le sidebar (deuxième clic)
-      if (activeNodeId === node.id) {
-        setSidebarOpen(true)
-        console.log("[Visualization] Ouverture du sidebar pour:", node)
-      } else {
-        // Premier clic : sélectionner et mettre en surbrillance
+      if (selectedNodeId !== node.id) {
         selectNode(node.id)
-        setActiveNodeId((current) => (current === node.id ? null : node.id))
-        console.log("[Visualization] Note sélectionnée:", node)
       }
+      setActiveNodeId(node.id)
+      setSidebarOpen(true)
     },
-    [selectNode, activeNodeId]
+    [selectNode, selectedNodeId]
   )
 
   const onPaneClick = useCallback(() => {
@@ -127,6 +122,17 @@ export function CollectionVisualizationView({
     []
   )
 
+  useEffect(() => {
+    if (selectedNodeId) {
+      setActiveNodeId(selectedNodeId)
+      return
+    }
+
+    if (!selectedNodeId && activeNodeId && !orphanNodeIds.has(activeNodeId)) {
+      setActiveNodeId(null)
+    }
+  }, [selectedNodeId, activeNodeId, orphanNodeIds])
+
   if (!collectionId) {
     return (
       <EmptyState message="Sélectionnez une collection à gauche pour afficher la visualisation." />
@@ -142,17 +148,6 @@ export function CollectionVisualizationView({
   }
 
   const connectedNotesCount = data.nodes.length - orphanNodeIds.size
-
-  useEffect(() => {
-    if (selectedNodeId) {
-      setActiveNodeId(selectedNodeId)
-      return
-    }
-
-    if (!selectedNodeId && activeNodeId && !orphanNodeIds.has(activeNodeId)) {
-      setActiveNodeId(null)
-    }
-  }, [selectedNodeId, activeNodeId, orphanNodeIds])
 
   return (
     <div className="flex h-full w-full flex-col">
