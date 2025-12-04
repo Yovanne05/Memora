@@ -1,4 +1,4 @@
-import { LEGEND_COLORS, LEGEND_LABELS } from "../constants/visualization.constants"
+import { LEGEND_COLORS, LEGEND_LABELS } from "../lib/visualization.constants"
 
 interface LegendItem {
   color: string

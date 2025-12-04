@@ -1,7 +1,6 @@
 import { Position, type NodeProps } from "reactflow"
 import { NodeHandle } from "./NodeHandle"
 import { NodeContent } from "./NodeContent"
-import { NODE_BASE_CLASSES } from "../constants/node.constants"
 
 export interface CustomNodeData {
   title: string
@@ -32,7 +31,7 @@ export function CustomNode({ data }: NodeProps<CustomNodeData>) {
 
   return (
     <div
-      className={NODE_BASE_CLASSES}
+      className="group relative min-w-[140px] rounded-lg border-2 border-blue-400 bg-white px-4 py-3 shadow-lg transition-colors hover:border-blue-600"
       role="article"
       aria-label={`Note: ${data.title}, ${connectionLabel}`}
     >

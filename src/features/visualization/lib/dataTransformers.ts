@@ -8,7 +8,7 @@ import type {
 } from "../types/visualization.type"
 import type { CustomNodeData } from "../components/CustomNode"
 import type { NodePosition } from "./layout/types"
-import { REACT_FLOW_STYLES } from "../constants/visualization.constants"
+import { REACT_FLOW_STYLES } from "./visualization.constants"
 import {
   groupEdgesByConnection,
   calculateEdgeOffset,

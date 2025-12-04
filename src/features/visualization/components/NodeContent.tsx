@@ -1,4 +1,4 @@
-import { NODE_COLORS } from "../constants/visualization.constants"
+import { NODE_COLORS } from "../lib/visualization.constants"
 
 interface NodeContentProps {
   title: string

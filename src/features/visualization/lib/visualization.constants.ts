@@ -1,14 +1,8 @@
-/**
- * Seuils de connexions pour catégoriser les nœuds
- */
 export const CONNECTION_THRESHOLDS = {
   HIGH: 3,
   MEDIUM: 1,
 } as const
 
-/**
- * Couleurs des nœuds selon leur nombre de connexions
- */
 export const NODE_COLORS = {
   HIGH: "#3b82f6", // blue-500
   MEDIUM: "#60a5fa", // blue-400
@@ -16,27 +10,18 @@ export const NODE_COLORS = {
   DEFAULT: "#3b82f6", // blue-500
 } as const
 
-/**
- * Classes CSS Tailwind pour les couleurs de la légende
- */
 export const LEGEND_COLORS = {
   HIGH: "bg-blue-600",
   MEDIUM: "bg-blue-400",
   LOW: "bg-blue-200",
 } as const
 
-/**
- * Labels pour la légende
- */
 export const LEGEND_LABELS = {
   HIGH: "3+ connexions",
   MEDIUM: "2-3 connexions",
   LOW: "0-1 connexion",
 } as const
 
-/**
- * Configuration des styles ReactFlow
- */
 export const REACT_FLOW_STYLES = {
   EDGE_COLOR: "#3b82f6",
   EDGE_WIDTH: 2,
