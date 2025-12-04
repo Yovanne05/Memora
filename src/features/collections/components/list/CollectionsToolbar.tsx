@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Filter, X } from "lucide-react"
 import type { CollectionsSort, CollectionsTab } from "../../lib/collections-query"
 import type { CollectionVisibility } from "../../models/collection.model"
+import { forwardRef } from "react"
 
 interface CollectionsToolbarProps {
   search: string
@@ -26,32 +27,37 @@ interface CollectionsToolbarProps {
   onToggleFilters: () => void
 }
 
-export function CollectionsToolbar({
-  search,
-  onSearchChange,
-  tab,
-  onTabChange,
-  sort,
-  onSortChange,
-  visibilityFilter,
-  onVisibilityFilterChange,
-  showFilters,
-  onToggleFilters,
-}: CollectionsToolbarProps) {
-  const activeFiltersCount = visibilityFilter ? 1 : 0
+export const CollectionsToolbar = forwardRef<HTMLInputElement, CollectionsToolbarProps>(
+  function CollectionsToolbar(
+    {
+      search,
+      onSearchChange,
+      tab,
+      onTabChange,
+      sort,
+      onSortChange,
+      visibilityFilter,
+      onVisibilityFilterChange,
+      showFilters,
+      onToggleFilters,
+    },
+    ref
+  ) {
+    const activeFiltersCount = visibilityFilter ? 1 : 0
 
-  return (
-    <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full min-w-60 lg:w-80">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher des collections..."
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+    return (
+      <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative w-full min-w-60 lg:w-80">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              ref={ref}
+              placeholder="Rechercher des collections..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-9"
+            />
+          </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Tabs
@@ -145,3 +151,4 @@ export function CollectionsToolbar({
     </div>
   )
 }
+)

@@ -2,6 +2,7 @@ import { useCallback, useState } from "react"
 
 export function useCollectionsSelection() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [selectionMode, setSelectionMode] = useState(false)
 
   const toggleSelection = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -28,12 +29,27 @@ export function useCollectionsSelection() {
     [selectedIds]
   )
 
+  const toggleSelectionMode = useCallback(() => {
+    setSelectionMode((prev) => !prev)
+    if (selectionMode) {
+      setSelectedIds(new Set())
+    }
+  }, [selectionMode])
+
+  const exitSelectionMode = useCallback(() => {
+    setSelectionMode(false)
+    setSelectedIds(new Set())
+  }, [])
+
   return {
     selectedIds: Array.from(selectedIds),
     selectedCount: selectedIds.size,
+    selectionMode,
     toggleSelection,
     selectAll,
     clearSelection,
     isSelected,
+    toggleSelectionMode,
+    exitSelectionMode,
   }
 }

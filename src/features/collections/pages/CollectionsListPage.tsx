@@ -1,60 +1,31 @@
-import { Plus, CheckSquare } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { CollectionsHeader } from "../components/list/CollectionsHeader"
 import { CollectionsContent } from "../components/list/CollectionsContent"
 import { CollectionDialogs } from "../components/dialogs/CollectionDialogs"
 import { CollectionsBulkActions } from "../components/list/CollectionsBulkActions"
-import { CollectionsKeyboardHelp } from "../components/list/CollectionsKeyboardHelp"
+import { CollectionsPageActions } from "../components/list/CollectionsPageActions"
 import { useCollectionsManager } from "../hooks/useCollectionsManager"
 import { useCollectionsSelection } from "../hooks/useCollectionsSelection"
+import { useCollectionsBulkActions } from "../hooks/useCollectionsBulkActions"
 import { useCollectionsKeyboardShortcuts } from "../hooks/useCollectionsKeyboardShortcuts"
 import { CollectionsToolbar } from "../components/list/CollectionsToolbar"
-import { useState, useCallback, useRef } from "react"
+import { useRef } from "react"
 
 export function CollectionsListPage() {
   const manager = useCollectionsManager()
   const selection = useCollectionsSelection()
-  const [selectionMode, setSelectionMode] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const handleToggleSelectionMode = useCallback(() => {
-    setSelectionMode((prev) => !prev)
-    if (selectionMode) {
-      selection.clearSelection()
-    }
-  }, [selectionMode, selection])
-
-  const handleBulkDelete = useCallback(async () => {
-    // TODO: Implémenter la suppression groupée
-    console.log("Bulk delete:", selection.selectedIds)
-    selection.clearSelection()
-    setSelectionMode(false)
-  }, [selection])
-
-  const handleBulkSetPrivate = useCallback(async () => {
-    // TODO: Implémenter le changement de visibilité groupé
-    console.log("Set private:", selection.selectedIds)
-    selection.clearSelection()
-    setSelectionMode(false)
-  }, [selection])
-
-  const handleBulkSetPublic = useCallback(async () => {
-    // TODO: Implémenter le changement de visibilité groupé
-    console.log("Set public:", selection.selectedIds)
-    selection.clearSelection()
-    setSelectionMode(false)
-  }, [selection])
-
-  const handleFocusSearch = useCallback(() => {
-    const searchInput = document.querySelector<HTMLInputElement>('input[placeholder*="Rechercher"]')
-    searchInput?.focus()
-  }, [])
+  const bulkActions = useCollectionsBulkActions({
+    selectedIds: selection.selectedIds,
+    collections: manager.collections,
+    onSuccess: selection.exitSelectionMode,
+  })
 
   useCollectionsKeyboardShortcuts({
     onNewCollection: manager.create.open,
     onToggleFilters: () => manager.filters.setShowFilters(!manager.filters.showFilters),
-    onToggleSelectionMode: handleToggleSelectionMode,
-    onSearch: handleFocusSearch,
+    onToggleSelectionMode: selection.toggleSelectionMode,
+    onSearch: () => searchInputRef.current?.focus(),
     disabled: manager.create.isOpen || !!manager.edit.target || !!manager.deletion.target,
   })
 
@@ -62,32 +33,15 @@ export function CollectionsListPage() {
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <CollectionsHeader />
-        <div className="flex gap-2">
-          <CollectionsKeyboardHelp />
-          <Button
-            onClick={handleToggleSelectionMode}
-            size="lg"
-            variant={selectionMode ? "default" : "outline"}
-            className="gap-2"
-            aria-label="Mode sélection"
-          >
-            <CheckSquare className="h-4 w-4" aria-hidden="true" />
-            {selectionMode ? "Annuler" : "Sélectionner"}
-          </Button>
-          <Button
-            onClick={manager.create.open}
-            size="lg"
-            className="gap-2"
-            aria-label="Créer une nouvelle collection"
-            disabled={selectionMode}
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Nouvelle collection
-          </Button>
-        </div>
+        <CollectionsPageActions
+          selectionMode={selection.selectionMode}
+          onToggleSelectionMode={selection.toggleSelectionMode}
+          onCreateClick={manager.create.open}
+        />
       </div>
 
       <CollectionsToolbar
+        ref={searchInputRef}
         search={manager.filters.search}
         onSearchChange={manager.filters.setSearch}
         tab={manager.filters.tab}
@@ -109,18 +63,15 @@ export function CollectionsListPage() {
         onDelete={manager.deletion.open}
         isSelected={selection.isSelected}
         onToggleSelection={selection.toggleSelection}
-        selectionMode={selectionMode}
+        selectionMode={selection.selectionMode}
       />
 
       <CollectionsBulkActions
         selectedCount={selection.selectedCount}
-        onClearSelection={() => {
-          selection.clearSelection()
-          setSelectionMode(false)
-        }}
-        onBulkDelete={handleBulkDelete}
-        onBulkSetPrivate={handleBulkSetPrivate}
-        onBulkSetPublic={handleBulkSetPublic}
+        onClearSelection={selection.exitSelectionMode}
+        onBulkDelete={bulkActions.deleteSelected}
+        onBulkSetPrivate={bulkActions.setPrivate}
+        onBulkSetPublic={bulkActions.setPublic}
       />
 
       <CollectionDialogs

@@ -79,7 +79,6 @@ export function CollectionNotesSection() {
       );
     }
 
-    // Sort
     const sorted = [...filtered].sort((a, b) => {
       if (sort === "alphabetical") {
         return a.title.localeCompare(b.title);
@@ -87,7 +86,6 @@ export function CollectionNotesSection() {
       if (sort === "oldest") {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       }
-      // recent
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
