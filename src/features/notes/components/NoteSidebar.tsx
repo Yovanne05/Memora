@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import type { Note } from "../models/note.model";
 import { cn } from "@/lib/utils";
+import { useResizable } from "@/hooks/useResizable";
 
 interface NoteSidebarProps {
   note: Note | null;
@@ -13,10 +14,6 @@ interface NoteSidebarProps {
   onNoteClick?: (noteId: string) => void;
 }
 
-/**
- * Sidebar component to display detailed note information on the right side.
- * Includes related notes navigation at the top.
- */
 export function NoteSidebar({
   note,
   open,
@@ -24,6 +21,13 @@ export function NoteSidebar({
   relatedNotes = [],
   onNoteClick,
 }: NoteSidebarProps) {
+  const { width, isResizing, handleMouseDown, resizeRef } = useResizable({
+    minWidth: 320,
+    maxWidth: window.innerWidth * 0.8,
+    defaultWidth: 480,
+    storageKey: "note-sidebar-width",
+  });
+
   if (!note) return null;
 
   const formattedCreatedAt = new Date(note.createdAt).toLocaleString("fr-FR", {
@@ -44,14 +48,24 @@ export function NoteSidebar({
 
   return (
     <>
-      {/* Sidebar Panel - No backdrop overlay to allow graph interaction */}
       <aside
+        ref={resizeRef}
+        style={{ width: `${width}px` }}
         className={cn(
-          "fixed top-0 right-0 h-full w-full sm:w-[480px] bg-background border-l shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col",
-          open ? "translate-x-0" : "translate-x-full"
+          "fixed top-0 right-0 h-full bg-background border-l shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col",
+          open ? "translate-x-0" : "translate-x-full",
+          isResizing && "transition-none"
         )}
       >
-        {/* Header with Close Button */}
+        <div
+          onMouseDown={handleMouseDown}
+          className={cn(
+            "absolute left-0 top-0 h-full w-1 cursor-ew-resize hover:bg-primary/50 transition-colors group",
+            isResizing && "bg-primary"
+          )}
+        >
+          <div className="absolute left-0 top-0 h-full w-4 -translate-x-1.5" />
+        </div>
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-semibold">Détails de la note</h2>
           <Button
@@ -64,9 +78,7 @@ export function NoteSidebar({
           </Button>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
-          {/* Related Notes Section */}
           {relatedNotes.length > 0 && (
             <div className="px-6 py-4 bg-muted/30">
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">
@@ -94,9 +106,7 @@ export function NoteSidebar({
             </div>
           )}
 
-          {/* Note Details */}
           <div className="px-6 py-6 space-y-6">
-            {/* Title and Visibility Badge */}
             <div>
               <h1 className="text-2xl font-bold leading-tight mb-3">
                 {note.title}
@@ -116,7 +126,6 @@ export function NoteSidebar({
 
             <Separator />
 
-            {/* Note Content */}
             <div>
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">
                 Contenu
@@ -134,7 +143,6 @@ export function NoteSidebar({
 
             <Separator />
 
-            {/* Metadata */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground">
                 Informations
