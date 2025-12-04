@@ -22,6 +22,7 @@ import {
 
 import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation"
 import { useNoteQuery } from "../hooks/useNoteQuery"
+import { UserDisplay } from "@/features/users/components/UserDisplay"
 
 const formatDate = (date: string) =>
     new Intl.DateTimeFormat("fr-FR", {
@@ -116,7 +117,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     ) : (
                                         <span className="flex items-center gap-2">
                                             <NotebookPen className="h-4 w-4" />
-                                            Propriétaire {note?.ownerId}
+                                            Propriétaire <UserDisplay userId={note?.ownerId || ""} />
                                         </span>
                                     )}
 
@@ -246,7 +247,9 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     <div className="flex items-center gap-2">
                                         <NotebookPen className="h-4 w-4" />
                                         <span className="text-foreground">Propriétaire</span>
-                                        <span className="text-muted-foreground">{note?.ownerId}</span>
+                                        <span className="text-muted-foreground">
+                                            <UserDisplay userId={note?.ownerId || ""} />
+                                        </span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
