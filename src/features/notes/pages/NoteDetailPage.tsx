@@ -23,22 +23,7 @@ import {
 import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation"
 import { useNoteQuery } from "../hooks/useNoteQuery"
 import { UserDisplay } from "@/features/users/components/UserDisplay"
-
-const formatDate = (date: string) =>
-    new Intl.DateTimeFormat("fr-FR", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    }).format(new Date(date))
-
-const formatDateTime = (date: string) =>
-    new Intl.DateTimeFormat("fr-FR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    }).format(new Date(date))
+import { formatShortDate, formatLongDateTime, VISIBILITY_LABELS } from "@/lib/format.utils"
 
 export function NoteDetailPage({ noteId }: { noteId: string }) {
     const { data: note, isLoading, isError, error } = useNoteQuery(noteId)
@@ -90,7 +75,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                             ) : (
                                                 <Lock className="h-3.5 w-3.5" />
                                             )}
-                                            {note?.visibility === "public" ? "note publique" : "note privée"}
+                                            {note && `note ${VISIBILITY_LABELS[note.visibility].toLowerCase()}`}
                                         </Badge>
                                     )}
                                 </div>
@@ -126,7 +111,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
-                                        <span>Créée le {note && formatDate(note.createdAt)}</span>
+                                        <span>Créée le {note && formatShortDate(note.createdAt)}</span>
                                     )}
 
                                     <Separator orientation="vertical" className="h-4" />
@@ -134,7 +119,7 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                     {isLoading ? (
                                         <Skeleton className="h-4 w-28" />
                                     ) : (
-                                        <span>Mise à jour le {note && formatDate(note.updatedAt)}</span>
+                                        <span>Mise à jour le {note && formatShortDate(note.updatedAt)}</span>
                                     )}
                                 </div>
                             </div>
@@ -256,20 +241,20 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                                         <Globe className="h-4 w-4" />
                                         <span className="text-foreground">Visibilité</span>
                                         <Badge variant="outline" className="capitalize">
-                                            {note?.visibility === "public" ? "Publique" : "Privée"}
+                                            {note && VISIBILITY_LABELS[note.visibility]}
                                         </Badge>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
                                         <span className="text-foreground">Créée</span>
-                                        <span>{note && formatDateTime(note.createdAt)}</span>
+                                        <span>{note && formatLongDateTime(note.createdAt)}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <CalendarClock className="h-4 w-4" />
                                         <span className="text-foreground">Mise à jour</span>
-                                        <span>{note && formatDateTime(note.updatedAt)}</span>
+                                        <span>{note && formatLongDateTime(note.updatedAt)}</span>
                                     </div>
                                 </>
                             )}

@@ -5,13 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Eye, LayoutGrid } from "lucide-react"
 
 import type { Note } from "../models/note.model"
-
-const formatDate = (date: string) =>
-    new Intl.DateTimeFormat("en", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    }).format(new Date(date))
+import { formatShortDate } from "@/lib/format.utils"
 
 interface NoteCardProps {
     note: Note
@@ -66,7 +60,7 @@ export function NoteCard({ note, onPreview }: NoteCardProps) {
                         </span>
 
                         <span className="flex items-center gap-1">
-                            Mis à jour le {formatDate(note.updatedAt)}
+                            Mis à jour le {formatShortDate(note.updatedAt)}
                         </span>
                     </div>
                 </CardContent>
