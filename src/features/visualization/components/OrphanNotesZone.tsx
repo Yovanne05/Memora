@@ -5,9 +5,14 @@ import { FileQuestion } from "lucide-react"
 interface OrphanNotesZoneProps {
   data: CollectionVisualization
   orphanNodeIds: Set<string>
+  onSelect?: (noteId: string) => void
 }
 
-export function OrphanNotesZone({ data, orphanNodeIds }: OrphanNotesZoneProps) {
+export function OrphanNotesZone({
+  data,
+  orphanNodeIds,
+  onSelect,
+}: OrphanNotesZoneProps) {
   const orphanNotes = data.nodes.filter((node) => orphanNodeIds.has(node.id))
 
   if (orphanNotes.length === 0) {
@@ -28,6 +33,16 @@ export function OrphanNotesZone({ data, orphanNodeIds }: OrphanNotesZoneProps) {
             key={note.id}
             className="cursor-pointer px-3 py-2 transition-all hover:border-primary hover:shadow-sm"
             title={note.title}
+            onClick={() => onSelect?.(note.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault()
+                onSelect?.(note.id)
+              }
+            }}
+            aria-label={`Ouvrir la note orpheline ${note.title}`}
           >
             <div className="flex max-w-[200px] items-center gap-2">
               <div className="h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50" />

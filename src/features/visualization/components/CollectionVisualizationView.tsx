@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import type { MouseEvent } from "react"
 import ReactFlow, { Background, Controls, MiniMap, type Node } from "reactflow"
 import "reactflow/dist/style.css"
@@ -41,17 +41,18 @@ export function CollectionVisualizationView({
   )
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { data: selectedNote } = useNoteQuery(selectedNodeId ?? "")
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null)
+  const { data: selectedNote } = useNoteQuery(activeNodeId ?? "")
 
   // Get related notes (notes connected to the selected note via edges)
   const relatedNotes = useMemo(() => {
-    if (!selectedNodeId || !data) return []
+    if (!activeNodeId || !data) return []
 
     const connectedNodeIds = new Set<string>()
     data.edges.forEach((edge) => {
-      if (edge.sourceId === selectedNodeId) {
+      if (edge.sourceId === activeNodeId) {
         connectedNodeIds.add(edge.targetId)
-      } else if (edge.targetId === selectedNodeId) {
+      } else if (edge.targetId === activeNodeId) {
         connectedNodeIds.add(edge.sourceId)
       }
     })
@@ -69,39 +70,57 @@ export function CollectionVisualizationView({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       } as Note))
-  }, [selectedNodeId, data])
+  }, [activeNodeId, data])
 
   const memoizedNodeTypes = useMemo(() => nodeTypes, [])
 
   const onNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
       // Si le nœud est déjà sélectionné, ouvrir le sidebar (deuxième clic)
-      if (selectedNodeId === node.id) {
+      if (activeNodeId === node.id) {
         setSidebarOpen(true)
         console.log("[Visualization] Ouverture du sidebar pour:", node)
       } else {
         // Premier clic : sélectionner et mettre en surbrillance
         selectNode(node.id)
+        setActiveNodeId((current) => (current === node.id ? null : node.id))
         console.log("[Visualization] Note sélectionnée:", node)
       }
     },
-    [selectNode, selectedNodeId]
+    [selectNode, activeNodeId]
   )
 
   const onPaneClick = useCallback(() => {
     clearSelection()
     setSidebarOpen(false)
+    setActiveNodeId(null)
   }, [clearSelection])
 
   const handleSidebarClose = useCallback(() => {
     setSidebarOpen(false)
     clearSelection()
+    setActiveNodeId(null)
   }, [clearSelection])
 
-  const handleRelatedNoteClick = useCallback((noteId: string) => {
-    selectNode(noteId)
-    // Keep sidebar open to show the new note
-  }, [selectNode])
+  const handleRelatedNoteClick = useCallback(
+    (noteId: string) => {
+      if (selectedNodeId !== noteId) {
+        selectNode(noteId)
+      }
+      setActiveNodeId(noteId)
+      setSidebarOpen(true)
+    },
+    [selectNode, selectedNodeId]
+  )
+
+  const handleOrphanNoteClick = useCallback(
+    (noteId: string) => {
+      clearSelection()
+      setActiveNodeId(noteId)
+      setSidebarOpen(true)
+    },
+    [clearSelection]
+  )
 
   const getMiniMapNodeColor = useCallback(
     (node: Node) => getNodeColorForMiniMap(node, getNodeColorByConnections),
@@ -123,6 +142,17 @@ export function CollectionVisualizationView({
   }
 
   const connectedNotesCount = data.nodes.length - orphanNodeIds.size
+
+  useEffect(() => {
+    if (selectedNodeId) {
+      setActiveNodeId(selectedNodeId)
+      return
+    }
+
+    if (!selectedNodeId && activeNodeId && !orphanNodeIds.has(activeNodeId)) {
+      setActiveNodeId(null)
+    }
+  }, [selectedNodeId, activeNodeId, orphanNodeIds])
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -155,7 +185,13 @@ export function CollectionVisualizationView({
 
       <VisualizationLegend />
 
-      {data && <OrphanNotesZone data={data} orphanNodeIds={orphanNodeIds} />}
+      {data && (
+        <OrphanNotesZone
+          data={data}
+          orphanNodeIds={orphanNodeIds}
+          onSelect={handleOrphanNoteClick}
+        />
+      )}
 
       <NoteSidebar
         note={selectedNote ?? null}
