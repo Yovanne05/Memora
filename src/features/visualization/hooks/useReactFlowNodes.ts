@@ -15,7 +15,7 @@ export function useReactFlowNodes(
 ): ReactFlowNode[] {
   return useMemo<ReactFlowNode[]>(() => {
     if (!data) return []
-    // Filtrer les nœuds orphelins pour le graphe ReactFlow
+    // Filtrer les nœuds orphelins pour le graphe
     const filteredData = {
       ...data,
       nodes: data.nodes.filter((node) => !orphanNodeIds.has(node.id)),

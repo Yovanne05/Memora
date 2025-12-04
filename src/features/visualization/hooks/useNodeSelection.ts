@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import type { ReactFlowEdge, ReactFlowNode } from "../types/visualization.type"
 
 const CONNECTED_EDGE_OPACITY = 1
@@ -17,15 +17,21 @@ export function useNodeSelection(
   nodes: ReactFlowNode[],
   edges: ReactFlowEdge[]
 ): UseNodeSelectionResult {
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [rawSelectedNodeId, setRawSelectedNodeId] = useState<string | null>(null)
 
   const selectNode = useCallback((nodeId: string) => {
-    setSelectedNodeId((current) => (current === nodeId ? null : nodeId))
+    setRawSelectedNodeId((current) => (current === nodeId ? null : nodeId))
   }, [])
 
   const clearSelection = useCallback(() => {
-    setSelectedNodeId(null)
+    setRawSelectedNodeId(null)
   }, [])
+
+  const selectedNodeId = useMemo(() => {
+    if (!rawSelectedNodeId) return null
+    const exists = nodes.some((node) => node.id === rawSelectedNodeId)
+    return exists ? rawSelectedNodeId : null
+  }, [rawSelectedNodeId, nodes])
 
   const connectedNodeIds = useMemo(() => {
     if (!selectedNodeId) return null
@@ -78,14 +84,6 @@ export function useNodeSelection(
       }
     })
   }, [nodes, selectedNodeId, connectedNodeIds])
-
-  useEffect(() => {
-    if (!selectedNodeId) return
-    const exists = nodes.some((node) => node.id === selectedNodeId)
-    if (!exists) {
-      setSelectedNodeId(null)
-    }
-  }, [nodes, selectedNodeId])
 
   return {
     selectedNodeId,

@@ -19,7 +19,7 @@ interface UseVisualizationLayoutResult {
 /**
  * Hook principal pour calculer le layout complet de la visualisation
  *
- * Ce hook orchestre plusieurs sous-hooks pour:
+ * Plusieurs sous-hooks pour:
  * - Calculer les connexions de chaque nœud
  * - Déterminer les positions optimales
  * - Transformer les données en format ReactFlow

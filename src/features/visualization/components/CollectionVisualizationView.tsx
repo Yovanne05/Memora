@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import type { MouseEvent } from "react"
 import ReactFlow, { Background, Controls, MiniMap, type Node } from "reactflow"
 import "reactflow/dist/style.css"
@@ -14,18 +14,19 @@ import { EmptyState } from "./EmptyState"
 import { LoadingState } from "./LoadingState"
 import { ErrorState } from "./ErrorState"
 import { useNodeSelection } from "../hooks/useNodeSelection"
+import { useNoteSidebar } from "../hooks/useNoteSidebar"
+import { useRelatedNotes } from "../hooks/useRelatedNotes"
 import { NoteSidebar } from "../../notes/components/NoteSidebar"
 import { useNoteQuery } from "../../notes/hooks/useNoteQuery"
-import type { Note } from "../../notes/models/note.model"
 
 interface CollectionVisualizationViewProps {
   collectionId?: string
   onBack?: () => void
 }
 
-const nodeTypes = {
+const NODE_TYPES = {
   custom: CustomNode,
-}
+} as const
 
 export function CollectionVisualizationView({
   collectionId,
@@ -35,86 +36,51 @@ export function CollectionVisualizationView({
     useCollectionVisualizationQuery(collectionId)
 
   const { nodes, edges, orphanNodeIds } = useVisualizationLayout(data)
-  const { selectedNodeId, styledNodes, styledEdges, selectNode, clearSelection } = useNodeSelection(
-    nodes,
-    edges
-  )
+  const { selectedNodeId, styledNodes, styledEdges, selectNode, clearSelection } =
+    useNodeSelection(nodes, edges)
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeNodeId, setActiveNodeId] = useState<string | null>(null)
-  const { data: selectedNote } = useNoteQuery(activeNodeId ?? "")
+  const sidebar = useNoteSidebar()
+  const { data: selectedNote } = useNoteQuery(sidebar.activeNoteId ?? "")
+  const relatedNotes = useRelatedNotes(sidebar.activeNoteId, data)
 
-  // Get related notes (notes connected to the selected note via edges)
-  const relatedNotes = useMemo(() => {
-    if (!activeNodeId || !data) return []
+  const memoizedNodeTypes = useMemo(() => NODE_TYPES, [])
 
-    const connectedNodeIds = new Set<string>()
-    data.edges.forEach((edge) => {
-      if (edge.sourceId === activeNodeId) {
-        connectedNodeIds.add(edge.targetId)
-      } else if (edge.targetId === activeNodeId) {
-        connectedNodeIds.add(edge.sourceId)
-      }
-    })
-
-    // Return the connected nodes with their basic info
-    return data.nodes
-      .filter((node) => connectedNodeIds.has(node.id))
-      .map((node) => ({
-        id: node.id,
-        title: node.title,
-        content: "",
-        visibility: "private" as const,
-        ownerId: "",
-        collectionId: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as Note))
-  }, [activeNodeId, data])
-
-  const memoizedNodeTypes = useMemo(() => nodeTypes, [])
-
-  const onNodeClick = useCallback(
+  const handleNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
       if (selectedNodeId !== node.id) {
         selectNode(node.id)
       }
-      setActiveNodeId(node.id)
-      setSidebarOpen(true)
+      sidebar.openWithNote(node.id)
     },
-    [selectNode, selectedNodeId]
+    [selectNode, selectedNodeId, sidebar]
   )
 
-  const onPaneClick = useCallback(() => {
+  const handlePaneClick = useCallback(() => {
     clearSelection()
-    setSidebarOpen(false)
-    setActiveNodeId(null)
-  }, [clearSelection])
+    sidebar.close()
+  }, [clearSelection, sidebar])
 
   const handleSidebarClose = useCallback(() => {
-    setSidebarOpen(false)
     clearSelection()
-    setActiveNodeId(null)
-  }, [clearSelection])
+    sidebar.close()
+  }, [clearSelection, sidebar])
 
   const handleRelatedNoteClick = useCallback(
     (noteId: string) => {
       if (selectedNodeId !== noteId) {
         selectNode(noteId)
       }
-      setActiveNodeId(noteId)
-      setSidebarOpen(true)
+      sidebar.openWithNote(noteId)
     },
-    [selectNode, selectedNodeId]
+    [selectNode, selectedNodeId, sidebar]
   )
 
   const handleOrphanNoteClick = useCallback(
     (noteId: string) => {
       clearSelection()
-      setActiveNodeId(noteId)
-      setSidebarOpen(true)
+      sidebar.openWithNote(noteId)
     },
-    [clearSelection]
+    [clearSelection, sidebar]
   )
 
   const getMiniMapNodeColor = useCallback(
@@ -124,14 +90,14 @@ export function CollectionVisualizationView({
 
   useEffect(() => {
     if (selectedNodeId) {
-      setActiveNodeId(selectedNodeId)
+      sidebar.openWithNote(selectedNodeId)
       return
     }
 
-    if (!selectedNodeId && activeNodeId && !orphanNodeIds.has(activeNodeId)) {
-      setActiveNodeId(null)
+    if (!selectedNodeId && sidebar.activeNoteId && !orphanNodeIds.has(sidebar.activeNoteId)) {
+      sidebar.close()
     }
-  }, [selectedNodeId, activeNodeId, orphanNodeIds])
+  }, [selectedNodeId, sidebar, orphanNodeIds])
 
   if (!collectionId) {
     return (
@@ -162,8 +128,8 @@ export function CollectionVisualizationView({
           nodes={styledNodes}
           edges={styledEdges}
           nodeTypes={memoizedNodeTypes}
-          onNodeClick={onNodeClick}
-          onPaneClick={onPaneClick}
+          onNodeClick={handleNodeClick}
+          onPaneClick={handlePaneClick}
           fitView
           className="bg-muted/30"
           nodesDraggable={true}
@@ -190,7 +156,7 @@ export function CollectionVisualizationView({
 
       <NoteSidebar
         note={selectedNote ?? null}
-        open={sidebarOpen}
+        open={sidebar.isOpen}
         onClose={handleSidebarClose}
         relatedNotes={relatedNotes}
         onNoteClick={handleRelatedNoteClick}

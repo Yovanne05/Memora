@@ -5,23 +5,29 @@ interface NodeContentProps {
   connections: number
 }
 
+const getConnectionText = (connections: number): string => {
+  return `${connections} connexion${connections !== 1 ? "s" : ""}`
+}
+
 export function NodeContent({ title, connections }: NodeContentProps) {
-  const connectionText = `${connections} connexion${connections !== 1 ? "s" : ""}`
+  const connectionText = getConnectionText(connections)
 
   return (
-    <>
+    <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
         <div
-          className="h-2 w-2 rounded-full"
+          className="h-2 w-2 shrink-0 rounded-full"
           style={{ backgroundColor: NODE_COLORS.DEFAULT }}
           aria-hidden="true"
         />
-        <div className="text-sm font-semibold text-gray-800">{title}</div>
+        <h3 className="text-sm font-semibold text-gray-800 truncate">
+          {title}
+        </h3>
       </div>
 
-      <div className="mt-1 text-xs text-gray-500" aria-label={connectionText}>
+      <p className="text-xs text-gray-500" aria-label={connectionText}>
         {connectionText}
-      </div>
-    </>
+      </p>
+    </div>
   )
 }
