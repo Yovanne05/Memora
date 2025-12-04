@@ -1,4 +1,4 @@
-export function NotesHeader({ total }: { total: number }) {
+export function NotesHeader({ total }: Readonly<{ total: number }>) {
   return (
     <header className="space-y-1">
       <h1 className="text-3xl font-semibold tracking-tight">Notes</h1>

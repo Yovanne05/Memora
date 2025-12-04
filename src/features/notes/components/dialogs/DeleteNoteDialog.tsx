@@ -16,7 +16,7 @@ interface DeleteNoteDialogProps {
   loading?: boolean
 }
 
-export function DeleteNoteDialog({ open, onOpenChange, onConfirm, loading }: DeleteNoteDialogProps) {
+export function DeleteNoteDialog({ open, onOpenChange, onConfirm, loading }: Readonly<DeleteNoteDialogProps>) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>

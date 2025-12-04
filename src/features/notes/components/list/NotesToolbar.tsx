@@ -37,7 +37,7 @@ export function NotesToolbar({
   onViewChange,
   onReset,
   onSubmitSearch,
-}: NotesToolbarProps) {
+}: Readonly<NotesToolbarProps>) {
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

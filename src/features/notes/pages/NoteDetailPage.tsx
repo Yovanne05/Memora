@@ -8,7 +8,7 @@ import { NoteDetailsHeader } from "../components/details/NoteDetailsHeader"
 import { NoteDetailsContent } from "../components/details/NoteDetailsContent"
 import { DeleteNoteDialog } from "../components/dialogs/DeleteNoteDialog"
 
-export function NoteDetailPage({ noteId }: { noteId: string }) {
+export function NoteDetailPage({ noteId }: Readonly<{ noteId: string }>) {
   const router = useRouter()
   const { data: note, isLoading, isError, error, refetch } = useNoteQuery(noteId)
   const deleteNoteMutation = useDeleteNoteMutation()

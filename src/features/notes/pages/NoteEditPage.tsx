@@ -14,7 +14,7 @@ interface NoteEditPageProps {
   noteId: string
 }
 
-export function NoteEditPage({ noteId }: NoteEditPageProps) {
+export function NoteEditPage({ noteId }: Readonly<NoteEditPageProps>) {
   const router = useRouter()
   const { data: note, isLoading, isError, error } = useNoteQuery(noteId)
   const updateNoteMutation = useUpdateNoteMutation()

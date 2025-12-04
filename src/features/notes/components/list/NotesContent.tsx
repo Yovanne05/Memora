@@ -13,7 +13,7 @@ interface NotesContentProps {
   onRetry: () => void
 }
 
-export function NotesContent({ loading, error, notes, view, onRetry }: NotesContentProps) {
+export function NotesContent({ loading, error, notes, view, onRetry }: Readonly<NotesContentProps>) {
   if (error) {
     return (
       <div className="flex items-center justify-between rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">

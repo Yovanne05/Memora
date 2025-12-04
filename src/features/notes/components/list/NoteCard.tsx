@@ -24,7 +24,7 @@ const formatDate = (date: string) =>
     day: "numeric",
   }).format(new Date(date))
 
-export function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
+export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
   const isPublic = note.visibility === "public"
 
   return (

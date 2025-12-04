@@ -19,7 +19,7 @@ const formatDate = (date: string) =>
     day: "numeric",
   }).format(new Date(date))
 
-export function NoteDetailsHeader({ note, onEdit, onDelete, isDeleting }: NoteDetailsHeaderProps) {
+export function NoteDetailsHeader({ note, onEdit, onDelete, isDeleting }: Readonly<NoteDetailsHeaderProps>) {
 
   return (
     <div className="space-y-4">

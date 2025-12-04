@@ -7,7 +7,7 @@ interface NotesGridProps {
   onDelete?: (n: Note) => void
 }
 
-export function NotesGrid({ items, onEdit, onDelete }: NotesGridProps) {
+export function NotesGrid({ items, onEdit, onDelete }: Readonly<NotesGridProps>) {
   return (
     <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {items.map((note) => (
