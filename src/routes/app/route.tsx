@@ -19,8 +19,8 @@ function SidebarToggleButton() {
       variant="outline"
       size="icon"
       onClick={toggleSidebar}
-      className="fixed top-4 left-4 z-40 shadow-lg"
-      title="Ouvrir la sidebar"
+      className="fixed bottom-4 left-4 z-40 shadow-lg"
+      title="Ouvrir la sidebar (Ctrl+B)"
     >
       <PanelLeft className="h-4 w-4" />
     </Button>

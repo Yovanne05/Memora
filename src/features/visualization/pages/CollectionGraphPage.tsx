@@ -17,12 +17,12 @@ export function CollectionGraphPage() {
 
   return (
     <div className="relative h-[calc(100vh-8rem)]">
-      {/* Back Button */}
+      {/* Back Button - Positioned top right to avoid conflicts */}
       <Button
         variant="outline"
         size="sm"
         onClick={handleBack}
-        className="absolute top-4 left-4 z-10 shadow-lg gap-2"
+        className="absolute top-4 right-4 z-10 shadow-lg gap-2"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour aux collections
