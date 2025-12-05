@@ -1,17 +1,17 @@
 from typing import List
 
+from domain_services.collection_domain_service import (
+    ensure_collection_exists,
+    ensure_not_sharing_with_owner,
+    ensure_share_does_not_exist,
+    ensure_user_exists,
+)
 from dtos.collection_share_dto import (
     CollectionShareCreateDTO,
     CollectionShareDTO,
     CollectionShareUpdateDTO,
 )
-from exceptions.collection_exception import (
-    CollectionNotFound,
-    CollectionShareAlreadyExists,
-    CollectionShareNotFound,
-    CollectionShareTargetDoesNotExist,
-    CollectionShareWithOwnerForbidden,
-)
+from exceptions.collection_exception import CollectionShareNotFound
 from mappers.collection_share_mapper import (
     collection_share_to_dto,
     dto_to_collection_share,
@@ -26,7 +26,9 @@ from services.interfaces.collection.collection_share_service_interface import Co
 
 class CollectionShareService(CollectionShareServiceInterface):
     def list_shares(self, collection_id: str) -> List[CollectionShareDTO]:
-        self._get_collection_or_raise(collection_id)
+        collection_entity = collection_repository.find_one(collection_id)
+        ensure_collection_exists(collection_entity)
+
         share_entities = collection_share_repository.find_by_collection(
             collection_id
         )
@@ -37,10 +39,16 @@ class CollectionShareService(CollectionShareServiceInterface):
     def share_collection(
         self, collection_id: str, share_dto: CollectionShareCreateDTO
     ) -> CollectionShareDTO:
-        collection_entity = self._get_collection_or_raise(collection_id)
-        self._ensure_share_target_exists(share_dto.user_id)
-        self._ensure_not_owner(collection_entity.owner_id, share_dto.user_id)
-        self._ensure_share_does_not_exist(collection_id, share_dto.user_id)
+        collection_entity = collection_repository.find_one(collection_id)
+        ensure_collection_exists(collection_entity)
+
+        user_entity = user_repository.find_one(share_dto.user_id)
+        ensure_user_exists(user_entity)
+
+        ensure_not_sharing_with_owner(collection_entity.owner_id, share_dto.user_id)
+
+        existing_share = collection_share_repository.find_one(collection_id, share_dto.user_id)
+        ensure_share_does_not_exist(existing_share)
 
         share_entity = dto_to_collection_share(collection_id, share_dto)
         saved = collection_share_repository.add(share_entity)
@@ -49,7 +57,9 @@ class CollectionShareService(CollectionShareServiceInterface):
     def update_share(
         self, collection_id: str, user_id: str, share_update_dto: CollectionShareUpdateDTO
     ) -> CollectionShareDTO:
-        self._get_collection_or_raise(collection_id)
+        collection_entity = collection_repository.find_one(collection_id)
+        ensure_collection_exists(collection_entity)
+
         share_entity = collection_share_repository.find_one(
             collection_id, user_id
         )
@@ -61,31 +71,12 @@ class CollectionShareService(CollectionShareServiceInterface):
         return collection_share_to_dto(saved)
 
     def revoke_share(self, collection_id: str, user_id: str) -> None:
-        self._get_collection_or_raise(collection_id)
+        collection_entity = collection_repository.find_one(collection_id)
+        ensure_collection_exists(collection_entity)
+
         deleted = collection_share_repository.delete(collection_id, user_id)
         if not deleted:
             raise CollectionShareNotFound()
-
-    def _get_collection_or_raise(self, collection_id: str):
-        collection_entity = collection_repository.find_one(collection_id)
-        if not collection_entity:
-            raise CollectionNotFound()
-        return collection_entity
-
-    def _ensure_share_target_exists(self, user_id: str) -> None:
-        if not user_repository.find_one(user_id):
-            raise CollectionShareTargetDoesNotExist()
-
-    def _ensure_not_owner(self, owner_id: str, target_user_id: str) -> None:
-        if owner_id == target_user_id:
-            raise CollectionShareWithOwnerForbidden()
-
-    def _ensure_share_does_not_exist(
-        self, collection_id: str, user_id: str
-    ) -> None:
-        existing = collection_share_repository.find_one(collection_id, user_id)
-        if existing:
-            raise CollectionShareAlreadyExists()
 
 
 collection_share_service = CollectionShareService()

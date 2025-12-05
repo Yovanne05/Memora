@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from sqlalchemy import func, select
 
-from daos.collection_dao import Collection, CollectionTag, CollectionShare
+from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
@@ -18,9 +18,9 @@ class CollectionSearchParams :
     visibility : VisibilityEnum | None = None
     title_contains : Optional[str] = None
     ids : Optional[list[str]] = None
-    tag_ids: Optional[list[str]] = None
+    tags: Optional[list[str]] = None
     shared_with_user_id: Optional[str] = None
-    
+
     only_with_notes: bool = False
 
     sort_by : Literal["title", "created_at", "updated_at"] = "created_at"
@@ -88,19 +88,10 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
     if param.ids :
         filters.append(Collection.id.in_(param.ids))
 
-    request = select(Collection).where(*filters)
+    if param.tags:
+        for tag in param.tags:
+            filters.append(Collection.tags.contains([tag]))
 
-    if param.tag_ids:
-        for tag_id in param.tag_ids:
-            tag_exists = (
-                select(1)
-                .where(
-                    CollectionTag.collection_id == Collection.id,
-                    CollectionTag.tag_id == tag_id,
-                )
-                .exists()
-            )
-            request = request.where(tag_exists)
     request = select(Collection)
 
     if param.shared_with_user_id:

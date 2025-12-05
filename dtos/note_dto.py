@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 from pydantic import BaseModel, ConfigDict, Field
 from utils.enums import VisibilityEnum
 
@@ -11,6 +12,7 @@ class NoteCreateDTO(BaseModel):
         default=None, min_length=1, max_length=36
     )
     visibility: VisibilityEnum = VisibilityEnum.PRIVATE
+    tags: List[str] = Field(default_factory=list)
 
 
 class NoteUpdateDTO(BaseModel):
@@ -20,6 +22,7 @@ class NoteUpdateDTO(BaseModel):
     collection_id: str | None = Field(
         default=None, min_length=1, max_length=36
     )
+    tags: List[str] | None = None
 
 
 class NoteDTO(BaseModel):
@@ -28,7 +31,10 @@ class NoteDTO(BaseModel):
     content: str
     visibility: VisibilityEnum
     owner_id: str
+    owner_username: str
     collection_id: str | None = None
+    collection_name: str | None = None
+    tags: List[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 

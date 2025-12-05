@@ -2,9 +2,6 @@ DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS flashcards;
 DROP TABLE IF EXISTS note_images;
 DROP TABLE IF EXISTS note_links;
-DROP TABLE IF EXISTS note_tags;
-DROP TABLE IF EXISTS collection_tags;
-DROP TABLE IF EXISTS tags;
 DROP TABLE IF EXISTS note_shares;
 DROP TABLE IF EXISTS collection_shares;
 DROP TABLE IF EXISTS notes;
@@ -39,6 +36,7 @@ CREATE TABLE collections (
     name         VARCHAR(200) NOT NULL,
     description  TEXT,
     visibility   visibility_enum NOT NULL DEFAULT 'private',
+    tags         TEXT[] DEFAULT '{}',
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_collections_owner
@@ -57,6 +55,7 @@ CREATE TABLE notes (
     title          VARCHAR(255) NOT NULL,
     content        TEXT NOT NULL,
     visibility     visibility_enum NOT NULL DEFAULT 'private',
+    tags           TEXT[] DEFAULT '{}',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_notes_collection
@@ -131,47 +130,6 @@ CREATE TABLE note_shares (
 
 CREATE INDEX idx_note_shares_user
     ON note_shares (user_id);
-
-CREATE TABLE tags (
-    id         CHAR(36) PRIMARY KEY,
-    name       VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_tags_name UNIQUE (name)
-);
-
-CREATE TABLE collection_tags (
-    collection_id CHAR(36) NOT NULL,
-    tag_id        CHAR(36) NOT NULL,
-    PRIMARY KEY (collection_id, tag_id),
-    CONSTRAINT fk_collection_tags_collection
-        FOREIGN KEY (collection_id) REFERENCES collections(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT fk_collection_tags_tag
-        FOREIGN KEY (tag_id) REFERENCES tags(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-CREATE INDEX idx_collection_tags_tag
-    ON collection_tags (tag_id);
-
-CREATE TABLE note_tags (
-    note_id CHAR(36) NOT NULL,
-    tag_id  CHAR(36) NOT NULL,
-    PRIMARY KEY (note_id, tag_id),
-    CONSTRAINT fk_note_tags_note
-        FOREIGN KEY (note_id) REFERENCES notes(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT fk_note_tags_tag
-        FOREIGN KEY (tag_id) REFERENCES tags(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-CREATE INDEX idx_note_tags_tag
-    ON note_tags (tag_id);
 
 CREATE TABLE note_links (
     note_id_1  CHAR(36) NOT NULL,

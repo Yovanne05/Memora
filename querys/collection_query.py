@@ -11,7 +11,7 @@ class CollectionFindQuery(BaseModel) :
     visibility : VisibilityEnum | None = None
     title_contains : Optional[str] = Field(default = None, alias = "titleContains")
     ids : Optional[list[UUID]] = None
-    tag_ids : Optional[list[UUID]] = Field(default=None, alias="tagIds")
+    tags : Optional[list[str]] = None
     only_with_notes : bool = Field(default = False, alias = "onlyWithNotes")
 
     sort_by : Literal["title", "created_at", "updated_at"] = Field(
@@ -24,8 +24,8 @@ class CollectionFindQuery(BaseModel) :
 
     model_config = ConfigDict(populate_by_name = True)
 
-    @field_validator("ids", "tag_ids", mode = "before")
-    def parse_ids_csv(cls, value) :
+    @field_validator("ids", "tags", mode = "before")
+    def parse_csv(cls, value) :
         if value is None :
             return value
         if isinstance(value, str) :
@@ -40,7 +40,7 @@ class CollectionFindQuery(BaseModel) :
             title_contains = self.title_contains,
             only_with_notes = self.only_with_notes,
             ids = [str(item) for item in self.ids] if self.ids else None,
-            tag_ids=[str(item) for item in self.tag_ids] if self.tag_ids else None,
+            tags=self.tags,
             sort_by = self.sort_by,
             sort_dir = self.sort_dir,
             limit = self.limit,

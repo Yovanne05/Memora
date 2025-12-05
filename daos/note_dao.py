@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    ARRAY,
     DateTime,
     Enum as SAEnum,
     ForeignKey,
@@ -18,7 +19,6 @@ from utils.db import Base
 from utils.utils import generate_uuid
 
 from daos.flashcard_dao import Flashcard
-from daos.tag_dao import Tag
 
 if TYPE_CHECKING:
     from daos.collection_dao import Collection
@@ -62,6 +62,11 @@ class Note(Base):
         nullable=False,
         server_default=text("'private'"),
     )
+    tags: Mapped[list[str]] = mapped_column(
+        ARRAY(String),
+        nullable=False,
+        server_default=text("'{}'"),
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )
@@ -73,11 +78,10 @@ class Note(Base):
     )
 
     collection: Mapped["Collection | None"] = relationship(
-        back_populates="notes"
+        back_populates="notes", lazy="selectin"
     )
-    owner: Mapped["User"] = relationship(back_populates="notes")
+    owner: Mapped["User"] = relationship(back_populates="notes", lazy="selectin")
     shares: Mapped[list["NoteShare"]] = relationship(back_populates="note")
-    tag_links: Mapped[list["NoteTag"]] = relationship(back_populates="note")
     flashcards: Mapped[list["Flashcard"]] = relationship(back_populates="note")
     outgoing_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_1],
@@ -118,25 +122,6 @@ class NoteShare(Base):
 
     note: Mapped["Note"] = relationship(back_populates="shares")
     user: Mapped["User"] = relationship(back_populates="note_shares")
-
-
-class NoteTag(Base):
-    __tablename__ = "note_tags"
-    __table_args__ = (Index("idx_note_tags_tag", "tag_id"),)
-
-    note_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
-    tag_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey("tags.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
-
-    note: Mapped["Note"] = relationship(back_populates="tag_links")
-    tag: Mapped["Tag"] = relationship(back_populates="note_links")
 
 
 class NoteLink(Base):

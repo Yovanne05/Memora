@@ -35,11 +35,11 @@ parameters:
     description: >
       Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
   - in: query
-    name: tagIds
+    name: tags
     type: string
     required: false
     description: >
-      Liste CSV d'identifiants de tags (ex. `uuid1,uuid2`) pour filtrer sur les tags associes.
+      Liste CSV de tags (ex. `mathematiques,universite`) pour filtrer les collections par tags.
   - in: query
     name: onlyWithNotes
     type: boolean
