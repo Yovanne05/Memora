@@ -1,18 +1,18 @@
 import { memo, useCallback } from "react"
 import type { Collection } from "../../models/collection.model"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
 import { FileText, MoreHorizontal, Files } from "lucide-react"
 import { useRouter } from "@tanstack/react-router"
-import { formatCollectionDate, getVisibilityLabel, getVisibilityBadgeClasses } from "../../lib/collection-format.utils"
+import { VISIBILITY_LABELS, VISIBILITY_BADGE_CLASSES, formatShortDate } from "@/lib/format.utils"
 
 interface CollectionCardProps {
   collection: Collection
@@ -140,9 +140,9 @@ export const CollectionCard = memo(function CollectionCard({
         <div className="flex items-center justify-between gap-2">
           <Badge
             variant="outline"
-            className={getVisibilityBadgeClasses(collection.visibility)}
+            className={VISIBILITY_BADGE_CLASSES[collection.visibility]}
           >
-            {getVisibilityLabel(collection.visibility)}
+            {VISIBILITY_LABELS[collection.visibility]}
           </Badge>
 
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -153,7 +153,7 @@ export const CollectionCard = memo(function CollectionCard({
 
         {!compact && (
           <div className="text-xs text-muted-foreground">
-            Créée le {formatCollectionDate(collection.createdAt)}
+            Créée le {formatShortDate(collection.createdAt)}
           </div>
         )}
       </CardContent>

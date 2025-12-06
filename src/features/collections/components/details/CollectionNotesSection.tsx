@@ -79,7 +79,6 @@ export function CollectionNotesSection() {
       );
     }
 
-    // Sort
     const sorted = [...filtered].sort((a, b) => {
       if (sort === "alphabetical") {
         return a.title.localeCompare(b.title);
@@ -87,7 +86,6 @@ export function CollectionNotesSection() {
       if (sort === "oldest") {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       }
-      // recent
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
@@ -95,7 +93,7 @@ export function CollectionNotesSection() {
   }, [data, search, sort]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 rounded-2xl border border-border/50 bg-card/30 p-6 shadow-sm backdrop-blur-sm md:p-8">
       <CollectionNotesHeader
         availableNotes={availableNotes}
         selected={selected}

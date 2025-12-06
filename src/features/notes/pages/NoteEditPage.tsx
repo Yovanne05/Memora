@@ -22,17 +22,10 @@ import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutat
 import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
 import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutation"
 import type { Note } from "@/features/notes/models/note.model"
+import { formatTime, VISIBILITY_LABELS } from "@/lib/format.utils"
 
 interface NoteEditPageProps {
     noteId: string
-}
-
-function formatTime(dateString?: string) {
-    if (!dateString) return "--:--"
-    return new Intl.DateTimeFormat("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit",
-    }).format(new Date(dateString))
 }
 
 export function NoteEditPage({ noteId }: NoteEditPageProps) {
@@ -51,7 +44,10 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
     const currentContent = content ?? note?.content ?? ""
     const currentVisibility = visibility ?? note?.visibility ?? "private"
 
-    const savedTime = useMemo(() => formatTime(lastSavedAt ?? note?.updatedAt), [note, lastSavedAt])
+    const savedTime = useMemo(() => {
+        const dateToFormat = lastSavedAt ?? note?.updatedAt
+        return dateToFormat ? formatTime(dateToFormat) : "--:--"
+    }, [note, lastSavedAt])
 
     const handleSave = async () => {
         if (!noteId) return
@@ -160,7 +156,7 @@ export function NoteEditPage({ noteId }: NoteEditPageProps) {
                                 <div className="space-y-0.5">
                                     <p className="text-sm font-medium">Visibilité</p>
                                     <p className="text-xs text-muted-foreground">
-                                        {currentVisibility === "public" ? "Publique" : "Privée"}
+                                        {VISIBILITY_LABELS[currentVisibility]}
                                     </p>
                                 </div>
 
