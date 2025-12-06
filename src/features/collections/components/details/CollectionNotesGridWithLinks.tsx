@@ -80,7 +80,7 @@ function NoteLinkButton({ note, availableNotes }: { note: Note; availableNotes: 
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+                    className={`h-5 w-5 rounded border-2 flex items-center justify-center transition-colors shrink-0 ${
                       isLinked
                         ? "bg-primary border-primary"
                         : "border-muted-foreground/30"
