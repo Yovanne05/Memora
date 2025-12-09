@@ -48,7 +48,6 @@ describe("useCollectionsQuery hooks", () => {
     vi.clearAllMocks()
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
-      logger: { log: () => {}, warn: () => {}, error: () => {} },
     })
   })
 

@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from "@testing-library/react"
+import { act, renderHook } from "@testing-library/react"
 import { vi } from "vitest"
 import { useCollectionCreate } from "@/features/collections/hooks/useCollectionCreate"
 import { useCollectionEdit } from "@/features/collections/hooks/useCollectionEdit"

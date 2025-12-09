@@ -94,7 +94,7 @@ describe("Notes des collections", () => {
   })
 
   test("CollectionNotesSection ajoute et retire des notes", async () => {
-    mockUseNotesQuery.mockImplementation((page: number, limit: number, filters: any) => {
+    mockUseNotesQuery.mockImplementation((_page: number, _limit: number, filters: any) => {
       if (filters.collectionId) {
         return { data: { items: [note], total: 1 }, isLoading: false }
       }
