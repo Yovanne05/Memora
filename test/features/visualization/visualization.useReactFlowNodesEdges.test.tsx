@@ -66,10 +66,10 @@ describe("useReactFlowEdges", () => {
 
   test("retourne vide sans data ou nodes", () => {
     const noData = renderHook(() => useReactFlowEdges(undefined, nodes))
-    expect(noData.result.current ?? noData.current).toEqual([])
+    expect(noData.result.current).toEqual([])
 
     const noNodes = renderHook(() => useReactFlowEdges(data, []))
-    expect(noNodes.result.current ?? noNodes.current).toEqual([])
+    expect(noNodes.result.current).toEqual([])
   })
 
   test("transforme les arêtes valides", () => {

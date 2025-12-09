@@ -18,10 +18,10 @@ const data: CollectionVisualization = {
 describe("useRelatedNotes", () => {
   test("retourne une liste vide sans note active ou data", () => {
     const noData = renderHook(() => useRelatedNotes("n1", undefined))
-    expect(noData.result?.current ?? noData.current).toEqual([])
+    expect(noData.result.current).toEqual([])
 
     const noActive = renderHook(() => useRelatedNotes(null, data))
-    expect(noActive.result?.current ?? noActive.current).toEqual([])
+    expect(noActive.result.current).toEqual([])
   })
 
   test("retourne les notes liées à la note active", () => {

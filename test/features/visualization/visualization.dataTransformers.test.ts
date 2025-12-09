@@ -3,7 +3,7 @@ import type { CollectionVisualization, VisualizationEdge, ReactFlowNode } from "
 import { REACT_FLOW_STYLES } from "@/features/visualization/lib/visualization.constants"
 
 vi.mock("@/features/visualization/lib/layoutEngine", () => ({
-  groupEdgesByConnection: (edges: VisualizationEdge[], positions: Record<string, { x: number; y: number }>) => {
+  groupEdgesByConnection: (edges: VisualizationEdge[], _positions: Record<string, { x: number; y: number }>) => {
     // simple grouping: one group per unique pair
     return edges.map((edge, index) => ({
       sourceId: edge.sourceId,
