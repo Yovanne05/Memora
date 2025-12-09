@@ -36,7 +36,7 @@ CREATE TABLE collections (
     name         VARCHAR(200) NOT NULL,
     description  TEXT,
     visibility   visibility_enum NOT NULL DEFAULT 'private',
-    tags         TEXT[] DEFAULT '{}',
+    tags         TEXT[] NOT NULL DEFAULT '{}',
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_collections_owner

@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    ARRAY,
     DateTime,
     Enum as SAEnum,
     ForeignKey,
@@ -16,6 +15,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.enums import SharePermissionEnum, VisibilityEnum
 from utils.db import Base
+from utils.db_types import StringArray
 from utils.utils import generate_uuid
 
 if TYPE_CHECKING:
@@ -54,9 +54,9 @@ class Collection(Base):
         server_default=text("'private'"),
     )
     tags: Mapped[list[str]] = mapped_column(
-        ARRAY(String),
+        StringArray,
         nullable=False,
-        server_default=text("'{}'"),
+        server_default=text("'[]'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
