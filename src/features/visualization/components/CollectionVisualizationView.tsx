@@ -32,16 +32,16 @@ export function CollectionVisualizationView({
   collectionId,
   onBack,
 }: CollectionVisualizationViewProps) {
-  const { data, isLoading, isError } =
+  const { data: collection, isLoading, isError } =
     useCollectionVisualizationQuery(collectionId)
 
-  const { nodes, edges, orphanNodeIds } = useVisualizationLayout(data)
+  const { nodes, edges, orphanNodeIds } = useVisualizationLayout(collection)
   const { selectedNodeId, styledNodes, styledEdges, selectNode, clearSelection } =
     useNodeSelection(nodes, edges)
 
   const sidebar = useNoteSidebar()
   const { data: selectedNote } = useNoteQuery(sidebar.activeNoteId ?? "")
-  const relatedNotes = useRelatedNotes(sidebar.activeNoteId, data)
+  const relatedNotes = useRelatedNotes(sidebar.activeNoteId, collection)
 
   const memoizedNodeTypes = useMemo(() => NODE_TYPES, [])
 
@@ -109,17 +109,17 @@ export function CollectionVisualizationView({
     return <LoadingState message="Chargement de la visualisation..." />
   }
 
-  if (isError || !data) {
+  if (isError || !collection) {
     return <ErrorState message="Erreur lors du chargement de la visualisation." />
   }
 
-  const connectedNotesCount = data.nodes.length - orphanNodeIds.size
+  const connectedNotesCount = collection.nodes.length - orphanNodeIds.size
 
   return (
     <div className="flex h-full w-full flex-col">
       <VisualizationHeader
         notesCount={connectedNotesCount}
-        connectionsCount={data.edges.length}
+        connectionsCount={collection.edges.length}
         onBack={onBack}
       />
 
@@ -146,9 +146,9 @@ export function CollectionVisualizationView({
 
       <VisualizationLegend />
 
-      {data && (
+      {collection && (
         <OrphanNotesZone
-          data={data}
+          collection={collection}
           orphanNodeIds={orphanNodeIds}
           onSelect={handleOrphanNoteClick}
         />

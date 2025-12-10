@@ -1,19 +1,19 @@
 import { Card } from "@/components/ui/card"
-import type { CollectionVisualization } from "../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 import { FileQuestion } from "lucide-react"
 
 interface OrphanNotesZoneProps {
-  data: CollectionVisualization
+  collection: Collection
   orphanNodeIds: Set<string>
   onSelect?: (noteId: string) => void
 }
 
 export function OrphanNotesZone({
-  data,
+  collection,
   orphanNodeIds,
   onSelect,
 }: OrphanNotesZoneProps) {
-  const orphanNotes = data.nodes.filter((node) => orphanNodeIds.has(node.id))
+  const orphanNotes = collection.nodes.filter((node) => orphanNodeIds.has(node.id))
 
   if (orphanNotes.length === 0) {
     return null
@@ -32,7 +32,7 @@ export function OrphanNotesZone({
           <Card
             key={note.id}
             className="cursor-pointer px-3 py-2 transition-all hover:border-primary hover:shadow-sm"
-            title={note.title}
+            title={note.data.title}
             onClick={() => onSelect?.(note.id)}
             role="button"
             tabIndex={0}
@@ -42,11 +42,11 @@ export function OrphanNotesZone({
                 onSelect?.(note.id)
               }
             }}
-            aria-label={`Ouvrir la note orpheline ${note.title}`}
+            aria-label={`Ouvrir la note orpheline ${note.data.title}`}
           >
             <div className="flex max-w-[200px] items-center gap-2">
               <div className="h-2 w-2 shrink-0 rounded-full bg-muted-foreground/50" />
-              <span className="truncate text-sm">{note.title}</span>
+              <span className="truncate text-sm">{note.data.title}</span>
             </div>
           </Card>
         ))}

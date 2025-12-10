@@ -1,9 +1,5 @@
-import type {
-  CollectionVisualization,
-  NodeConnectionsMap,
-  ReactFlowNode,
-  ReactFlowEdge,
-} from "../types/visualization.type"
+import type { NodeConnectionsMap, ReactFlowNode, ReactFlowEdge } from "../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 import { useNodeConnections } from "./useNodeConnections"
 import { useNodePositions } from "./useNodePositions"
 import { useReactFlowNodes } from "./useReactFlowNodes"
@@ -24,19 +20,19 @@ interface UseVisualizationLayoutResult {
  * - Déterminer les positions optimales
  * - Transformer les données en format ReactFlow
  *
- * @param data - Données de visualisation contenant les nœuds et les arêtes
+ * @param collection - Collection contenant les nœuds et les arêtes
  * @returns Nœuds et arêtes formatés pour React Flow avec leurs positions
  */
 export function useVisualizationLayout(
-  data?: CollectionVisualization
+  collection?: Collection
 ): UseVisualizationLayoutResult {
-  const nodeConnections = useNodeConnections(data)
+  const nodeConnections = useNodeConnections(collection)
 
-  const { positions, orphanNodeIds } = useNodePositions(data)
+  const { positions, orphanNodeIds } = useNodePositions(collection)
 
-  const nodes = useReactFlowNodes(data, positions, nodeConnections, orphanNodeIds)
+  const nodes = useReactFlowNodes(collection, positions, nodeConnections, orphanNodeIds)
 
-  const edges = useReactFlowEdges(data, nodes)
+  const edges = useReactFlowEdges(collection, nodes)
 
   return {
     nodes,

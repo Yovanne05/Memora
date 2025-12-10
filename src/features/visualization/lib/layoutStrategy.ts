@@ -1,18 +1,21 @@
-import type { CollectionVisualization } from "../types/visualization.type"
-
 const LAYOUT_THRESHOLDS = {
   VERY_SMALL_GRAPH: 2,
   SMALL_GRAPH: 6,
   MIN_EDGES_FOR_FORCE: 2,
 } as const
 
+interface GraphData {
+  nodes: { length: number }
+  edges: { length: number }
+}
+
 /**
  * Détermine si le force layout doit être appliqué pour un graphe donné
  *
- * @param data - Données de visualisation
+ * @param data - Données du graphe (nodes et edges)
  * @returns true si le force layout doit être utilisé
  */
-export function shouldApplyForceLayout(data: CollectionVisualization): boolean {
+export function shouldApplyForceLayout(data: GraphData): boolean {
   const totalNodes = data.nodes.length
   const totalEdges = data.edges.length
 
