@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 from typing_extensions import Literal
 
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import func, select, Select
+from sqlalchemy.orm import selectinload, Session
 
 from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note
@@ -13,12 +13,18 @@ from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
 
-def _apply_eager_loading(stmt):
+def _apply_eager_loading(stmt: Select) -> Select:
     return stmt.options(
         selectinload(Collection.notes).selectinload(Note.owner),
         selectinload(Collection.notes).selectinload(Note.outgoing_links),
         selectinload(Collection.notes).selectinload(Note.incoming_links)
     )
+
+
+def _reload_with_relationships(session: Session, collection_id: str) -> Collection:
+    stmt = select(Collection).where(Collection.id == collection_id)
+    stmt = _apply_eager_loading(stmt)
+    return session.execute(stmt).scalar_one()
 
 @dataclass
 class CollectionSearchParams :
@@ -54,73 +60,60 @@ def find_for_owner(collection_id: str, owner_id: str) -> Optional[Collection]:
         return session.execute(stmt).scalar_one_or_none()
 
 
-def add(collection_entity : Collection) -> Collection :
-    with get_db_session() as session :
+def add(collection_entity: Collection) -> Collection:
+    with get_db_session() as session:
         session.add(collection_entity)
         session.flush()
-
-        # Reload with eager loading to avoid lazy load issues
-        stmt = select(Collection).where(Collection.id == collection_entity.id)
-        stmt = _apply_eager_loading(stmt)
-        reloaded = session.execute(stmt).scalar_one()
-
-        return reloaded
+        return _reload_with_relationships(session, collection_entity.id)
 
 
-def update(collection_entity : Collection) -> Collection :
-    with get_db_session() as session :
-        merged : Collection = session.merge(collection_entity)
+def update(collection_entity: Collection) -> Collection:
+    with get_db_session() as session:
+        merged = session.merge(collection_entity)
         session.flush()
-
-        # Reload with eager loading to avoid lazy load issues
-        stmt = select(Collection).where(Collection.id == merged.id)
-        stmt = _apply_eager_loading(stmt)
-        reloaded = session.execute(stmt).scalar_one()
-
-        return reloaded
+        return _reload_with_relationships(session, merged.id)
 
 
-def delete(collection_id : str) -> bool :
-    with get_db_session() as session :
+def delete(collection_id: str) -> bool:
+    with get_db_session() as session:
         entity = session.get(Collection, collection_id)
-        if not entity :
+        if not entity:
             return False
-        
+
         session.delete(entity)
         session.flush()
-
         return True
 
 
-def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Collection], int] :
+def find_many(params: Optional[CollectionSearchParams] = None) -> Tuple[List[Collection], int]:
     param = params or CollectionSearchParams()
+
     filters = []
-    if param.owner_id :
+    if param.owner_id:
         filters.append(Collection.owner_id == param.owner_id)
 
-    if param.visibility :
+    if param.visibility:
         filters.append(Collection.visibility == param.visibility)
 
     if param.title_contains:
         filters.append(Collection.name.ilike(f"%{param.title_contains}%"))
 
-
-    if param.ids :
+    if param.ids:
         filters.append(Collection.id.in_(param.ids))
 
     if param.tags:
         for tag in param.tags:
             filters.append(Collection.tags.contains([tag]))
 
-    request = select(Collection)
+    stmt = select(Collection)
 
     if param.shared_with_user_id:
-        request = request.join(
+        stmt = stmt.join(
             CollectionShare,
             CollectionShare.collection_id == Collection.id,
         )
         filters.append(CollectionShare.user_id == param.shared_with_user_id)
-    
+
     if param.only_with_notes:
         note_exists = (
             select(1)
@@ -129,7 +122,8 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
         )
         filters.append(note_exists)
 
-    request = request.where(*filters)
+    stmt = stmt.where(*filters)
+
     sort_map = {
         "title": Collection.name,
         "created_at": Collection.created_at,
@@ -138,10 +132,12 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
     order_column = sort_map[param.sort_by]
     order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
 
-    request = _apply_eager_loading(request)
+    stmt = _apply_eager_loading(stmt)
 
-    with get_db_session() as session :
-        total = session.scalar(select(func.count()).select_from(request.subquery()))
-        items = session.scalars(request.order_by(order_expr).limit(param.limit).offset(param.offset)).all()
+    with get_db_session() as session:
+        total = session.scalar(select(func.count()).select_from(stmt.subquery()))
+        items = session.scalars(
+            stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
+        ).all()
 
     return items, total or 0
