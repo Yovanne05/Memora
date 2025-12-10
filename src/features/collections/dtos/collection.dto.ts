@@ -35,7 +35,10 @@ export const collectionDtoSchema = z.object({
 
 export const collectionsListDtoSchema = z.union([
   z.array(collectionDtoSchema),
-  z.object({ items: z.array(collectionDtoSchema) })
+  z.object({
+    items: z.array(collectionDtoSchema),
+    total: z.number()
+  })
 ])
 
 export const collectionCreateDtoSchema = z.object({
