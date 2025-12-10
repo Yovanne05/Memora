@@ -1,18 +1,13 @@
+from typing import List, Set
 from daos.collection_dao import Collection
+from daos.note_dao import Note
 
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from mappers.note_mapper import note_to_dto
 
 
-def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
-    # Créer les DTOs des notes
-    note_dtos = [note_to_dto(note) for note in collection_entity.notes]
-
-    # Créer un set des IDs de notes dans cette collection
-    note_ids_in_collection = {note.id for note in collection_entity.notes}
-
-    # Construire les nodes (une node par note)
-    nodes = [
+def _build_graph_nodes(notes: List[Note]) -> List[dict]:
+    return [
         {
             "id": note.id,
             "data": {
@@ -22,18 +17,17 @@ def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
                 "tags": note.tags,
             }
         }
-        for note in collection_entity.notes
+        for note in notes
     ]
 
-    # Construire les edges (liens entre notes de cette collection)
+
+def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
     edges = []
-    seen_edges = set()  # Pour éviter les doublons
+    seen_edges = set()
 
-    for note in collection_entity.notes:
-        # Liens sortants
+    for note in notes:
         for link in note.outgoing_links:
-            # Ne garder que les liens entre notes de cette collection
-            if link.note_id_2 in note_ids_in_collection:
+            if link.note_id_2 in note_ids:
                 edge_key = (link.note_id_1, link.note_id_2)
                 if edge_key not in seen_edges:
                     edges.append({
@@ -43,10 +37,8 @@ def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
                     })
                     seen_edges.add(edge_key)
 
-        # Liens entrants
         for link in note.incoming_links:
-            # Ne garder que les liens entre notes de cette collection
-            if link.note_id_1 in note_ids_in_collection:
+            if link.note_id_1 in note_ids:
                 edge_key = (link.note_id_1, link.note_id_2)
                 if edge_key not in seen_edges:
                     edges.append({
@@ -55,6 +47,16 @@ def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
                         "target": link.note_id_2,
                     })
                     seen_edges.add(edge_key)
+
+    return edges
+
+
+def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
+    note_dtos = [note_to_dto(note) for note in collection_entity.notes]
+    note_ids = {note.id for note in collection_entity.notes}
+
+    nodes = _build_graph_nodes(collection_entity.notes)
+    edges = _build_graph_edges(collection_entity.notes, note_ids)
 
     return CollectionDTO.model_validate(
         {

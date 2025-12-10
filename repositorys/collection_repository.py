@@ -12,6 +12,15 @@ from daos.note_dao import Note
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
+
+def _apply_eager_loading(stmt):
+    return stmt.options(
+        selectinload(Collection.notes).selectinload(Note.owner),
+        selectinload(Collection.notes).selectinload(Note.collection),
+        selectinload(Collection.notes).selectinload(Note.outgoing_links),
+        selectinload(Collection.notes).selectinload(Note.incoming_links)
+    )
+
 @dataclass
 class CollectionSearchParams :
 
@@ -32,25 +41,17 @@ class CollectionSearchParams :
     
 def find_one(collection_id: str) -> Optional[Collection]:
     with get_db_session() as session:
-        stmt = select(Collection).where(Collection.id == collection_id).options(
-            selectinload(Collection.notes).selectinload(Note.owner),
-            selectinload(Collection.notes).selectinload(Note.collection),
-            selectinload(Collection.notes).selectinload(Note.outgoing_links),
-            selectinload(Collection.notes).selectinload(Note.incoming_links)
-        )
+        stmt = select(Collection).where(Collection.id == collection_id)
+        stmt = _apply_eager_loading(stmt)
         return session.execute(stmt).scalar_one_or_none()
 
 
 def find_for_owner(collection_id: str, owner_id: str) -> Optional[Collection]:
-    stmt = select(Collection).where(
-        Collection.id == collection_id, Collection.owner_id == owner_id
-    ).options(
-        selectinload(Collection.notes).selectinload(Note.owner),
-        selectinload(Collection.notes).selectinload(Note.collection),
-        selectinload(Collection.notes).selectinload(Note.outgoing_links),
-        selectinload(Collection.notes).selectinload(Note.incoming_links)
-    )
     with get_db_session() as session:
+        stmt = select(Collection).where(
+            Collection.id == collection_id, Collection.owner_id == owner_id
+        )
+        stmt = _apply_eager_loading(stmt)
         return session.execute(stmt).scalar_one_or_none()
 
 
@@ -130,16 +131,10 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
     order_column = sort_map[param.sort_by]
     order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
 
-    request = request.options(
-        selectinload(Collection.notes).selectinload(Note.owner),
-        selectinload(Collection.notes).selectinload(Note.collection),
-        selectinload(Collection.notes).selectinload(Note.outgoing_links),
-        selectinload(Collection.notes).selectinload(Note.incoming_links)
-    )
+    request = _apply_eager_loading(request)
 
     with get_db_session() as session :
         total = session.scalar(select(func.count()).select_from(request.subquery()))
         items = session.scalars(request.order_by(order_expr).limit(param.limit).offset(param.offset)).all()
-
 
     return items, total or 0
