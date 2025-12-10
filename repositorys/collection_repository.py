@@ -34,7 +34,9 @@ def find_one(collection_id: str) -> Optional[Collection]:
     with get_db_session() as session:
         stmt = select(Collection).where(Collection.id == collection_id).options(
             selectinload(Collection.notes).selectinload(Note.owner),
-            selectinload(Collection.notes).selectinload(Note.collection)
+            selectinload(Collection.notes).selectinload(Note.collection),
+            selectinload(Collection.notes).selectinload(Note.outgoing_links),
+            selectinload(Collection.notes).selectinload(Note.incoming_links)
         )
         return session.execute(stmt).scalar_one_or_none()
 
@@ -44,7 +46,9 @@ def find_for_owner(collection_id: str, owner_id: str) -> Optional[Collection]:
         Collection.id == collection_id, Collection.owner_id == owner_id
     ).options(
         selectinload(Collection.notes).selectinload(Note.owner),
-        selectinload(Collection.notes).selectinload(Note.collection)
+        selectinload(Collection.notes).selectinload(Note.collection),
+        selectinload(Collection.notes).selectinload(Note.outgoing_links),
+        selectinload(Collection.notes).selectinload(Note.incoming_links)
     )
     with get_db_session() as session:
         return session.execute(stmt).scalar_one_or_none()
@@ -128,7 +132,9 @@ def find_many(params : Optional[CollectionSearchParams] = None) -> Tuple[List[Co
 
     request = request.options(
         selectinload(Collection.notes).selectinload(Note.owner),
-        selectinload(Collection.notes).selectinload(Note.collection)
+        selectinload(Collection.notes).selectinload(Note.collection),
+        selectinload(Collection.notes).selectinload(Note.outgoing_links),
+        selectinload(Collection.notes).selectinload(Note.incoming_links)
     )
 
     with get_db_session() as session :
