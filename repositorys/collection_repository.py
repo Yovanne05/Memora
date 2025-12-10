@@ -16,7 +16,6 @@ from utils.enums import VisibilityEnum
 def _apply_eager_loading(stmt):
     return stmt.options(
         selectinload(Collection.notes).selectinload(Note.owner),
-        selectinload(Collection.notes).selectinload(Note.collection),
         selectinload(Collection.notes).selectinload(Note.outgoing_links),
         selectinload(Collection.notes).selectinload(Note.incoming_links)
     )
@@ -59,18 +58,26 @@ def add(collection_entity : Collection) -> Collection :
     with get_db_session() as session :
         session.add(collection_entity)
         session.flush()
-        session.refresh(collection_entity)
 
-        return collection_entity
+        # Reload with eager loading to avoid lazy load issues
+        stmt = select(Collection).where(Collection.id == collection_entity.id)
+        stmt = _apply_eager_loading(stmt)
+        reloaded = session.execute(stmt).scalar_one()
+
+        return reloaded
 
 
 def update(collection_entity : Collection) -> Collection :
     with get_db_session() as session :
         merged : Collection = session.merge(collection_entity)
         session.flush()
-        session.refresh(merged)
 
-        return merged
+        # Reload with eager loading to avoid lazy load issues
+        stmt = select(Collection).where(Collection.id == merged.id)
+        stmt = _apply_eager_loading(stmt)
+        reloaded = session.execute(stmt).scalar_one()
+
+        return reloaded
 
 
 def delete(collection_id : str) -> bool :

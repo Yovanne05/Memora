@@ -3,7 +3,26 @@ from daos.collection_dao import Collection
 from daos.note_dao import Note
 
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
-from mappers.note_mapper import note_to_dto
+from dtos.note_dto import NoteDTO
+
+
+def _note_to_dto_with_collection_name(note_entity: Note, collection_name: str) -> NoteDTO:
+    """Convert note to DTO with explicit collection name (avoids lazy loading)."""
+    return NoteDTO.model_validate(
+        {
+            "id": note_entity.id,
+            "title": note_entity.title,
+            "content": note_entity.content,
+            "visibility": note_entity.visibility,
+            "owner_id": note_entity.owner_id,
+            "owner_username": note_entity.owner.username,
+            "collection_id": note_entity.collection_id,
+            "collection_name": collection_name if note_entity.collection_id else None,
+            "tags": note_entity.tags,
+            "created_at": note_entity.created_at,
+            "updated_at": note_entity.updated_at,
+        }
+    )
 
 
 def _build_graph_nodes(notes: List[Note]) -> List[dict]:
@@ -52,7 +71,10 @@ def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
 
 
 def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
-    note_dtos = [note_to_dto(note) for note in collection_entity.notes]
+    note_dtos = [
+        _note_to_dto_with_collection_name(note, collection_entity.name)
+        for note in collection_entity.notes
+    ]
     note_ids = {note.id for note in collection_entity.notes}
 
     nodes = _build_graph_nodes(collection_entity.notes)
