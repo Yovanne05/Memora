@@ -1,7 +1,5 @@
 import type { Collection } from "@/features/collections/models/collection.model"
 import { collectionsService } from "@/features/collections/services/collections.service"
-import { httpClient } from "@/lib/http-client"
-import type { CollectionVisualization } from "../types/visualization.type"
 
 export function createVisualizationService() {
   return {
@@ -14,8 +12,8 @@ export function createVisualizationService() {
       })
     },
 
-    async getCollectionVisualization(collectionId: string): Promise<CollectionVisualization> {
-      return httpClient.get<CollectionVisualization>(`/collections/${collectionId}/visualization`)
+    async getCollectionForVisualization(collectionId: string): Promise<Collection> {
+      return collectionsService.get(collectionId)
     },
   }
 }

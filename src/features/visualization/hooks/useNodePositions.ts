@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import type { CollectionVisualization } from "../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 import type { NodePosition } from "../lib/layout/types"
 import {
   calculateLayeredLayout,
@@ -10,32 +10,38 @@ import {
   shouldApplyForceLayout,
   calculateCanvasDimensions,
 } from "../lib/layoutStrategy"
+import { toLayoutNodes, toLayoutEdges } from "../lib/dataTransformers"
 
 export function useNodePositions(
-  data?: CollectionVisualization
+  collection?: Collection
 ): { positions: Record<string, NodePosition>; orphanNodeIds: Set<string> } {
   return useMemo(() => {
-    if (!data)
+    if (!collection)
       return { positions: {}, orphanNodeIds: new Set<string>() }
 
+    const layoutNodes = toLayoutNodes(collection.nodes)
+    const layoutEdges = toLayoutEdges(collection.edges)
+
     const { positions: layeredPositions, orphanNodes } = calculateLayeredLayout(
-      data.nodes,
-      data.edges
+      layoutNodes,
+      layoutEdges
     )
 
+    const connectedLayoutNodes = layoutNodes.filter((node) => !orphanNodes.has(node.id))
+
     const refinedPositions = refineLayeredPositions(
-      data.nodes.filter((node) => !orphanNodes.has(node.id)),
-      data.edges,
+      connectedLayoutNodes,
+      layoutEdges,
       layeredPositions
     )
 
-    if (shouldApplyForceLayout(data)) {
+    if (shouldApplyForceLayout({ nodes: layoutNodes, edges: layoutEdges })) {
       const dimensions = calculateCanvasDimensions(
-        data.nodes.length - orphanNodes.size
+        layoutNodes.length - orphanNodes.size
       )
       const forcePositions = calculateForceDirectedLayout(
-        data.nodes.filter((node) => !orphanNodes.has(node.id)),
-        data.edges,
+        connectedLayoutNodes,
+        layoutEdges,
         {
           width: dimensions.width,
           height: dimensions.height,
@@ -46,5 +52,5 @@ export function useNodePositions(
     }
 
     return { positions: refinedPositions, orphanNodeIds: orphanNodes }
-  }, [data])
+  }, [collection])
 }

@@ -17,7 +17,10 @@ export function dtoToCollection(dto: CollectionDto): Collection {
     name: dto.name,
     description: dto.description ?? null,
     visibility: dto.visibility ?? "private",
+    tags: dto.tags ?? [],
     notes: dto.notes.map(dtoToNote),
+    nodes: dto.nodes ?? [],
+    edges: dto.edges ?? [],
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
   }
@@ -29,6 +32,7 @@ export function toCollectionCreateDto(payload: CollectionCreate): CollectionCrea
     name: payload.name,
     description: payload.description ?? null,
     visibility: payload.visibility ?? "private",
+    tags: payload.tags,
   }
 }
 
@@ -37,5 +41,6 @@ export function toCollectionUpdateDto(payload: CollectionUpdate): CollectionUpda
     name: payload.name,
     description: payload.description,
     visibility: payload.visibility,
+    tags: payload.tags,
   }
 }
