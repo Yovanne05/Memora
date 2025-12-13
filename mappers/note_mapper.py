@@ -4,10 +4,7 @@ from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
 
 
-def _get_collection_name(note_entity: Note, override: Optional[str] = None) -> Optional[str]:
-    if override is not None:
-        return override if note_entity.collection_id else None
-
+def _get_collection_name(note_entity: Note) -> Optional[str]:
     if not note_entity.collection_id:
         return None
 
@@ -18,7 +15,7 @@ def _get_collection_name(note_entity: Note, override: Optional[str] = None) -> O
     return None
 
 
-def note_to_dto_dict(note_entity: Note, collection_name_override: Optional[str] = None) -> dict:
+def note_to_dto_dict(note_entity: Note) -> dict:
     return {
         "id": note_entity.id,
         "title": note_entity.title,
@@ -27,15 +24,15 @@ def note_to_dto_dict(note_entity: Note, collection_name_override: Optional[str] 
         "owner_id": note_entity.owner_id,
         "owner_username": note_entity.owner.username,
         "collection_id": note_entity.collection_id,
-        "collection_name": _get_collection_name(note_entity, collection_name_override),
+        "collection_name": _get_collection_name(note_entity),
         "tags": note_entity.tags,
         "created_at": note_entity.created_at,
         "updated_at": note_entity.updated_at,
     }
 
 
-def note_to_dto(note_entity: Note, collection_name_override: Optional[str] = None) -> NoteDTO:
-    return NoteDTO.model_validate(note_to_dto_dict(note_entity, collection_name_override))
+def note_to_dto(note_entity: Note) -> NoteDTO:
+    return NoteDTO.model_validate(note_to_dto_dict(note_entity))
 
 
 def dto_to_note(note_create_dto: NoteCreateDTO) -> Note:
