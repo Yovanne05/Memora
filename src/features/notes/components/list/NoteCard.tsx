@@ -95,7 +95,7 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
         <CardContent className="space-y-3 pt-0 text-sm text-muted-foreground">
           <Badge variant="secondary" className="inline-flex items-center gap-1">
             <FolderClosed className="h-3.5 w-3.5" />
-            <span className="truncate max-w-[160px]">{note.collectionName ?? "Sans collection"}</span>
+            <span className="truncate max-w-40">{note.collectionName ?? "Sans collection"}</span>
           </Badge>
 
           <div className="space-y-2">
