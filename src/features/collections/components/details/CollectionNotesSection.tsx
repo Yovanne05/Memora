@@ -5,7 +5,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { CollectionNotesHeader, type NotesSort } from "./CollectionNotesHeader";
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation";
 import type { Note } from "@/features/notes/models/note.model";
-import { CollectionNotesGrid } from "./CollectionNotesGrid";
+import { CollectionNotesGridWithLinks } from "./CollectionNotesGridWithLinks";
 import type { AvailableNoteOption } from "../../types/note.types";
 
 export function CollectionNotesSection() {
@@ -105,7 +105,7 @@ export function CollectionNotesSection() {
         onSortChange={setSort}
       />
 
-      <CollectionNotesGrid
+      <CollectionNotesGridWithLinks
         notes={filteredNotes}
         isLoading={isLoading}
         isUpdating={isPending}

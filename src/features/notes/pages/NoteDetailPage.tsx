@@ -24,6 +24,7 @@ import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation"
 import { useNoteQuery } from "../hooks/useNoteQuery"
 import { UserDisplay } from "@/features/users/components/UserDisplay"
 import { formatShortDate, formatLongDateTime, VISIBILITY_LABELS } from "@/lib/format.utils"
+import { NoteLinkManager } from "../components/NoteLinkManager"
 
 export function NoteDetailPage({ noteId }: { noteId: string }) {
     const { data: note, isLoading, isError, error } = useNoteQuery(noteId)
@@ -260,6 +261,8 @@ export function NoteDetailPage({ noteId }: { noteId: string }) {
                             )}
                         </CardContent>
                     </Card>
+
+                    {note && <NoteLinkManager note={note} />}
                 </div>
             </div>
         </div>
