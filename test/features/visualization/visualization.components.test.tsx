@@ -1,5 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { vi } from "vitest"
+import type { HTMLAttributes } from "react"
+
 import { VisualizationHeader } from "@/features/visualization/components/VisualizationHeader"
 import { VisualizationLegend } from "@/features/visualization/components/VisualizationLegend"
 import { LoadingState } from "@/features/visualization/components/VisualizationSkeleton"
@@ -13,24 +16,45 @@ import type { Collection } from "@/features/collections/models/collection.model"
 import { Position, type NodeProps } from "reactflow"
 
 vi.mock("@/features/collections/components/list/CollectionCard", () => ({
-  CollectionCard: ({ collection, onCardClick }: { collection: Collection; onCardClick: (c: Collection) => void }) => (
-    <button onClick={() => onCardClick(collection)} aria-label={`card-${collection.id}`}>
+  CollectionCard: ({
+    collection,
+    onCardClick,
+  }: {
+    collection: Collection
+    onCardClick: (c: Collection) => void
+  }) => (
+    <button
+      onClick={() => onCardClick(collection)}
+      aria-label={`card-${collection.id}`}
+    >
       {collection.name}
     </button>
   ),
 }))
 
+type ReactFlowHandleProps = HTMLAttributes<HTMLDivElement> & {
+  id: string
+  type?: "source" | "target"
+  position?: "top" | "right" | "bottom" | "left"
+}
+
 vi.mock("reactflow", () => ({
   Position: { Top: "top", Right: "right", Bottom: "bottom", Left: "left" },
-  Handle: (props: any) => <div data-testid={`handle-${props.id}`} {...props} />,
+  Handle: (props: ReactFlowHandleProps) => (
+    <div data-testid={`handle-${props.id}`} {...props} />
+  ),
 }))
 
 describe("Visualization components", () => {
   test("VisualizationHeader affiche les compteurs et onBack", async () => {
     const onBack = vi.fn()
-    render(<VisualizationHeader notesCount={3} connectionsCount={5} onBack={onBack} />)
+    render(
+      <VisualizationHeader notesCount={3} connectionsCount={5} onBack={onBack} />
+    )
 
-    await userEvent.click(screen.getByRole("button", { name: /Retour aux collections/ }))
+    await userEvent.click(
+      screen.getByRole("button", { name: /Retour aux collections/ })
+    )
     expect(onBack).toHaveBeenCalled()
     expect(screen.getByLabelText(/3 notes/)).toBeInTheDocument()
     expect(screen.getByLabelText(/5 connexions/)).toBeInTheDocument()
@@ -45,6 +69,7 @@ describe("Visualization components", () => {
     render(<LoadingState message="Chargement test" />)
     expect(screen.getByText(/Chargement test/)).toBeInTheDocument()
   })
+
   test("LoadingState affiche le message par defaut et les placeholders", () => {
     const { container } = render(<LoadingState />)
     expect(screen.getByText("Chargement...")).toBeInTheDocument()
@@ -69,13 +94,21 @@ describe("Visualization components", () => {
     ]
 
     const { rerender } = render(
-      <VisualizationCollectionsList collections={[]} selectedId={undefined} onSelect={vi.fn()} />
+      <VisualizationCollectionsList
+        collections={[]}
+        selectedId={undefined}
+        onSelect={vi.fn()}
+      />
     )
     expect(screen.getByText(/Aucune collection/)).toBeInTheDocument()
 
     const onSelect = vi.fn()
     rerender(
-      <VisualizationCollectionsList collections={collections} selectedId="c1" onSelect={onSelect} />
+      <VisualizationCollectionsList
+        collections={collections}
+        selectedId="c1"
+        onSelect={onSelect}
+      />
     )
     await userEvent.click(screen.getByLabelText("card-c1"))
     expect(onSelect).toHaveBeenCalledWith(collections[0])
@@ -110,8 +143,15 @@ describe("Visualization components", () => {
       ],
       edges: [],
     }
+
     const onSelect = vi.fn()
-    render(<OrphanNotesZone collection={collection} orphanNodeIds={new Set(["n2"])} onSelect={onSelect} />)
+    render(
+      <OrphanNotesZone
+        collection={collection}
+        orphanNodeIds={new Set(["n2"])}
+        onSelect={onSelect}
+      />
+    )
 
     await userEvent.click(screen.getByRole("button", { name: /N2/ }))
     expect(onSelect).toHaveBeenCalledWith("n2")
@@ -131,7 +171,10 @@ describe("Visualization components", () => {
       nodes: [],
       edges: [],
     }
-    const { container } = render(<OrphanNotesZone collection={collection} orphanNodeIds={new Set()} />)
+
+    const { container } = render(
+      <OrphanNotesZone collection={collection} orphanNodeIds={new Set()} />
+    )
     expect(container.firstChild).toBeNull()
   })
 
@@ -152,8 +195,15 @@ describe("Visualization components", () => {
       ],
       edges: [],
     }
+
     const onSelect = vi.fn()
-    render(<OrphanNotesZone collection={collection} orphanNodeIds={new Set(["n2"])} onSelect={onSelect} />)
+    render(
+      <OrphanNotesZone
+        collection={collection}
+        orphanNodeIds={new Set(["n2"])}
+        onSelect={onSelect}
+      />
+    )
 
     const orphanButton = screen.getByRole("button", { name: /N2/ })
     fireEvent.keyDown(orphanButton, { key: "Enter" })
@@ -162,7 +212,9 @@ describe("Visualization components", () => {
   })
 
   test("NodeContent affiche le titre, la couleur et la pluralisation", () => {
-    const { container, rerender } = render(<NodeContent title="Note 1" connections={1} />)
+    const { container, rerender } = render(
+      <NodeContent title="Note 1" connections={1} />
+    )
 
     expect(screen.getByRole("heading", { name: "Note 1" })).toBeInTheDocument()
     expect(screen.getByLabelText("1 connexion")).toHaveTextContent("1 connexion")
@@ -175,7 +227,7 @@ describe("Visualization components", () => {
   })
 
   test("NodeHandle expose les deux handles avec id et position", () => {
-    render(<NodeHandle position={Position.Left as any} side="left" />)
+    render(<NodeHandle position={Position.Left} side="left" />)
 
     const source = screen.getByTestId("handle-left-source")
     const target = screen.getByTestId("handle-left-target")

@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react"
 import { useNodePositions } from "@/features/visualization/hooks/useNodePositions"
-import type { CollectionVisualization } from "@/features/visualization/types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 
 const mockCalculateLayeredLayout = vi.hoisted(() =>
   vi.fn().mockReturnValue({
@@ -24,14 +24,45 @@ vi.mock("@/features/visualization/lib/layoutStrategy", () => ({
   calculateCanvasDimensions: mockCalculateCanvasDimensions,
 }))
 
-const data: CollectionVisualization = {
-  collectionId: "c1",
+const data: Collection = {
+  id: "c1",
+  ownerId: "owner",
+  name: "Test Collection",
+  description: null,
+  visibility: "private",
+  tags: [],
+  notes: [],
   nodes: [
-    { id: "n1", title: "Node 1" },
-    { id: "orphan", title: "Orphan" },
+    {
+      id: "n1",
+      data: {
+        label: "Node 1",
+        note_id: "n1",
+        title: "Node 1",
+        tags: [],
+      },
+    },
+    {
+      id: "orphan",
+      data: {
+        label: "Orphan",
+        note_id: "orphan",
+        title: "Orphan",
+        tags: [],
+      },
+    },
   ],
-  edges: [{ sourceId: "n1", targetId: "n1" }],
+  edges: [
+    {
+      id: "e1",
+      source: "n1",
+      target: "n1",
+    },
+  ],
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-02T00:00:00.000Z",
 }
+
 
 describe("useNodePositions", () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react"
 import { useVisualizationLayout } from "@/features/visualization/hooks/useVisualizationLayout"
-import type { CollectionVisualization } from "@/features/visualization/types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 
 const mockUseNodeConnections = vi.hoisted(() => vi.fn())
 const mockUseNodePositions = vi.hoisted(() => vi.fn())
@@ -20,11 +20,30 @@ vi.mock("@/features/visualization/hooks/useReactFlowEdges", () => ({
   useReactFlowEdges: mockUseReactFlowEdges,
 }))
 
-const data: CollectionVisualization = {
-  collectionId: "c1",
-  nodes: [{ id: "n1", title: "A" }],
+const data: Collection = {
+  id: "c1",
+  ownerId: "owner",
+  name: "Collection",
+  description: null,
+  visibility: "private",
+  tags: [],
+  notes: [],
+  nodes: [
+    {
+      id: "n1",
+      data: {
+        label: "A",
+        note_id: "n1",
+        title: "A",
+        tags: [],
+      },
+    },
+  ],
   edges: [],
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-02T00:00:00.000Z",
 }
+
 
 describe("useVisualizationLayout", () => {
   beforeEach(() => {

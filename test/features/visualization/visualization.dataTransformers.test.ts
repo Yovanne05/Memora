@@ -4,8 +4,7 @@ import type { GraphNode, GraphEdge } from "@/features/collections/models/collect
 import { REACT_FLOW_STYLES } from "@/features/visualization/lib/visualization.constants"
 
 vi.mock("@/features/visualization/lib/layoutEngine", () => ({
-  groupEdgesByConnection: (edges: GraphEdge[], _positions: Record<string, { x: number; y: number }>) => {
-    // simple grouping: one group per unique pair
+  groupEdgesByConnection: (edges: GraphEdge[]) => {
     return edges.map((edge, index) => ({
       sourceId: edge.source,
       targetId: edge.target,
