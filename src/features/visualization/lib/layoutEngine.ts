@@ -1,6 +1,4 @@
 import type {
-  LayoutNode,
-  LayoutEdge,
   NodePosition,
   LayoutConfig,
   NodeLevels,
@@ -13,7 +11,7 @@ import {
   assignRemainingLevels,
 } from "./layout/levelCalculator"
 import { groupNodesByLevel, calculatePositions } from "./layout/positionCalculator"
-export type { LayoutNode, LayoutEdge, NodePosition, LayoutConfig } from "./layout/types"
+export type { NodePosition, LayoutConfig } from "./layout/types"
 export type { EdgeGroup } from "./layout/types"
 export {
   determineConnectionDirection,
@@ -22,10 +20,11 @@ export {
 } from "./layout/edgeManager"
 export { calculateForceDirectedLayout } from "./layout/forceLayout"
 export { refineLayeredPositions } from "./layout/positionRefiner"
+import type { GraphEdge, GraphNode } from "@/features/collections/models/collection.model"
 
 export function calculateLayeredLayout(
-  nodes: LayoutNode[],
-  edges: LayoutEdge[],
+  nodes: GraphNode[],
+  edges: GraphEdge[],
   config: LayoutConfig = {}
 ): { positions: Record<string, NodePosition>; orphanNodes: Set<string> } {
   const { verticalGap, horizontalGap } = { ...DEFAULT_LAYOUT_CONFIG, ...config }

@@ -1,4 +1,5 @@
-import type { LayoutEdge, NodePosition, EdgeGroup } from "./types"
+import type { NodePosition, EdgeGroup } from "./types"
+import type { GraphEdge } from "@/features/collections/models/collection.model"
 
 export function determineConnectionDirection(
   sourcePosition: NodePosition,
@@ -80,7 +81,7 @@ export function calculateEdgeOffset(
 }
 
 export function groupEdgesByConnection(
-  edges: LayoutEdge[],
+  edges: GraphEdge[],
   positions: Record<string, NodePosition>
 ): EdgeGroup[] {
   const groupMap = new Map<string, EdgeGroup>()

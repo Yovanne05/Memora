@@ -1,5 +1,6 @@
-import type { LayoutNode, LayoutEdge, NodePosition } from "./types"
+import type { NodePosition } from "./types"
 import { DEFAULT_LAYOUT_CONFIG } from "./types"
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 
 interface RefineLayoutConfig {
   horizontalGap?: number
@@ -9,8 +10,8 @@ interface RefineLayoutConfig {
 const LEVEL_PRECISION = 4
 
 export function refineLayeredPositions(
-  nodes: LayoutNode[],
-  edges: LayoutEdge[],
+  nodes: GraphNode[],
+  edges: GraphEdge[],
   positions: Record<string, NodePosition>,
   config: RefineLayoutConfig = {}
 ): Record<string, NodePosition> {
@@ -85,7 +86,7 @@ export function refineLayeredPositions(
 }
 
 function buildNeighborMap(
-  edges: LayoutEdge[],
+  edges: GraphEdge[],
   groupBy: "source" | "target",
   neighbor: "source" | "target"
 ): Map<string, string[]> {

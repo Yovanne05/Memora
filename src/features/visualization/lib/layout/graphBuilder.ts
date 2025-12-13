@@ -1,15 +1,14 @@
 import type {
-  LayoutNode,
-  LayoutEdge,
   GraphStructure,
   DegreeMap,
   AdjacencyList,
 } from "./types"
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 
 export function validateEdges(
-  edges: LayoutEdge[],
+  edges: GraphEdge[],
   nodeIds: Set<string>
-): LayoutEdge[] {
+): GraphEdge[] {
   return edges.filter((edge) => {
     const isValid = nodeIds.has(edge.source) && nodeIds.has(edge.target)
 
@@ -24,8 +23,8 @@ export function validateEdges(
 }
 
 export function buildAdjacencyList(
-  nodes: LayoutNode[],
-  edges: LayoutEdge[]
+  nodes: GraphNode[],
+  edges: GraphEdge[]
 ): AdjacencyList {
   const adjacency: AdjacencyList = {}
 
@@ -44,8 +43,8 @@ export function buildAdjacencyList(
 }
 
 export function buildGraphStructure(
-  nodes: LayoutNode[],
-  edges: LayoutEdge[]
+  nodes: GraphNode[],
+  edges: GraphEdge[]
 ): GraphStructure {
   const inDegree: DegreeMap = {}
   const outAdj: AdjacencyList = {}
@@ -64,7 +63,7 @@ export function buildGraphStructure(
 }
 
 export function findOrphanNodes(
-  nodes: LayoutNode[],
+  nodes: GraphNode[],
   inDegree: DegreeMap,
   outAdj: AdjacencyList
 ): Set<string> {

@@ -1,6 +1,5 @@
-import type { LayoutNode, LayoutEdge } from "./types"
 import { buildAdjacencyList } from "./graphBuilder"
-
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 export interface Cluster {
   id: number
   nodeIds: string[]
@@ -8,8 +7,8 @@ export interface Cluster {
 }
 
 export function detectClusters(
-  nodes: LayoutNode[],
-  edges: LayoutEdge[]
+  nodes: GraphNode[],
+  edges: GraphEdge[]
 ): Map<string, number> {
   if (nodes.length === 0) {
     return new Map()
@@ -66,7 +65,7 @@ export function detectClusters(
 }
 
 export function analyzeClusters(
-  edges: LayoutEdge[],
+  edges: GraphEdge[],
   nodeToCluster: Map<string, number>
 ): Cluster[] {
   const clusterMap = new Map<number, Cluster>()

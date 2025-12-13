@@ -1,12 +1,12 @@
 import type {
-  LayoutNode,
   NodeLevels,
   DegreeMap,
   AdjacencyList,
 } from "./types"
+import type { GraphNode } from "@/features/collections/models/collection.model"
 
 export function initializeQueue(
-  nodes: LayoutNode[],
+  nodes: GraphNode[],
   inDegree: DegreeMap,
   orphanNodes: Set<string>,
   levels: NodeLevels
@@ -52,7 +52,7 @@ export function propagateLevels(
 }
 
 export function assignRemainingLevels(
-  nodes: LayoutNode[],
+  nodes: GraphNode[],
   levels: NodeLevels,
   orphanNodes: Set<string>
 ): void {
