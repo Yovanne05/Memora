@@ -11,11 +11,11 @@ export function validateEdges(
   nodeIds: Set<string>
 ): LayoutEdge[] {
   return edges.filter((edge) => {
-    const isValid = nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId)
+    const isValid = nodeIds.has(edge.source) && nodeIds.has(edge.target)
 
     if (!isValid) {
       console.warn(
-        `Arete ignorée car elle reference un noeud inconnu: ${edge.sourceId} -> ${edge.targetId}`
+        `Arete ignorée car elle reference un noeud inconnu: ${edge.source} -> ${edge.target}`
       )
     }
 
@@ -34,9 +34,9 @@ export function buildAdjacencyList(
   })
 
   edges.forEach((edge) => {
-    if (adjacency[edge.sourceId] && adjacency[edge.targetId]) {
-      adjacency[edge.sourceId].push(edge.targetId)
-      adjacency[edge.targetId].push(edge.sourceId)
+    if (adjacency[edge.source] && adjacency[edge.target]) {
+      adjacency[edge.source].push(edge.target)
+      adjacency[edge.target].push(edge.source)
     }
   })
 
@@ -56,8 +56,8 @@ export function buildGraphStructure(
   })
 
   edges.forEach((edge) => {
-    outAdj[edge.sourceId].push(edge.targetId)
-    inDegree[edge.targetId]++
+    outAdj[edge.source].push(edge.target)
+    inDegree[edge.target]++
   })
 
   return { inDegree, outAdj }

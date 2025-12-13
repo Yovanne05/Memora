@@ -10,7 +10,6 @@ import {
   shouldApplyForceLayout,
   calculateCanvasDimensions,
 } from "../lib/layoutStrategy"
-import { toLayoutNodes, toLayoutEdges } from "../lib/dataTransformers"
 
 export function useNodePositions(
   collection?: Collection
@@ -19,29 +18,26 @@ export function useNodePositions(
     if (!collection)
       return { positions: {}, orphanNodeIds: new Set<string>() }
 
-    const layoutNodes = toLayoutNodes(collection.nodes)
-    const layoutEdges = toLayoutEdges(collection.edges)
-
     const { positions: layeredPositions, orphanNodes } = calculateLayeredLayout(
-      layoutNodes,
-      layoutEdges
+      collection.nodes,
+      collection.edges
     )
 
-    const connectedLayoutNodes = layoutNodes.filter((node) => !orphanNodes.has(node.id))
+    const connectedNodes = collection.nodes.filter((node) => !orphanNodes.has(node.id))
 
     const refinedPositions = refineLayeredPositions(
-      connectedLayoutNodes,
-      layoutEdges,
+      connectedNodes,
+      collection.edges,
       layeredPositions
     )
 
-    if (shouldApplyForceLayout({ nodes: layoutNodes, edges: layoutEdges })) {
+    if (shouldApplyForceLayout({ nodes: collection.nodes, edges: collection.edges })) {
       const dimensions = calculateCanvasDimensions(
-        layoutNodes.length - orphanNodes.size
+        collection.nodes.length - orphanNodes.size
       )
       const forcePositions = calculateForceDirectedLayout(
-        connectedLayoutNodes,
-        layoutEdges,
+        connectedNodes,
+        collection.edges,
         {
           width: dimensions.width,
           height: dimensions.height,

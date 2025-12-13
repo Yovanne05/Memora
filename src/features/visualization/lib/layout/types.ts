@@ -1,11 +1,7 @@
-export interface LayoutNode {
-  id: string
-}
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 
-export interface LayoutEdge {
-  sourceId: string
-  targetId: string
-}
+export type LayoutNode = Pick<GraphNode, "id">
+export type LayoutEdge = Pick<GraphEdge, "source" | "target">
 
 export interface NodePosition {
   x: number

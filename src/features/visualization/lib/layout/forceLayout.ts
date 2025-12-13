@@ -55,8 +55,8 @@ export function calculateForceDirectedLayout(
   })
 
   const simulationLinks: ForceLayoutLink[] = edges.map((edge) => ({
-    source: edge.sourceId,
-    target: edge.targetId,
+    source: edge.source,
+    target: edge.target,
   }))
 
   const linkForce = forceLink<ForceLayoutNode, ForceLayoutLink>(

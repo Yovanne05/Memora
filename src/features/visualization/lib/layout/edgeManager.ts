@@ -86,12 +86,12 @@ export function groupEdgesByConnection(
   const groupMap = new Map<string, EdgeGroup>()
 
   edges.forEach((edge, index) => {
-    const sourcePos = positions[edge.sourceId]
-    const targetPos = positions[edge.targetId]
+    const sourcePos = positions[edge.source]
+    const targetPos = positions[edge.target]
 
     if (!sourcePos || !targetPos) {
       console.warn(
-        `Impossible de positionner l'arete ${edge.sourceId} -> ${edge.targetId} car une position est manquante`
+        `Impossible de positionner l'arete ${edge.source} -> ${edge.target} car une position est manquante`
       )
       return
     }
@@ -100,12 +100,12 @@ export function groupEdgesByConnection(
       sourcePos,
       targetPos
     )
-    const key = `${edge.sourceId}-${sourceSide}-${edge.targetId}-${targetSide}`
+    const key = `${edge.source}-${sourceSide}-${edge.target}-${targetSide}`
 
     if (!groupMap.has(key)) {
       groupMap.set(key, {
-        sourceId: edge.sourceId,
-        targetId: edge.targetId,
+        sourceId: edge.source,
+        targetId: edge.target,
         sourceSide,
         targetSide,
         edgeIndices: [],

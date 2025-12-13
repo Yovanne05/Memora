@@ -43,8 +43,8 @@ export function refineLayeredPositions(
     levels[levelIndex].push(nodeId)
   })
 
-  const incomingNeighbors = buildNeighborMap(edges, "targetId", "sourceId")
-  const outgoingNeighbors = buildNeighborMap(edges, "sourceId", "targetId")
+  const incomingNeighbors = buildNeighborMap(edges, "target", "source")
+  const outgoingNeighbors = buildNeighborMap(edges, "source", "target")
 
   levels.forEach((_nodes, levelIndex) => {
     assignPositionsForLevel(
@@ -86,8 +86,8 @@ export function refineLayeredPositions(
 
 function buildNeighborMap(
   edges: LayoutEdge[],
-  groupBy: "sourceId" | "targetId",
-  neighbor: "sourceId" | "targetId"
+  groupBy: "source" | "target",
+  neighbor: "source" | "target"
 ): Map<string, string[]> {
   const map = new Map<string, string[]>()
 

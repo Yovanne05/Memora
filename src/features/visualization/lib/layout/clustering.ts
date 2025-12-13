@@ -83,8 +83,8 @@ export function analyzeClusters(
   })
 
   edges.forEach((edge) => {
-    const sourceCluster = nodeToCluster.get(edge.sourceId)
-    const targetCluster = nodeToCluster.get(edge.targetId)
+    const sourceCluster = nodeToCluster.get(edge.source)
+    const targetCluster = nodeToCluster.get(edge.target)
 
     if (
       sourceCluster !== undefined &&
