@@ -37,7 +37,7 @@ export function CollectionNotesSection() {
     async (noteId?: string) => {
       if (!noteId) return;
       try {
-        await mutateAsync({ noteId, payload: { collection_id: id } });
+        await mutateAsync({ noteId, payload: { collectionId: id } });
       } catch (err) {
         console.error("Failed to add note to collection", err);
       }
@@ -48,7 +48,7 @@ export function CollectionNotesSection() {
   const handleRemoveFromCollection = useCallback(
     async (noteId: string) => {
       try {
-        await mutateAsync({ noteId, payload: { collection_id: null } });
+        await mutateAsync({ noteId, payload: { collectionId: null } });
       } catch (err) {
         console.error("Failed to remove note from collection", err);
       }

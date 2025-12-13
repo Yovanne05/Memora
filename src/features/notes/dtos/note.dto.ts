@@ -1,6 +1,6 @@
-import { z } from 'zod'
+import { z } from "zod"
 
-export const noteVisibilitySchema = z.enum(['private', 'public'])
+export const noteVisibilitySchema = z.enum(["private", "public"])
 
 export const noteDtoSchema = z.object({
   id: z.uuid(),
@@ -10,18 +10,18 @@ export const noteDtoSchema = z.object({
   owner_username: z.string(),
   title: z.string().min(1).max(255),
   content: z.string(),
-  visibility: noteVisibilitySchema.default('private'),
   tags: z.array(z.string()).default([]),
+  visibility: noteVisibilitySchema.default("private"),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
 })
 
 export const notesListDtoSchema = z.union([
   z.array(noteDtoSchema),
-  z.object({ 
-    items: z.array(noteDtoSchema), 
-    total: z.number() 
-  })
+  z.object({
+    items: z.array(noteDtoSchema),
+    total: z.number(),
+  }),
 ])
 
 export const noteCreateDtoSchema = z.object({
@@ -29,6 +29,7 @@ export const noteCreateDtoSchema = z.object({
   owner_id: z.uuid(),
   title: z.string().min(1).max(255),
   content: z.string(),
+  tags: z.array(z.string()).optional(),
   visibility: noteVisibilitySchema.optional(),
 })
 
@@ -36,6 +37,7 @@ export const noteUpdateDtoSchema = z.object({
   collection_id: z.uuid().nullable().optional(),
   title: z.string().min(1).max(255).optional(),
   content: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   visibility: noteVisibilitySchema.optional(),
 })
 
@@ -44,3 +46,4 @@ export type NoteDto = z.infer<typeof noteDtoSchema>
 export type NotesListDto = z.infer<typeof notesListDtoSchema>
 export type NoteCreateDto = z.infer<typeof noteCreateDtoSchema>
 export type NoteUpdateDto = z.infer<typeof noteUpdateDtoSchema>
+

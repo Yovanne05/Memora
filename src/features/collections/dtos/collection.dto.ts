@@ -1,4 +1,4 @@
-import { noteDtoSchema } from '@/features/notes/dto/note.dto'
+import { noteDtoSchema } from '@/features/notes/dtos/note.dto'
 import { z } from 'zod'
 
 export const collectionVisibilitySchema = z.enum(['private', 'public'])

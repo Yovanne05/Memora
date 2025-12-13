@@ -1,17 +1,22 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { fetchNotes } from "../api/notes.api";
-import type { NotesFilters } from "../models/note-filters.model";
-import type { PaginatedNotes } from "../models/note.model";
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
+import { notesService } from "../services/notes.service"
+import type { NotesFilters } from "../types/note-query"
+import type { PaginatedNotes } from "../types/paginated-note"
 
-export function useNotesQuery(
-    page: number,
-    limit: number,
-    filters: NotesFilters
-) {
-    return useQuery<PaginatedNotes>({
-        queryKey: ["notes", page, filters],
-        retry: 1,
-        queryFn: () => fetchNotes({ page, limit, filters }),
-        placeholderData: keepPreviousData,
-    });
+export const NOTES_QUERY_KEYS = {
+  all: ["notes"] as const,
+  lists: () => [...NOTES_QUERY_KEYS.all, "list"] as const,
+  list: (filters: Record<string, unknown> = {}) =>
+    [...NOTES_QUERY_KEYS.lists(), filters] as const,
+  details: () => [...NOTES_QUERY_KEYS.all, "detail"] as const,
+  detail: (id: string) => [...NOTES_QUERY_KEYS.details(), id] as const,
+}
+
+export function useNotesQuery(page: number, limit: number, filters: NotesFilters = {}) {
+  return useQuery<PaginatedNotes>({
+    queryKey: NOTES_QUERY_KEYS.list({ page, limit, filters }),
+    retry: 1,
+    queryFn: () => notesService.list({ ...filters, limit, offset: page * limit }),
+    placeholderData: keepPreviousData,
+  })
 }
