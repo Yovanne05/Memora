@@ -14,7 +14,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppVisualizationIndexRouteImport } from './routes/app/visualization/index'
+import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
+import { Route as AppSearchIndexRouteImport } from './routes/app/search/index'
+import { Route as AppRevisionIndexRouteImport } from './routes/app/revision/index'
 import { Route as AppNotesIndexRouteImport } from './routes/app/notes/index'
+import { Route as AppDashboardIndexRouteImport } from './routes/app/dashboard/index'
 import { Route as AppCollectionsIndexRouteImport } from './routes/app/collections/index'
 import { Route as AppNotesIdIndexRouteImport } from './routes/app/notes/$id/index'
 import { Route as AppCollectionsIdIndexRouteImport } from './routes/app/collections/$id/index'
@@ -43,9 +47,29 @@ const AppVisualizationIndexRoute = AppVisualizationIndexRouteImport.update({
   path: '/visualization/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSearchIndexRoute = AppSearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppRevisionIndexRoute = AppRevisionIndexRouteImport.update({
+  id: '/revision/',
+  path: '/revision/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
   id: '/notes/',
   path: '/notes/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppCollectionsIndexRoute = AppCollectionsIndexRouteImport.update({
@@ -80,7 +104,11 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteRouteWithChildren
   '/app/': typeof AppIndexLazyRoute
   '/app/collections': typeof AppCollectionsIndexRoute
+  '/app/dashboard': typeof AppDashboardIndexRoute
   '/app/notes': typeof AppNotesIndexRoute
+  '/app/revision': typeof AppRevisionIndexRoute
+  '/app/search': typeof AppSearchIndexRoute
+  '/app/settings': typeof AppSettingsIndexRoute
   '/app/visualization': typeof AppVisualizationIndexRoute
   '/app/collections/$id': typeof AppCollectionsIdIndexRoute
   '/app/notes/$id': typeof AppNotesIdIndexRoute
@@ -91,7 +119,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppIndexLazyRoute
   '/app/collections': typeof AppCollectionsIndexRoute
+  '/app/dashboard': typeof AppDashboardIndexRoute
   '/app/notes': typeof AppNotesIndexRoute
+  '/app/revision': typeof AppRevisionIndexRoute
+  '/app/search': typeof AppSearchIndexRoute
+  '/app/settings': typeof AppSettingsIndexRoute
   '/app/visualization': typeof AppVisualizationIndexRoute
   '/app/collections/$id': typeof AppCollectionsIdIndexRoute
   '/app/notes/$id': typeof AppNotesIdIndexRoute
@@ -104,7 +136,11 @@ export interface FileRoutesById {
   '/app': typeof AppRouteRouteWithChildren
   '/app/': typeof AppIndexLazyRoute
   '/app/collections/': typeof AppCollectionsIndexRoute
+  '/app/dashboard/': typeof AppDashboardIndexRoute
   '/app/notes/': typeof AppNotesIndexRoute
+  '/app/revision/': typeof AppRevisionIndexRoute
+  '/app/search/': typeof AppSearchIndexRoute
+  '/app/settings/': typeof AppSettingsIndexRoute
   '/app/visualization/': typeof AppVisualizationIndexRoute
   '/app/collections/$id/': typeof AppCollectionsIdIndexRoute
   '/app/notes/$id/': typeof AppNotesIdIndexRoute
@@ -118,7 +154,11 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/'
     | '/app/collections'
+    | '/app/dashboard'
     | '/app/notes'
+    | '/app/revision'
+    | '/app/search'
+    | '/app/settings'
     | '/app/visualization'
     | '/app/collections/$id'
     | '/app/notes/$id'
@@ -129,7 +169,11 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/app/collections'
+    | '/app/dashboard'
     | '/app/notes'
+    | '/app/revision'
+    | '/app/search'
+    | '/app/settings'
     | '/app/visualization'
     | '/app/collections/$id'
     | '/app/notes/$id'
@@ -141,7 +185,11 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/'
     | '/app/collections/'
+    | '/app/dashboard/'
     | '/app/notes/'
+    | '/app/revision/'
+    | '/app/search/'
+    | '/app/settings/'
     | '/app/visualization/'
     | '/app/collections/$id/'
     | '/app/notes/$id/'
@@ -184,11 +232,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVisualizationIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/settings/': {
+      id: '/app/settings/'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/search/': {
+      id: '/app/search/'
+      path: '/search'
+      fullPath: '/app/search'
+      preLoaderRoute: typeof AppSearchIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/revision/': {
+      id: '/app/revision/'
+      path: '/revision'
+      fullPath: '/app/revision'
+      preLoaderRoute: typeof AppRevisionIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/notes/': {
       id: '/app/notes/'
       path: '/notes'
       fullPath: '/app/notes'
       preLoaderRoute: typeof AppNotesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/dashboard/': {
+      id: '/app/dashboard/'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/collections/': {
@@ -232,7 +308,11 @@ declare module '@tanstack/react-router' {
 interface AppRouteRouteChildren {
   AppIndexLazyRoute: typeof AppIndexLazyRoute
   AppCollectionsIndexRoute: typeof AppCollectionsIndexRoute
+  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
   AppNotesIndexRoute: typeof AppNotesIndexRoute
+  AppRevisionIndexRoute: typeof AppRevisionIndexRoute
+  AppSearchIndexRoute: typeof AppSearchIndexRoute
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppVisualizationIndexRoute: typeof AppVisualizationIndexRoute
   AppCollectionsIdIndexRoute: typeof AppCollectionsIdIndexRoute
   AppNotesIdIndexRoute: typeof AppNotesIdIndexRoute
@@ -243,7 +323,11 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppIndexLazyRoute: AppIndexLazyRoute,
   AppCollectionsIndexRoute: AppCollectionsIndexRoute,
+  AppDashboardIndexRoute: AppDashboardIndexRoute,
   AppNotesIndexRoute: AppNotesIndexRoute,
+  AppRevisionIndexRoute: AppRevisionIndexRoute,
+  AppSearchIndexRoute: AppSearchIndexRoute,
+  AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppVisualizationIndexRoute: AppVisualizationIndexRoute,
   AppCollectionsIdIndexRoute: AppCollectionsIdIndexRoute,
   AppNotesIdIndexRoute: AppNotesIdIndexRoute,

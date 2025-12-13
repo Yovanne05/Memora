@@ -34,17 +34,17 @@ export function AppSidebar() {
     const { toggleSidebar } = useSidebar()
 
     const navigationItems = [
-        { title: "Tableau de bord", icon: LayoutDashboard, url: "#" },
+        { title: "Tableau de bord", icon: LayoutDashboard, url: "/app/dashboard" },
         { title: "Notes", icon: FileText, url: "/app/notes" },
         { title: "Collections", icon: FolderKanban, url: "/app/collections" },
         { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
-        { title: "Recherche", icon: Search, url: "#" },
-        { title: "Révision", icon: GraduationCap, url: "#" },
+        { title: "Recherche", icon: Search, url: "/app/search" },
+        { title: "Révision", icon: GraduationCap, url: "/app/revision" },
         { title: "Journal et stats", icon: History, url: "#" },
     ]
 
     const accountItems = [
-        { title: "Paramètres", icon: SettingsIcon, url: "#" },
+        { title: "Paramètres", icon: SettingsIcon, url: "/app/settings" },
     ]
 
     return (
