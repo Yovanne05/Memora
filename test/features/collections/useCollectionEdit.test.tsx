@@ -127,18 +127,23 @@ describe("useCollectionEdit", () => {
       result.current.open(collection)
     })
 
+    let submitPromise: Promise<void>
     act(() => {
-      result.current.submit({
+      submitPromise = result.current.submit({
         name: "Updated",
         description: "Desc",
         visibility: "private",
       })
     })
 
-    expect(result.current.loading).toBe(true)
-
     await waitFor(() => {
-      expect(result.current.loading).toBe(false)
+      expect(result.current.loading).toBe(true)
     })
+
+    await act(async () => {
+      await submitPromise
+    })
+
+    expect(result.current.loading).toBe(false)
   })
 })

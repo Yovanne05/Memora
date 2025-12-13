@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { usePublicCollectionsQuery } from "@/features/visualization/hooks/usePublicCollectionsQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import { vi } from "vitest"
+import type { ReactNode } from "react"
 
 const visualizationServiceMock = vi.hoisted(() => ({
   listPublicCollections: vi.fn(),
@@ -12,9 +13,20 @@ vi.mock("@/features/visualization/services/visualization.service", () => ({
   visualizationService: visualizationServiceMock,
 }))
 
-const createWrapper = (client: QueryClient) => {
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+      mutations: {
+        retry: false,
+      },
+    },
+  })
+
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 
@@ -40,15 +52,17 @@ describe("usePublicCollectionsQuery", () => {
   })
 
   test("récupère les collections publiques", async () => {
-    const queryClient = new QueryClient()
-    visualizationServiceMock.listPublicCollections.mockResolvedValue(sample)
+    visualizationServiceMock.listPublicCollections.mockResolvedValueOnce(sample)
 
     const { result } = renderHook(() => usePublicCollectionsQuery(), {
-      wrapper: createWrapper(queryClient),
+      wrapper: createWrapper(),
     })
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(result.current.data).toEqual(sample)
-    expect(visualizationServiceMock.listPublicCollections).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+      expect(result.current.data).toEqual(sample)
+    })
+
+    expect(visualizationServiceMock.listPublicCollections).toHaveBeenCalledTimes(1)
   })
 })

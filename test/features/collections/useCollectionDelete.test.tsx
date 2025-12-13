@@ -118,15 +118,20 @@ describe("useCollectionDelete", () => {
       result.current.open(collection);
     });
 
+    let confirmPromise: Promise<void>;
     act(() => {
-      result.current.confirm();
+      confirmPromise = result.current.confirm();
     });
-
-    expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+      expect(result.current.loading).toBe(true);
     });
+
+    await act(async () => {
+      await confirmPromise;
+    });
+
+    expect(result.current.loading).toBe(false);
   });
 
   test("error est défini en cas d'échec", async () => {
