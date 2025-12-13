@@ -30,7 +30,7 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
               </p>
             ))
           ) : (
-            <p className="text-muted-foreground">Aucun contenu a afficher pour cette note.</p>
+            <p className="text-muted-foreground">Aucun contenu à afficher pour cette note.</p>
           )}
         </CardContent>
       </Card>
