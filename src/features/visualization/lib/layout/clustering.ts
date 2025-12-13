@@ -1,4 +1,5 @@
-import type { LayoutNode, LayoutEdge, AdjacencyList } from "./types"
+import type { LayoutNode, LayoutEdge } from "./types"
+import { buildAdjacencyList } from "./graphBuilder"
 
 export interface Cluster {
   id: number
@@ -64,26 +65,6 @@ export function detectClusters(
   return nodeToCluster
 }
 
-function buildAdjacencyList(
-  nodes: LayoutNode[],
-  edges: LayoutEdge[]
-): AdjacencyList {
-  const adjacency: AdjacencyList = {}
-
-  nodes.forEach((node) => {
-    adjacency[node.id] = []
-  })
-
-  edges.forEach((edge) => {
-    if (adjacency[edge.sourceId] && adjacency[edge.targetId]) {
-      adjacency[edge.sourceId].push(edge.targetId)
-      adjacency[edge.targetId].push(edge.sourceId)
-    }
-  })
-
-  return adjacency
-}
-
 export function analyzeClusters(
   edges: LayoutEdge[],
   nodeToCluster: Map<string, number>
@@ -118,24 +99,4 @@ export function analyzeClusters(
   })
 
   return Array.from(clusterMap.values())
-}
-
-export function calculateModularity(
-  edges: LayoutEdge[],
-  nodeToCluster: Map<string, number>
-): number {
-  if (edges.length === 0) return 0
-
-  const m = edges.length
-
-  let internalEdges = 0
-  edges.forEach((edge) => {
-    const sourceCluster = nodeToCluster.get(edge.sourceId)
-    const targetCluster = nodeToCluster.get(edge.targetId)
-    if (sourceCluster === targetCluster) {
-      internalEdges++
-    }
-  })
-
-  return internalEdges / m
 }

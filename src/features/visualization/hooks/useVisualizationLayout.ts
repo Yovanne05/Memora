@@ -1,9 +1,14 @@
+import { useMemo } from "react"
 import type { NodeConnectionsMap, ReactFlowNode, ReactFlowEdge } from "../types/visualization.type"
 import type { Collection } from "@/features/collections/models/collection.model"
-import { useNodeConnections } from "./useNodeConnections"
 import { useNodePositions } from "./useNodePositions"
-import { useReactFlowNodes } from "./useReactFlowNodes"
-import { useReactFlowEdges } from "./useReactFlowEdges"
+import { calculateNodeConnections } from "../lib/nodeConnections"
+import {
+  transformNodesToReactFlow,
+  extractNodePositions,
+  filterValidEdges,
+  transformEdgesToReactFlow,
+} from "../lib/dataTransformers"
 
 interface UseVisualizationLayoutResult {
   nodes: ReactFlowNode[]
@@ -12,27 +17,31 @@ interface UseVisualizationLayoutResult {
   orphanNodeIds: Set<string>
 }
 
-/**
- * Hook principal pour calculer le layout complet de la visualisation
- *
- * Plusieurs sous-hooks pour:
- * - Calculer les connexions de chaque nœud
- * - Déterminer les positions optimales
- * - Transformer les données en format ReactFlow
- *
- * @param collection - Collection contenant les nœuds et les arêtes
- * @returns Nœuds et arêtes formatés pour React Flow avec leurs positions
- */
 export function useVisualizationLayout(
   collection?: Collection
 ): UseVisualizationLayoutResult {
-  const nodeConnections = useNodeConnections(collection)
+  const nodeConnections = useMemo<NodeConnectionsMap>(() => {
+    if (!collection) return {}
+    return calculateNodeConnections(collection.nodes, collection.edges)
+  }, [collection])
 
   const { positions, orphanNodeIds } = useNodePositions(collection)
 
-  const nodes = useReactFlowNodes(collection, positions, nodeConnections, orphanNodeIds)
+  const nodes = useMemo<ReactFlowNode[]>(() => {
+    if (!collection) return []
+    const filteredNodes = collection.nodes.filter((node) => !orphanNodeIds.has(node.id))
+    return transformNodesToReactFlow(filteredNodes, positions, nodeConnections)
+  }, [collection, positions, nodeConnections, orphanNodeIds])
 
-  const edges = useReactFlowEdges(collection, nodes)
+  const edges = useMemo<ReactFlowEdge[]>(() => {
+    if (!collection || nodes.length === 0) return []
+
+    const nodePositions = extractNodePositions(nodes)
+    const validNodeIds = new Set(nodes.map((node) => node.id))
+    const validEdges = filterValidEdges(collection.edges, validNodeIds)
+
+    return transformEdgesToReactFlow(validEdges, nodePositions)
+  }, [collection, nodes])
 
   return {
     nodes,

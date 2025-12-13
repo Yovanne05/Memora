@@ -5,25 +5,28 @@ import {
   createClusterForce,
 } from "./clusterForces"
 
-export function runFirstPhase(
-  simulation: Simulation<ForceLayoutNode, undefined>,
-  iterations: number
-): void {
-  simulation.stop()
-  const firstPhase = Math.floor(iterations * 0.6)
-  for (let i = 0; i < firstPhase; i += 1) {
-    simulation.tick()
-  }
-}
-
-export function runClusteringPhase(
+export function runSimulation(
   simulation: Simulation<ForceLayoutNode, undefined>,
   simulationNodes: ForceLayoutNode[],
   nodeToCluster: Map<string, number>,
   clusterStrength: number,
-  totalIterations: number,
-  firstPhaseIterations: number
+  iterations: number
 ): void {
+  simulation.stop()
+
+  const firstPhaseIterations = Math.floor(iterations * 0.6)
+  for (let i = 0; i < firstPhaseIterations; i += 1) {
+    simulation.tick()
+  }
+
+  if (clusterStrength <= 0) {
+    const remaining = iterations - firstPhaseIterations
+    for (let i = 0; i < remaining; i += 1) {
+      simulation.tick()
+    }
+    return
+  }
+
   const clusterCenters = calculateClusterCenters(simulationNodes, nodeToCluster)
   const clusterForce = createClusterForce(
     simulationNodes,
@@ -33,7 +36,7 @@ export function runClusteringPhase(
   )
   simulation.force("cluster", clusterForce)
 
-  const secondPhase = totalIterations - firstPhaseIterations
+  const secondPhase = iterations - firstPhaseIterations
   for (let i = 0; i < secondPhase; i += 1) {
     if (i % 20 === 0) {
       const updatedCenters = calculateClusterCenters(
@@ -50,17 +53,6 @@ export function runClusteringPhase(
         )
       )
     }
-    simulation.tick()
-  }
-}
-
-export function runRemainingPhase(
-  simulation: Simulation<ForceLayoutNode, undefined>,
-  totalIterations: number,
-  firstPhaseIterations: number
-): void {
-  const remaining = totalIterations - firstPhaseIterations
-  for (let i = 0; i < remaining; i += 1) {
     simulation.tick()
   }
 }

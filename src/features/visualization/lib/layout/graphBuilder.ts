@@ -23,6 +23,26 @@ export function validateEdges(
   })
 }
 
+export function buildAdjacencyList(
+  nodes: LayoutNode[],
+  edges: LayoutEdge[]
+): AdjacencyList {
+  const adjacency: AdjacencyList = {}
+
+  nodes.forEach((node) => {
+    adjacency[node.id] = []
+  })
+
+  edges.forEach((edge) => {
+    if (adjacency[edge.sourceId] && adjacency[edge.targetId]) {
+      adjacency[edge.sourceId].push(edge.targetId)
+      adjacency[edge.targetId].push(edge.sourceId)
+    }
+  })
+
+  return adjacency
+}
+
 export function buildGraphStructure(
   nodes: LayoutNode[],
   edges: LayoutEdge[]

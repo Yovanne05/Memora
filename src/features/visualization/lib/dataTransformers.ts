@@ -3,9 +3,9 @@ import type {
   ReactFlowNode,
   ReactFlowEdge,
   NodeConnectionsMap,
+  CustomNodeData,
 } from "../types/visualization.type"
 import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
-import type { CustomNodeData } from "../components/CustomNode"
 import type { NodePosition, LayoutNode, LayoutEdge } from "./layout/types"
 import { REACT_FLOW_STYLES } from "./visualization.constants"
 import {

@@ -15,11 +15,7 @@ import {
   calculateForceParameters,
 } from "./forceConfig"
 import { calculateClusterStrength } from "./clusterForces"
-import {
-  runFirstPhase,
-  runClusteringPhase,
-  runRemainingPhase,
-} from "./simulationPhases"
+import { runSimulation } from "./simulationPhases"
 
 interface ForceLayoutLink extends SimulationLinkDatum<ForceLayoutNode> {
   source: string
@@ -76,23 +72,15 @@ export function calculateForceDirectedLayout(
     .force("collide", forceCollide().radius(forceParams.collideRadius).strength(0.9))
     .force("center", forceCenter(0, 0))
 
-  runFirstPhase(simulation, iterations)
-  const firstPhase = Math.floor(iterations * 0.6)
-
   const clusterStrength = calculateClusterStrength(clusters.length, nodes.length)
 
-  if (clusterStrength > 0) {
-    runClusteringPhase(
-      simulation,
-      simulationNodes,
-      nodeToCluster,
-      clusterStrength,
-      iterations,
-      firstPhase
-    )
-  } else {
-    runRemainingPhase(simulation, iterations, firstPhase)
-  }
+  runSimulation(
+    simulation,
+    simulationNodes,
+    nodeToCluster,
+    clusterStrength,
+    iterations
+  )
 
   const positions: Record<string, NodePosition> = {}
   simulationNodes.forEach((node) => {
