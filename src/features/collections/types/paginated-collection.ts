@@ -1,14 +1,6 @@
 import type { Collection } from "../models/collection.model"
 import type { CollectionsFilters } from "./collection-query"
+import type { ListParams, PaginatedResponse } from "@/types/pagination"
 
-export interface PaginatedCollections {
-  items: Collection[]
-  total: number
-  page: number
-  limit: number
-}
-
-export interface CollectionsListParams extends CollectionsFilters {
-  limit?: number
-  offset?: number
-}
+export type PaginatedCollections = PaginatedResponse<Collection>
+export type CollectionsListParams = ListParams<CollectionsFilters>

@@ -1,6 +1,4 @@
-import type { QueryParamValue } from "@/types/query-params"
-
-export type UsersFilters = Record<string, QueryParamValue> & {
+export interface UsersFilters {
   email?: string
   username?: string
   role?: "client" | "admin" | "super_admin"

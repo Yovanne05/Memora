@@ -1,14 +1,6 @@
 import type { User } from "../models/user.model"
 import type { UsersFilters } from "./user-query"
+import type { ListParams, PaginatedResponse } from "@/types/pagination"
 
-export interface PaginatedUsers {
-  items: User[]
-  total: number
-  page: number
-  limit: number
-}
-
-export interface UsersListParams extends UsersFilters {
-  limit?: number
-  offset?: number
-}
+export type PaginatedUsers = PaginatedResponse<User>
+export type UsersListParams = ListParams<UsersFilters>
