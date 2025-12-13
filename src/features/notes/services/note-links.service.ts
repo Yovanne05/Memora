@@ -1,8 +1,3 @@
-import type {
-  NoteLinkDto,
-  PaginatedNoteLinksDto,
-  CreateNoteLinkDto,
-} from "../dto/note-link.dto"
 import {
   dtoToNoteLink,
   toCreateNoteLinkDto,
@@ -10,6 +5,7 @@ import {
 import { httpClient, type HttpClient } from "@/lib/http-client"
 import type { INoteLinksService } from "./note-links.service.interface"
 import type { CreateNoteLink } from "../models/note-link.model"
+import type { CreateNoteLinkDto, NoteLinkDto, PaginatedNoteLinksDto } from "../dtos/note-link.dto"
 
 export function createNoteLinksService(client: HttpClient = httpClient): INoteLinksService {
   return {
