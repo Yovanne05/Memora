@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Dialog,
@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -20,6 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { NoteVisibility } from "../../models/note.model"
@@ -38,146 +45,6 @@ interface CreateNoteDialogProps {
   submitting?: boolean
 }
 
-function DialogField({
-  label,
-  htmlFor,
-  children,
-}: Readonly<{ label: string; htmlFor: string; children: ReactNode }>) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={htmlFor}>{label}</Label>
-      {children}
-    </div>
-  )
-}
-
-function TitleField({
-  value,
-  disabled,
-  onChange,
-}: Readonly<{ value: string; disabled: boolean; onChange: (value: string) => void }>) {
-  return (
-    <DialogField label="Nom de la note" htmlFor="note-title">
-      <Input
-        id="note-title"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Ex. Cours de SQL - Chapitre 1"
-        disabled={disabled}
-        autoFocus
-      />
-    </DialogField>
-  )
-}
-
-function CollectionField({
-  value,
-  collections,
-  disabled,
-  onChange,
-}: Readonly<{
-  value: string | null
-  collections?: Collection[]
-  disabled: boolean
-  onChange: (value: string | null) => void
-}>) {
-  return (
-    <DialogField label="Collection" htmlFor="note-collection">
-      <Select
-        value={value ?? "none"}
-        onValueChange={(val) => onChange(val === "none" ? null : val)}
-        disabled={disabled}
-      >
-        <SelectTrigger id="note-collection" className="w-full">
-          <SelectValue placeholder="Choisir une collection" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="none">Aucune collection</SelectItem>
-          {collections?.map((collection) => (
-            <SelectItem key={collection.id} value={collection.id}>
-              {collection.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </DialogField>
-  )
-}
-
-function VisibilityField({
-  value,
-  disabled,
-  onChange,
-}: Readonly<{ value: NoteVisibility; disabled: boolean; onChange: (value: NoteVisibility) => void }>) {
-  return (
-    <DialogField label="Visibilite" htmlFor="note-visibility">
-      <Select value={value} onValueChange={(val: NoteVisibility) => onChange(val)} disabled={disabled}>
-        <SelectTrigger id="note-visibility" className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="private">Privee</SelectItem>
-          <SelectItem value="public">Publique</SelectItem>
-        </SelectContent>
-      </Select>
-    </DialogField>
-  )
-}
-
-function TagsField({
-  value,
-  tags,
-  disabled,
-  onChange,
-  onAdd,
-  onRemove,
-}: Readonly<{
-  value: string
-  tags: string[]
-  disabled: boolean
-  onChange: (value: string) => void
-  onAdd: () => void
-  onRemove: (tag: string) => void
-}>) {
-  return (
-    <DialogField label="Tags (optionnel)" htmlFor="note-tags">
-      <div className="space-y-2">
-        <Input
-          id="note-tags"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault()
-              onAdd()
-            }
-          }}
-          placeholder="SQL, bases de donnees, chapitre 1"
-          disabled={disabled}
-        />
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="inline-flex items-center gap-1">
-                {tag}
-                <button
-                  type="button"
-                  aria-label={`Supprimer le tag ${tag}`}
-                  className="rounded-full p-1 transition hover:bg-muted-foreground/10 disabled:opacity-60"
-                  onClick={() => onRemove(tag)}
-                  disabled={disabled}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-    </DialogField>
-  )
-}
-
 export function CreateNoteDialog({
   open,
   onOpenChange,
@@ -187,16 +54,7 @@ export function CreateNoteDialog({
   const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
   const [tagInput, setTagInput] = useState("")
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    setError,
-    clearErrors,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<NoteCreateFormInput>({
+  const form = useForm<NoteCreateFormInput>({
     resolver: zodResolver(noteCreateFormSchema),
     defaultValues: {
       title: "",
@@ -206,46 +64,46 @@ export function CreateNoteDialog({
     },
   })
 
-  const tags = watch("tags")
-  const titleValue = watch("title")
+  const tags = form.watch("tags")
+  const titleValue = form.watch("title")
 
   const addTag = () => {
     const value = tagInput.trim()
     if (!value) return
     if (tags.includes(value)) {
-      setError("tags", { type: "manual", message: "Ce tag est deja ajoute" })
+      form.setError("tags", { type: "manual", message: "Ce tag est deja ajoute" })
       return
     }
     const nextTags = [...tags, value]
-    setValue("tags", nextTags)
-    clearErrors("tags")
+    form.setValue("tags", nextTags)
+    form.clearErrors("tags")
     setTagInput("")
   }
 
   const removeTag = (tag: string) => {
     const nextTags = tags.filter((t) => t !== tag)
-    setValue("tags", nextTags)
+    form.setValue("tags", nextTags)
   }
 
-  const handleFormSubmit = handleSubmit(async (values) => {
+  const handleFormSubmit = form.handleSubmit(async (values) => {
     await onSubmit({
       title: values.title,
       collectionId: values.collectionId ?? null,
       visibility: values.visibility,
       tags: values.tags,
     })
-    reset()
+    form.reset()
     setTagInput("")
   })
 
-  const isFormDisabled = submitting || isSubmitting
+  const isFormDisabled = submitting || form.formState.isSubmitting
 
   return (
     <Dialog
       open={open}
       onOpenChange={(value) => {
         if (!value) {
-          reset()
+          form.reset()
           setTagInput("")
         }
         onOpenChange(value)
@@ -257,72 +115,140 @@ export function CreateNoteDialog({
           <DialogDescription>Renseigne le nom, la collection et la visibilite de la note.</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <div className="space-y-1">
-            <TitleField
-              value={titleValue}
-              disabled={isFormDisabled}
-              onChange={(val) => setValue("title", val)}
+        <Form {...form}>
+          <form onSubmit={handleFormSubmit} className="space-y-4 py-2">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom de la note</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="note-title"
+                      disabled={isFormDisabled}
+                      placeholder="Ex. Cours de SQL - Chapitre 1"
+                      autoFocus
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
-          </div>
 
-          <div className="space-y-1">
-            <Controller
+            <FormField
+              control={form.control}
               name="collectionId"
-              control={control}
               render={({ field }) => (
-                <CollectionField
-                  value={field.value ?? null}
-                  collections={collections as Collection[] | undefined}
-                  disabled={isFormDisabled || loadingCollections}
-                  onChange={field.onChange}
-                />
+                <FormItem>
+                  <FormLabel>Collection</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value ?? "none"}
+                      onValueChange={(val) => field.onChange(val === "none" ? null : val)}
+                      disabled={isFormDisabled || loadingCollections}
+                    >
+                      <SelectTrigger id="note-collection" className="w-full">
+                        <SelectValue placeholder="Choisir une collection" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucune collection</SelectItem>
+                        {(collections as Collection[] | undefined)?.map((collection) => (
+                          <SelectItem key={collection.id} value={collection.id}>
+                            {collection.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.collectionId && (
-              <p className="text-sm text-destructive">{errors.collectionId.message}</p>
-            )}
-          </div>
 
-          <div className="space-y-1">
-            <Controller
+            <FormField
+              control={form.control}
               name="visibility"
-              control={control}
               render={({ field }) => (
-                <VisibilityField
-                  value={field.value}
-                  disabled={isFormDisabled}
-                  onChange={field.onChange}
-                />
+                <FormItem>
+                  <FormLabel>Visibilite</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={(val: NoteVisibility) => field.onChange(val)}
+                      disabled={isFormDisabled}
+                    >
+                      <SelectTrigger id="note-visibility" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="private">Privee</SelectItem>
+                        <SelectItem value="public">Publique</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.visibility && (
-              <p className="text-sm text-destructive">{errors.visibility.message}</p>
-            )}
-          </div>
 
-          <div className="space-y-1">
-            <TagsField
-              value={tagInput}
-              tags={tags}
-              disabled={isFormDisabled}
-              onChange={setTagInput}
-              onAdd={addTag}
-              onRemove={removeTag}
+            <FormField
+              control={form.control}
+              name="tags"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Tags (optionnel)</FormLabel>
+                  <div className="space-y-2">
+                    <FormControl>
+                      <Input
+                        id="note-tags"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault()
+                            addTag()
+                          }
+                        }}
+                        placeholder="SQL, bases de donnees, chapitre 1"
+                        disabled={isFormDisabled}
+                      />
+                    </FormControl>
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="inline-flex items-center gap-1">
+                            {tag}
+                            <button
+                              type="button"
+                              aria-label={`Supprimer le tag ${tag}`}
+                              className="rounded-full p-1 transition hover:bg-muted-foreground/10 disabled:opacity-60"
+                              onClick={() => removeTag(tag)}
+                              disabled={isFormDisabled}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.tags && <p className="text-sm text-destructive">{errors.tags.message}</p>}
-          </div>
-        </div>
 
-        <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isFormDisabled}>
-            Annuler
-          </Button>
-          <Button onClick={handleFormSubmit} disabled={isFormDisabled || !titleValue.trim()}>
-            {submitting ? "Creation..." : "Creer"}
-          </Button>
-        </DialogFooter>
+            <DialogFooter className="gap-2">
+              <Button variant="ghost" type="button" onClick={() => onOpenChange(false)} disabled={isFormDisabled}>
+                Annuler
+              </Button>
+              <Button type="submit" disabled={isFormDisabled || !titleValue.trim()}>
+                {submitting ? "Creation..." : "Creer"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )
