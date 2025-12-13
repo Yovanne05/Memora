@@ -1,4 +1,4 @@
-import type { NodePosition, EdgeGroup } from "./types"
+import type { NodePosition, EdgeGroup } from "../../types/visualization.type"
 import type { GraphEdge } from "@/features/collections/models/collection.model"
 
 export function determineConnectionDirection(

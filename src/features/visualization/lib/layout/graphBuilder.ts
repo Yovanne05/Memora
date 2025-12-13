@@ -2,7 +2,7 @@ import type {
   GraphStructure,
   DegreeMap,
   AdjacencyList,
-} from "./types"
+} from "../../types/visualization.type"
 import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 
 export function validateEdges(

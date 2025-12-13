@@ -2,7 +2,7 @@ import type {
   NodeLevels,
   DegreeMap,
   AdjacencyList,
-} from "./types"
+} from "../../types/visualization.type"
 import type { GraphNode } from "@/features/collections/models/collection.model"
 
 export function initializeQueue(

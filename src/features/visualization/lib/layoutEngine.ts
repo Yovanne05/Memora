@@ -2,8 +2,10 @@ import type {
   NodePosition,
   LayoutConfig,
   NodeLevels,
-} from "./layout/types"
-import { DEFAULT_LAYOUT_CONFIG } from "./layout/types"
+  EdgeGroup,
+} from "../types/visualization.type"
+import { DEFAULT_LAYOUT_CONFIG } from "../types/visualization.type"
+import type { GraphEdge, GraphNode } from "@/features/collections/models/collection.model"
 import { validateEdges, buildGraphStructure, findOrphanNodes } from "./layout/graphBuilder"
 import {
   initializeQueue,
@@ -11,8 +13,7 @@ import {
   assignRemainingLevels,
 } from "./layout/levelCalculator"
 import { groupNodesByLevel, calculatePositions } from "./layout/positionCalculator"
-export type { NodePosition, LayoutConfig } from "./layout/types"
-export type { EdgeGroup } from "./layout/types"
+export type { NodePosition, LayoutConfig, EdgeGroup }
 export {
   determineConnectionDirection,
   calculateEdgeOffset,
@@ -20,7 +21,6 @@ export {
 } from "./layout/edgeManager"
 export { calculateForceDirectedLayout } from "./layout/forceLayout"
 export { refineLayeredPositions } from "./layout/positionRefiner"
-import type { GraphEdge, GraphNode } from "@/features/collections/models/collection.model"
 
 export function calculateLayeredLayout(
   nodes: GraphNode[],

@@ -1,5 +1,5 @@
-import type { NodePosition } from "./types"
-import { DEFAULT_LAYOUT_CONFIG } from "./types"
+import type { NodePosition } from "../../types/visualization.type"
+import { DEFAULT_LAYOUT_CONFIG } from "../../types/visualization.type"
 import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 
 interface RefineLayoutConfig {

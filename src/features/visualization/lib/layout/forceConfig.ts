@@ -1,5 +1,5 @@
 import type { SimulationNodeDatum } from "d3-force"
-import type { NodePosition } from "./types"
+import type { NodePosition } from "../../types/visualization.type"
 
 export interface ForceLayoutConfig {
   width?: number

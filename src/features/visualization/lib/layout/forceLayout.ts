@@ -6,7 +6,8 @@ import {
   forceSimulation,
   type SimulationLinkDatum,
 } from "d3-force"
-import type { NodePosition } from "./types"
+import type { NodePosition } from "../../types/visualization.type"
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 import { detectClusters, analyzeClusters } from "./clustering"
 import {
   type ForceLayoutConfig,
@@ -16,7 +17,6 @@ import {
 } from "./forceConfig"
 import { calculateClusterStrength } from "./clusterForces"
 import { runSimulation } from "./simulationPhases"
-import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 interface ForceLayoutLink extends SimulationLinkDatum<ForceLayoutNode> {
   source: string
   target: string

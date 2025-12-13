@@ -1,4 +1,4 @@
-import type { NodeLevels, NodePosition } from "./types"
+import type { NodeLevels, NodePosition } from "../../types/visualization.type"
 
 export function groupNodesByLevel(levels: NodeLevels): Record<number, string[]> {
   const grouped: Record<number, string[]> = {}

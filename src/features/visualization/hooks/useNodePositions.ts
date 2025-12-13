@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import type { Collection } from "@/features/collections/models/collection.model"
-import type { NodePosition } from "../lib/layout/types"
+import type { NodePosition } from "../types/visualization.type"
 import {
   calculateLayeredLayout,
   calculateForceDirectedLayout,
