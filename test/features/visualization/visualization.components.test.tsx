@@ -59,7 +59,10 @@ describe("Visualization components", () => {
         name: "Col 1",
         description: "",
         visibility: "public",
+        tags: [],
         notes: [],
+        nodes: [],
+        edges: [],
         createdAt: "",
         updatedAt: "",
       },
@@ -91,38 +94,66 @@ describe("Visualization components", () => {
   })
 
   test("OrphanNotesZone liste les orphelins et declenche onSelect", async () => {
-    const data = {
-      collectionId: "c1",
+    const collection: Collection = {
+      id: "c1",
+      ownerId: "owner",
+      name: "Test",
+      description: "",
+      visibility: "public",
+      tags: [],
+      notes: [],
+      createdAt: "",
+      updatedAt: "",
       nodes: [
-        { id: "n1", title: "N1" },
-        { id: "n2", title: "N2" },
+        { id: "n1", data: { label: "N1", note_id: "n1", title: "N1", tags: [] } },
+        { id: "n2", data: { label: "N2", note_id: "n2", title: "N2", tags: [] } },
       ],
       edges: [],
     }
     const onSelect = vi.fn()
-    render(<OrphanNotesZone data={data} orphanNodeIds={new Set(["n2"])} onSelect={onSelect} />)
+    render(<OrphanNotesZone collection={collection} orphanNodeIds={new Set(["n2"])} onSelect={onSelect} />)
 
     await userEvent.click(screen.getByRole("button", { name: /N2/ }))
     expect(onSelect).toHaveBeenCalledWith("n2")
   })
 
   test("OrphanNotesZone ne rend rien sans orphelins", () => {
-    const data = { collectionId: "c1", nodes: [], edges: [] }
-    const { container } = render(<OrphanNotesZone data={data} orphanNodeIds={new Set()} />)
+    const collection: Collection = {
+      id: "c1",
+      ownerId: "owner",
+      name: "Test",
+      description: "",
+      visibility: "public",
+      tags: [],
+      notes: [],
+      createdAt: "",
+      updatedAt: "",
+      nodes: [],
+      edges: [],
+    }
+    const { container } = render(<OrphanNotesZone collection={collection} orphanNodeIds={new Set()} />)
     expect(container.firstChild).toBeNull()
   })
 
   test("OrphanNotesZone gere la navigation clavier", () => {
-    const data = {
-      collectionId: "c1",
+    const collection: Collection = {
+      id: "c1",
+      ownerId: "owner",
+      name: "Test",
+      description: "",
+      visibility: "public",
+      tags: [],
+      notes: [],
+      createdAt: "",
+      updatedAt: "",
       nodes: [
-        { id: "n1", title: "N1" },
-        { id: "n2", title: "N2" },
+        { id: "n1", data: { label: "N1", note_id: "n1", title: "N1", tags: [] } },
+        { id: "n2", data: { label: "N2", note_id: "n2", title: "N2", tags: [] } },
       ],
       edges: [],
     }
     const onSelect = vi.fn()
-    render(<OrphanNotesZone data={data} orphanNodeIds={new Set(["n2"])} onSelect={onSelect} />)
+    render(<OrphanNotesZone collection={collection} orphanNodeIds={new Set(["n2"])} onSelect={onSelect} />)
 
     const orphanButton = screen.getByRole("button", { name: /N2/ })
     fireEvent.keyDown(orphanButton, { key: "Enter" })

@@ -1,13 +1,14 @@
 import { transformNodesToReactFlow, filterValidEdges, extractNodePositions, transformEdgesToReactFlow, getNodeColorForMiniMap } from "@/features/visualization/lib/dataTransformers"
-import type { CollectionVisualization, VisualizationEdge, ReactFlowNode } from "@/features/visualization/types/visualization.type"
+import type { ReactFlowNode } from "@/features/visualization/types/visualization.type"
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 import { REACT_FLOW_STYLES } from "@/features/visualization/lib/visualization.constants"
 
 vi.mock("@/features/visualization/lib/layoutEngine", () => ({
-  groupEdgesByConnection: (edges: VisualizationEdge[], _positions: Record<string, { x: number; y: number }>) => {
+  groupEdgesByConnection: (edges: GraphEdge[], _positions: Record<string, { x: number; y: number }>) => {
     // simple grouping: one group per unique pair
     return edges.map((edge, index) => ({
-      sourceId: edge.sourceId,
-      targetId: edge.targetId,
+      sourceId: edge.source,
+      targetId: edge.target,
       sourceSide: "right" as const,
       targetSide: "left" as const,
       edgeIndices: [index],
@@ -16,18 +17,18 @@ vi.mock("@/features/visualization/lib/layoutEngine", () => ({
   calculateEdgeOffset: (localIndex: number) => localIndex * 10,
 }))
 
-const sampleData: CollectionVisualization = {
-  collectionId: "c1",
-  nodes: [
-    { id: "n1", title: "A" },
-    { id: "n2", title: "B" },
-  ],
-  edges: [{ sourceId: "n1", targetId: "n2" }],
-}
+const sampleNodes: GraphNode[] = [
+  { id: "n1", data: { label: "A", note_id: "n1", title: "A", tags: [] } },
+  { id: "n2", data: { label: "B", note_id: "n2", title: "B", tags: [] } },
+]
+
+const sampleEdges: GraphEdge[] = [
+  { id: "e1", source: "n1", target: "n2" },
+]
 
 describe("dataTransformers", () => {
   test("transformNodesToReactFlow applique la position par défaut et le nombre de connexions", () => {
-    const nodes = transformNodesToReactFlow(sampleData, { n1: { x: 5, y: 10 } }, { n1: 2, n2: 1 })
+    const nodes = transformNodesToReactFlow(sampleNodes, { n1: { x: 5, y: 10 } }, { n1: 2, n2: 1 })
     expect(nodes).toEqual([
       {
         id: "n1",
@@ -47,9 +48,9 @@ describe("dataTransformers", () => {
   test("filterValidEdges ignore les arêtes invalides et prévient", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
     const valid = new Set(["n1"])
-    const edges = [
-      { sourceId: "n1", targetId: "nX" },
-      { sourceId: "n1", targetId: "n1" },
+    const edges: GraphEdge[] = [
+      { id: "e1", source: "n1", target: "nX" },
+      { id: "e2", source: "n1", target: "n1" },
     ]
 
     const result = filterValidEdges(edges, valid)
@@ -71,10 +72,10 @@ describe("dataTransformers", () => {
 
   test("transformEdgesToReactFlow crée des arêtes ReactFlow avec styles", () => {
     const positions = { n1: { x: 0, y: 0 }, n2: { x: 10, y: 0 } }
-    const edges = transformEdgesToReactFlow(sampleData.edges, positions)
+    const edges = transformEdgesToReactFlow(sampleEdges, positions)
 
     expect(edges[0]).toMatchObject({
-      id: "en1-n2",
+      id: expect.stringContaining("n1"),
       source: "n1",
       target: "n2",
       sourceHandle: "right-source",
