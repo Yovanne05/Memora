@@ -31,7 +31,7 @@ class NoteDTO(BaseModel):
     content: str
     visibility: VisibilityEnum
     owner_id: str
-    owner_username: str
+    owner_username: str | None = None
     collection_id: str | None = None
     collection_name: str | None = None
     tags: List[str] = Field(default_factory=list)
