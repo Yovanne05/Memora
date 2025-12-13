@@ -1,4 +1,6 @@
-export interface CollectionsFilters {
+import type { QueryParamValue } from "@/types/query-params"
+
+export type CollectionsFilters = Record<string, QueryParamValue> & {
   ownerId?: string
   sharedWithUserId?: string
   visibility?: "private" | "public"
