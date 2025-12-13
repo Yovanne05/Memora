@@ -1,21 +1,26 @@
-import type {
-  CollectionVisualization,
-  NodeConnectionsMap,
-} from "../types/visualization.type"
+import type { NodeConnectionsMap } from "../types/visualization.type"
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 
-
+/**
+ * Calcule le nombre de connexions pour chaque nœud
+ *
+ * @param nodes - Nœuds de la collection
+ * @param edges - Arêtes de la collection
+ * @returns Map du nombre de connexions par nœud
+ */
 export function calculateNodeConnections(
-  data: CollectionVisualization
+  nodes: GraphNode[],
+  edges: GraphEdge[]
 ): NodeConnectionsMap {
   const connections: NodeConnectionsMap = {}
 
-  data.nodes.forEach((node) => {
+  nodes.forEach((node) => {
     connections[node.id] = 0
   })
 
-  data.edges.forEach((edge) => {
-    connections[edge.sourceId] = (connections[edge.sourceId] || 0) + 1
-    connections[edge.targetId] = (connections[edge.targetId] || 0) + 1
+  edges.forEach((edge) => {
+    connections[edge.source] = (connections[edge.source] || 0) + 1
+    connections[edge.target] = (connections[edge.target] || 0) + 1
   })
 
   return connections

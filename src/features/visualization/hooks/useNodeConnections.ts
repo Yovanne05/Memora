@@ -1,15 +1,13 @@
 import { useMemo } from "react"
-import type {
-  CollectionVisualization,
-  NodeConnectionsMap,
-} from "../types/visualization.type"
+import type { NodeConnectionsMap } from "../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 import { calculateNodeConnections } from "../lib/nodeConnections"
 
 export function useNodeConnections(
-  data?: CollectionVisualization
+  collection?: Collection
 ): NodeConnectionsMap {
   return useMemo<NodeConnectionsMap>(() => {
-    if (!data) return {}
-    return calculateNodeConnections(data)
-  }, [data])
+    if (!collection) return {}
+    return calculateNodeConnections(collection.nodes, collection.edges)
+  }, [collection])
 }

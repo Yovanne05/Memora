@@ -1,13 +1,12 @@
 import type { Node } from "reactflow"
 import type {
-  CollectionVisualization,
-  VisualizationEdge,
   ReactFlowNode,
   ReactFlowEdge,
   NodeConnectionsMap,
 } from "../types/visualization.type"
+import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 import type { CustomNodeData } from "../components/CustomNode"
-import type { NodePosition } from "./layout/types"
+import type { NodePosition, LayoutNode, LayoutEdge } from "./layout/types"
 import { REACT_FLOW_STYLES } from "./visualization.constants"
 import {
   groupEdgesByConnection,
@@ -15,19 +14,36 @@ import {
 } from "./layoutEngine"
 
 /**
- * Transforme les nœuds métier en nœuds ReactFlow avec leurs positions
+ * Convertit les nœuds de collection en nœuds de layout
+ */
+export function toLayoutNodes(nodes: GraphNode[]): LayoutNode[] {
+  return nodes.map((node) => ({ id: node.id }))
+}
+
+/**
+ * Convertit les arêtes de collection en arêtes de layout
+ */
+export function toLayoutEdges(edges: GraphEdge[]): LayoutEdge[] {
+  return edges.map((edge) => ({
+    sourceId: edge.source,
+    targetId: edge.target,
+  }))
+}
+
+/**
+ * Transforme les nœuds de collection en nœuds ReactFlow avec leurs positions
  *
- * @param data - Données de visualisation
+ * @param nodes - Nœuds de la collection
  * @param positions - Positions calculées pour chaque nœud
  * @param connections - Map des connexions de chaque nœud
  * @returns Nœuds formatés pour ReactFlow
  */
 export function transformNodesToReactFlow(
-  data: CollectionVisualization,
+  nodes: GraphNode[],
   positions: Record<string, NodePosition>,
   connections: NodeConnectionsMap
 ): ReactFlowNode[] {
-  return data.nodes.map((node) => {
+  return nodes.map((node) => {
     const position = positions[node.id] ?? { x: 0, y: 0 }
 
     return {
@@ -35,7 +51,7 @@ export function transformNodesToReactFlow(
       type: "custom",
       position,
       data: {
-        title: node.title,
+        title: node.data.title,
         connections: connections[node.id] ?? 0,
       },
     }
@@ -50,12 +66,12 @@ export function transformNodesToReactFlow(
  * @returns Arêtes valides
  */
 export function filterValidEdges(
-  edges: VisualizationEdge[],
+  edges: GraphEdge[],
   validNodeIds: Set<string>
-): VisualizationEdge[] {
+): GraphEdge[] {
   return edges.filter((edge) => {
     const isValid =
-      validNodeIds.has(edge.sourceId) && validNodeIds.has(edge.targetId)
+      validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
 
     if (!isValid) {
       console.warn(
@@ -87,35 +103,36 @@ export function extractNodePositions(
 }
 
 /**
- * Transforme les arêtes métier en arêtes ReactFlow avec gestion des arêtes parallèles
+ * Transforme les arêtes de collection en arêtes ReactFlow avec gestion des arêtes parallèles
  *
  * @param validEdges - Arêtes valides à transformer
  * @param nodePositions - Positions des nœuds
  * @returns Arêtes formatées pour ReactFlow
  */
 export function transformEdgesToReactFlow(
-  validEdges: VisualizationEdge[],
+  validEdges: GraphEdge[],
   nodePositions: Record<string, { x: number; y: number }>
 ): ReactFlowEdge[] {
-  const edgeGroups = groupEdgesByConnection(validEdges, nodePositions)
+  const layoutEdges = toLayoutEdges(validEdges)
+  const edgeGroups = groupEdgesByConnection(layoutEdges, nodePositions)
   const reactFlowEdges: ReactFlowEdge[] = []
 
   edgeGroups.forEach((group) => {
     const totalEdgesInGroup = group.edgeIndices.length
 
     group.edgeIndices.forEach((originalEdgeIndex, localIndex) => {
-      const originalEdge = validEdges[originalEdgeIndex]
+      const layoutEdge = layoutEdges[originalEdgeIndex]
       const offset = calculateEdgeOffset(localIndex, totalEdgesInGroup)
 
       const edgeId =
         totalEdgesInGroup === 1
-          ? `e${originalEdge.sourceId}-${originalEdge.targetId}`
-          : `e${originalEdge.sourceId}-${originalEdge.targetId}-${localIndex}`
+          ? `e${layoutEdge.sourceId}-${layoutEdge.targetId}`
+          : `e${layoutEdge.sourceId}-${layoutEdge.targetId}-${localIndex}`
 
       reactFlowEdges.push({
         id: edgeId,
-        source: originalEdge.sourceId,
-        target: originalEdge.targetId,
+        source: layoutEdge.sourceId,
+        target: layoutEdge.targetId,
         sourceHandle: `${group.sourceSide}-source`,
         targetHandle: `${group.targetSide}-target`,
         style: {

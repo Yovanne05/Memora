@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 import { visualizationService } from "../services/visualization.service"
-import type { CollectionVisualization } from "../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 
 export function useCollectionVisualizationQuery(collectionId?: string) {
-  return useQuery<CollectionVisualization>({
-    queryKey: ["visualization", "collection-visualization", collectionId],
+  return useQuery<Collection>({
+    queryKey: ["visualization", "collection", collectionId],
     enabled: !!collectionId,
-    queryFn: () => visualizationService.getCollectionVisualization(collectionId!),
+    queryFn: () => visualizationService.getCollectionForVisualization(collectionId!),
   })
 }
