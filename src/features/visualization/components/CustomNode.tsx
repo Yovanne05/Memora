@@ -1,13 +1,8 @@
 import { Position, type NodeProps } from "reactflow"
 import { NodeHandle } from "./NodeHandle"
 import { NodeContent } from "./NodeContent"
+import type { CustomNodeData, HandleSide } from "../types/visualization.type"
 
-export interface CustomNodeData {
-  title: string
-  connections: number
-}
-
-type HandleSide = "top" | "right" | "bottom" | "left"
 
 interface HandleConfig {
   position: Position

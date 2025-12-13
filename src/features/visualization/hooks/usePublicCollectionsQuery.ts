@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Collection } from "@/features/collections/models/collection.model";
-import { visualizationService } from "../services/visualization.service";
+import { collectionsService } from "@/features/collections/services/collections.service";
 
 export function usePublicCollectionsQuery() {
   return useQuery<Collection[]>({
     queryKey: ["visualization", "public-collections"],
-    queryFn: () => visualizationService.listPublicCollections(),
+    queryFn: () =>
+      collectionsService.list({
+        visibility: "public",
+        onlyWithNotes: true,
+        sortBy: "created_at",
+        sortDir: "desc",
+      }),
   });
 }

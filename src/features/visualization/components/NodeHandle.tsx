@@ -1,7 +1,6 @@
-import { Handle, Position } from "reactflow"
+import { Handle, Position, type HandleType } from "reactflow"
+import type { HandleSide } from "../types/visualization.type"
 
-type HandleSide = "top" | "right" | "bottom" | "left"
-type HandleType = "source" | "target"
 
 interface NodeHandleProps {
   position: Position

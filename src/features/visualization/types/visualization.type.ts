@@ -1,16 +1,11 @@
 import type { Node, Edge } from "reactflow"
-import type { CustomNodeData } from "../components/CustomNode"
+export interface CustomNodeData {
+  title: string
+  connections: number
+}
 
+export type HandleSide = "top" | "right" | "bottom" | "left"
+export type HandleType = "source" | "target"
 export type NodeConnectionsMap = Record<string, number>
 export type ReactFlowNode = Node<CustomNodeData>
 export type ReactFlowEdge = Edge
-
-export interface VisualizationComponentProps {
-  collectionId?: string
-}
-
-export interface VisualizationLayoutState {
-  nodes: ReactFlowNode[]
-  edges: ReactFlowEdge[]
-  orphanNodeIds: Set<string>
-}
