@@ -52,7 +52,7 @@ export default function NotesPage() {
           disabled={createNoteMutation.isPending}
         >
           <Plus className="h-4 w-4" />
-          {createNoteMutation.isPending ? "Creation..." : "Nouvelle note"}
+          {createNoteMutation.isPending ? "Création..." : "Nouvelle note"}
         </Button>
       </div>
 
