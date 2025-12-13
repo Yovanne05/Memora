@@ -41,8 +41,12 @@ def add(link: NoteLink) -> NoteLink:
 
 def delete(note_id_1: str, note_id_2: str) -> bool:
     normalized = _normalize_ids(note_id_1, note_id_2)
+    stmt = select(NoteLink).where(
+        NoteLink.note_id_1 == normalized[0],
+        NoteLink.note_id_2 == normalized[1],
+    )
     with get_db_session() as session:
-        entity = session.get(NoteLink, normalized)
+        entity = session.execute(stmt).scalar_one_or_none()
         if not entity:
             return False
         session.delete(entity)

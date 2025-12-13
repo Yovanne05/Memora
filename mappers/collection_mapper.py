@@ -4,12 +4,11 @@ from daos.note_dao import Note
 
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from dtos.note_dto import NoteDTO
-from mappers.note_mapper import note_to_dto_dict
 
 
-def _build_note_dtos(notes: List[Note], collection_name: str) -> List[NoteDTO]:
+def _build_note_dtos(notes: List[Note]) -> List[NoteDTO]:
     return [
-        NoteDTO.model_validate(note_to_dto_dict(note, collection_name_override=collection_name))
+        NoteDTO.model_validate(note)
         for note in notes
     ]
 
@@ -75,7 +74,7 @@ def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
             "tags": collection_entity.tags,
             "created_at": collection_entity.created_at,
             "updated_at": collection_entity.updated_at,
-            "notes": _build_note_dtos(notes, collection_entity.name),
+            "notes": _build_note_dtos(notes),
             "nodes": _build_graph_nodes(notes),
             "edges": _build_graph_edges(notes, note_ids),
         }

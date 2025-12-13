@@ -45,11 +45,12 @@ class NoteLinkService(NoteLinkServiceInterface):
         note_entity = note_repository.find_one(note_id)
         ensure_note_exists(note_entity)
 
+        linked_note_entity = note_repository.find_one(linked_note_id)
+        ensure_note_exists(linked_note_entity)
+
         ensure_not_self_link(note_id, linked_note_id)
 
-        deleted = note_link_repository.delete(note_id, linked_note_id)
-        if not deleted:
-            raise NoteLinkNotFound()
+        note_link_repository.delete(note_id, linked_note_id)
 
 
 note_link_service = NoteLinkService()

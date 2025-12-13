@@ -1,41 +1,43 @@
 from typing import Optional
-from sqlalchemy import inspect
 from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
+from typing import Optional
+from sqlalchemy import inspect 
+from daos.note_dao import Note
+from dtos.note_dto import NoteDTO
 
 
-def _get_collection_name(note_entity: Note, override: Optional[str] = None) -> Optional[str]:
-    if override is not None:
-        return override if note_entity.collection_id else None
-
-    if not note_entity.collection_id:
+def _safe_owner_username(note: Note) -> Optional[str]:
+    insp = inspect(note)
+    if "owner" in insp.unloaded:
         return None
-
-    insp = inspect(note_entity)
-    if 'collection' not in insp.unloaded:
-        return note_entity.collection.name if note_entity.collection else None
-
-    return None
+    return note.owner.username if note.owner else None
 
 
-def note_to_dto_dict(note_entity: Note, collection_name_override: Optional[str] = None) -> dict:
-    return {
-        "id": note_entity.id,
-        "title": note_entity.title,
-        "content": note_entity.content,
-        "visibility": note_entity.visibility,
-        "owner_id": note_entity.owner_id,
-        "owner_username": note_entity.owner.username,
-        "collection_id": note_entity.collection_id,
-        "collection_name": _get_collection_name(note_entity, collection_name_override),
-        "tags": note_entity.tags,
-        "created_at": note_entity.created_at,
-        "updated_at": note_entity.updated_at,
+def _safe_collection_name(note: Note) -> Optional[str]:
+    if not note.collection_id:
+        return None
+    insp = inspect(note)
+    if "collection" in insp.unloaded:
+        return None
+    return note.collection.name if note.collection else None
+
+
+def note_to_dto(note: Note) -> NoteDTO:
+    data = {
+        "id": note.id,
+        "title": note.title,
+        "content": note.content,
+        "visibility": note.visibility,
+        "owner_id": note.owner_id,
+        "collection_id": note.collection_id,
+        "tags": note.tags,
+        "created_at": note.created_at,
+        "updated_at": note.updated_at,
+        "owner_username": _safe_owner_username(note),
+        "collection_name": _safe_collection_name(note),
     }
-
-
-def note_to_dto(note_entity: Note, collection_name_override: Optional[str] = None) -> NoteDTO:
-    return NoteDTO.model_validate(note_to_dto_dict(note_entity, collection_name_override))
+    return NoteDTO.model_validate(data)
 
 
 def dto_to_note(note_create_dto: NoteCreateDTO) -> Note:
