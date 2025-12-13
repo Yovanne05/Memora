@@ -37,7 +37,7 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
 
       <Card className="border border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Details</CardTitle>
+          <CardTitle className="text-lg">Détails</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-3 text-sm text-muted-foreground">
