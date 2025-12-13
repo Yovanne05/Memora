@@ -1,7 +1,6 @@
-import { renderHook, waitFor } from "@testing-library/react"
+import { renderHook } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useCollectionVisualizationQuery } from "@/features/visualization/hooks/useCollectionVisualizationQuery"
-import type { Collection } from "@/features/collections/models/collection.model"
 import { vi } from "vitest"
 
 const visualizationServiceMock = vi.hoisted(() => ({
@@ -17,31 +16,6 @@ const createWrapper = (client: QueryClient) => {
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
 }
-
-const sample: Collection = {
-  id: "c1",
-  ownerId: "owner",
-  name: "Sample Collection",
-  description: "A sample collection for testing",
-  visibility: "private",
-  tags: [],
-  notes: [],
-  nodes: [
-    {
-      id: "n1",
-      data: {
-        label: "A",
-        note_id: "n1",
-        title: "A",
-        tags: [],
-      },
-    },
-  ],
-  edges: [],
-  createdAt: "2024-01-01T00:00:00.000Z",
-  updatedAt: "2024-01-02T00:00:00.000Z",
-}
-
 
 describe("useCollectionVisualizationQuery", () => {
   beforeEach(() => {
