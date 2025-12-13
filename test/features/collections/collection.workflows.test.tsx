@@ -9,15 +9,27 @@ import { useCollectionsBulkActions } from "@/features/collections/hooks/useColle
 import { useCollectionDetails } from "@/features/collections/hooks/useCollectionDetails"
 import type { Collection } from "@/features/collections/models/collection.model"
 
+interface MutationCallbacks<TData = unknown> {
+  onSuccess?: (data: TData) => void
+  onError?: (error: Error) => void
+}
+
+interface MockMutation {
+  mutateAsync: ReturnType<typeof vi.fn>
+  isPending: boolean
+  error: Error | null
+  reset: ReturnType<typeof vi.fn>
+}
+
 const mockUseCollectionsListQuery = vi.fn()
 
 const createMutationFactory = () => {
-  let callbacks: any
-  const mutateAsync = vi.fn(async (...args: any[]) => {
+  let callbacks: MutationCallbacks | undefined
+  const mutateAsync = vi.fn(async (...args: unknown[]) => {
     callbacks?.onSuccess?.(args[0])
   })
   const reset = vi.fn()
-  const hook = (cb?: any) => {
+  const hook = (cb?: MutationCallbacks): MockMutation => {
     callbacks = cb
     return { mutateAsync, isPending: false, error: null, reset }
   }
@@ -32,9 +44,9 @@ const mockUseCollectionQuery = vi.fn()
 
 vi.mock("@/features/collections/hooks/useCollectionsQuery", () => ({
   useCollectionsListQuery: () => mockUseCollectionsListQuery(),
-  useCreateCollectionMutation: (cb?: any) => createMutation.hook(cb),
-  useUpdateCollectionMutation: (cb?: any) => updateMutation.hook(cb),
-  useDeleteCollectionMutation: (cb?: any) => deleteMutation.hook(cb),
+  useCreateCollectionMutation: (cb?: MutationCallbacks) => createMutation.hook(cb),
+  useUpdateCollectionMutation: (cb?: MutationCallbacks) => updateMutation.hook(cb),
+  useDeleteCollectionMutation: (cb?: MutationCallbacks) => deleteMutation.hook(cb),
   useCollectionQuery: (id: string) => mockUseCollectionQuery(id),
 }))
 
@@ -55,6 +67,9 @@ const sampleCollection: Collection = {
   description: "Desc",
   visibility: "private",
   notes: [],
+  tags: [],
+  nodes: [],
+  edges: [],
   createdAt: "2024-01-01T00:00:00.000Z",
   updatedAt: "2024-01-02T00:00:00.000Z",
 }

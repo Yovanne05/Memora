@@ -6,8 +6,40 @@ import { CollectionsToolbar } from "@/features/collections/components/list/Colle
 import { CollectionCollaboratorsSection } from "@/features/collections/components/details/CollectionCollaboratorsSection"
 import { CollectionNotesHeader } from "@/features/collections/components/details/CollectionNotesHeader"
 
+interface FormSelectOption {
+  value: string
+  label: string
+}
+
+interface FormSelectProps {
+  value: string
+  onValueChange?: (value: string) => void
+  options: FormSelectOption[]
+  id?: string
+  label?: string
+}
+
+interface SelectProps {
+  value: string
+  onValueChange?: (value: string) => void
+  children: React.ReactNode
+}
+
+interface SelectItemProps {
+  value: string
+  children: React.ReactNode
+}
+
+interface SelectTriggerProps {
+  children: React.ReactNode
+}
+
+interface SelectContentProps {
+  children: React.ReactNode
+}
+
 vi.mock("@/components/ui/form-select", () => ({
-  FormSelect: ({ value, onValueChange, options, id, label }: any) => (
+  FormSelect: ({ value, onValueChange, options, id, label }: FormSelectProps) => (
     <div>
       {label && <label htmlFor={id}>{label}</label>}
       <select
@@ -16,7 +48,7 @@ vi.mock("@/components/ui/form-select", () => ({
         onChange={(e) => onValueChange?.(e.target.value)}
       >
         <option value="">--</option>
-        {options.map((opt: any) => (
+        {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>
@@ -27,16 +59,17 @@ vi.mock("@/components/ui/form-select", () => ({
 }))
 
 vi.mock("@/components/ui/select", () => {
-  const SelectItem = ({ value, children }: any) => <option value={value}>{children}</option>
+  const SelectItem = ({ value, children }: SelectItemProps) => <option value={value}>{children}</option>
 
-  const Select = ({ value, onValueChange, children }: any) => {
-    const flatten = (nodes: any): any[] =>
-      React.Children.toArray(nodes).flatMap((node: any) => {
-        if (node?.type === "option") return node
-        if (node?.props?.value !== undefined) {
-          return <option value={node.props.value}>{node.props.children}</option>
+  const Select = ({ value, onValueChange, children }: SelectProps) => {
+    const flatten = (nodes: React.ReactNode): React.ReactElement[] =>
+      React.Children.toArray(nodes).flatMap((node) => {
+        const elem = node as React.ReactElement<{ value?: string; children?: React.ReactNode }>
+        if (elem?.type === "option") return elem
+        if (elem?.props?.value !== undefined) {
+          return <option value={elem.props.value}>{elem.props.children}</option>
         }
-        if (node?.props?.children) return flatten(node.props.children)
+        if (elem?.props?.children) return flatten(elem.props.children)
         return []
       })
 
@@ -55,9 +88,9 @@ vi.mock("@/components/ui/select", () => {
 
   return {
     Select,
-    SelectTrigger: ({ children }: any) => <>{children}</>,
+    SelectTrigger: ({ children }: SelectTriggerProps) => <>{children}</>,
     SelectValue: () => null,
-    SelectContent: ({ children }: any) => <>{children}</>,
+    SelectContent: ({ children }: SelectContentProps) => <>{children}</>,
     SelectItem,
   }
 })

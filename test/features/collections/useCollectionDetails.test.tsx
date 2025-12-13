@@ -1,4 +1,4 @@
-import { renderHook, waitFor, act } from "@testing-library/react"
+import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { vi } from "vitest"
 import { useCollectionDetails } from "@/features/collections/hooks/useCollectionDetails"

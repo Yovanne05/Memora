@@ -38,7 +38,8 @@ describe("useUsersQuery hooks", () => {
     username: "testuser",
     email: "test@example.com",
     createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-02T00:00:00.000Z",
+    role: "client",
+    displayName: "Test User",
   }
 
   beforeEach(() => {

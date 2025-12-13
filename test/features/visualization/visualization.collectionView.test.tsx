@@ -2,6 +2,31 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { CollectionVisualizationView } from "@/features/visualization/components/CollectionVisualizationView"
 import type { CollectionVisualization } from "@/features/visualization/types/visualization.type"
+import type { Note } from "@/features/notes/models/note.model"
+import type { ReactFlowNode, ReactFlowEdge } from "@/features/visualization/types/visualization.type"
+
+interface OrphanNotesZoneProps {
+  orphanNodeIds: Set<string>
+  onSelect?: (id: string) => void
+}
+
+interface VisualizationHeaderProps {
+  notesCount: number
+  connectionsCount: number
+}
+
+interface NoteSidebarProps {
+  open: boolean
+  onClose: () => void
+  relatedNotes: Note[]
+}
+
+interface ReactFlowProps {
+  nodes: ReactFlowNode[]
+  edges: ReactFlowEdge[]
+  onNodeClick?: (event: React.MouseEvent, node: ReactFlowNode) => void
+  onPaneClick?: (event: React.MouseEvent) => void
+}
 
 const mockUseCollectionVisualizationQuery = vi.hoisted(() => vi.fn())
 const mockUseVisualizationLayout = vi.hoisted(() => vi.fn())
