@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useCollectionsQuery } from "@/features/collections/hooks/useAllCollectionsQuery"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { NoteVisibility } from "../../models/note.model"
 import { X } from "lucide-react"
@@ -229,7 +229,7 @@ export function CreateNoteDialog({
   onSubmit,
   submitting = false,
 }: Readonly<CreateNoteDialogProps>) {
-  const { data: collections, isLoading: loadingCollections } = useCollectionsQuery()
+  const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
   const { state, addTag, removeTag, updateField, reset } = useCreateNoteForm()
 
   const handleSubmit = async () => {

@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Check, Save, Trash2, X } from "lucide-react"
-import { useCollectionsQuery } from "@/features/collections/hooks/useAllCollectionsQuery"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { Note, NoteVisibility } from "../../models/note.model"
 
@@ -49,7 +49,7 @@ export function NoteEditForm({
   const [tagsInput, setTagsInput] = useState("")
   const [tags, setTags] = useState<string[]>(note?.tags ?? [])
   const [lastSavedAt, setLastSavedAt] = useState<string | undefined>()
-  const { data: collections, isLoading: loadingCollections } = useCollectionsQuery()
+  const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
 
   useEffect(() => {
     if (note) {
