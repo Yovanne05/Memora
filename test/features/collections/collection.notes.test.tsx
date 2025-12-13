@@ -126,7 +126,7 @@ describe("Notes des collections", () => {
     await user.click(screen.getByRole("button", { name: /Retirer/ }))
     expect(onRemove).toHaveBeenCalledWith("n1")
   })
-/** 
+
   test("CollectionNotesSection ajoute et retire des notes", async () => {
     const user = userEvent.setup()
 
@@ -153,19 +153,19 @@ describe("Notes des collections", () => {
         }
       }
     )
-*/
+
     render(<CollectionNotesSection />, { wrapper: createWrapper() })
 
     await user.selectOptions(screen.getByTestId("add-note"), "available-1")
     expect(mockUpdateNoteMutation.mutateAsync).toHaveBeenCalledWith({
       noteId: "available-1",
-      payload: { collection_id: "col-1" },
+      payload: { collectionId: "col-1" },
     })
 
     await user.click(screen.getByRole("button", { name: /Retirer/ }))
     expect(mockUpdateNoteMutation.mutateAsync).toHaveBeenCalledWith({
       noteId: "n1",
-      payload: { collection_id: null },
+      payload: { collectionId: null },
     })
   })
 })

@@ -5,12 +5,12 @@ import type { Collection } from "@/features/collections/models/collection.model"
 import { vi } from "vitest"
 import type { ReactNode } from "react"
 
-const visualizationServiceMock = vi.hoisted(() => ({
-  listPublicCollections: vi.fn(),
+const collectionsServiceMock = vi.hoisted(() => ({
+  list: vi.fn(),
 }))
 
-vi.mock("@/features/visualization/services/visualization.service", () => ({
-  visualizationService: visualizationServiceMock,
+vi.mock("@/features/collections/services/collections.service", () => ({
+  collectionsService: collectionsServiceMock,
 }))
 
 const createWrapper = () => {
@@ -52,7 +52,7 @@ describe("usePublicCollectionsQuery", () => {
   })
 
   test("récupère les collections publiques", async () => {
-    visualizationServiceMock.listPublicCollections.mockResolvedValueOnce(sample)
+    collectionsServiceMock.list.mockResolvedValueOnce(sample)
 
     const { result } = renderHook(() => usePublicCollectionsQuery(), {
       wrapper: createWrapper(),
@@ -63,6 +63,12 @@ describe("usePublicCollectionsQuery", () => {
       expect(result.current.data).toEqual(sample)
     })
 
-    expect(visualizationServiceMock.listPublicCollections).toHaveBeenCalledTimes(1)
+    expect(collectionsServiceMock.list).toHaveBeenCalledTimes(1)
+    expect(collectionsServiceMock.list).toHaveBeenCalledWith({
+      visibility: "public",
+      onlyWithNotes: true,
+      sortBy: "created_at",
+      sortDir: "desc",
+    })
   })
 })
