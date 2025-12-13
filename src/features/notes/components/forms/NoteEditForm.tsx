@@ -25,7 +25,7 @@ import { Check, Save, Trash2, X } from "lucide-react"
 import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { Note, NoteVisibility } from "../../models/note.model"
-import { noteEditFormSchema, type NoteEditFormInput } from "../../schemas/note.schema"
+import { noteEditFormSchema } from "../../schemas/note.schema"
 
 export interface NoteFormValues {
   title: string
@@ -56,7 +56,7 @@ export function NoteEditForm({
   const [lastSavedAt, setLastSavedAt] = useState<string | undefined>(note?.updatedAt)
   const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
 
-  const form = useForm<NoteEditFormInput>({
+  const form = useForm({
     resolver: zodResolver(noteEditFormSchema),
     defaultValues: {
       title: note?.title ?? "",
@@ -79,7 +79,7 @@ export function NoteEditForm({
     setTagInput("")
   }, [note, form])
 
-  const tags = form.watch("tags")
+  const tags = form.watch("tags") ?? []
 
   const savedTime = useMemo(() => {
     if (!lastSavedAt) return null
@@ -118,7 +118,6 @@ export function NoteEditForm({
 
   const isFormDisabled = loading || form.formState.isSubmitting
 
-  return (
   return (
     <Form {...form}>
       <form className="space-y-6" onSubmit={handleFormSubmit}>
