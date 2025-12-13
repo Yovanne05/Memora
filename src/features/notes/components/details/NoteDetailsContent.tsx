@@ -1,7 +1,8 @@
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import type { Note } from "../../models/note.model"
-import { CalendarClock, Globe, Lock, NotebookPen } from "lucide-react"
+import { CalendarClock, FolderClosed, Globe, Lock, NotebookPen, Tag } from "lucide-react"
 
 interface NoteDetailsContentProps {
   note: Note
@@ -21,7 +22,6 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
   return (
     <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
       <Card className="border border-border/70 shadow-sm">
-
         <CardContent className="space-y-4 text-base leading-relaxed text-foreground">
           {paragraphs.length ? (
             paragraphs.map((block, index) => (
@@ -30,21 +30,27 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
               </p>
             ))
           ) : (
-            <p className="text-muted-foreground">Aucun contenu à afficher pour cette note.</p>
+            <p className="text-muted-foreground">Aucun contenu a afficher pour cette note.</p>
           )}
         </CardContent>
       </Card>
 
       <Card className="border border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Détails</CardTitle>
+          <CardTitle className="text-lg">Details</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <NotebookPen className="h-4 w-4" />
             <span className="text-foreground">Propriétaire</span>
-            <span>{note.ownerId}</span>
+            <span>{note.ownerUsername}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <FolderClosed className="h-4 w-4" />
+            <span className="text-foreground">Collection</span>
+            <span>{note.collectionName ?? "Sans collection"}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -56,6 +62,19 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
             <span className="text-foreground">Visibilité</span>
             <span className="capitalize">{note.visibility === "public" ? "Publique" : "Privée"}</span>
           </div>
+
+          {!!note.tags.length && (
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              <div className="flex flex-wrap gap-1.5">
+                {note.tags.map((tag) => (
+                  <Badge key={tag} variant="outline" className="border-border bg-background">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
 
           <Separator />
 
@@ -75,4 +94,3 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
     </div>
   )
 }
-

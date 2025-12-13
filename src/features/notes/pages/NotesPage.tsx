@@ -8,27 +8,37 @@ import { NotesContent } from "../components/list/NotesContent"
 import { NotesPagination } from "../components/list/NotesPagination"
 import { useNotesManager } from "../hooks/useNotesManager"
 import { useCreateNoteMutation } from "../hooks/useCreateNoteMutation"
+import { useState } from "react"
+import { CreateNoteDialog } from "../components/dialogs/CreateNoteDialog"
 
 export default function NotesPage() {
   const router = useRouter()
   const manager = useNotesManager()
   const { userId } = useCurrentUser()
   const createNoteMutation = useCreateNoteMutation()
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-  const handleCreateNote = async () => {
+  const handleCreateNote = async (payload: {
+    title: string
+    collectionId: string | null
+    visibility: "private" | "public"
+    tags: string[]
+  }) => {
     if (!userId) return
-    const timestamp = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
-
     const note = await createNoteMutation.mutateAsync({
-      title: `Nouvelle note ${timestamp}`,
-      content: "Commencez a rediger vos idees...",
-      visibility: "private",
+      title: payload.title,
+      content: payload.title,
+      visibility: payload.visibility,
+      collectionId: payload.collectionId,
+      tags: payload.tags,
+      ownerId: userId,
     })
 
     router.navigate({
       to: "/app/notes/$id/edit",
       params: { id: note.id },
     })
+    setDialogOpen(false)
   }
 
   return (
@@ -38,7 +48,7 @@ export default function NotesPage() {
         <Button
           size="lg"
           className="gap-2"
-          onClick={handleCreateNote}
+          onClick={() => setDialogOpen(true)}
           disabled={createNoteMutation.isPending}
         >
           <Plus className="h-4 w-4" />
@@ -64,10 +74,6 @@ export default function NotesPage() {
         }}
         view={manager.view}
         onViewChange={manager.setView}
-        onReset={() => {
-          manager.reset()
-          manager.setPage(0)
-        }}
         onSubmitSearch={() => manager.setPage(0)}
       />
 
@@ -80,6 +86,13 @@ export default function NotesPage() {
       />
 
       <NotesPagination page={manager.page} maxPage={manager.maxPage} setPage={manager.setPage} />
+
+      <CreateNoteDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleCreateNote}
+        submitting={createNoteMutation.isPending}
+      />
     </div>
   )
 }

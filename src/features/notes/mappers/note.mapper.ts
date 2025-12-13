@@ -6,9 +6,12 @@ export function dtoToNote(dto: NoteDto): Note {
   return {
     id: dto.id,
     collectionId: dto.collection_id,
+    collectionName: dto.collection_name,
     ownerId: dto.owner_id,
+    ownerUsername: dto.owner_username,
     title: dto.title,
     content: dto.content,
+    tags: dto.tags ?? [],
     visibility: dto.visibility ?? "private",
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
@@ -21,6 +24,7 @@ export function toNoteCreateDto(payload: NoteCreate): NoteCreateDto {
     owner_id: payload.ownerId,
     title: payload.title,
     content: payload.content,
+    tags: payload.tags,
     visibility: payload.visibility ?? "private",
   }
 }
@@ -30,6 +34,7 @@ export function toNoteUpdateDto(payload: NoteUpdate): NoteUpdateDto {
     collection_id: payload.collectionId,
     title: payload.title,
     content: payload.content,
+    tags: payload.tags,
     visibility: payload.visibility,
   }
 }

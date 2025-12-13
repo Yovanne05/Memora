@@ -8,8 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { LayoutGrid, List, RefreshCcw, Search, SlidersHorizontal } from "lucide-react"
+import { LayoutGrid, List, Search } from "lucide-react"
 import type { NotesSort, NotesView } from "../../hooks/useNotesManager"
 import type { NotesFilters } from "../../types/note-query"
 
@@ -22,7 +21,6 @@ interface NotesToolbarProps {
   onVisibilityChange: (value: NotesFilters["visibility"]) => void
   view: NotesView
   onViewChange: (value: NotesView) => void
-  onReset: () => void
   onSubmitSearch?: () => void
 }
 
@@ -35,13 +33,12 @@ export function NotesToolbar({
   onVisibilityChange,
   view,
   onViewChange,
-  onReset,
   onSubmitSearch,
 }: Readonly<NotesToolbarProps>) {
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full min-w-60 lg:w-80">
+        <div className="relative w-full min-w-60 lg:w-[28rem]">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Rechercher une note..."
@@ -67,10 +64,7 @@ export function NotesToolbar({
             </TabsList>
           </Tabs>
 
-          <Select
-            value={sort}
-            onValueChange={(value: NotesSort) => onSortChange(value)}
-          >
+          <Select value={sort} onValueChange={(value: NotesSort) => onSortChange(value)}>
             <SelectTrigger className="w-[190px]">
               <SelectValue placeholder="Trier" />
             </SelectTrigger>
@@ -86,7 +80,7 @@ export function NotesToolbar({
             <Button
               variant={view === "grid" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9"
+              className="h-8 w-8"
               onClick={() => onViewChange("grid")}
             >
               <LayoutGrid className="h-4 w-4" />
@@ -94,7 +88,7 @@ export function NotesToolbar({
             <Button
               variant={view === "list" ? "default" : "ghost"}
               size="icon"
-              className="h-9 w-9"
+              className="h-8 w-8"
               onClick={() => onViewChange("list")}
             >
               <List className="h-4 w-4" />
@@ -102,17 +96,6 @@ export function NotesToolbar({
           </div>
         </div>
       </div>
-
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <SlidersHorizontal className="h-3.5 w-3.5" />
-        <span>Filtres actifs</span>
-        <Separator orientation="vertical" className="h-4" />
-        <Button variant="ghost" size="sm" className="gap-1 text-foreground" onClick={onReset}>
-          <RefreshCcw className="h-3.5 w-3.5" />
-          Réinitialiser
-        </Button>
-      </div>
     </div>
   )
 }
-

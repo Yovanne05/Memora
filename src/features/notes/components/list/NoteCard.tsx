@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { CalendarClock, Eye, FileText, Lock, MoreHorizontal } from "lucide-react"
+import { CalendarClock, Eye, FileText, FolderClosed, Lock, MoreHorizontal, Tag, User2 } from "lucide-react"
 import type { Note } from "../../models/note.model"
 
 interface NoteCardProps {
@@ -93,35 +93,48 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
         </CardHeader>
 
         <CardContent className="space-y-3 pt-0 text-sm text-muted-foreground">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge
-              variant="outline"
-              className={
-                isPublic
-                  ? "border-emerald-400/50 bg-emerald-50 text-emerald-700"
-                  : "border-border bg-muted text-foreground"
-              }
-            >
-              {isPublic ? "Publique" : "Privée"}
-            </Badge>
-            <Badge variant="secondary">
-              {note.collectionId ? "Dans une collection" : "Sans collection"}
-            </Badge>
-          </div>
+          <Badge variant="secondary" className="inline-flex items-center gap-1">
+            <FolderClosed className="h-3.5 w-3.5" />
+            <span className="truncate max-w-[160px]">{note.collectionName ?? "Sans collection"}</span>
+          </Badge>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs">
-            <span className="flex items-center gap-1 text-foreground">
-              {isPublic ? <Eye className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-              {isPublic ? "Partagée" : "Privée"}
-            </span>
-            <span className="flex items-center gap-1">
-              <CalendarClock className="h-3.5 w-3.5" />
-              Mis à jour le {formatDate(note.updatedAt)}
-            </span>
+          <div className="space-y-2">
+            {!!note.tags.length && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                {note.tags.map((tag) => (
+                  <Badge key={tag} variant="outline" className="border-border bg-background text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-3 text-xs">
+              <span className="flex items-center gap-1 text-foreground">
+                <User2 className="h-3.5 w-3.5" />
+                {note.ownerUsername}
+                <span className="text-muted-foreground">•</span>
+                {isPublic ? (
+                  <>
+                    <Eye className="h-3.5 w-3.5" />
+                    Publique
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-3.5 w-3.5" />
+                    Privée
+                  </>
+                )}
+              </span>
+              <span className="flex items-center gap-1">
+                <CalendarClock className="h-3.5 w-3.5" />
+                Mis à jour le {formatDate(note.updatedAt)}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
     </Link>
   )
 }
-
