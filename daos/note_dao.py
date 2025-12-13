@@ -67,6 +67,11 @@ class Note(Base):
         nullable=False,
         server_default=text("'{}'"),
     )
+    images: Mapped[list[str]] = mapped_column(
+        StringArray,
+        nullable=False,
+        server_default=text("'{}'"),
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )

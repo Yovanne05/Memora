@@ -32,6 +32,7 @@ def note_to_dto(note: Note) -> NoteDTO:
         "owner_id": note.owner_id,
         "collection_id": note.collection_id,
         "tags": note.tags,
+        "images": note.images,
         "created_at": note.created_at,
         "updated_at": note.updated_at,
         "owner_username": _safe_owner_username(note),
@@ -48,4 +49,5 @@ def dto_to_note(note_create_dto: NoteCreateDTO) -> Note:
         collection_id=note_create_dto.collection_id,
         visibility=note_create_dto.visibility,
         tags=note_create_dto.tags,
+        images=note_create_dto.images,
     )

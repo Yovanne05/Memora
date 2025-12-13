@@ -40,3 +40,7 @@ def get_db_session() -> Generator[Session, None, None]:
 
 def create_all() -> None:
     Base.metadata.create_all(bind=engine)
+
+
+def drop_all() -> None:
+    Base.metadata.drop_all(bind=engine)

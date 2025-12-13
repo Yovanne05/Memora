@@ -6,6 +6,7 @@ from controllers.user_controller import bp_users
 from controllers.collection_controller import bp_collections
 from controllers.share_note_controller import bp_note_shares
 from controllers.share_collection_controller import bp_collection_shares
+from controllers.image_note_controller import bp_note_images
 from config import APP_ENV
 from utils import db
 from utils.filter import register_global_filter
@@ -30,6 +31,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_collections)
     app.register_blueprint(bp_note_shares)
     app.register_blueprint(bp_collection_shares)
+    app.register_blueprint(bp_note_images)
 
     return app
 
