@@ -1,7 +1,7 @@
 import { useQueries } from "@tanstack/react-query"
-import { fetchNoteById } from "../api/notes.api"
 import type { Note } from "../models/note.model"
 import type { NoteLink } from "../models/note-link.model"
+import { notesService } from "../services/notes.service"
 
 export function useLinkedNotesQuery(links: NoteLink[] | undefined) {
   const linkedNoteIds = links?.map(link => link.linkedNoteId) ?? []
@@ -9,7 +9,7 @@ export function useLinkedNotesQuery(links: NoteLink[] | undefined) {
   const queries = useQueries({
     queries: linkedNoteIds.map(noteId => ({
       queryKey: ["note", noteId],
-      queryFn: () => fetchNoteById(noteId),
+      queryFn: () => notesService.get(noteId),
       retry: 1,
       staleTime: 5 * 60 * 1000,
     }))

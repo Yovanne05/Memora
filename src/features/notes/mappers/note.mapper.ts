@@ -6,7 +6,7 @@ export function dtoToNote(dto: NoteDto): Note {
   return {
     id: dto.id,
     collectionId: dto.collection_id,
-    collectionName: dto.collection_name,
+    collectionName: dto.collection_name ?? null,
     ownerId: dto.owner_id,
     ownerUsername: dto.owner_username,
     title: dto.title,

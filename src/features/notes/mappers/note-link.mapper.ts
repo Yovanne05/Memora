@@ -1,4 +1,4 @@
-import type { NoteLinkDto, CreateNoteLinkDto } from "../dto/note-link.dto"
+import type { CreateNoteLinkDto, NoteLinkDto } from "../dtos/note-link.dto"
 import type { NoteLink, CreateNoteLink } from "../models/note-link.model"
 
 export function dtoToNoteLink(dto: NoteLinkDto): NoteLink {
