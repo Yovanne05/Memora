@@ -5,9 +5,12 @@ export const noteVisibilitySchema = z.enum(["private", "public"])
 export const noteDtoSchema = z.object({
   id: z.uuid(),
   collection_id: z.uuid().nullable(),
+  collection_name: z.string().nullable(),
   owner_id: z.uuid(),
+  owner_username: z.string(),
   title: z.string().min(1).max(255),
   content: z.string(),
+  tags: z.array(z.string()).default([]),
   visibility: noteVisibilitySchema.default("private"),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
@@ -26,6 +29,7 @@ export const noteCreateDtoSchema = z.object({
   owner_id: z.uuid(),
   title: z.string().min(1).max(255),
   content: z.string(),
+  tags: z.array(z.string()).optional(),
   visibility: noteVisibilitySchema.optional(),
 })
 
@@ -33,6 +37,7 @@ export const noteUpdateDtoSchema = z.object({
   collection_id: z.uuid().nullable().optional(),
   title: z.string().min(1).max(255).optional(),
   content: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   visibility: noteVisibilitySchema.optional(),
 })
 
