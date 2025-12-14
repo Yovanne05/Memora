@@ -1,5 +1,7 @@
 from http import HTTPStatus
 from flask import jsonify
+from flask_jwt_extended.exceptions import JWTExtendedException
+from flask_limiter.errors import RateLimitExceeded
 from werkzeug.exceptions import HTTPException
 from pydantic import ValidationError
 
@@ -13,6 +15,10 @@ def register_global_filter(app):
             status_code = int(error.code)
         elif isinstance(error, ValidationError):
             status_code = int(HTTPStatus.UNPROCESSABLE_ENTITY)
+        elif isinstance(error, JWTExtendedException):
+            status_code = int(HTTPStatus.UNAUTHORIZED)
+        elif isinstance(error, RateLimitExceeded):
+            status_code = int(HTTPStatus.TOO_MANY_REQUESTS)
         else:
             status_code = int(HTTPStatus.INTERNAL_SERVER_ERROR)
 
