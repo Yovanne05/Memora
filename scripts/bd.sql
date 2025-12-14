@@ -26,7 +26,8 @@ CREATE TABLE users (
     password_hash   TEXT NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login      TIMESTAMP,
-    role            VARCHAR(20) NOT NULL DEFAULT 'user'
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    role            VARCHAR(20) NOT NULL DEFAULT 'client'
 );
 
 CREATE INDEX idx_users_role ON users (role);

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum as SAEnum, String, Text, text
+from sqlalchemy import Boolean, DateTime, Enum as SAEnum, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
@@ -35,6 +35,12 @@ class User(Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
+    last_login: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("true")
     )
 
     collections: Mapped[list["Collection"]] = relationship(
