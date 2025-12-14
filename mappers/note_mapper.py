@@ -1,10 +1,7 @@
 from typing import Optional
+from sqlalchemy import inspect
 from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
-from typing import Optional
-from sqlalchemy import inspect 
-from daos.note_dao import Note
-from dtos.note_dto import NoteDTO
 
 
 def _safe_owner_username(note: Note) -> Optional[str]:

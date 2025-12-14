@@ -6,6 +6,10 @@ from controllers.auth_controller import bp_auth
 from controllers.collection_controller import bp_collections
 from controllers.note_controller import bp_notes
 from controllers.user_controller import bp_users
+from controllers.collection_controller import bp_collections
+from controllers.share_note_controller import bp_note_shares
+from controllers.share_collection_controller import bp_collection_shares
+from controllers.image_note_controller import bp_note_images
 from utils import db
 from utils.jwt import init_jwt
 from utils.limiter import init_limiter
@@ -36,6 +40,9 @@ def create_app() -> Flask:
     app.register_blueprint(bp_users)
     app.register_blueprint(bp_notes)
     app.register_blueprint(bp_collections)
+    app.register_blueprint(bp_note_shares)
+    app.register_blueprint(bp_collection_shares)
+    app.register_blueprint(bp_note_images)
 
     return app
 

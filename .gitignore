@@ -2,3 +2,9 @@
 !.gitkeep
 __pycache__/
 logs/
+
+# Ignorer toutes les images uploadées
+uploads/**
+
+# Mais garder les .gitkeep
+!uploads/**/.gitkeep

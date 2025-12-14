@@ -7,12 +7,12 @@ from flasgger import swag_from
 
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
 from dtos.note_link_dto import NoteLinkCreateDTO
-from dtos.note_share_dto import NoteShareCreateDTO, NoteShareUpdateDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
 from services.impl.note.note_link_service_impl import note_link_service
-from services.impl.note.note_share_service_impl import note_share_service
+
 from utils.swagger import swagger_doc
+
 
 bp_notes = Blueprint("notes", __name__, url_prefix="/notes")
 
@@ -68,51 +68,7 @@ def delete(note_id: UUID):
     return "", HTTPStatus.NO_CONTENT
 
 
-@swag_from(swagger_doc("notes/share_list.yaml"))
-@bp_notes.get("/<uuid:note_id>/shares")
-@jwt_required()
-def list_shares(note_id: UUID):
-    share_dtos = note_share_service.list_shares(str(note_id))
-    return (
-        jsonify(
-            {
-                "items": [dto.model_dump() for dto in share_dtos],
-                "total": len(share_dtos),
-            }
-        ),
-        HTTPStatus.OK,
-    )
-
-
-@swag_from(swagger_doc("notes/share_create.yaml"))
-@bp_notes.post("/<uuid:note_id>/shares")
-@jwt_required()
-def share_note(note_id: UUID):
-    payload = NoteShareCreateDTO.model_validate_json(request.data)
-    share_dto = note_share_service.share_note(str(note_id), payload)
-    return jsonify(share_dto.model_dump()), HTTPStatus.CREATED
-
-
-@swag_from(swagger_doc("notes/share_update.yaml"))
-@bp_notes.patch("/<uuid:note_id>/shares/<uuid:user_id>")
-@jwt_required()
-def update_share(note_id: UUID, user_id: UUID):
-    payload = NoteShareUpdateDTO.model_validate_json(request.data)
-    share_dto = note_share_service.update_share(
-        str(note_id), str(user_id), payload
-    )
-    return jsonify(share_dto.model_dump()), HTTPStatus.OK
-
-
-@swag_from(swagger_doc("notes/share_delete.yaml"))
-@bp_notes.delete("/<uuid:note_id>/shares/<uuid:user_id>")
-@jwt_required()
-def revoke_share(note_id: UUID, user_id: UUID):
-    note_share_service.revoke_share(str(note_id), str(user_id))
-    return "", HTTPStatus.NO_CONTENT
-
-
-@swag_from(swagger_doc("notes/links_list.yaml"))
+@swag_from("../docs/notes/links_list.yaml")
 @bp_notes.get("/<uuid:note_id>/links")
 @jwt_required()
 def list_links(note_id: UUID):

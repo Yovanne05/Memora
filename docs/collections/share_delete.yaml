@@ -1,5 +1,5 @@
 tags:
-  - collections
+  - collection-shares
 summary: Revoquer un partage de collection
 description: Supprime l'acces d'un utilisateur a la collection specifiee.
 parameters:
