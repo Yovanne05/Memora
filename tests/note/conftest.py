@@ -10,10 +10,7 @@ from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
-    monkeypatch.setattr(config, "APP_ENV", "test")
-    monkeypatch.setattr(
-        config, "SQLALCHEMY_TEST_DATABASE_URI", "sqlite+pysqlite:///:memory:"
-    )
+
 
 @dataclass
 class NoteTestData:
