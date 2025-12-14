@@ -20,12 +20,7 @@ def create_app() -> Flask:
     db.configure_engine()
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
-    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
-    app.config["JWT_HEADER_NAME"] = "Authorization"
-    app.config["JWT_HEADER_TYPE"] = "Bearer"
     app.config["RATELIMIT_STORAGE_URI"] = config.RATELIMIT_STORAGE_URI
-    app.config["RATELIMIT_ENABLED"] = True
-    app.config["TESTING"] = config.APP_ENV == "test"
 
     init_limiter(app)
     init_jwt(app)
