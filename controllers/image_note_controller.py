@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, request, send_file
 from flasgger import swag_from
 
 from services.impl.note.note_image_service_impl import note_image_service
-from exceptions.image_note_exception import NoFileProvided, NoteImageNotFound
+from exceptions.note_exception import NoFileProvided, NoteImageNotFound
 
 bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 
