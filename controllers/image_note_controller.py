@@ -14,7 +14,6 @@ bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 @swag_from("../docs/notes/image_upload.yaml")
 @bp_note_images.post("/<uuid:note_id>/images")
 def upload_image(note_id: UUID):
-    """Upload une image pour une note."""
     try:
         if "image" not in request.files:
             return jsonify({"error": "Aucune image fournie"}), HTTPStatus.BAD_REQUEST
@@ -45,7 +44,6 @@ def upload_image(note_id: UUID):
 @swag_from("../docs/notes/image_get.yaml")
 @bp_note_images.get("/<uuid:note_id>/images/<filename>")
 def get_image(note_id: UUID, filename: str):
-    """Récupère une image d'une note."""
     try:
         filepath = os.path.join("uploads/notes", str(note_id), filename)
 
@@ -63,7 +61,6 @@ def get_image(note_id: UUID, filename: str):
 @swag_from("../docs/notes/image_delete.yaml")
 @bp_note_images.delete("/<uuid:note_id>/images/<filename>")
 def delete_image(note_id: UUID, filename: str):
-    """Supprime une image d'une note."""
     try:
         note_image_service.delete_image(str(note_id), filename)
         return "", HTTPStatus.NO_CONTENT
