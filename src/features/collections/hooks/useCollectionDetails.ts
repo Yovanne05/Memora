@@ -30,6 +30,7 @@ export function useCollectionDetails(id: string) {
           name: values.name,
           description: values.description,
           visibility: values.visibility,
+          tags: values.tags,
         },
       })
     },
@@ -61,6 +62,7 @@ export function useCollectionDetails(id: string) {
       name: collectionQuery.data?.name ?? "",
       description: collectionQuery.data?.description ?? "",
       visibility: collectionQuery.data?.visibility ?? "private",
+      tags: collectionQuery.data?.tags ?? [],
     }),
     [collectionQuery.data]
   )
