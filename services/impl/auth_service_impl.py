@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Tuple
 
 from flask_jwt_extended import create_access_token
@@ -42,7 +42,7 @@ class AuthService(AuthServiceInterface):
         if not verify_password(login_dto.password, user_entity.password_hash):
             raise InvalidCredentials()
 
-        user_entity.last_login = datetime.utcnow()
+        user_entity.last_login = datetime.now(timezone.utc)
         saved = user_repository.update(user_entity)
         user_dto = user_to_dto(saved)
         token = self._create_token(saved.id, saved.role.value, saved.email)

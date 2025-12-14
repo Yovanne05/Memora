@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from utils.db import Base
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class NoteImage(Base):
@@ -16,5 +16,5 @@ class NoteImage(Base):
     file_size: Mapped[int] = mapped_column(Integer)
     mime_type: Mapped[str] = mapped_column(String(100))
     uploaded_at: Mapped[datetime] = mapped_column(
-        default=datetime.utcnow, nullable=False
+        default=lambda: datetime.now(timezone.utc), nullable=False
     )
