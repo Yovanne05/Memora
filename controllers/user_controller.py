@@ -7,12 +7,11 @@ from flasgger import swag_from
 from dtos.user_dto import UserCreateDTO, UserUpdateDTO
 from querys.user_query import UserFindQuery
 from services.impl.user_service_impl import user_service
-from utils.swagger import swagger_doc
 
 bp_users = Blueprint("users", __name__, url_prefix="/users")
 
 
-@swag_from(swagger_doc("users/list.yaml"))
+@swag_from("docs/users/list.yaml")
 @bp_users.get("")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
@@ -28,14 +27,14 @@ def find_many():
     )
 
 
-@swag_from(swagger_doc("users/find_one.yaml"))
+@swag_from("docs/users/find_one.yaml")
 @bp_users.get("/<uuid:user_id>")
 def find_one(user_id: UUID):
     user = user_service.find_one(str(user_id))
     return jsonify(user.model_dump()), HTTPStatus.OK
 
 
-@swag_from(swagger_doc("users/create.yaml"))
+@swag_from("docs/users/create.yaml")
 @bp_users.post("")
 def create():
     payload = UserCreateDTO.model_validate_json(request.data)
@@ -43,7 +42,7 @@ def create():
     return jsonify(user.model_dump()), HTTPStatus.CREATED
 
 
-@swag_from(swagger_doc("users/update.yaml"))
+@swag_from("docs/users/update.yaml")
 @bp_users.patch("/<uuid:user_id>")
 def patch(user_id: UUID):
     payload = UserUpdateDTO.model_validate_json(request.data)
@@ -51,7 +50,7 @@ def patch(user_id: UUID):
     return jsonify(user.model_dump()), HTTPStatus.OK
 
 
-@swag_from(swagger_doc("users/delete.yaml"))
+@swag_from("docs/users/delete.yaml")
 @bp_users.delete("/<uuid:user_id>")
 def delete(user_id: UUID):
     user_service.delete(str(user_id))
