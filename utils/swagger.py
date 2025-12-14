@@ -30,6 +30,7 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
         "info": {"title": title, "version": version},
         "basePath": base_path,
         "tags": [
+            {"name": "auth"},
             {"name": "users"},
             {"name": "notes"},
             {"name": "collections"},

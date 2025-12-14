@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from daos.user_dao import User
 from utils.db import get_db_session
@@ -81,6 +81,14 @@ def find_one_by_email(email: str) -> Optional[User]:
 
 def find_one_by_username(username: str) -> Optional[User]:
     stmt = select(User).where(User.username == username)
+    with get_db_session() as session:
+        return session.execute(stmt).scalar_one_or_none()
+
+
+def find_one_by_identifier(identifier: str) -> Optional[User]:
+    stmt = select(User).where(
+        or_(User.email == identifier, User.username == identifier)
+    )
     with get_db_session() as session:
         return session.execute(stmt).scalar_one_or_none()
 

@@ -3,8 +3,6 @@ from uuid import uuid4
 
 import config
 import pytest
-
-from app import create_app
 from daos.user_dao import User
 from dtos.collection_dto import CollectionCreateDTO
 from dtos.collection_share_dto import CollectionShareCreateDTO
@@ -28,6 +26,7 @@ def disable_swagger(monkeypatch):
 @pytest.fixture(scope="session", autouse=True)
 def ensure_test_app_schema():
     """Create the in-memory schema once so repository calls succeed."""
+    from app import create_app
     app = create_app()
     with app.app_context():
         return
@@ -118,6 +117,23 @@ def collection_test_data():
 
 @pytest.fixture
 def client_with_collection_data(collection_test_data):
+    from app import create_app
     app = create_app()
     with app.test_client() as client:
+        client.environ_base["REMOTE_ADDR"] = (
+            f"12.0.0.{int(uuid4().int % 200) + 1}"
+        )
+        auth_email = f"auth-{uuid4().hex[:8]}@example.com"
+        auth_password = "ValidPass1!"
+        auth_resp = client.post(
+            "/auth/register",
+            json={
+                "email": auth_email,
+                "password": auth_password,
+                "username": f"auth-{uuid4().hex[:6]}",
+            },
+        )
+        assert auth_resp.status_code == 201, auth_resp.get_data(as_text=True)
+        token = auth_resp.get_json()["access_token"]
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         yield client, collection_test_data
