@@ -17,6 +17,7 @@ class NoteFindQuery(BaseModel):
         default=None, alias="contentContains"
     )
     ids: Optional[list[UUID]] = None
+    tags: Optional[list[str]] = None
 
     sort_by: Literal["title", "created_at", "updated_at"] = Field(
         default="created_at", alias="sortBy"
@@ -28,9 +29,9 @@ class NoteFindQuery(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    @field_validator("ids", mode="before")
+    @field_validator("ids", "tags", mode="before")
     @classmethod
-    def parse_ids_csv(cls, value):
+    def parse_csv(cls, value):
         if value is None:
             return value
         if isinstance(value, str):
@@ -50,6 +51,7 @@ class NoteFindQuery(BaseModel):
             title_contains=self.title_contains,
             content_contains=self.content_contains,
             ids=[str(item) for item in self.ids] if self.ids else None,
+            tags=self.tags,
             sort_by=self.sort_by,
             sort_dir=self.sort_dir,
             limit=self.limit,

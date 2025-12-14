@@ -16,6 +16,7 @@ class NoteSearchParams:
     title_contains: Optional[str] = None
     content_contains: Optional[str] = None
     ids: Optional[list[str]] = None
+    tags: Optional[list[str]] = None
 
     sort_by: Literal["title", "created_at", "updated_at"] = "created_at"
     sort_dir: Literal["asc", "desc"] = "desc"
@@ -45,6 +46,10 @@ def find_many(params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], in
 
     if p.ids:
         filters.append(Note.id.in_(p.ids))
+
+    if p.tags:
+        for tag in p.tags:
+            filters.append(Note.tags.contains([tag]))
 
     stmt = select(Note).options(
         joinedload(Note.collection), joinedload(Note.owner)
