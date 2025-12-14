@@ -8,14 +8,13 @@ from flasgger import swag_from
 
 from services.impl.note.note_image_service_impl import note_image_service
 from exceptions.note_exception import NoteNotFound
-from utils.swagger import swagger_doc
 
 bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 
 
-@swag_from(swagger_doc("notes/image_upload.yaml"))
 @bp_note_images.post("/<uuid:note_id>/images")
 @jwt_required()
+@swag_from("../docs/notes/image_upload.yaml")
 def upload_image(note_id: UUID):
     try:
         if "image" not in request.files:
@@ -39,9 +38,9 @@ def upload_image(note_id: UUID):
         )
 
 
-@swag_from(swagger_doc("notes/image_list.yaml"))
 @bp_note_images.get("/<uuid:note_id>/images")
 @jwt_required()
+@swag_from("../docs/notes/image_list.yaml")
 def list_images(note_id: UUID):
     try:
         images = note_image_service.list_images(str(note_id))
@@ -55,9 +54,9 @@ def list_images(note_id: UUID):
         )
 
 
-@swag_from(swagger_doc("notes/image_get.yaml"))
 @bp_note_images.get("/<uuid:note_id>/images/<filename>")
 @jwt_required()
+@swag_from("../docs/notes/image_get.yaml")
 def get_image(note_id: UUID, filename: str):
     try:
         filepath = os.path.join("uploads/notes", str(note_id), filename)
@@ -73,9 +72,9 @@ def get_image(note_id: UUID, filename: str):
         )
 
 
-@swag_from(swagger_doc("notes/image_delete.yaml"))
 @bp_note_images.delete("/<uuid:note_id>/images/<filename>")
 @jwt_required()
+@swag_from("../docs/notes/image_delete.yaml")
 def delete_image(note_id: UUID, filename: str):
     try:
         note_image_service.delete_image(str(note_id), filename)
