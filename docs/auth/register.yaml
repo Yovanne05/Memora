@@ -1,0 +1,18 @@
+tags:
+  - auth
+summary: Inscription d'un utilisateur
+description: Cree un compte client et renvoie un token d'acces JWT.
+security: []
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      $ref: "#/definitions/AuthRegisterPayload"
+responses:
+  201:
+    description: Utilisateur cree et token retourne.
+    schema:
+      $ref: "#/definitions/AuthResponse"
+  409:
+    description: Conflit sur l'email ou le username.

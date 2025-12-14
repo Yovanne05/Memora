@@ -1,7 +1,7 @@
 definitions:
   User:
     type: object
-    description: Profil d’utilisateur exposé par l’API MEMORA.
+    description: Profil d'utilisateur expose par l'API MEMORA.
     properties:
       id:
         type: string
@@ -11,7 +11,7 @@ definitions:
       email:
         type: string
         format: email
-        description: Adresse e-mail vérifiée de l’utilisateur.
+        description: Adresse e-mail verifiee de l'utilisateur.
         example: "lea.dupont@example.com"
       username:
         type: string
@@ -21,19 +21,29 @@ definitions:
       display_name:
         type: string
         nullable: true
-        description: Nom complet ou pseudo long affiché dans l’interface.
-        example: "Léa Dupont"
+        description: Nom complet ou pseudo long affiche dans l'interface.
+        example: "Lea Dupont"
       role:
         type: string
         enum: ["client", "admin", "super_admin"]
-        description: Niveau d’autorisation du compte.
+        description: Niveau d'autorisation du compte.
         example: "client"
+      is_active:
+        type: boolean
+        description: Statut actif/inactif du compte.
+        example: true
+      last_login:
+        type: string
+        format: date-time
+        nullable: true
+        description: Derniere connexion reussie.
+        example: "2025-06-01T10:00:00Z"
       created_at:
         type: string
         format: date-time
-        description: Date d’inscription.
+        description: Date d'inscription.
         example: "2025-05-15T08:22:44Z"
-    required: ["id", "email", "created_at", "role"]
+    required: ["id", "email", "created_at", "role", "is_active"]
 
   UserCreatePayload:
     type: object
@@ -47,13 +57,13 @@ definitions:
         type: string
         format: password
         minLength: 8
-        description: Mot de passe en clair (sera hashé avant stockage).
+        description: Mot de passe en clair (sera hash avant stockage).
       username:
         type: string
         minLength: 3
         maxLength: 50
         nullable: true
-        description: Alias court à afficher publiquement.
+        description: Alias court a afficher publiquement.
       display_name:
         type: string
         maxLength: 100
@@ -63,7 +73,11 @@ definitions:
         type: string
         enum: ["client", "admin", "super_admin"]
         default: "client"
-        description: Rôle attribué au compte (défaut client).
+        description: Role attribue au compte (defaut client).
+      is_active:
+        type: boolean
+        default: true
+        description: Statut du compte (actif par defaut).
 
   UserUpdatePayload:
     type: object
@@ -88,11 +102,14 @@ definitions:
         type: string
         maxLength: 100
         nullable: true
-        description: Nouveau nom d’affichage (null pour effacer).
+        description: Nouveau nom d'affichage (null pour effacer).
       role:
         type: string
         enum: ["client", "admin", "super_admin"]
-        description: Nouveau rôle à appliquer.
+        description: Nouveau role a appliquer.
+      is_active:
+        type: boolean
+        description: Active ou desactive le compte.
 
   UserListResponse:
     type: object
@@ -100,7 +117,7 @@ definitions:
       total:
         type: integer
         format: int32
-        description: Nombre total d’utilisateurs correspondant aux filtres.
+        description: Nombre total d'utilisateurs correspondant aux filtres.
         example: 42
       items:
         type: array

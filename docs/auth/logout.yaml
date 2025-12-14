@@ -1,0 +1,9 @@
+tags:
+  - auth
+summary: Deconnexion
+description: Invalide rien cote serveur; le client doit oublier le token.
+responses:
+  204:
+    description: Deconnexion effectuee (le client doit supprimer le token).
+  401:
+    description: Token manquant ou invalide.

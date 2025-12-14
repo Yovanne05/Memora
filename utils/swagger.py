@@ -4,6 +4,8 @@ import yaml
 from flasgger import Swagger
 import config
 
+DOCS_DIR = Path(__file__).resolve().parents[1] / "docs"
+
 
 def load_definitions(defs_dir: Path) -> dict:
     merged = {"definitions": {}, "parameters": {}}
@@ -30,6 +32,7 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
         "info": {"title": title, "version": version},
         "basePath": base_path,
         "tags": [
+            {"name": "auth"},
             {"name": "users"},
             {"name": "notes"},
             {"name": "collections"},
@@ -63,3 +66,8 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
     defs = load_definitions(docs_dir)
 
     return Swagger(app, template={**base, **defs})
+
+
+def swagger_doc(relative_path: str) -> str:
+    """Return an absolute path to a swagger YAML file under docs/."""
+    return str(DOCS_DIR / relative_path)
