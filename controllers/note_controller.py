@@ -63,15 +63,7 @@ def delete(note_id: UUID):
 @bp_notes.get("/<uuid:note_id>/links")
 def list_links(note_id: UUID):
     link_dtos = note_link_service.list_links(str(note_id))
-    return (
-        jsonify(
-            {
-                "items": [dto.model_dump() for dto in link_dtos],
-                "total": len(link_dtos),
-            }
-        ),
-        HTTPStatus.OK,
-    )
+    return jsonify([dto.model_dump() for dto in link_dtos]), HTTPStatus.OK
 
 
 @swag_from("../docs/notes/links_create.yaml")
