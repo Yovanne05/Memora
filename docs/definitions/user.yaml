@@ -28,10 +28,6 @@ definitions:
         enum: ["client", "admin", "super_admin"]
         description: Niveau d'autorisation du compte.
         example: "client"
-      is_active:
-        type: boolean
-        description: Statut actif/inactif du compte.
-        example: true
       last_login:
         type: string
         format: date-time
@@ -43,7 +39,7 @@ definitions:
         format: date-time
         description: Date d'inscription.
         example: "2025-05-15T08:22:44Z"
-    required: ["id", "email", "created_at", "role", "is_active"]
+    required: ["id", "email", "created_at", "role"]
 
   UserCreatePayload:
     type: object
@@ -74,10 +70,6 @@ definitions:
         enum: ["client", "admin", "super_admin"]
         default: "client"
         description: Role attribue au compte (defaut client).
-      is_active:
-        type: boolean
-        default: true
-        description: Statut du compte (actif par defaut).
 
   UserUpdatePayload:
     type: object
@@ -107,9 +99,6 @@ definitions:
         type: string
         enum: ["client", "admin", "super_admin"]
         description: Nouveau role a appliquer.
-      is_active:
-        type: boolean
-        description: Active ou desactive le compte.
 
   UserListResponse:
     type: object

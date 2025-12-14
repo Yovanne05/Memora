@@ -45,7 +45,6 @@ def test_register_returns_token_and_user(client):
 
     assert "access_token" in body
     assert body["user"]["email"] == email
-    assert body["user"]["is_active"] is True
 
 
 def test_register_rejects_weak_password(client):

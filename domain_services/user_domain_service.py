@@ -15,7 +15,4 @@ def apply_user_update(user_entity: User, user_update_dto: UserUpdateDTO) -> User
     if user_update_dto.role is not None:
         user_entity.role = user_update_dto.role
 
-    if "is_active" in user_update_dto.model_fields_set:
-        user_entity.is_active = user_update_dto.is_active
-
     return user_entity

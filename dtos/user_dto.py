@@ -17,7 +17,6 @@ class UserCreateDTO(BaseModel):
     username: str | None = Field(default=None, min_length=3, max_length=50)
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
     role: RoleEnum = RoleEnum.CLIENT
-    is_active: bool = True
 
     @field_validator("password")
     @classmethod
@@ -33,7 +32,6 @@ class UserUpdateDTO(BaseModel):
     username: str | None = Field(default=None, min_length=3, max_length=50)
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
     role: RoleEnum | None = None
-    is_active: bool | None = None
 
     @field_validator("password")
     @classmethod
@@ -52,7 +50,6 @@ class UserDTO(BaseModel):
     display_name: str | None = None
     created_at: datetime
     last_login: datetime | None = None
-    is_active: bool
     role: RoleEnum
 
     model_config = ConfigDict(from_attributes=True)

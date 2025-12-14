@@ -13,5 +13,4 @@ def dto_to_user(user_create_dto: UserCreateDTO, password_hash: str) -> User:
         display_name=user_create_dto.display_name,
         password_hash=password_hash,
         role=user_create_dto.role,
-        is_active=user_create_dto.is_active,
     )

@@ -62,7 +62,6 @@ class CollectionTestData:
             username=f"{label}-{unique_suffix}",
             display_name=f"{label.capitalize()} user",
             password_hash="test-password-hash",
-            is_active=True,
             role=RoleEnum.CLIENT,
         )
         user_repository.add(user)

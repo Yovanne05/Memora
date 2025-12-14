@@ -26,7 +26,6 @@ CREATE TABLE users (
     password_hash   TEXT NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login      TIMESTAMP,
-    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
     role            VARCHAR(20) NOT NULL DEFAULT 'client'
 );
 

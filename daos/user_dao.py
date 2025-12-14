@@ -39,9 +39,6 @@ class User(Base):
     last_login: Mapped[datetime | None] = mapped_column(
         DateTime, nullable=True
     )
-    is_active: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default=text("true")
-    )
 
     collections: Mapped[list["Collection"]] = relationship(
         back_populates="owner"

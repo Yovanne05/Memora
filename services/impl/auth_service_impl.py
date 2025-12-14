@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token
 
 from dtos.auth_dto import LoginDTO, RegisterDTO
 from dtos.user_dto import UserCreateDTO, UserDTO
-from exceptions.auth_exception import InactiveAccount, InvalidCredentials
+from exceptions.auth_exception import InvalidCredentials
 from exceptions.user_exception import UserNotFound
 from mappers.user_mapper import user_to_dto
 from repositorys import user_repository
@@ -23,7 +23,6 @@ class AuthService(AuthServiceInterface):
             username=register_dto.username,
             display_name=register_dto.display_name,
             role=RoleEnum.CLIENT,
-            is_active=True,
         )
         user = user_service.create(user_create)
         token = self._create_token(user.id, user.role.value, user.email)
@@ -35,9 +34,6 @@ class AuthService(AuthServiceInterface):
         )
         if not user_entity:
             raise InvalidCredentials()
-
-        if not user_entity.is_active:
-            raise InactiveAccount()
 
         if not verify_password(login_dto.password, user_entity.password_hash):
             raise InvalidCredentials()
