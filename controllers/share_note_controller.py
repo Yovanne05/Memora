@@ -16,15 +16,7 @@ bp_note_shares = Blueprint("note_shares", __name__, url_prefix="/notes")
 @swag_from("../docs/notes/share_list.yaml")
 def list_shares(note_id: UUID):
     share_dtos = note_share_service.list_shares(str(note_id))
-    return (
-        jsonify(
-            {
-                "items": [dto.model_dump() for dto in share_dtos],
-                "total": len(share_dtos),
-            }
-        ),
-        HTTPStatus.OK,
-    )
+    return jsonify([dto.model_dump() for dto in share_dtos]), HTTPStatus.OK
 
 
 @bp_note_shares.post("/<uuid:note_id>/shares")

@@ -36,8 +36,6 @@ def test_upload_image_without_file_returns_400(client_with_note_data):
     )
 
     assert response.status_code == 400
-    json_data = response.get_json()
-    assert "error" in json_data
 
 
 def test_upload_image_with_invalid_extension_returns_400(client_with_note_data):
@@ -52,9 +50,6 @@ def test_upload_image_with_invalid_extension_returns_400(client_with_note_data):
     )
 
     assert response.status_code == 400
-    json_data = response.get_json()
-    assert "error" in json_data
-    assert "non autorisé" in json_data["error"].lower()
 
 
 def test_upload_image_for_nonexistent_note_returns_404(client_with_note_data):

@@ -23,15 +23,7 @@ bp_collection_shares = Blueprint(
 @swag_from("../docs/collections/share_list.yaml")
 def list_shares(collection_id: UUID):
     share_dtos = collection_share_service.list_shares(str(collection_id))
-    return (
-        jsonify(
-            {
-                "items": [dto.model_dump() for dto in share_dtos],
-                "total": len(share_dtos),
-            }
-        ),
-        HTTPStatus.OK,
-    )
+    return jsonify([dto.model_dump() for dto in share_dtos]), HTTPStatus.OK
 
 
 @bp_collection_shares.post("/<uuid:collection_id>/shares")

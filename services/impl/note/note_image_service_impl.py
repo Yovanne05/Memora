@@ -10,7 +10,13 @@ from repositorys import note_image_repository
 from daos.note_image_dao import NoteImage
 from dtos.note_image_dto import NoteImageDTO
 from mappers.note_image_mapper import note_image_to_dto
-from exceptions.note_exception import NoteNotFound
+from exceptions.note_exception import (
+    NoteNotFound,
+    NoFileProvided,
+    InvalidFileType,
+    FileTooLarge,
+    NoteImageNotFound,
+)
 
 
 class NoteImageService(NoteImageServiceInterface):
@@ -39,17 +45,13 @@ class NoteImageService(NoteImageServiceInterface):
             raise NoteNotFound()
 
         if not file or file.filename == "":
-            raise ValueError("Aucun fichier fourni")
+            raise NoFileProvided()
 
         if not self._allowed_file(file.filename):
-            raise ValueError(
-                f"Type de fichier non autorisé. Extensions autorisées : {', '.join(self.ALLOWED_EXTENSIONS)}"
-            )
+            raise InvalidFileType()
 
         if not self._validate_file_size(file):
-            raise ValueError(
-                f"Fichier trop volumineux. Taille maximale : {self.MAX_FILE_SIZE // (1024 * 1024)}MB"
-            )
+            raise FileTooLarge()
 
         ext = file.filename.rsplit(".", 1)[1].lower()
         filename = f"{uuid4()}.{ext}"
@@ -94,7 +96,7 @@ class NoteImageService(NoteImageServiceInterface):
 
         image = note_image_repository.find_by_note_and_filename(note_id, filename)
         if not image:
-            raise ValueError("Image introuvable pour cette note")
+            raise NoteImageNotFound()
 
         filepath = image.file_path
         if os.path.exists(filepath):
