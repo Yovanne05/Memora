@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { TagList } from "@/components/ui/tag-list"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -150,6 +151,10 @@ export const CollectionCard = memo(function CollectionCard({
             <span>{collection.notes.length}</span>
           </div>
         </div>
+
+        {collection.tags && collection.tags.length > 0 && (
+          <TagList tags={collection.tags} maxVisible={compact ? 2 : 3} size="sm" />
+        )}
 
         {!compact && (
           <div className="text-xs text-muted-foreground">

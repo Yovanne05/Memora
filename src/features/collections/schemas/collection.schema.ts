@@ -16,6 +16,10 @@ export const collectionFormSchema = z.object({
   visibility: z.enum(["private", "public"], {
     message: "La visibilité doit être privée ou publique",
   }),
+
+  tags: z
+    .array(z.string().trim().min(1, "Le tag ne peut pas être vide"))
+    .max(20, "20 tags maximum"),
 })
 
 export type CollectionFormInput = z.infer<typeof collectionFormSchema>

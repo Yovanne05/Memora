@@ -31,6 +31,7 @@ interface EditProps extends BaseProps {
     name: string
     description?: string
     visibility: CollectionVisibility
+    tags?: string[]
   }
 }
 

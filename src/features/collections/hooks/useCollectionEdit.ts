@@ -19,6 +19,7 @@ export function useCollectionEdit() {
           name: values.name,
           description: values.description,
           visibility: values.visibility,
+          tags: values.tags,
         },
       })
     },
