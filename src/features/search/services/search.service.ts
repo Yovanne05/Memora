@@ -1,8 +1,7 @@
-import { httpClient, type HttpClient } from '@/lib/http-client'
-import { dtoToCollection } from '@/features/collections/mappers/collection.mapper'
-import { dtoToNote } from '@/features/notes/mappers/note.mapper'
-import type { CollectionDto } from '@/features/collections/dtos/collection.dto'
-import type { NoteDto } from '@/features/notes/dtos/note.dto'
+import { collectionsService } from '@/features/collections/services/collections.service'
+import { notesService } from '@/features/notes/services/notes.service'
+import type { ICollectionsService } from '@/features/collections/services/collections.service.interface'
+import type { INotesService } from '@/features/notes/services/notes.service.interface'
 import type {
   SearchParams,
   SearchResult,
@@ -13,7 +12,10 @@ export interface ISearchService {
   search(params: SearchParams): Promise<PaginatedSearchResponse>
 }
 
-export function createSearchService(client: HttpClient = httpClient): ISearchService {
+export function createSearchService(
+  collectionsApi: ICollectionsService = collectionsService,
+  notesApi: INotesService = notesService
+): ISearchService {
   return {
     async search(params: SearchParams): Promise<PaginatedSearchResponse> {
       const results: SearchResult[] = []
@@ -23,64 +25,48 @@ export function createSearchService(client: HttpClient = httpClient): ISearchSer
       const isSearchingCollections = searchType === 'all' || searchType === 'collection'
       const isSearchingNotes = searchType === 'all' || searchType === 'note'
 
-      // Préparer les paramètres communs (toujours public uniquement)
       const commonParams = {
         limit: params.limit,
         offset: params.offset,
-        visibility: 'public',
+        visibility: 'public' as const,
         tags: params.tags?.length ? params.tags.join(',') : undefined,
       }
 
-      // Recherche dans les collections
       if (isSearchingCollections) {
         const collectionParams = {
           ...commonParams,
           titleContains: params.query,
-          sortBy: params.sortBy === 'alphabetical' ? 'title' : params.sortBy === 'date' ? 'created_at' : 'created_at',
-          sortDir: params.sortDir || 'desc',
+          sortBy: params.sortBy === 'alphabetical' ? ('title' as const) : ('created_at' as const),
+          sortDir: params.sortDir || ('desc' as const),
         }
 
         try {
-          const data = await client.get<{ items: CollectionDto[]; total: number }>(
-            '/collections',
-            { params: collectionParams }
-          )
-          const items = Array.isArray(data) ? data : data?.items ?? []
-          const collections = items.map(dtoToCollection)
-
+          const collections = await collectionsApi.list(collectionParams)
           results.push(...collections.map(item => ({ type: 'collection' as const, item })))
-          totalCount += Array.isArray(data) ? items.length : data?.total ?? items.length
+          totalCount += collections.length
         } catch (error) {
           console.error('Error fetching collections:', error)
         }
       }
 
-      // Recherche dans les notes
       if (isSearchingNotes) {
         const noteParams = {
           ...commonParams,
           titleContains: params.query,
           contentContains: params.query,
-          sortBy: params.sortBy === 'alphabetical' ? 'title' : params.sortBy === 'date' ? 'created_at' : 'created_at',
-          sortDir: params.sortDir || 'desc',
+          sortBy: params.sortBy === 'alphabetical' ? ('title' as const) : ('created_at' as const),
+          sortDir: params.sortDir || ('desc' as const),
         }
 
         try {
-          const data = await client.get<{ items: NoteDto[]; total: number }>(
-            '/notes',
-            { params: noteParams }
-          )
-          const items = Array.isArray(data) ? data : data?.items ?? []
-          const notes = items.map(dtoToNote)
-
-          results.push(...notes.map(item => ({ type: 'note' as const, item })))
-          totalCount += Array.isArray(data) ? items.length : data?.total ?? items.length
+          const paginatedNotes = await notesApi.list(noteParams)
+          results.push(...paginatedNotes.items.map(item => ({ type: 'note' as const, item })))
+          totalCount += paginatedNotes.total
         } catch (error) {
           console.error('Error fetching notes:', error)
         }
       }
 
-      // Tri des résultats combinés si nécessaire
       if (searchType === 'all') {
         results.sort((a, b) => {
           const dateA = new Date(a.item.createdAt).getTime()

@@ -31,7 +31,7 @@ export function useSearchManager() {
 
   const totalPages = useMemo(
     () => (data?.total ? Math.ceil(data.total / DEFAULT_LIMIT) : 0),
-    [data?.total]
+    [data]
   )
 
   const updateFilters = useCallback((newFilters: Partial<SearchFilters>) => {

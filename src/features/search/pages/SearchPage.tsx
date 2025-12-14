@@ -18,7 +18,6 @@ export default function SearchPage() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Recherche</h1>
@@ -29,7 +28,6 @@ export default function SearchPage() {
         <Search className="h-8 w-8 text-muted-foreground" />
       </div>
 
-      {/* Search Input */}
       <SearchInput
         value={manager.query}
         onChange={manager.setQuery}
@@ -37,7 +35,6 @@ export default function SearchPage() {
         className="max-w-2xl"
       />
 
-      {/* Filters */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Filtres de recherche</CardTitle>
@@ -51,7 +48,6 @@ export default function SearchPage() {
         </CardContent>
       </Card>
 
-      {/* Results Count */}
       {manager.hasSearched && !manager.isLoading && (
         <div className="text-sm text-muted-foreground">
           {manager.total} résultat{manager.total > 1 ? 's' : ''} trouvé{manager.total > 1 ? 's' : ''}
@@ -66,7 +62,6 @@ export default function SearchPage() {
         hasSearched={manager.hasSearched}
       />
 
-      {/* Pagination */}
       {manager.hasSearched && !manager.isLoading && manager.totalPages > 1 && (
         <Pagination>
           <PaginationContent>
@@ -80,7 +75,6 @@ export default function SearchPage() {
 
             {Array.from({ length: manager.totalPages }, (_, i) => i)
               .filter((i) => {
-                // Afficher les 3 premières pages, 3 dernières, et 2 autour de la page actuelle
                 return (
                   i < 3 ||
                   i >= manager.totalPages - 3 ||
@@ -88,7 +82,6 @@ export default function SearchPage() {
                 )
               })
               .map((i, idx, arr) => {
-                // Ajouter des ellipses
                 const showEllipsisBefore = idx > 0 && arr[idx - 1] !== i - 1
                 const showEllipsisAfter = idx < arr.length - 1 && arr[idx + 1] !== i + 1
 
