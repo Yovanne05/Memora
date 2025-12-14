@@ -7,7 +7,8 @@ from controllers.collection_controller import bp_collections
 from controllers.note_controller import bp_notes
 from controllers.user_controller import bp_users
 from utils import db
-from utils.extensions import jwt, limiter
+from utils.jwt import init_jwt
+from utils.limiter import init_limiter
 from utils.filter import register_global_filter
 from utils.logger import init_logger
 from utils.swagger import init_swagger
@@ -23,10 +24,11 @@ def create_app() -> Flask:
     app.config["JWT_HEADER_NAME"] = "Authorization"
     app.config["JWT_HEADER_TYPE"] = "Bearer"
     app.config["RATELIMIT_STORAGE_URI"] = config.RATELIMIT_STORAGE_URI
+    app.config["RATELIMIT_ENABLED"] = True
     app.config["TESTING"] = config.APP_ENV == "test"
 
-    jwt.init_app(app)
-    limiter.init_app(app)
+    init_limiter(app)
+    init_jwt(app)
     init_swagger(app)
     init_logger(app)
     
