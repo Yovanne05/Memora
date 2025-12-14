@@ -68,7 +68,7 @@ def delete(note_id: UUID):
     return "", HTTPStatus.NO_CONTENT
 
 
-@swag_from(swagger_doc("notes/links_list.yaml"))
+@swag_from("../docs/notes/links_list.yaml")
 @bp_notes.get("/<uuid:note_id>/links")
 @jwt_required()
 def list_links(note_id: UUID):
