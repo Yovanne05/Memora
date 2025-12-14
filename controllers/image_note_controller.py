@@ -25,7 +25,6 @@ def upload_image(note_id: UUID):
         return (
             jsonify(
                 {
-                    "message": "Image uploadée avec succès",
                     "filepath": filepath,
                     "filename": os.path.basename(filepath),
                 }
