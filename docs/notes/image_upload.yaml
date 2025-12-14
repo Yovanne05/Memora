@@ -24,15 +24,28 @@ responses:
     schema:
       type: object
       properties:
-        message:
+        id:
           type: string
-          example: "Image uploadée avec succès"
-        filepath:
+          example: "abc-123-456"
+        note_id:
           type: string
-          example: "uploads/notes/abc-123/image-uuid.jpg"
-        filename:
+          example: "note-uuid-123"
+        file_name:
           type: string
           example: "image-uuid.jpg"
+        file_path:
+          type: string
+          example: "uploads/notes/note-uuid-123/image-uuid.jpg"
+        file_size:
+          type: integer
+          example: 204800
+        mime_type:
+          type: string
+          example: "image/jpeg"
+        uploaded_at:
+          type: string
+          format: date-time
+          example: "2025-12-14T10:30:00.000000Z"
   400:
     description: Requête invalide (pas de fichier, type non autorisé, taille trop grande).
   404:

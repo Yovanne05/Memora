@@ -36,6 +36,7 @@ def upload_image(note_id: UUID):
         )
 
 
+@swag_from("../docs/notes/image_list.yaml")
 @bp_note_images.get("/<uuid:note_id>/images")
 def list_images(note_id: UUID):
     try:
