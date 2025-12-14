@@ -7,7 +7,7 @@ from flasgger import swag_from
 
 from dtos.auth_dto import LoginDTO, RegisterDTO
 from services.impl.auth_service_impl import auth_service
-from utils.extensions import limiter
+from utils.limiter import limiter
 from utils.swagger import swagger_doc
 
 bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
@@ -24,9 +24,9 @@ def register():
     )
 
 
+@bp_auth.post("/login")
 @limiter.limit(config.LOGIN_RATE_LIMIT)
 @swag_from(swagger_doc("auth/login.yaml"))
-@bp_auth.post("/login")
 def login():
     payload = LoginDTO.model_validate_json(request.data)
     user, token = auth_service.login(payload)
