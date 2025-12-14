@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from "react"
-import type { CollectionVisibility } from "../models/collection.model"
+import { useCurrentUser } from "@/hooks/useCurrentUser"
 import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
 import { applyCollectionsQuery } from "../lib/collections-query"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
+import type { CollectionVisibility } from "../models/collection.model"
 import { useCollectionsListQuery } from "./useCollectionsListQuery"
 
 const DEFAULT_LIMIT = 12

@@ -41,11 +41,23 @@ const deleteMutation = createMutationFactory()
 
 const mockUseCollectionQuery = vi.fn()
 
-vi.mock("@/features/collections/hooks/useCollectionsQuery", () => ({
+vi.mock("@/features/collections/hooks/useCollectionsListQuery", () => ({
   useCollectionsListQuery: () => mockUseCollectionsListQuery(),
+}))
+
+vi.mock("@/features/collections/hooks/useCreateCollectionMutation", () => ({
   useCreateCollectionMutation: (cb?: MutationCallbacks) => createMutation.hook(cb),
+}))
+
+vi.mock("@/features/collections/hooks/useUpdateCollectionMutation", () => ({
   useUpdateCollectionMutation: (cb?: MutationCallbacks) => updateMutation.hook(cb),
+}))
+
+vi.mock("@/features/collections/hooks/useDeleteCollectionMutation", () => ({
   useDeleteCollectionMutation: (cb?: MutationCallbacks) => deleteMutation.hook(cb),
+}))
+
+vi.mock("@/features/collections/hooks/useCollectionQuery", () => ({
   useCollectionQuery: (id: string) => mockUseCollectionQuery(id),
 }))
 
@@ -181,9 +193,6 @@ describe("hooks collections (workflows)", () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeNull()
   })
-
-  // Test removed: useCollectionsManager has been deleted in favor of individual hooks
-  // Tests for individual hooks (useCollectionCreate, useCollectionEdit, useCollectionDelete) are covered separately
 
   test("useCollectionDetails expose les gestionnaires et valeurs initiales", async () => {
     const { result } = renderHook(() => useCollectionDetails("col-1"))

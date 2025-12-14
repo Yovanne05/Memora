@@ -51,6 +51,7 @@ export const CollectionEditForm = memo(function CollectionEditForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     control,
+    getFieldState,
   } = form
 
   const isEdit = mode === "edit"
@@ -58,14 +59,22 @@ export const CollectionEditForm = memo(function CollectionEditForm({
 
   const handleFormSubmit = useCallback(
     (data: CollectionFormInput) => {
-      return onSubmit({
+      const payload: CollectionFormValues = {
         name: data.name,
         description: data.description ?? undefined,
         visibility: data.visibility,
-        tags: data.tags ?? [],
-      })
+      }
+
+      const hasTags = Array.isArray(data.tags) && data.tags.length > 0
+      const tagsDirty = getFieldState("tags").isDirty
+
+      if (hasTags || tagsDirty) {
+        payload.tags = data.tags ?? []
+      }
+
+      return onSubmit(payload)
     },
-    [onSubmit]
+    [onSubmit, getFieldState]
   )
 
   const submitButtonText = isEdit ? "Enregistrer les modifications" : "Créer la collection"

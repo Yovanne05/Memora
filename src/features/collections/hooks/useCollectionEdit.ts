@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react"
-import type { Collection } from "../models/collection.model"
-import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
+import type { Collection, CollectionUpdate } from "../models/collection.model"
+import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
 
 export function useCollectionEdit() {
   const [target, setTarget] = useState<Collection | null>(null)
@@ -13,14 +13,19 @@ export function useCollectionEdit() {
   const handleSubmit = useCallback(
     async (values: CollectionFormValues) => {
       if (!target) return
+      const data: CollectionUpdate = {
+        name: values.name,
+        description: values.description,
+        visibility: values.visibility,
+      }
+
+      if (values.tags !== undefined) {
+        data.tags = values.tags
+      }
+
       await updateMutation.mutateAsync({
         id: target.id,
-        data: {
-          name: values.name,
-          description: values.description,
-          visibility: values.visibility,
-          tags: values.tags,
-        },
+        data,
       })
     },
     [target, updateMutation]

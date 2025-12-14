@@ -36,6 +36,9 @@ export function CollectionsListPage() {
     disabled: create.isOpen || !!edit.target || !!deletion.target,
   })
 
+  const pagination = filters.pagination
+  const shouldDisplayPagination = pagination && filters.total > pagination.limit
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -73,11 +76,11 @@ export function CollectionsListPage() {
         selectionMode={selection.selectionMode}
       />
 
-      {filters.total > filters.pagination.limit && (
+      {shouldDisplayPagination && pagination && (
         <CollectionsPagination
-          page={filters.pagination.page}
-          maxPage={filters.pagination.maxPage}
-          setPage={filters.pagination.setPage}
+          page={pagination.page}
+          maxPage={pagination.maxPage}
+          setPage={pagination.setPage}
         />
       )}
 

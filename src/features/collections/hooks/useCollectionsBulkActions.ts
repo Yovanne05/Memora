@@ -1,8 +1,8 @@
 import { useCallback } from "react"
 import { toast } from "sonner"
-import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
-import { useDeleteCollectionMutation } from "./useDeleteCollectionMutation"
 import type { Collection, CollectionVisibility } from "../models/collection.model"
+import { useDeleteCollectionMutation } from "./useDeleteCollectionMutation"
+import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
 
 interface UseCollectionsBulkActionsProps {
   selectedIds: string[]

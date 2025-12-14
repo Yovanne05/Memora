@@ -19,7 +19,8 @@ export const collectionFormSchema = z.object({
 
   tags: z
     .array(z.string().trim().min(1, "Le tag ne peut pas être vide"))
-    .max(20, "20 tags maximum"),
+    .max(20, "20 tags maximum")
+    .optional(),
 })
 
 export type CollectionFormInput = z.infer<typeof collectionFormSchema>

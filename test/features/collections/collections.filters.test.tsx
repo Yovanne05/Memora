@@ -11,7 +11,7 @@ vi.mock("@/features/collections/lib/collections-query", () => ({
   applyCollectionsQuery: applyCollectionsQueryMock,
 }))
 
-vi.mock("@/features/collections/hooks/useCollectionsQuery", () => ({
+vi.mock("@/features/collections/hooks/useCollectionsListQuery", () => ({
   useCollectionsListQuery: () => useCollectionsListQueryMock(),
 }))
 
