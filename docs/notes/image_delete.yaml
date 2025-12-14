@@ -1,0 +1,23 @@
+tags:
+  - note-images
+summary: Supprimer une image d'une note
+description: >
+  Supprime une image associée à une note.
+  Le fichier physique est également supprimé du serveur.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+  - in: path
+    name: filename
+    type: string
+    required: true
+    description: Nom du fichier image à supprimer.
+responses:
+  204:
+    description: Image supprimée avec succès.
+  404:
+    description: Image ou note introuvable.

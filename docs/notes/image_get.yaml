@@ -1,0 +1,29 @@
+tags:
+  - note-images
+summary: Récupérer une image d'une note
+description: >
+  Retourne le fichier image associé à une note.
+produces:
+  - image/jpeg
+  - image/png
+  - image/gif
+  - image/webp
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+  - in: path
+    name: filename
+    type: string
+    required: true
+    description: Nom du fichier image.
+responses:
+  200:
+    description: Image retournée avec succès.
+    schema:
+      type: file
+  404:
+    description: Image ou note introuvable.

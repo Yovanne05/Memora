@@ -1,5 +1,5 @@
 tags:
-  - notes
+  - note-shares
 summary: Lister les partages d'une note
 description: >
   Retourne les utilisateurs avec lesquels la note est actuellement partagée,
