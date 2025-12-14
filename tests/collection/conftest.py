@@ -23,11 +23,17 @@ from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
+    monkeypatch.setattr(config, "APP_ENV", "test")
+    monkeypatch.setattr(
+        config, "SQLALCHEMY_TEST_DATABASE_URI", "sqlite+pysqlite:///:memory:"
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
 def ensure_test_app_schema():
     """Create the in-memory schema once so repository calls succeed."""
+    config.APP_ENV = "test"
+    config.SQLALCHEMY_TEST_DATABASE_URI = "sqlite+pysqlite:///:memory:"
     app = create_app()
     with app.app_context():
         return
@@ -63,6 +69,7 @@ class CollectionTestData:
             username=f"{label}-{unique_suffix}",
             display_name=f"{label.capitalize()} user",
             password_hash="test-password-hash",
+            is_active=True,
             role=RoleEnum.CLIENT,
         )
         user_repository.add(user)
@@ -120,4 +127,20 @@ def collection_test_data():
 def client_with_collection_data(collection_test_data):
     app = create_app()
     with app.test_client() as client:
+        client.environ_base["REMOTE_ADDR"] = (
+            f"12.0.0.{int(uuid4().int % 200) + 1}"
+        )
+        auth_email = f"auth-{uuid4().hex[:8]}@example.com"
+        auth_password = "ValidPass1!"
+        auth_resp = client.post(
+            "/auth/register",
+            json={
+                "email": auth_email,
+                "password": auth_password,
+                "username": f"auth-{uuid4().hex[:6]}",
+            },
+        )
+        assert auth_resp.status_code == 201, auth_resp.get_data(as_text=True)
+        token = auth_resp.get_json()["access_token"]
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         yield client, collection_test_data

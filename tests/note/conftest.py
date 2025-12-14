@@ -12,6 +12,10 @@ from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
+    monkeypatch.setattr(config, "APP_ENV", "test")
+    monkeypatch.setattr(
+        config, "SQLALCHEMY_TEST_DATABASE_URI", "sqlite+pysqlite:///:memory:"
+    )
 
 @dataclass
 class NoteTestData:
@@ -29,6 +33,8 @@ class NoteTestData:
     created_tag_ids: set[str] = field(default_factory=set)
     created_shares: set[tuple[str, str]] = field(default_factory=set)
     created_links: set[tuple[str, str]] = field(default_factory=set)
+    _user_credentials: dict[str, dict[str, str]] = field(default_factory=dict)
+    access_token: str | None = None
 
     base_slug: str = field(default_factory=lambda: uuid4().hex[:8])
     linked_slug: str = field(default_factory=lambda: uuid4().hex[:8])
@@ -42,6 +48,7 @@ class NoteTestData:
         self.search_term = self.base_slug
 
         self.owner_id = self._create_user("owner")
+        self._authenticate_client(self.owner_id)
         self.share_user_id = self._create_user("share-target")
         self.collection_id = self._create_collection()
 
@@ -58,7 +65,7 @@ class NoteTestData:
         unique = uuid4().hex[:8]
         payload = {
             "email": f"{label}-{self.base_slug}-{unique}@example.com",
-            "password": f"TestPwd-{self.base_slug}-{unique}",
+            "password": f"TestPwd-{self.base_slug}-{unique}-1!",
             "username": f"{label}-{self.base_slug}-{unique}",
             "display_name": f"{label.capitalize()} user {unique}",
             "role": RoleEnum.CLIENT.value,
@@ -66,8 +73,28 @@ class NoteTestData:
         response = self.client.post("/users", json=payload)
         assert response.status_code == 201, response.get_data(as_text=True)
         body = response.get_json()
-        self.created_user_ids.add(body["id"])
-        return body["id"]
+        user_id = body["id"]
+        self.created_user_ids.add(user_id)
+        self._user_credentials[user_id] = {
+            "email": payload["email"],
+            "username": payload["username"],
+            "password": payload["password"],
+        }
+        return user_id
+
+    def _authenticate_client(self, user_id: str) -> None:
+        creds = self._user_credentials[user_id]
+        response = self.client.post(
+            "/auth/login",
+            json={
+                "identifier": creds["email"],
+                "password": creds["password"],
+            },
+        )
+        assert response.status_code == 200, response.get_data(as_text=True)
+        token = response.get_json()["access_token"]
+        self.access_token = token
+        self.client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
 
     def create_user(self, label: str) -> str:
         return self._create_user(label)
@@ -208,6 +235,9 @@ class NoteTestData:
 def app_client():
     app = create_app()
     with app.test_client() as client:
+        client.environ_base["REMOTE_ADDR"] = (
+            f"11.0.0.{int(uuid4().int % 200) + 1}"
+        )
         yield client
 
 
