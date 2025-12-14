@@ -12,7 +12,7 @@ from utils.swagger import swagger_doc
 bp_note_shares = Blueprint("note_shares", __name__, url_prefix="/notes")
 
 
-@swag_from(swagger_doc("notes/share_list.yaml"))
+@swag_from(swagger_doc("note/share_list.yaml"))
 @bp_note_shares.get("/<uuid:note_id>/shares")
 @jwt_required()
 def list_shares(note_id: UUID):
@@ -28,7 +28,7 @@ def list_shares(note_id: UUID):
     )
 
 
-@swag_from(swagger_doc("notes/share_create.yaml"))
+@swag_from(swagger_doc("note/share_create.yaml"))
 @bp_note_shares.post("/<uuid:note_id>/shares")
 @jwt_required()
 def share_note(note_id: UUID):
@@ -37,7 +37,7 @@ def share_note(note_id: UUID):
     return jsonify(share_dto.model_dump()), HTTPStatus.CREATED
 
 
-@swag_from(swagger_doc("notes/share_update.yaml"))
+@swag_from(swagger_doc("note/share_update.yaml"))
 @bp_note_shares.patch("/<uuid:note_id>/shares/<uuid:user_id>")
 @jwt_required()
 def update_share(note_id: UUID, user_id: UUID):
@@ -48,7 +48,7 @@ def update_share(note_id: UUID, user_id: UUID):
     return jsonify(share_dto.model_dump()), HTTPStatus.OK
 
 
-@swag_from(swagger_doc("notes/share_delete.yaml"))
+@swag_from(swagger_doc("note/share_delete.yaml"))
 @bp_note_shares.delete("/<uuid:note_id>/shares/<uuid:user_id>")
 @jwt_required()
 def revoke_share(note_id: UUID, user_id: UUID):
