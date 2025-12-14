@@ -12,7 +12,7 @@ from utils.limiter import limiter
 bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@swag_from("docs/auth/register.yaml")
+@swag_from("../docs/auth/register.yaml")
 @bp_auth.post("/register")
 def register():
     payload = RegisterDTO.model_validate_json(request.data)
@@ -25,14 +25,14 @@ def register():
 
 @bp_auth.post("/login")
 @limiter.limit(config.LOGIN_RATE_LIMIT)
-@swag_from("docs/auth/login.yaml")
+@swag_from("../docs/auth/login.yaml")
 def login():
     payload = LoginDTO.model_validate_json(request.data)
     user, token = auth_service.login(payload)
     return jsonify({"user": user.model_dump(), "access_token": token}), HTTPStatus.OK
 
 
-@swag_from("docs/auth/me.yaml")
+@swag_from("../docs/auth/me.yaml")
 @bp_auth.get("/me")
 @jwt_required()
 def me():
@@ -41,7 +41,7 @@ def me():
     return jsonify({"user": user.model_dump()}), HTTPStatus.OK
 
 
-@swag_from("docs/auth/logout.yaml")
+@swag_from("../docs/auth/logout.yaml")
 @bp_auth.post("/logout")
 @jwt_required()
 def logout():
