@@ -7,10 +7,6 @@ import pytest
 @pytest.fixture(autouse=True)
 def configure_env(monkeypatch):
     monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
-    monkeypatch.setattr(config, "APP_ENV", "test")
-    monkeypatch.setattr(
-        config, "SQLALCHEMY_TEST_DATABASE_URI", "sqlite+pysqlite:///:memory:"
-    )
 
 
 @pytest.fixture

@@ -17,7 +17,6 @@ JWT_ACCESS_TOKEN_EXPIRES = timedelta(
 )
 RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI", "memory://")
 LOGIN_RATE_LIMIT = os.getenv("LOGIN_RATE_LIMIT", "5 per 15 minutes")
-RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "1") == "1"
 
 
 def get_database_uri() -> str:
