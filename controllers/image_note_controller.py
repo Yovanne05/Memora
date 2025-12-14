@@ -19,24 +19,33 @@ def upload_image(note_id: UUID):
             return jsonify({"error": "Aucune image fournie"}), HTTPStatus.BAD_REQUEST
 
         file = request.files["image"]
-        filepath = note_image_service.upload_image(str(note_id), file)
+        image_dto = note_image_service.upload_image(str(note_id), file)
 
         return (
-            jsonify(
-                {
-                    "filepath": filepath,
-                    "filename": os.path.basename(filepath),
-                }
-            ),
+            jsonify(image_dto.model_dump()),
             HTTPStatus.CREATED,
         )
     except NoteNotFound:
         return jsonify({"error": "Note introuvable"}), HTTPStatus.NOT_FOUND
     except ValueError as e:
         return jsonify({"error": str(e)}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
+    except Exception:
         return (
             jsonify({"error": "Erreur lors de l'upload de l'image"}),
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+
+
+@bp_note_images.get("/<uuid:note_id>/images")
+def list_images(note_id: UUID):
+    try:
+        images = note_image_service.list_images(str(note_id))
+        return jsonify([img.model_dump() for img in images]), HTTPStatus.OK
+    except NoteNotFound:
+        return jsonify({"error": "Note introuvable"}), HTTPStatus.NOT_FOUND
+    except Exception:
+        return (
+            jsonify({"error": "Erreur lors de la récupération des images"}),
             HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
@@ -51,7 +60,7 @@ def get_image(note_id: UUID, filename: str):
             return jsonify({"error": "Image introuvable"}), HTTPStatus.NOT_FOUND
 
         return send_file(filepath, mimetype="image/jpeg")
-    except Exception as e:
+    except Exception:
         return (
             jsonify({"error": "Erreur lors de la récupération de l'image"}),
             HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -68,7 +77,7 @@ def delete_image(note_id: UUID, filename: str):
         return jsonify({"error": "Note introuvable"}), HTTPStatus.NOT_FOUND
     except ValueError as e:
         return jsonify({"error": str(e)}), HTTPStatus.NOT_FOUND
-    except Exception as e:
+    except Exception:
         return (
             jsonify({"error": "Erreur lors de la suppression de l'image"}),
             HTTPStatus.INTERNAL_SERVER_ERROR,

@@ -13,7 +13,6 @@ class NoteCreateDTO(BaseModel):
     )
     visibility: VisibilityEnum = VisibilityEnum.PRIVATE
     tags: List[str] = Field(default_factory=list)
-    images: List[str] = Field(default_factory=list)
 
 
 class NoteUpdateDTO(BaseModel):
@@ -24,7 +23,6 @@ class NoteUpdateDTO(BaseModel):
         default=None, min_length=1, max_length=36
     )
     tags: List[str] | None = None
-    images: List[str] | None = None
 
 
 class NoteDTO(BaseModel):
@@ -37,7 +35,6 @@ class NoteDTO(BaseModel):
     collection_id: str | None = None
     collection_name: str | None = None
     tags: List[str] = Field(default_factory=list)
-    images: List[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 

@@ -1,9 +1,6 @@
-import os
 from io import BytesIO
-import pytest
 from uuid import uuid4
 
-from tests.note.conftest import NoteTestData
 
 
 def test_upload_image_returns_created(client_with_note_data):
@@ -19,9 +16,14 @@ def test_upload_image_returns_created(client_with_note_data):
 
     assert response.status_code == 201
     json_data = response.get_json()
-    assert "filepath" in json_data
-    assert "filename" in json_data
-    assert json_data["filename"].endswith(".png")
+    assert "id" in json_data
+    assert "file_name" in json_data
+    assert "file_path" in json_data
+    assert "file_size" in json_data
+    assert "mime_type" in json_data
+    assert "uploaded_at" in json_data
+    assert json_data["file_name"].endswith(".png")
+    assert json_data["note_id"] == data.note_id
 
 
 def test_upload_image_without_file_returns_400(client_with_note_data):
@@ -79,7 +81,7 @@ def test_get_image_returns_file(client_with_note_data):
         data={"image": (BytesIO(image_data), "test.png")},
         content_type="multipart/form-data",
     )
-    filename = upload_response.get_json()["filename"]
+    filename = upload_response.get_json()["file_name"]
 
     response = client.get(f"/notes/{data.note_id}/images/{filename}")
 
@@ -104,7 +106,7 @@ def test_delete_image_returns_no_content(client_with_note_data):
         data={"image": (BytesIO(image_data), "test.png")},
         content_type="multipart/form-data",
     )
-    filename = upload_response.get_json()["filename"]
+    filename = upload_response.get_json()["file_name"]
 
     response = client.delete(f"/notes/{data.note_id}/images/{filename}")
 
@@ -120,15 +122,15 @@ def test_delete_image_removes_from_note(client_with_note_data):
         data={"image": (BytesIO(image_data), "test.png")},
         content_type="multipart/form-data",
     )
-    filename = upload_response.get_json()["filename"]
+    filename = upload_response.get_json()["file_name"]
 
-    note = client.get(f"/notes/{data.note_id}").get_json()
-    assert len(note["images"]) == 1
+    images = client.get(f"/notes/{data.note_id}/images").get_json()
+    assert len(images) == 1
 
     client.delete(f"/notes/{data.note_id}/images/{filename}")
 
-    note_after = client.get(f"/notes/{data.note_id}").get_json()
-    assert len(note_after["images"]) == 0
+    images_after = client.get(f"/notes/{data.note_id}/images").get_json()
+    assert len(images_after) == 0
 
 
 def test_delete_nonexistent_image_returns_404(client_with_note_data):
@@ -161,5 +163,5 @@ def test_upload_multiple_images(client_with_note_data):
         )
         assert response.status_code == 201
 
-    note = client.get(f"/notes/{data.note_id}").get_json()
-    assert len(note["images"]) == 3
+    images = client.get(f"/notes/{data.note_id}/images").get_json()
+    assert len(images) == 3

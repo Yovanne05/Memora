@@ -1,13 +1,19 @@
 import os
 from uuid import uuid4
-from werkzeug.utils import secure_filename
+from datetime import datetime, timezone
+from typing import List
 from werkzeug.datastructures import FileStorage
 
+from services.interfaces.note.note_image_service_interface import NoteImageServiceInterface
 from repositorys import note_repository
+from repositorys import note_image_repository
+from daos.note_image_dao import NoteImage
+from dtos.note_image_dto import NoteImageDTO
+from mappers.note_image_mapper import note_image_to_dto
 from exceptions.note_exception import NoteNotFound
 
 
-class NoteImageService:
+class NoteImageService(NoteImageServiceInterface):
     UPLOAD_FOLDER = "uploads/notes"
     ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
@@ -27,7 +33,7 @@ class NoteImageService:
         file.seek(0)
         return size <= self.MAX_FILE_SIZE
 
-    def upload_image(self, note_id: str, file: FileStorage) -> str:
+    def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
         note = note_repository.find_one(note_id)
         if not note:
             raise NoteNotFound()
@@ -52,30 +58,49 @@ class NoteImageService:
         os.makedirs(note_folder, exist_ok=True)
 
         filepath = os.path.join(note_folder, filename)
+
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+
         file.save(filepath)
 
-        if not note.images:
-            note.images = []
-        note.images.append(filepath)
-        note_repository.update(note)
+        image_entity = NoteImage(
+            id=str(uuid4()),
+            note_id=note_id,
+            file_name=filename,
+            file_path=filepath,
+            file_size=file_size,
+            mime_type=file.content_type or f"image/{ext}",
+            uploaded_at=datetime.now(timezone.utc)
+        )
 
-        return filepath
+        saved_entity = note_image_repository.add(image_entity)
+
+        return note_image_to_dto(saved_entity)
+
+    def list_images(self, note_id: str) -> List[NoteImageDTO]:
+        note = note_repository.find_one(note_id)
+        if not note:
+            raise NoteNotFound()
+
+        images = note_image_repository.find_by_note(note_id)
+        return [note_image_to_dto(img) for img in images]
 
     def delete_image(self, note_id: str, filename: str) -> None:
         note = note_repository.find_one(note_id)
         if not note:
             raise NoteNotFound()
 
-        filepath = os.path.join(self.UPLOAD_FOLDER, note_id, filename)
-
-        if filepath not in (note.images or []):
+        image = note_image_repository.find_by_note_and_filename(note_id, filename)
+        if not image:
             raise ValueError("Image introuvable pour cette note")
 
+        filepath = image.file_path
         if os.path.exists(filepath):
             os.remove(filepath)
 
-        note.images = [img for img in note.images if img != filepath]
-        note_repository.update(note)
+        note_image_repository.delete(image.id)
 
         note_folder = os.path.join(self.UPLOAD_FOLDER, note_id)
         if os.path.exists(note_folder) and not os.listdir(note_folder):
