@@ -3,8 +3,6 @@ from uuid import uuid4
 import config
 import pytest
 
-from app import create_app
-
 
 @pytest.fixture(autouse=True)
 def configure_env(monkeypatch):
@@ -17,6 +15,7 @@ def configure_env(monkeypatch):
 
 @pytest.fixture
 def client():
+    from app import create_app
     app = create_app()
     app.testing = False
     app.config["TESTING"] = False

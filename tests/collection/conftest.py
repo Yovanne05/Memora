@@ -3,8 +3,6 @@ from uuid import uuid4
 
 import config
 import pytest
-
-from app import create_app
 from daos.user_dao import User
 from dtos.collection_dto import CollectionCreateDTO
 from dtos.collection_share_dto import CollectionShareCreateDTO
@@ -34,6 +32,7 @@ def ensure_test_app_schema():
     """Create the in-memory schema once so repository calls succeed."""
     config.APP_ENV = "test"
     config.SQLALCHEMY_TEST_DATABASE_URI = "sqlite+pysqlite:///:memory:"
+    from app import create_app
     app = create_app()
     with app.app_context():
         return
@@ -125,6 +124,7 @@ def collection_test_data():
 
 @pytest.fixture
 def client_with_collection_data(collection_test_data):
+    from app import create_app
     app = create_app()
     with app.test_client() as client:
         client.environ_base["REMOTE_ADDR"] = (

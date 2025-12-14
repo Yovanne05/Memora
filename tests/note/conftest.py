@@ -4,8 +4,6 @@ from uuid import uuid4
 import config
 import pytest
 from werkzeug.test import Client
-
-from app import create_app
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 
@@ -233,6 +231,7 @@ class NoteTestData:
 
 @pytest.fixture
 def app_client():
+    from app import create_app
     app = create_app()
     with app.test_client() as client:
         client.environ_base["REMOTE_ADDR"] = (

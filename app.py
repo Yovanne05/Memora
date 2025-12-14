@@ -17,7 +17,6 @@ def create_app() -> Flask:
     app = Flask(__name__)
     CORS(app)
 
-    db.configure_engine()
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
     app.config["RATELIMIT_STORAGE_URI"] = config.RATELIMIT_STORAGE_URI
