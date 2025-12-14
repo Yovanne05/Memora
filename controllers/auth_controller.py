@@ -7,12 +7,13 @@ from flasgger import swag_from
 
 from dtos.auth_dto import LoginDTO, RegisterDTO
 from services.impl.auth_service_impl import auth_service
+from utils.swagger import swagger_doc
 from utils.limiter import limiter
 
 bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@swag_from("../docs/auth/register.yaml")
+@swag_from(swagger_doc("auth/register.yaml"))
 @bp_auth.post("/register")
 def register():
     payload = RegisterDTO.model_validate_json(request.data)
@@ -25,14 +26,14 @@ def register():
 
 @bp_auth.post("/login")
 @limiter.limit(config.LOGIN_RATE_LIMIT)
-@swag_from("../docs/auth/login.yaml")
+@swag_from(swagger_doc("auth/login.yaml"))
 def login():
     payload = LoginDTO.model_validate_json(request.data)
     user, token = auth_service.login(payload)
     return jsonify({"user": user.model_dump(), "access_token": token}), HTTPStatus.OK
 
 
-@swag_from("../docs/auth/me.yaml")
+@swag_from(swagger_doc("auth/me.yaml"))
 @bp_auth.get("/me")
 @jwt_required()
 def me():
@@ -41,7 +42,7 @@ def me():
     return jsonify({"user": user.model_dump()}), HTTPStatus.OK
 
 
-@swag_from("../docs/auth/logout.yaml")
+@swag_from(swagger_doc("auth/logout.yaml"))
 @bp_auth.post("/logout")
 @jwt_required()
 def logout():

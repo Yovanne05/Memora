@@ -18,6 +18,7 @@ from services.impl.collection.collection_service_impl import CollectionService
 from services.impl.collection.collection_share_service_impl import (
     collection_share_service,
 )
+from utils.swagger import swagger_doc
 
 collection_service = CollectionService()
 
@@ -26,7 +27,7 @@ bp_collections = Blueprint(
 )
 
 
-@swag_from("../docs/collections/list.yaml")
+@swag_from(swagger_doc("collections/list.yaml"))
 @bp_collections.get("")
 @jwt_required()
 def find_many() :
@@ -46,7 +47,7 @@ def find_many() :
     )
 
 
-@swag_from("../docs/collections/find_one.yaml")
+@swag_from(swagger_doc("collections/find_one.yaml"))
 @bp_collections.get("/<uuid:collection_id>")
 @jwt_required()
 def find_one(collection_id : UUID) :
@@ -54,7 +55,7 @@ def find_one(collection_id : UUID) :
     return jsonify(collection.model_dump()), HTTPStatus.OK
 
 
-@swag_from("../docs/collections/create.yaml")
+@swag_from(swagger_doc("collections/create.yaml"))
 @bp_collections.post("")
 @jwt_required()
 def create() :
@@ -63,7 +64,7 @@ def create() :
     return jsonify(collection.model_dump()), HTTPStatus.CREATED
 
 
-@swag_from("../docs/collections/update.yaml")
+@swag_from(swagger_doc("collections/update.yaml"))
 @bp_collections.patch("/<uuid:collection_id>")
 @jwt_required()
 def update(collection_id : UUID) :
@@ -72,7 +73,7 @@ def update(collection_id : UUID) :
     return jsonify(collection.model_dump()), HTTPStatus.OK
 
 
-@swag_from("../docs/collections/delete.yaml")
+@swag_from(swagger_doc("collections/delete.yaml"))
 @bp_collections.delete("/<uuid:collection_id>")
 @jwt_required()
 def delete(collection_id : UUID):
@@ -80,7 +81,7 @@ def delete(collection_id : UUID):
     return "", HTTPStatus.NO_CONTENT
 
 
-@swag_from("../docs/collections/share_list.yaml")
+@swag_from(swagger_doc("collections/share_list.yaml"))
 @bp_collections.get("/<uuid:collection_id>/shares")
 @jwt_required()
 def list_shares(collection_id: UUID):
@@ -96,7 +97,7 @@ def list_shares(collection_id: UUID):
     )
 
 
-@swag_from("../docs/collections/share_create.yaml")
+@swag_from(swagger_doc("collections/share_create.yaml"))
 @bp_collections.post("/<uuid:collection_id>/shares")
 @jwt_required()
 def share_collection(collection_id: UUID):
@@ -107,7 +108,7 @@ def share_collection(collection_id: UUID):
     return jsonify(share_dto.model_dump()), HTTPStatus.CREATED
 
 
-@swag_from("../docs/collections/share_update.yaml")
+@swag_from(swagger_doc("collections/share_update.yaml"))
 @bp_collections.patch("/<uuid:collection_id>/shares/<uuid:user_id>")
 @jwt_required()
 def update_share(collection_id: UUID, user_id: UUID):
@@ -118,7 +119,7 @@ def update_share(collection_id: UUID, user_id: UUID):
     return jsonify(share_dto.model_dump()), HTTPStatus.OK
 
 
-@swag_from("../docs/collections/share_delete.yaml")
+@swag_from(swagger_doc("collections/share_delete.yaml"))
 @bp_collections.delete("/<uuid:collection_id>/shares/<uuid:user_id>")
 @jwt_required()
 def revoke_share(collection_id: UUID, user_id: UUID):
