@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import type { Collection } from "../models/collection.model"
-import { useUpdateCollectionMutation } from "./useCollectionsQuery"
+import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
 
 export function useCollectionEdit() {

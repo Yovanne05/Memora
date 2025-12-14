@@ -4,7 +4,6 @@ import { useCollectionCreate } from "@/features/collections/hooks/useCollectionC
 import { useCollectionEdit } from "@/features/collections/hooks/useCollectionEdit"
 import { useCollectionDelete } from "@/features/collections/hooks/useCollectionDelete"
 import { useCollectionsFilters } from "@/features/collections/hooks/useCollectionsFilters"
-import { useCollectionsManager } from "@/features/collections/hooks/useCollectionsManager"
 import { useCollectionsBulkActions } from "@/features/collections/hooks/useCollectionsBulkActions"
 import { useCollectionDetails } from "@/features/collections/hooks/useCollectionDetails"
 import type { Collection } from "@/features/collections/models/collection.model"
@@ -183,42 +182,8 @@ describe("hooks collections (workflows)", () => {
     expect(result.current.error).toBeNull()
   })
 
-  test("useCollectionsManager gere etat d'UI et mutations", async () => {
-    const { result } = renderHook(() => useCollectionsManager())
-
-    await act(async () => {
-      await result.current.create.submit({
-        name: "New",
-        description: undefined,
-        visibility: "private",
-      })
-    })
-    expect(createMutation.mutateAsync).toHaveBeenCalledWith({
-      ownerId: "user-1",
-      name: "New",
-      description: undefined,
-      visibility: "private",
-    })
-
-    act(() => result.current.edit.open(sampleCollection))
-    await act(async () => {
-      await result.current.edit.submit({
-        name: "Maj",
-        description: "Desc",
-        visibility: "private",
-      })
-    })
-    expect(updateMutation.mutateAsync).toHaveBeenCalledWith({
-      id: "col-1",
-      data: { name: "Maj", description: "Desc", visibility: "private" },
-    })
-
-    act(() => result.current.deletion.open(sampleCollection))
-    await act(async () => {
-      await result.current.deletion.confirm()
-    })
-    expect(deleteMutation.mutateAsync).toHaveBeenCalledWith("col-1")
-  })
+  // Test removed: useCollectionsManager has been deleted in favor of individual hooks
+  // Tests for individual hooks (useCollectionCreate, useCollectionEdit, useCollectionDelete) are covered separately
 
   test("useCollectionDetails expose les gestionnaires et valeurs initiales", async () => {
     const { result } = renderHook(() => useCollectionDetails("col-1"))

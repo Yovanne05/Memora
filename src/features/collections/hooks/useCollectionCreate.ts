@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
-import { useCreateCollectionMutation } from "./useCollectionsQuery"
+import { useCreateCollectionMutation } from "./useCreateCollectionMutation"
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
 
 export function useCollectionCreate() {

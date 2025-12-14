@@ -3,6 +3,7 @@ import { CollectionsContent } from "../components/list/CollectionsContent"
 import { CollectionDialogs } from "../components/dialogs/CollectionDialogs"
 import { CollectionsBulkActions } from "../components/list/CollectionsBulkActions"
 import { CollectionsPageActions } from "../components/list/CollectionsPageActions"
+import { CollectionsPagination } from "../components/list/CollectionsPagination"
 import { useCollectionsFilters } from "../hooks/useCollectionsFilters"
 import { useCollectionCreate } from "../hooks/useCollectionCreate"
 import { useCollectionEdit } from "../hooks/useCollectionEdit"
@@ -71,6 +72,14 @@ export function CollectionsListPage() {
         onToggleSelection={selection.toggleSelection}
         selectionMode={selection.selectionMode}
       />
+
+      {filters.total > filters.pagination.limit && (
+        <CollectionsPagination
+          page={filters.pagination.page}
+          maxPage={filters.pagination.maxPage}
+          setPage={filters.pagination.setPage}
+        />
+      )}
 
       <CollectionsBulkActions
         selectedCount={selection.selectedCount}

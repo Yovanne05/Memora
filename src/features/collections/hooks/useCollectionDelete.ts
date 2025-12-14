@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import type { Collection } from "../models/collection.model"
-import { useDeleteCollectionMutation } from "./useCollectionsQuery"
+import { useDeleteCollectionMutation } from "./useDeleteCollectionMutation"
 
 export function useCollectionDelete() {
   const [target, setTarget] = useState<Collection | null>(null)

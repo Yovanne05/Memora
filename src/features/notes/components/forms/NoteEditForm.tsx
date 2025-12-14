@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Check, Save, Trash2 } from "lucide-react"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { Note, NoteVisibility } from "../../models/note.model"
 import { noteEditFormSchema } from "../../schemas/note.schema"

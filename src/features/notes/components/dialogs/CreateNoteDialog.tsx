@@ -26,7 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { NoteVisibility } from "../../models/note.model"
 import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"

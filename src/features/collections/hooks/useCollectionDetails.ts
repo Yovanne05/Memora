@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react"
 import { useRouter } from "@tanstack/react-router"
-import { useCollectionQuery, useUpdateCollectionMutation, useDeleteCollectionMutation } from "./useCollectionsQuery"
+import { useCollectionQuery } from "./useCollectionQuery"
+import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
+import { useDeleteCollectionMutation } from "./useDeleteCollectionMutation"
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
 import type { Collection } from "../models/collection.model"
 
