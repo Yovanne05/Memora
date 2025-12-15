@@ -157,12 +157,6 @@ CREATE TABLE flashcards (
     id             CHAR(36) PRIMARY KEY,
     note_id        CHAR(36) NOT NULL,
     question       TEXT NOT NULL,
-    answer         TEXT NOT NULL,
-    ease           INT DEFAULT 250,
-    interval_days  INT DEFAULT 0,
-    repetitions    INT DEFAULT 0,
-    streak         INT DEFAULT 0,
-    due_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_flashcards_note
@@ -172,8 +166,20 @@ CREATE TABLE flashcards (
 );
 
 CREATE INDEX idx_flashcards_note ON flashcards (note_id);
-CREATE INDEX idx_flashcards_due ON flashcards (due_at);
-CREATE INDEX idx_flashcards_streak ON flashcards (streak);
+
+CREATE TABLE flashcard_answers (
+    id             CHAR(36) PRIMARY KEY,
+    flashcard_id   CHAR(36) NOT NULL,
+    answer_text    TEXT NOT NULL,
+    is_correct     BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_flashcard_answers_flashcard
+        FOREIGN KEY (flashcard_id) REFERENCES flashcards(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE INDEX idx_flashcard_answers_flashcard ON flashcard_answers (flashcard_id);
 
 CREATE TABLE reviews (
     id             CHAR(36) PRIMARY KEY,

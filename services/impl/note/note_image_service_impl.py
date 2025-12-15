@@ -10,11 +10,11 @@ from repositorys import note_image_repository
 from daos.note_image_dao import NoteImage
 from dtos.note_image_dto import NoteImageDTO
 from mappers.note_image_mapper import note_image_to_dto
-from exceptions.note_exception import (
-    NoteNotFound,
-    NoFileProvided,
-    InvalidFileType,
+from exceptions.note_exception import NoteNotFound
+from exceptions.note_image_exception import (
     FileTooLarge,
+    InvalidFileType,
+    NoFileProvided,
     NoteImageNotFound,
 )
 

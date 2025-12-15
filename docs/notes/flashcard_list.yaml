@@ -1,0 +1,19 @@
+tags:
+  - flashcards
+summary: Lister les flashcards d'une note
+description: >
+  Retourne toutes les flashcards associées à une note donnée.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+responses:
+  200:
+    description: Liste des flashcards.
+    schema:
+      $ref: "#/definitions/FlashcardListResponse"
+  404:
+    description: Note introuvable.

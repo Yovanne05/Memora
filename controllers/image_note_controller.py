@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from services.impl.note.note_image_service_impl import note_image_service
-from exceptions.note_exception import NoFileProvided, NoteImageNotFound
+from exceptions.note_image_exception import NoFileProvided, NoteImageNotFound
 
 bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 

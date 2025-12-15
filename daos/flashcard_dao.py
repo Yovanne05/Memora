@@ -1,20 +1,14 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import (
-    DateTime,
-    ForeignKey,
-    Index,
-    String,
-    Text,
-    text,
-)
+from sqlalchemy import DateTime, ForeignKey, Index, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
 from utils.utils import generate_uuid
 
 if TYPE_CHECKING:
+    from daos.flashcard_answer_dao import FlashcardAnswer
     from daos.note_dao import Note
 
 
@@ -31,7 +25,6 @@ class Flashcard(Base):
         nullable=False,
     )
     question: Mapped[str] = mapped_column(Text, nullable=False)
-    answer: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )
@@ -43,3 +36,6 @@ class Flashcard(Base):
     )
 
     note: Mapped["Note"] = relationship(back_populates="flashcards")
+    answers: Mapped[list["FlashcardAnswer"]] = relationship(
+        back_populates="flashcard", cascade="all, delete-orphan"
+    )

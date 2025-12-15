@@ -82,7 +82,9 @@ class Note(Base):
     )
     owner: Mapped["User"] = relationship(back_populates="notes", lazy="selectin")
     shares: Mapped[list["NoteShare"]] = relationship(back_populates="note")
-    flashcards: Mapped[list["Flashcard"]] = relationship(back_populates="note")
+    flashcards: Mapped[list["Flashcard"]] = relationship(
+        back_populates="note", passive_deletes=True
+    )
     outgoing_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_1],
         back_populates="source_note",
