@@ -2,12 +2,12 @@ from typing import List
 
 from domain_services.flashcard_domain_service import apply_flashcard_update
 from dtos.flashcard_dto import FlashcardCreateDTO, FlashcardDTO, FlashcardUpdateDTO
-from exceptions.note_exception import (
+from exceptions.flashcard_exception import (
     FlashcardMustHaveAnswers,
     FlashcardMustHaveOneCorrectAnswer,
     FlashcardNotFound,
-    NoteNotFound,
 )
+from exceptions.note_exception import NoteNotFound
 from mappers.flashcard_mapper import dto_to_flashcard, flashcard_to_dto
 from repositorys import flashcard_repository, note_repository
 from services.interfaces.note.flashcard_service_interface import (
