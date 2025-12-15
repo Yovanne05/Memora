@@ -11,7 +11,7 @@ from dtos.note_share_dto import (
     NoteShareDTO,
     NoteShareUpdateDTO,
 )
-from exceptions.note_exception import NoteShareNotFound
+from exceptions.note_share_exception import NoteShareNotFound
 from mappers.note_share_mapper import dto_to_note_share, note_share_to_dto
 from repositorys import note_repository, note_share_repository, user_repository
 from services.interfaces.note.note_share_service_interface import (

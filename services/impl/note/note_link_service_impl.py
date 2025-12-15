@@ -5,7 +5,7 @@ from domain_services.note_domain_service import (
     ensure_same_collection,
 )
 from dtos.note_link_dto import NoteLinkCreateDTO, NoteLinkDTO
-from exceptions.note_exception import NoteLinkNotFound
+from exceptions.note_link_exception import NoteLinkNotFound
 from mappers.note_link_mapper import dto_to_note_link, note_link_to_dto
 from repositorys import note_repository
 from repositorys import note_link_repository

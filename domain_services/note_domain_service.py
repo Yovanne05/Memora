@@ -2,16 +2,20 @@ from daos.note_dao import Note
 from dtos.note_dto import NoteUpdateDTO
 from exceptions.note_exception import (
     NoteCollectionDoesNotExist,
+    NoteNotFound,
+    NoteOwnerDoesNotExist,
+    NoteTitleConflict,
+)
+from exceptions.note_link_exception import (
     NoteLinkAlreadyExists,
     NoteLinkCollectionChangeForbidden,
     NoteLinkCrossCollection,
     NoteLinkSelfReferenceForbidden,
-    NoteNotFound,
-    NoteOwnerDoesNotExist,
+)
+from exceptions.note_share_exception import (
     NoteShareAlreadyExists,
     NoteShareTargetDoesNotExist,
     NoteShareWithOwnerForbidden,
-    NoteTitleConflict,
 )
 
 
