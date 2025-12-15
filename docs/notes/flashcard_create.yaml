@@ -1,0 +1,31 @@
+tags:
+  - flashcards
+summary: Créer une flashcard
+description: >
+  Crée une nouvelle flashcard avec sa question et ses réponses possibles.
+  Exactement une réponse doit être marquée comme correcte.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Note à laquelle rattacher la flashcard.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/FlashcardCreatePayload"
+responses:
+  201:
+    description: Flashcard créée avec succès.
+    schema:
+      $ref: "#/definitions/Flashcard"
+  400:
+    description: >
+      Validation échouée : aucune réponse fournie, aucune réponse correcte,
+      ou plusieurs réponses correctes.
+  404:
+    description: Note introuvable.
+  422:
+    description: Erreur de validation Pydantic (liste de réponses vide).

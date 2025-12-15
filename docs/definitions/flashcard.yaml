@@ -1,0 +1,112 @@
+definitions:
+  FlashcardAnswer:
+    type: object
+    description: Réponse associée à une flashcard.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique de la réponse.
+        example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      flashcard_id:
+        type: string
+        format: uuid
+        description: Identifiant de la flashcard associée.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      answer_text:
+        type: string
+        description: Texte de la réponse.
+        example: "Paris"
+      is_correct:
+        type: boolean
+        description: Indique si cette réponse est la bonne.
+        example: true
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création.
+        example: "2025-05-12T09:23:41Z"
+    required: ["id", "flashcard_id", "answer_text", "is_correct", "created_at"]
+
+  FlashcardAnswerCreatePayload:
+    type: object
+    required: ["answer_text", "is_correct"]
+    properties:
+      answer_text:
+        type: string
+        description: Texte de la réponse.
+        example: "Paris"
+      is_correct:
+        type: boolean
+        description: Indique si cette réponse est correcte.
+        example: true
+
+  Flashcard:
+    type: object
+    description: Flashcard pour mémorisation par répétition espacée.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique de la flashcard.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note associée.
+        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      question:
+        type: string
+        description: Question posée à l'utilisateur.
+        example: "Quelle est la capitale de la France ?"
+      answers:
+        type: array
+        description: Liste des réponses possibles (dont exactement une correcte).
+        items:
+          $ref: "#/definitions/FlashcardAnswer"
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création.
+        example: "2025-05-12T09:23:41Z"
+      updated_at:
+        type: string
+        format: date-time
+        description: Dernière mise à jour.
+        example: "2025-05-15T16:02:07Z"
+    required: ["id", "note_id", "question", "answers", "created_at", "updated_at"]
+
+  FlashcardCreatePayload:
+    type: object
+    required: ["question", "answers"]
+    properties:
+      question:
+        type: string
+        description: Question à poser.
+        example: "Quelle est la capitale de la France ?"
+      answers:
+        type: array
+        minItems: 1
+        description: Liste des réponses possibles. Exactement une doit être correcte.
+        items:
+          $ref: "#/definitions/FlashcardAnswerCreatePayload"
+
+  FlashcardUpdatePayload:
+    type: object
+    properties:
+      question:
+        type: string
+        description: Nouvelle question (optionnel).
+        example: "Quelle est la capitale de l'Allemagne ?"
+      answers:
+        type: array
+        minItems: 1
+        description: Nouvelles réponses (optionnel). Si fourni, doit contenir exactement une réponse correcte.
+        items:
+          $ref: "#/definitions/FlashcardAnswerCreatePayload"
+
+  FlashcardListResponse:
+    type: array
+    description: Liste de flashcards.
+    items:
+      $ref: "#/definitions/Flashcard"

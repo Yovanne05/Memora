@@ -1,0 +1,17 @@
+tags:
+  - flashcards
+summary: Supprimer une flashcard
+description: >
+  Supprime définitivement une flashcard et toutes ses réponses associées.
+parameters:
+  - in: path
+    name: flashcard_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la flashcard.
+responses:
+  204:
+    description: Flashcard supprimée avec succès.
+  404:
+    description: Flashcard introuvable.

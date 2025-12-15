@@ -34,6 +34,7 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
             {"name": "users"},
             {"name": "notes"},
             {"name": "collections"},
+            {"name": "flashcards"},
         ],
         "securityDefinitions": {
             "bearerAuth": {
