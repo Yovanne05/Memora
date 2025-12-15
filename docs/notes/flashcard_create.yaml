@@ -3,7 +3,7 @@ tags:
 summary: Créer une flashcard
 description: >
   Crée une nouvelle flashcard avec sa question et ses réponses possibles.
-  Exactement une réponse doit être marquée comme correcte.
+  Au moins une réponse doit être marquée comme correcte.
 parameters:
   - in: path
     name: note_id
@@ -23,8 +23,7 @@ responses:
       $ref: "#/definitions/Flashcard"
   400:
     description: >
-      Validation échouée : aucune réponse fournie, aucune réponse correcte,
-      ou plusieurs réponses correctes.
+      Validation échouée : aucune réponse fournie ou aucune réponse correcte.
   404:
     description: Note introuvable.
   422:

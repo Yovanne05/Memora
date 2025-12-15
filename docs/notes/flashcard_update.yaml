@@ -3,7 +3,7 @@ tags:
 summary: Modifier une flashcard
 description: >
   Met à jour la question et/ou les réponses d'une flashcard existante.
-  Si les réponses sont modifiées, exactement une doit être correcte.
+  Si les réponses sont modifiées, au moins une doit être correcte.
 parameters:
   - in: path
     name: flashcard_id
@@ -23,8 +23,7 @@ responses:
       $ref: "#/definitions/Flashcard"
   400:
     description: >
-      Validation échouée : liste de réponses vide, aucune réponse correcte,
-      ou plusieurs réponses correctes.
+      Validation échouée : liste de réponses vide ou aucune réponse correcte.
   404:
     description: Flashcard introuvable.
   422:

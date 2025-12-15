@@ -4,7 +4,7 @@ from domain_services.flashcard_domain_service import apply_flashcard_update
 from dtos.flashcard_dto import FlashcardCreateDTO, FlashcardDTO, FlashcardUpdateDTO
 from exceptions.flashcard_exception import (
     FlashcardMustHaveAnswers,
-    FlashcardMustHaveOneCorrectAnswer,
+    FlashcardMustHaveAtLeastOneCorrectAnswer,
     FlashcardNotFound,
 )
 from exceptions.note_exception import NoteNotFound
@@ -39,8 +39,8 @@ class FlashcardService(FlashcardServiceInterface):
             raise FlashcardMustHaveAnswers()
 
         correct_answers_count = sum(1 for a in payload.answers if a.is_correct)
-        if correct_answers_count != 1:
-            raise FlashcardMustHaveOneCorrectAnswer()
+        if correct_answers_count < 1:
+            raise FlashcardMustHaveAtLeastOneCorrectAnswer()
 
         flashcard_entity = dto_to_flashcard(payload, note_id)
         saved = flashcard_repository.add(flashcard_entity)
@@ -58,8 +58,8 @@ class FlashcardService(FlashcardServiceInterface):
                 raise FlashcardMustHaveAnswers()
 
             correct_answers_count = sum(1 for a in payload.answers if a.is_correct)
-            if correct_answers_count != 1:
-                raise FlashcardMustHaveOneCorrectAnswer()
+            if correct_answers_count < 1:
+                raise FlashcardMustHaveAtLeastOneCorrectAnswer()
 
         updated_flashcard = apply_flashcard_update(flashcard, payload)
         saved = flashcard_repository.update(updated_flashcard)

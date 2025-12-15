@@ -11,6 +11,6 @@ class FlashcardMustHaveAnswers(BadRequest):
         super().__init__(description=description)
 
 
-class FlashcardMustHaveOneCorrectAnswer(BadRequest):
-    def __init__(self, description: str = "Flashcard must have exactly one correct answer."):
+class FlashcardMustHaveAtLeastOneCorrectAnswer(BadRequest):
+    def __init__(self, description: str = "Flashcard must have at least one correct answer."):
         super().__init__(description=description)
