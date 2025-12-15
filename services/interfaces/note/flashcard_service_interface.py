@@ -1,6 +1,11 @@
 from typing import List, Protocol
 
-from dtos.flashcard_dto import FlashcardCreateDTO, FlashcardDTO, FlashcardUpdateDTO
+from dtos.flashcard_dto import (
+    FlashcardCreateDTO,
+    FlashcardDTO,
+    FlashcardDuplicateDTO,
+    FlashcardUpdateDTO,
+)
 
 
 class FlashcardServiceInterface(Protocol):
@@ -15,6 +20,11 @@ class FlashcardServiceInterface(Protocol):
 
     def update(
         self, flashcard_id: str, payload: FlashcardUpdateDTO
+    ) -> FlashcardDTO:
+        pass
+
+    def duplicate(
+        self, flashcard_id: str, payload: FlashcardDuplicateDTO
     ) -> FlashcardDTO:
         pass
 

@@ -1,7 +1,13 @@
 from typing import List
 
 from domain_services.flashcard_domain_service import apply_flashcard_update
-from dtos.flashcard_dto import FlashcardCreateDTO, FlashcardDTO, FlashcardUpdateDTO
+from dtos.flashcard_dto import (
+    FlashcardCreateDTO,
+    FlashcardDTO,
+    FlashcardDuplicateDTO,
+    FlashcardUpdateDTO,
+)
+from dtos.flashcard_answer_dto import FlashcardAnswerCreateDTO
 from exceptions.flashcard_exception import (
     FlashcardMustHaveAnswers,
     FlashcardMustHaveAtLeastOneCorrectAnswer,
@@ -64,6 +70,35 @@ class FlashcardService(FlashcardServiceInterface):
         updated_flashcard = apply_flashcard_update(flashcard, payload)
         saved = flashcard_repository.update(updated_flashcard)
         return flashcard_to_dto(saved)
+
+    def duplicate(
+        self, flashcard_id: str, payload: FlashcardDuplicateDTO
+    ) -> FlashcardDTO:
+        source_flashcard = flashcard_repository.find_one(flashcard_id)
+        if not source_flashcard:
+            raise FlashcardNotFound()
+
+        target_note_id = (
+            payload.target_note_id
+            if payload.target_note_id
+            else source_flashcard.note_id
+        )
+
+        note = note_repository.find_one(target_note_id)
+        if not note:
+            raise NoteNotFound()
+
+        create_dto = FlashcardCreateDTO(
+            question=source_flashcard.question,
+            answers=[
+                FlashcardAnswerCreateDTO(
+                    answer_text=answer.answer_text, is_correct=answer.is_correct
+                )
+                for answer in source_flashcard.answers
+            ],
+        )
+
+        return self.create(target_note_id, create_dto)
 
     def delete(self, flashcard_id: str) -> None:
         deleted = flashcard_repository.delete(flashcard_id)
