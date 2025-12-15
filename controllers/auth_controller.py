@@ -33,7 +33,6 @@ def login():
 
 
 @bp_auth.get("/me")
-@jwt_required()
 @swag_from("../docs/auth/me.yaml")
 def me():
     user_id = get_jwt_identity()

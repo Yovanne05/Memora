@@ -18,7 +18,6 @@ bp_collections = Blueprint(
 
 
 @bp_collections.get("")
-@jwt_required()
 @swag_from("../docs/collections/list.yaml")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
@@ -38,7 +37,6 @@ def find_many():
 
 
 @bp_collections.get("/<uuid:collection_id>")
-@jwt_required()
 @swag_from("../docs/collections/find_one.yaml")
 def find_one(collection_id: UUID):
     collection = collection_service.find_one(str(collection_id))
@@ -46,7 +44,6 @@ def find_one(collection_id: UUID):
 
 
 @bp_collections.post("")
-@jwt_required()
 @swag_from("../docs/collections/create.yaml")
 def create():
     payload = CollectionCreateDTO.model_validate_json(request.data)
@@ -55,7 +52,6 @@ def create():
 
 
 @bp_collections.patch("/<uuid:collection_id>")
-@jwt_required()
 @swag_from("../docs/collections/update.yaml")
 def update(collection_id: UUID):
     payload = CollectionUpdateDTO.model_validate_json(request.data)
@@ -64,7 +60,6 @@ def update(collection_id: UUID):
 
 
 @bp_collections.delete("/<uuid:collection_id>")
-@jwt_required()
 @swag_from("../docs/collections/delete.yaml")
 def delete(collection_id: UUID):
     collection_service.delete(str(collection_id))

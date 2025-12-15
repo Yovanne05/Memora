@@ -13,7 +13,6 @@ bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 
 
 @bp_note_images.get("/<uuid:note_id>")
-@jwt_required()
 @swag_from("../docs/notes_images/list.yaml")
 def find_many(note_id: UUID):
     images = note_image_service.list_images(str(note_id))
@@ -21,7 +20,6 @@ def find_many(note_id: UUID):
 
 
 @bp_note_images.get("/<uuid:note_id>/images/<filename>")
-@jwt_required()
 @swag_from("../docs/notes_images/get.yaml")
 def find_one(note_id: UUID, filename: str):
     filepath = os.path.join("uploads/notes", str(note_id), filename)
@@ -33,7 +31,6 @@ def find_one(note_id: UUID, filename: str):
 
 
 @bp_note_images.post("/<uuid:note_id>")
-@jwt_required()
 @swag_from("../docs/notes_images/upload.yaml")
 def create(note_id: UUID):
     if "image" not in request.files:
@@ -45,7 +42,6 @@ def create(note_id: UUID):
 
 
 @bp_note_images.delete("/<uuid:note_id>/images/<filename>")
-@jwt_required()
 @swag_from("../docs/notes_images/delete.yaml")
 def delete(note_id: UUID, filename: str):
     note_image_service.delete_image(str(note_id), filename)
