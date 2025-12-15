@@ -105,6 +105,15 @@ definitions:
         items:
           $ref: "#/definitions/FlashcardAnswerCreatePayload"
 
+  FlashcardDuplicatePayload:
+    type: object
+    properties:
+      target_note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note cible (optionnel). Si absent, duplique dans la même note.
+        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+
   FlashcardListResponse:
     type: array
     description: Liste de flashcards.
