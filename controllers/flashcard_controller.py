@@ -41,12 +41,12 @@ def find_one(flashcard_id: UUID):
     return jsonify(flashcard.model_dump()), HTTPStatus.OK
 
 
-@bp_flashcards.post("")
+@bp_flashcards.post("/<uuid:note_id>")
 @jwt_required()
 @swag_from("../docs/flashcards/create.yaml")
-def create():
+def create(note_id : UUID):
     payload = FlashcardCreateDTO.model_validate_json(request.data)
-    flashcard = flashcard_service.create(payload.note_id, payload)
+    flashcard = flashcard_service.create(str(note_id), payload)
     return jsonify(flashcard.model_dump()), HTTPStatus.CREATED
 
 
