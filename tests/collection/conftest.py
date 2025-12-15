@@ -11,7 +11,7 @@ from repositorys import (
     collection_share_repository,
     user_repository,
 )
-from services.impl.collection.collection_service_impl import CollectionService
+from services.impl.collection.collection_service_impl import collection_service
 from services.impl.collection.collection_share_service_impl import (
     collection_share_service,
 )
@@ -74,8 +74,7 @@ class CollectionTestData:
             owner_id=self.owner_id,
             visibility=VisibilityEnum.PRIVATE,
         )
-        service = CollectionService()
-        created = service.create(dto)
+        created = collection_service.create(dto)
         self.created_collections.add(created.id)
         return created.id
 

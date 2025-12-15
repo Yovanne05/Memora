@@ -17,7 +17,7 @@ bp_note_links = Blueprint(
 @bp_note_links.get("")
 @jwt_required()
 @swag_from("../docs/link_notes/links_list.yaml")
-def list_links(note_id: UUID):
+def find_many(note_id: UUID):
     link_dtos = note_link_service.list_links(str(note_id))
     return jsonify([dto.model_dump() for dto in link_dtos]), HTTPStatus.OK
 
@@ -25,7 +25,7 @@ def list_links(note_id: UUID):
 @bp_note_links.post("")
 @jwt_required()
 @swag_from("../docs/link_notes/links_create.yaml")
-def create_link(note_id: UUID):
+def create(note_id: UUID):
     payload = NoteLinkCreateDTO.model_validate_json(request.data)
     link_dto = note_link_service.create_link(str(note_id), payload)
     return jsonify(link_dto.model_dump()), HTTPStatus.CREATED
@@ -34,6 +34,6 @@ def create_link(note_id: UUID):
 @bp_note_links.delete("/<uuid:linked_note_id>")
 @jwt_required()
 @swag_from("../docs/link_notes/links_delete.yaml")
-def delete_link(note_id: UUID, linked_note_id: UUID):
+def delete(note_id: UUID, linked_note_id: UUID):
     note_link_service.delete_link(str(note_id), str(linked_note_id))
     return "", HTTPStatus.NO_CONTENT

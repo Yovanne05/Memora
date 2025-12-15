@@ -40,3 +40,4 @@ class CollectionService(CollectionServiceInterface) :
             raise CollectionNotFound()
 
 
+collection_service = CollectionService()

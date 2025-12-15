@@ -21,7 +21,7 @@ bp_collection_shares = Blueprint(
 @bp_collection_shares.get("/<uuid:collection_id>/shares")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_list.yaml")
-def list_shares(collection_id: UUID):
+def find_many(collection_id: UUID):
     share_dtos = collection_share_service.list_shares(str(collection_id))
     return jsonify([dto.model_dump() for dto in share_dtos]), HTTPStatus.OK
 
@@ -29,7 +29,7 @@ def list_shares(collection_id: UUID):
 @bp_collection_shares.post("/<uuid:collection_id>/shares")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_create.yaml")
-def share_collection(collection_id: UUID):
+def create(collection_id: UUID):
     payload = CollectionShareCreateDTO.model_validate_json(request.data)
     share_dto = collection_share_service.share_collection(
         str(collection_id), payload
@@ -40,7 +40,7 @@ def share_collection(collection_id: UUID):
 @bp_collection_shares.patch("/<uuid:collection_id>/shares/<uuid:user_id>")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_update.yaml")
-def update_share(collection_id: UUID, user_id: UUID):
+def update(collection_id: UUID, user_id: UUID):
     payload = CollectionShareUpdateDTO.model_validate_json(request.data)
     share_dto = collection_share_service.update_share(
         str(collection_id), str(user_id), payload
@@ -51,6 +51,6 @@ def update_share(collection_id: UUID, user_id: UUID):
 @bp_collection_shares.delete("/<uuid:collection_id>/shares/<uuid:user_id>")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_delete.yaml")
-def revoke_share(collection_id: UUID, user_id: UUID):
+def delete(collection_id: UUID, user_id: UUID):
     collection_share_service.revoke_share(str(collection_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT

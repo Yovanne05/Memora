@@ -44,7 +44,7 @@ def create():
 
 @bp_users.patch("/<uuid:user_id>")
 @swag_from("../docs/users/update.yaml")
-def patch(user_id: UUID):
+def update(user_id: UUID):
     payload = UserUpdateDTO.model_validate_json(request.data)
     user = user_service.update(str(user_id), payload)
     return jsonify(user.model_dump()), HTTPStatus.OK
