@@ -7,7 +7,6 @@ from flasgger import swag_from
 
 from dtos.flashcard_dto import (
     FlashcardCreateDTO,
-    FlashcardDuplicateDTO,
     FlashcardUpdateDTO,
 )
 from querys.flashcard_query import FlashcardFindQuery
@@ -65,6 +64,5 @@ def delete(flashcard_id: UUID):
 @bp_flashcards.post("/<uuid:flashcard_id>/duplicate")
 @swag_from("../docs/flashcards/duplicate.yaml")
 def duplicate(flashcard_id: UUID):
-    payload = FlashcardDuplicateDTO.model_validate_json(request.data or "{}")
-    flashcard = flashcard_service.duplicate(str(flashcard_id), payload)
+    flashcard = flashcard_service.duplicate(str(flashcard_id))
     return jsonify(flashcard.model_dump()), HTTPStatus.CREATED

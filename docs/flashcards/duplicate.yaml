@@ -2,9 +2,8 @@ tags:
   - flashcards
 summary: Dupliquer une flashcard
 description: >
-  Duplique une flashcard existante avec toutes ses réponses.
-  Par défaut, la flashcard est dupliquée dans la même note.
-  Il est possible de spécifier une note cible différente via le paramètre target_note_id.
+  Duplique une flashcard existante avec toutes ses réponses dans la même note.
+  La flashcard dupliquée aura un nouvel identifiant unique mais conservera la même question et les mêmes réponses.
 parameters:
   - in: path
     name: flashcard_id
@@ -12,16 +11,10 @@ parameters:
     format: uuid
     required: true
     description: Identifiant unique de la flashcard à dupliquer.
-  - in: body
-    name: payload
-    required: false
-    schema:
-      $ref: "#/definitions/FlashcardDuplicatePayload"
 responses:
   201:
     description: Flashcard dupliquée avec succès.
     schema:
       $ref: "#/definitions/Flashcard"
   404:
-    description: >
-      Flashcard source ou note cible introuvable.
+    description: Flashcard source introuvable.

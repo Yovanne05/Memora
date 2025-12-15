@@ -4,7 +4,6 @@ from domain_services.flashcard_domain_service import apply_flashcard_update
 from dtos.flashcard_dto import (
     FlashcardCreateDTO,
     FlashcardDTO,
-    FlashcardDuplicateDTO,
     FlashcardUpdateDTO,
 )
 from dtos.flashcard_answer_dto import FlashcardAnswerCreateDTO
@@ -74,22 +73,10 @@ class FlashcardService(FlashcardServiceInterface):
         if not deleted:
             raise FlashcardNotFound()
 
-    def duplicate(
-        self, flashcard_id: str, payload: FlashcardDuplicateDTO
-    ) -> FlashcardDTO:
+    def duplicate(self, flashcard_id: str) -> FlashcardDTO:
         source_flashcard = flashcard_repository.find_one(flashcard_id)
         if not source_flashcard:
             raise FlashcardNotFound()
-
-        target_note_id = (
-            payload.target_note_id
-            if payload.target_note_id
-            else source_flashcard.note_id
-        )
-
-        note = note_repository.find_one(target_note_id)
-        if not note:
-            raise NoteNotFound()
 
         create_dto = FlashcardCreateDTO(
             question=source_flashcard.question,
@@ -101,7 +88,7 @@ class FlashcardService(FlashcardServiceInterface):
             ],
         )
 
-        return self.create(target_note_id, create_dto)
+        return self.create(source_flashcard.note_id, create_dto)
 
 
 flashcard_service = FlashcardService()

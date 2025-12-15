@@ -3,7 +3,6 @@ from typing import List, Protocol
 from dtos.flashcard_dto import (
     FlashcardCreateDTO,
     FlashcardDTO,
-    FlashcardDuplicateDTO,
     FlashcardUpdateDTO,
 )
 
@@ -25,8 +24,6 @@ class FlashcardServiceInterface(Protocol):
 
     def delete(self, flashcard_id: str) -> None:
         pass
-    
-    def duplicate(
-        self, flashcard_id: str, payload: FlashcardDuplicateDTO
-    ) -> FlashcardDTO:
+
+    def duplicate(self, flashcard_id: str) -> FlashcardDTO:
         pass
