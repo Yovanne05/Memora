@@ -6,10 +6,8 @@ from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
-from dtos.note_link_dto import NoteLinkCreateDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
-from services.impl.note.note_link_service_impl import note_link_service
 
 
 bp_notes = Blueprint("notes", __name__, url_prefix="/notes")
@@ -63,29 +61,4 @@ def update(note_id: UUID):
 @swag_from("../docs/notes/delete.yaml")
 def delete(note_id: UUID):
     note_crud_service.delete(str(note_id))
-    return "", HTTPStatus.NO_CONTENT
-
-
-@bp_notes.get("/<uuid:note_id>/links")
-@jwt_required()
-@swag_from("../docs/notes/links_list.yaml")
-def list_links(note_id: UUID):
-    link_dtos = note_link_service.list_links(str(note_id))
-    return jsonify([dto.model_dump() for dto in link_dtos]), HTTPStatus.OK
-
-
-@bp_notes.post("/<uuid:note_id>/links")
-@jwt_required()
-@swag_from("../docs/notes/links_create.yaml")
-def create_link(note_id: UUID):
-    payload = NoteLinkCreateDTO.model_validate_json(request.data)
-    link_dto = note_link_service.create_link(str(note_id), payload)
-    return jsonify(link_dto.model_dump()), HTTPStatus.CREATED
-
-
-@bp_notes.delete("/<uuid:note_id>/links/<uuid:linked_note_id>")
-@jwt_required()
-@swag_from("../docs/notes/links_delete.yaml")
-def delete_link(note_id: UUID, linked_note_id: UUID):
-    note_link_service.delete_link(str(note_id), str(linked_note_id))
     return "", HTTPStatus.NO_CONTENT

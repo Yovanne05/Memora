@@ -14,7 +14,7 @@ bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 
 @bp_note_images.post("/<uuid:note_id>/images")
 @jwt_required()
-@swag_from("../docs/notes/image_upload.yaml")
+@swag_from("../docs/notes_images/upload.yaml")
 def upload_image(note_id: UUID):
     if "image" not in request.files:
         raise NoFileProvided()
@@ -26,7 +26,7 @@ def upload_image(note_id: UUID):
 
 @bp_note_images.get("/<uuid:note_id>/images")
 @jwt_required()
-@swag_from("../docs/notes/image_list.yaml")
+@swag_from("../docs/notes_images/list.yaml")
 def list_images(note_id: UUID):
     images = note_image_service.list_images(str(note_id))
     return jsonify([img.model_dump() for img in images]), HTTPStatus.OK
@@ -34,7 +34,7 @@ def list_images(note_id: UUID):
 
 @bp_note_images.get("/<uuid:note_id>/images/<filename>")
 @jwt_required()
-@swag_from("../docs/notes/image_get.yaml")
+@swag_from("../docs/notes_images/get.yaml")
 def get_image(note_id: UUID, filename: str):
     filepath = os.path.join("uploads/notes", str(note_id), filename)
 
@@ -46,7 +46,7 @@ def get_image(note_id: UUID, filename: str):
 
 @bp_note_images.delete("/<uuid:note_id>/images/<filename>")
 @jwt_required()
-@swag_from("../docs/notes/image_delete.yaml")
+@swag_from("../docs/notes_images/delete.yaml")
 def delete_image(note_id: UUID, filename: str):
     note_image_service.delete_image(str(note_id), filename)
     return "", HTTPStatus.NO_CONTENT

@@ -39,10 +39,3 @@ def me():
     user_id = get_jwt_identity()
     user = auth_service.get_me(str(user_id))
     return jsonify({"user": user.model_dump()}), HTTPStatus.OK
-
-
-@bp_auth.post("/logout")
-@jwt_required()
-@swag_from("../docs/auth/logout.yaml")
-def logout():
-    return "", HTTPStatus.NO_CONTENT

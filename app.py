@@ -5,6 +5,7 @@ from flask_cors import CORS
 from controllers.auth_controller import bp_auth
 from controllers.collection_controller import bp_collections
 from controllers.note_controller import bp_notes
+from controllers.note_link_controller import bp_note_links
 from controllers.user_controller import bp_users
 from controllers.collection_controller import bp_collections
 from controllers.share_note_controller import bp_note_shares
@@ -40,6 +41,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_users)
     app.register_blueprint(bp_notes)
+    app.register_blueprint(bp_note_links)
     app.register_blueprint(bp_collections)
     app.register_blueprint(bp_note_shares)
     app.register_blueprint(bp_collection_shares)
