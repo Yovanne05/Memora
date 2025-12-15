@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from domain_services.collection_domain_service import (
     ensure_collection_exists,
@@ -21,20 +21,14 @@ from repositorys import (
     collection_share_repository,
     user_repository,
 )
+from repositorys.collection_share_repository import CollectionShareSearchParams
 from services.interfaces.collection.collection_share_service_interface import CollectionShareServiceInterface
 
 
 class CollectionShareService(CollectionShareServiceInterface):
-    def list_shares(self, collection_id: str) -> List[CollectionShareDTO]:
-        collection_entity = collection_repository.find_one(collection_id)
-        ensure_collection_exists(collection_entity)
-
-        share_entities = collection_share_repository.find_by_collection(
-            collection_id
-        )
-        return [
-            collection_share_to_dto(entity) for entity in share_entities
-        ]
+    def find_many(self, params: CollectionShareSearchParams) -> Tuple[List[CollectionShareDTO], int]:
+        shares, total = collection_share_repository.find_many(params)
+        return [collection_share_to_dto(share) for share in shares], total
 
     def share_collection(
         self, collection_id: str, share_dto: CollectionShareCreateDTO
@@ -45,9 +39,11 @@ class CollectionShareService(CollectionShareServiceInterface):
         user_entity = user_repository.find_one(share_dto.user_id)
         ensure_user_exists(user_entity)
 
-        ensure_not_sharing_with_owner(collection_entity.owner_id, share_dto.user_id)
+        ensure_not_sharing_with_owner(
+            collection_entity.owner_id, share_dto.user_id)
 
-        existing_share = collection_share_repository.find_one(collection_id, share_dto.user_id)
+        existing_share = collection_share_repository.find_one(
+            collection_id, share_dto.user_id)
         ensure_share_does_not_exist(existing_share)
 
         share_entity = dto_to_collection_share(collection_id, share_dto)

@@ -10,6 +10,7 @@ from dtos.flashcard_dto import (
     FlashcardDuplicateDTO,
     FlashcardUpdateDTO,
 )
+from querys.flashcard_query import FlashcardFindQuery
 from services.impl.note.flashcard_service_impl import flashcard_service
 
 bp_flashcards = Blueprint("flashcards", __name__, url_prefix="/flashcards")
@@ -19,9 +20,17 @@ bp_flashcards = Blueprint("flashcards", __name__, url_prefix="/flashcards")
 @jwt_required()
 @swag_from("../docs/flashcards/list.yaml")
 def find_many():
-    note_id = request.args.get("note_id")
-    flashcards = flashcard_service.list_flashcards(note_id)
-    return jsonify([fc.model_dump() for fc in flashcards]), HTTPStatus.OK
+    raw_query = request.args.to_dict(flat=True)
+    query = FlashcardFindQuery.model_validate(raw_query)
+    params = query.to_params()
+
+    flashcard_dtos, total = flashcard_service.find_many(params)
+    return (
+        jsonify(
+            {"items": [dto.model_dump() for dto in flashcard_dtos], "total": total}
+        ),
+        HTTPStatus.OK,
+    )
 
 
 @bp_flashcards.get("/<uuid:flashcard_id>")

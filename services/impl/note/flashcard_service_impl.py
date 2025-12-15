@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from domain_services.flashcard_domain_service import apply_flashcard_update
 from dtos.flashcard_dto import (
@@ -16,19 +16,16 @@ from exceptions.flashcard_exception import (
 from exceptions.note_exception import NoteNotFound
 from mappers.flashcard_mapper import dto_to_flashcard, flashcard_to_dto
 from repositorys import flashcard_repository, note_repository
+from repositorys.flashcard_repository import FlashcardSearchParams
 from services.interfaces.note.flashcard_service_interface import (
     FlashcardServiceInterface,
 )
 
 
 class FlashcardService(FlashcardServiceInterface):
-    def list_flashcards(self, note_id: str) -> List[FlashcardDTO]:
-        note = note_repository.find_one(note_id)
-        if not note:
-            raise NoteNotFound()
-
-        flashcards = flashcard_repository.find_by_note(note_id)
-        return [flashcard_to_dto(fc) for fc in flashcards]
+    def find_many(self, params: FlashcardSearchParams) -> Tuple[List[FlashcardDTO], int]:
+        flashcards, total = flashcard_repository.find_many(params)
+        return [flashcard_to_dto(fc) for fc in flashcards], total
 
     def find_one(self, flashcard_id: str) -> FlashcardDTO:
         flashcard = flashcard_repository.find_one(flashcard_id)
@@ -63,13 +60,19 @@ class FlashcardService(FlashcardServiceInterface):
             if len(payload.answers) == 0:
                 raise FlashcardMustHaveAnswers()
 
-            correct_answers_count = sum(1 for a in payload.answers if a.is_correct)
+            correct_answers_count = sum(
+                1 for a in payload.answers if a.is_correct)
             if correct_answers_count < 1:
                 raise FlashcardMustHaveAtLeastOneCorrectAnswer()
 
         updated_flashcard = apply_flashcard_update(flashcard, payload)
         saved = flashcard_repository.update(updated_flashcard)
         return flashcard_to_dto(saved)
+
+    def delete(self, flashcard_id: str) -> None:
+        deleted = flashcard_repository.delete(flashcard_id)
+        if not deleted:
+            raise FlashcardNotFound()
 
     def duplicate(
         self, flashcard_id: str, payload: FlashcardDuplicateDTO
@@ -99,11 +102,6 @@ class FlashcardService(FlashcardServiceInterface):
         )
 
         return self.create(target_note_id, create_dto)
-
-    def delete(self, flashcard_id: str) -> None:
-        deleted = flashcard_repository.delete(flashcard_id)
-        if not deleted:
-            raise FlashcardNotFound()
 
 
 flashcard_service = FlashcardService()

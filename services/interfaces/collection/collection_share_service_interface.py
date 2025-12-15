@@ -8,9 +8,6 @@ from dtos.collection_share_dto import (
 
 
 class CollectionShareServiceInterface(Protocol):
-    def list_shares(self, collection_id: str) -> List[CollectionShareDTO]:
-        pass
-
     def share_collection(
         self, collection_id: str, share_dto: CollectionShareCreateDTO
     ) -> CollectionShareDTO:

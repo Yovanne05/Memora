@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from domain_services.note_domain_service import (
     ensure_not_self_link,
     ensure_note_exists,
@@ -9,18 +11,16 @@ from exceptions.note_link_exception import NoteLinkNotFound
 from mappers.note_link_mapper import dto_to_note_link, note_link_to_dto
 from repositorys import note_repository
 from repositorys import note_link_repository
+from repositorys.note_link_repository import NoteLinkSearchParams
 from services.interfaces.note.note_link_service_interface import (
     NoteLinkServiceInterface,
 )
 
 
 class NoteLinkService(NoteLinkServiceInterface):
-    def list_links(self, note_id: str) -> list[NoteLinkDTO]:
-        note_entity = note_repository.find_one(note_id)
-        ensure_note_exists(note_entity)
-
-        link_entities = note_link_repository.find_by_note(note_id)
-        return [note_link_to_dto(entity, note_id) for entity in link_entities]
+    def find_many(self, params: NoteLinkSearchParams) -> Tuple[list[NoteLinkDTO], int]:
+        links, total = note_link_repository.find_many(params)
+        return [note_link_to_dto(link, link.note_id_1) for link in links], total
 
     def create_link(
         self, note_id: str, payload: NoteLinkCreateDTO
@@ -34,7 +34,8 @@ class NoteLinkService(NoteLinkServiceInterface):
         ensure_not_self_link(note_id, payload.linked_note_id)
         ensure_same_collection(source_note, target_note)
 
-        existing_link = note_link_repository.find_one(note_id, payload.linked_note_id)
+        existing_link = note_link_repository.find_one(
+            note_id, payload.linked_note_id)
         ensure_note_link_does_not_exist(existing_link)
 
         link_entity = dto_to_note_link(note_id, payload.linked_note_id)

@@ -1,10 +1,55 @@
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import List, Literal, Optional, Tuple
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from daos.flashcard_dao import Flashcard
 from utils.db import get_db_session
+
+
+@dataclass
+class FlashcardSearchParams:
+    note_id: Optional[str] = None
+    question_contains: Optional[str] = None
+
+    sort_by: Literal["question", "created_at", "updated_at"] = "created_at"
+    sort_dir: Literal["asc", "desc"] = "desc"
+
+    limit: int = 50
+    offset: int = 0
+
+
+def find_many(params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flashcard], int]:
+    param = params or FlashcardSearchParams()
+
+    filters = []
+    if param.note_id:
+        filters.append(Flashcard.note_id == param.note_id)
+
+    if param.question_contains:
+        filters.append(Flashcard.question.ilike(
+            f"%{param.question_contains}%"))
+
+    stmt = select(Flashcard).where(
+        *filters).options(selectinload(Flashcard.answers))
+
+    sort_map = {
+        "question": Flashcard.question,
+        "created_at": Flashcard.created_at,
+        "updated_at": Flashcard.updated_at,
+    }
+    order_column = sort_map[param.sort_by]
+    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+
+    with get_db_session() as session:
+        total = session.scalar(
+            select(func.count()).select_from(stmt.subquery()))
+        items = session.scalars(
+            stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
+        ).all()
+
+    return items, total or 0
 
 
 def find_by_note(note_id: str) -> List[Flashcard]:

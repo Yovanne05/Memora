@@ -8,7 +8,7 @@ from dtos.note_share_dto import (
 
 
 class NoteShareServiceInterface(Protocol):
-    def list_shares(self, note_id: str) -> List[NoteShareDTO]:
+    def find_many(self) -> List[NoteShareDTO]:
         pass
 
     def share_note(

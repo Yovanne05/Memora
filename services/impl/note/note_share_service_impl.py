@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from domain_services.note_domain_service import (
     ensure_not_sharing_with_owner,
@@ -14,18 +14,16 @@ from dtos.note_share_dto import (
 from exceptions.note_share_exception import NoteShareNotFound
 from mappers.note_share_mapper import dto_to_note_share, note_share_to_dto
 from repositorys import note_repository, note_share_repository, user_repository
+from repositorys.note_share_repository import NoteShareSearchParams
 from services.interfaces.note.note_share_service_interface import (
     NoteShareServiceInterface,
 )
 
 
 class NoteShareService(NoteShareServiceInterface):
-    def list_shares(self, note_id: str) -> List[NoteShareDTO]:
-        note_entity = note_repository.find_one(note_id)
-        ensure_note_exists(note_entity)
-
-        share_entities = note_share_repository.find_by_note(note_id)
-        return [note_share_to_dto(entity) for entity in share_entities]
+    def find_many(self, params: NoteShareSearchParams) -> Tuple[List[NoteShareDTO], int]:
+        shares, total = note_share_repository.find_many(params)
+        return [note_share_to_dto(share) for share in shares], total
 
     def share_note(
         self, note_id: str, share_dto: NoteShareCreateDTO
@@ -38,7 +36,8 @@ class NoteShareService(NoteShareServiceInterface):
 
         ensure_not_sharing_with_owner(note_entity.owner_id, share_dto.user_id)
 
-        existing_share = note_share_repository.find_one(note_id, share_dto.user_id)
+        existing_share = note_share_repository.find_one(
+            note_id, share_dto.user_id)
         ensure_note_share_does_not_exist(existing_share)
 
         share_entity = dto_to_note_share(note_id, share_dto)

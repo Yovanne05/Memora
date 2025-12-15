@@ -4,7 +4,7 @@ from dtos.note_link_dto import NoteLinkCreateDTO, NoteLinkDTO
 
 
 class NoteLinkServiceInterface(Protocol):
-    def list_links(self, note_id: str) -> List[NoteLinkDTO]:
+    def find_many(self) -> List[NoteLinkDTO]:
         pass
 
     def create_link(

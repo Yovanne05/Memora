@@ -9,7 +9,7 @@ from dtos.flashcard_dto import (
 
 
 class FlashcardServiceInterface(Protocol):
-    def list_flashcards(self, note_id: str) -> List[FlashcardDTO]:
+    def find_many(self) -> List[FlashcardDTO]:
         pass
 
     def find_one(self, flashcard_id: str) -> FlashcardDTO:
@@ -23,10 +23,10 @@ class FlashcardServiceInterface(Protocol):
     ) -> FlashcardDTO:
         pass
 
+    def delete(self, flashcard_id: str) -> None:
+        pass
+    
     def duplicate(
         self, flashcard_id: str, payload: FlashcardDuplicateDTO
     ) -> FlashcardDTO:
-        pass
-
-    def delete(self, flashcard_id: str) -> None:
         pass
