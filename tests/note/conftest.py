@@ -169,8 +169,9 @@ class NoteTestData:
         self, permission: SharePermissionEnum = SharePermissionEnum.READ
     ):
         response = self.client.post(
-            f"/notes/{self.note_id}/shares",
+            f"/note-shares/{self.note_id}",
             json={
+                "note_id": self.note_id,
                 "user_id": self.share_user_id,
                 "permission": permission.value,
             },
@@ -182,7 +183,7 @@ class NoteTestData:
 
     def ensure_link(self):
         response = self.client.post(
-            f"/notes/{self.note_id}/links",
+            f"/note-links/{self.note_id}",
             json={"linked_note_id": self.linked_note_id},
         )
         assert response.status_code == 201, response.get_data(as_text=True)
@@ -201,10 +202,10 @@ class NoteTestData:
 
     def cleanup(self) -> None:
         for note_id, linked_note_id in self.created_links:
-            self._delete_if_exists(f"/notes/{note_id}/links/{linked_note_id}")
+            self._delete_if_exists(f"/note-links/{note_id}/links/{linked_note_id}")
 
         for note_id, user_id in self.created_shares:
-            self._delete_if_exists(f"/notes/{note_id}/shares/{user_id}")
+            self._delete_if_exists(f"/note-shares/{note_id}/shares/{user_id}")
 
         for note_id in self.created_note_ids:
             self._delete_if_exists(f"/notes/{note_id}")

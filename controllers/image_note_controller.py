@@ -32,7 +32,7 @@ def find_one(note_id: UUID, filename: str):
     return send_file(filepath, mimetype="image/jpeg")
 
 
-@bp_note_images.post("/<uuid:note_id>/images")
+@bp_note_images.post("/<uuid:note_id>")
 @jwt_required()
 @swag_from("../docs/notes_images/upload.yaml")
 def create(note_id: UUID):

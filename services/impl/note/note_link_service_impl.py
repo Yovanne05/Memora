@@ -18,9 +18,12 @@ from services.interfaces.note.note_link_service_interface import (
 
 
 class NoteLinkService(NoteLinkServiceInterface):
-    def find_many(self, params: NoteLinkSearchParams) -> Tuple[list[NoteLinkDTO], int]:
+    def find_many(
+        self, params: NoteLinkSearchParams
+    ) -> Tuple[list[NoteLinkDTO], int]:
         links, total = note_link_repository.find_many(params)
-        return [note_link_to_dto(link, link.note_id_1) for link in links], total
+        base_note_id = params.note_id
+        return [note_link_to_dto(link, base_note_id) for link in links], total
 
     def create_link(
         self, note_id: str, payload: NoteLinkCreateDTO

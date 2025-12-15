@@ -27,12 +27,12 @@ def find_many():
     )
 
 
-@bp_note_shares.post("")
+@bp_note_shares.post("/<uuid:note_id>")
 @jwt_required()
 @swag_from("../docs/share_notes/share_create.yaml")
-def create():
+def create(note_id: UUID):
     payload = NoteShareCreateDTO.model_validate_json(request.data)
-    share_dto = note_share_service.share_note(payload.note_id, payload)
+    share_dto = note_share_service.share_note(str(note_id), payload)
     return jsonify(share_dto.model_dump()), HTTPStatus.CREATED
 
 
@@ -41,7 +41,9 @@ def create():
 @swag_from("../docs/share_notes/share_update.yaml")
 def update(note_id: UUID, user_id: UUID):
     payload = NoteShareUpdateDTO.model_validate_json(request.data)
-    share_dto = note_share_service.update_share(note_id, user_id, payload)
+    share_dto = note_share_service.update_share(
+        str(note_id), str(user_id), payload
+    )
     return jsonify(share_dto.model_dump()), HTTPStatus.OK
 
 
@@ -49,5 +51,5 @@ def update(note_id: UUID, user_id: UUID):
 @jwt_required()
 @swag_from("../docs/share_notes/share_delete.yaml")
 def delete(note_id: UUID, user_id: UUID):
-    note_share_service.revoke_share(note_id, user_id)
+    note_share_service.revoke_share(str(note_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT

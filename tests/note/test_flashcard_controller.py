@@ -1,11 +1,14 @@
 def test_list_flashcards_returns_empty(client_with_note_data):
     client, data = client_with_note_data
-    response = client.get(f"/notes/{data.note_id}/flashcards")
+    response = client.get(
+        "/flashcards", query_string={"noteId": data.note_id}
+    )
 
     assert response.status_code == 200
     body = response.get_json()
-    assert isinstance(body, list)
-    assert len(body) == 0
+    assert isinstance(body, dict)
+    assert body["items"] == []
+    assert body["total"] == 0
 
 
 def test_create_flashcard_with_single_answer(client_with_note_data):
@@ -15,7 +18,7 @@ def test_create_flashcard_with_single_answer(client_with_note_data):
         "answers": [{"answer_text": "Paris", "is_correct": True}],
     }
 
-    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
+    response = client.post(f"/flashcards/{data.note_id}", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -38,7 +41,7 @@ def test_create_flashcard_with_multiple_answers(client_with_note_data):
         ],
     }
 
-    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
+    response = client.post(f"/flashcards/{data.note_id}", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -50,7 +53,7 @@ def test_create_flashcard_without_answers_returns_400(client_with_note_data):
     client, data = client_with_note_data
     payload = {"question": "What is Python?", "answers": []}
 
-    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
+    response = client.post(f"/flashcards/{data.note_id}", json=payload)
 
     assert response.status_code == 422
 
@@ -65,7 +68,7 @@ def test_create_flashcard_without_correct_answer_returns_400(client_with_note_da
         ],
     }
 
-    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
+    response = client.post(f"/flashcards/{data.note_id}", json=payload)
 
     assert response.status_code == 400
 
@@ -83,7 +86,7 @@ def test_create_flashcard_with_multiple_correct_answers(
         ],
     }
 
-    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
+    response = client.post(f"/flashcards/{data.note_id}", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -101,7 +104,7 @@ def test_create_flashcard_for_nonexistent_note_returns_404(client_with_note_data
     }
 
     response = client.post(
-        "/notes/00000000-0000-0000-0000-000000000000/flashcards", json=payload
+        "/flashcards/00000000-0000-0000-0000-000000000000", json=payload
     )
 
     assert response.status_code == 404
@@ -119,16 +122,19 @@ def test_list_flashcards_returns_created_flashcards(client_with_note_data):
         "answers": [{"answer_text": "Answer 2", "is_correct": True}],
     }
 
-    client.post(f"/notes/{data.note_id}/flashcards", json=payload1)
-    client.post(f"/notes/{data.note_id}/flashcards", json=payload2)
+    client.post(f"/flashcards/{data.note_id}", json=payload1)
+    client.post(f"/flashcards/{data.note_id}", json=payload2)
 
-    response = client.get(f"/notes/{data.note_id}/flashcards")
+    response = client.get(
+        "/flashcards", query_string={"noteId": data.note_id}
+    )
 
     assert response.status_code == 200
     body = response.get_json()
-    assert len(body) == 2
-    assert body[0]["question"] == "Question 1?"
-    assert body[1]["question"] == "Question 2?"
+    assert body["total"] == 2
+    assert len(body["items"]) == 2
+    questions = {item["question"] for item in body["items"]}
+    assert questions == {"Question 1?", "Question 2?"}
 
 
 def test_find_one_flashcard_returns_flashcard(client_with_note_data):
@@ -139,11 +145,11 @@ def test_find_one_flashcard_returns_flashcard(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
-    response = client.get(f"/notes/flashcards/{flashcard_id}")
+    response = client.get(f"/flashcards/{flashcard_id}")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -154,7 +160,7 @@ def test_find_one_flashcard_returns_flashcard(client_with_note_data):
 def test_find_one_nonexistent_flashcard_returns_404(client_with_note_data):
     client, data = client_with_note_data
 
-    response = client.get("/notes/flashcards/00000000-0000-0000-0000-000000000000")
+    response = client.get("/flashcards/00000000-0000-0000-0000-000000000000")
 
     assert response.status_code == 404
 
@@ -167,13 +173,13 @@ def test_update_flashcard_question(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
     update_payload = {"question": "New question?"}
     response = client.patch(
-        f"/notes/flashcards/{flashcard_id}", json=update_payload
+        f"/flashcards/{flashcard_id}", json=update_payload
     )
 
     assert response.status_code == 200
@@ -190,7 +196,7 @@ def test_update_flashcard_answers(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
@@ -201,7 +207,7 @@ def test_update_flashcard_answers(client_with_note_data):
         ]
     }
     response = client.patch(
-        f"/notes/flashcards/{flashcard_id}", json=update_payload
+        f"/flashcards/{flashcard_id}", json=update_payload
     )
 
     assert response.status_code == 200
@@ -219,13 +225,13 @@ def test_update_flashcard_with_empty_answers_returns_400(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
     update_payload = {"answers": []}
     response = client.patch(
-        f"/notes/flashcards/{flashcard_id}", json=update_payload
+        f"/flashcards/{flashcard_id}", json=update_payload
     )
 
     assert response.status_code == 422
@@ -236,7 +242,7 @@ def test_update_nonexistent_flashcard_returns_404(client_with_note_data):
     update_payload = {"question": "New question?"}
 
     response = client.patch(
-        "/notes/flashcards/00000000-0000-0000-0000-000000000000",
+        "/flashcards/00000000-0000-0000-0000-000000000000",
         json=update_payload,
     )
 
@@ -251,15 +257,15 @@ def test_delete_flashcard(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
-    response = client.delete(f"/notes/flashcards/{flashcard_id}")
+    response = client.delete(f"/flashcards/{flashcard_id}")
 
     assert response.status_code == 204
 
-    get_response = client.get(f"/notes/flashcards/{flashcard_id}")
+    get_response = client.get(f"/flashcards/{flashcard_id}")
     assert get_response.status_code == 404
 
 
@@ -274,35 +280,43 @@ def test_delete_flashcard_removes_answers(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
-    client.delete(f"/notes/flashcards/{flashcard_id}")
+    client.delete(f"/flashcards/{flashcard_id}")
 
-    response = client.get(f"/notes/{data.note_id}/flashcards")
+    response = client.get(
+        "/flashcards", query_string={"noteId": data.note_id}
+    )
     assert response.status_code == 200
-    assert len(response.get_json()) == 0
+    body = response.get_json()
+    assert body["total"] == 0
+    assert body["items"] == []
 
 
 def test_delete_nonexistent_flashcard_returns_404(client_with_note_data):
     client, data = client_with_note_data
 
     response = client.delete(
-        "/notes/flashcards/00000000-0000-0000-0000-000000000000"
+        "/flashcards/00000000-0000-0000-0000-000000000000"
     )
 
     assert response.status_code == 404
 
 
-def test_list_flashcards_for_nonexistent_note_returns_404(client_with_note_data):
+def test_list_flashcards_for_nonexistent_note_returns_empty(client_with_note_data):
     client, data = client_with_note_data
 
     response = client.get(
-        "/notes/00000000-0000-0000-0000-000000000000/flashcards"
+        "/flashcards",
+        query_string={"noteId": "00000000-0000-0000-0000-000000000000"},
     )
 
-    assert response.status_code == 404
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["total"] == 0
+    assert body["items"] == []
 
 
 def test_duplicate_flashcard_in_same_note(client_with_note_data):
@@ -316,13 +330,13 @@ def test_duplicate_flashcard_in_same_note(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     original_flashcard = create_response.get_json()
     original_id = original_flashcard["id"]
 
     duplicate_response = client.post(
-        f"/notes/flashcards/{original_id}/duplicate", json={}
+        f"/flashcards/{original_id}/duplicate", json={}
     )
 
     assert duplicate_response.status_code == 201
@@ -346,12 +360,12 @@ def test_duplicate_flashcard_without_body(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
     duplicate_response = client.post(
-        f"/notes/flashcards/{flashcard_id}/duplicate"
+        f"/flashcards/{flashcard_id}/duplicate"
     )
 
     assert duplicate_response.status_code == 201
@@ -370,19 +384,20 @@ def test_duplicate_flashcard_to_another_note(client_with_note_data):
     }
     note2_response = client.post("/notes", json=note2_payload)
     note2_id = note2_response.get_json()["id"]
+    data.track_created_note(note2_id)
 
     flashcard_payload = {
         "question": "Question in note 1?",
         "answers": [{"answer_text": "Answer", "is_correct": True}],
     }
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=flashcard_payload
+        f"/flashcards/{data.note_id}", json=flashcard_payload
     )
     original_id = create_response.get_json()["id"]
 
     duplicate_payload = {"target_note_id": note2_id}
     duplicate_response = client.post(
-        f"/notes/flashcards/{original_id}/duplicate", json=duplicate_payload
+        f"/flashcards/{original_id}/duplicate", json=duplicate_payload
     )
 
     assert duplicate_response.status_code == 201
@@ -391,11 +406,13 @@ def test_duplicate_flashcard_to_another_note(client_with_note_data):
     assert duplicated["note_id"] == note2_id
     assert duplicated["question"] == "Question in note 1?"
 
-    list_note1 = client.get(f"/notes/{data.note_id}/flashcards")
-    assert len(list_note1.get_json()) == 1
+    list_note1 = client.get(
+        "/flashcards", query_string={"noteId": data.note_id}
+    )
+    assert list_note1.get_json()["total"] == 1
 
-    list_note2 = client.get(f"/notes/{note2_id}/flashcards")
-    assert len(list_note2.get_json()) == 1
+    list_note2 = client.get("/flashcards", query_string={"noteId": note2_id})
+    assert list_note2.get_json()["total"] == 1
 
     client.delete(f"/notes/{note2_id}")
 
@@ -404,7 +421,7 @@ def test_duplicate_nonexistent_flashcard_returns_404(client_with_note_data):
     client, data = client_with_note_data
 
     response = client.post(
-        "/notes/flashcards/00000000-0000-0000-0000-000000000000/duplicate", json={}
+        "/flashcards/00000000-0000-0000-0000-000000000000/duplicate", json={}
     )
 
     assert response.status_code == 404
@@ -418,13 +435,13 @@ def test_duplicate_flashcard_to_nonexistent_note_returns_404(client_with_note_da
     }
 
     create_response = client.post(
-        f"/notes/{data.note_id}/flashcards", json=payload
+        f"/flashcards/{data.note_id}", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
     duplicate_payload = {"target_note_id": "00000000-0000-0000-0000-000000000000"}
     response = client.post(
-        f"/notes/flashcards/{flashcard_id}/duplicate", json=duplicate_payload
+        f"/flashcards/{flashcard_id}/duplicate", json=duplicate_payload
     )
 
     assert response.status_code == 404

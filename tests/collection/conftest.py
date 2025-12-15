@@ -84,7 +84,9 @@ class CollectionTestData:
         share = collection_share_service.share_collection(
             self.collection_id,
             CollectionShareCreateDTO(
-                user_id=self.share_user_id, permission=permission
+                collection_id=self.collection_id,
+                user_id=self.share_user_id,
+                permission=permission,
             ),
         )
         self.created_shares.add((self.collection_id, self.share_user_id))

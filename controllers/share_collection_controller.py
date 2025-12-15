@@ -34,13 +34,13 @@ def find_many():
     )
 
 
-@bp_collection_shares.post("")
+@bp_collection_shares.post("/<uuid:collection_id>")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_create.yaml")
-def create():
+def create(collection_id: UUID):
     payload = CollectionShareCreateDTO.model_validate_json(request.data)
     share_dto = collection_share_service.share_collection(
-        payload.collection_id, payload
+        str(collection_id), payload
     )
     return jsonify(share_dto.model_dump()), HTTPStatus.CREATED
 
@@ -50,9 +50,7 @@ def create():
 @swag_from("../docs/shares_collections/share_update.yaml")
 def update(collection_id: UUID, user_id: UUID):
     payload = CollectionShareUpdateDTO.model_validate_json(request.data)
-    share_dto = collection_share_service.update_share(
-        collection_id, user_id, payload
-    )
+    share_dto = collection_share_service.update_share(str(collection_id), str(user_id), payload)
     return jsonify(share_dto.model_dump()), HTTPStatus.OK
 
 
@@ -60,5 +58,5 @@ def update(collection_id: UUID, user_id: UUID):
 @jwt_required()
 @swag_from("../docs/shares_collections/share_delete.yaml")
 def delete(collection_id: UUID, user_id: UUID):
-    collection_share_service.revoke_share(collection_id, user_id)
+    collection_share_service.revoke_share(str(collection_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT
