@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Schema pour la réponse d'une flashcard (form)
 export const flashcardAnswerFormSchema = z.object({
   answerText: z.string().min(1, "La réponse ne peut pas être vide"),
   isCorrect: z.boolean().default(false),
@@ -8,7 +7,6 @@ export const flashcardAnswerFormSchema = z.object({
 
 export type FlashcardAnswerForm = z.infer<typeof flashcardAnswerFormSchema>;
 
-// Schema pour créer/éditer une flashcard
 export const flashcardEditFormSchema = z
   .object({
     question: z
@@ -30,8 +28,8 @@ export const flashcardEditFormSchema = z
   );
 
 export type FlashcardEditForm = z.infer<typeof flashcardEditFormSchema>;
+export type FlashcardEditFormInput = z.input<typeof flashcardEditFormSchema>;
 
-// Schema pour dupliquer une flashcard
 export const flashcardDuplicateFormSchema = z.object({
   targetNoteId: z.string().uuid().optional(),
 });

@@ -10,7 +10,7 @@ import type { CreateNoteLinkDto, NoteLinkDto, PaginatedNoteLinksDto } from "../d
 export function createNoteLinksService(client: HttpClient = httpClient): INoteLinksService {
   return {
     async list(noteId: string) {
-      const data = await client.get<PaginatedNoteLinksDto>(`/notes/${noteId}/links`)
+      const data = await client.get<PaginatedNoteLinksDto>(`/notes/${noteId}`)
       const items = data?.items ?? []
       return items.map(dtoToNoteLink)
     },

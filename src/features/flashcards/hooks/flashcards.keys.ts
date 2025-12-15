@@ -1,5 +1,3 @@
-import type { FlashcardsFilters } from "../types/flashcard-query";
-
 export const FLASHCARDS_QUERY_KEYS = {
   all: ["flashcards"] as const,
   lists: () => [...FLASHCARDS_QUERY_KEYS.all, "list"] as const,

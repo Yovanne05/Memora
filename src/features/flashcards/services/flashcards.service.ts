@@ -50,7 +50,7 @@ class FlashcardsService implements IFlashcardsService {
   async create(flashcard: FlashcardCreate): Promise<Flashcard> {
     const payload = toFlashcardCreateDto(flashcard);
     const dto = await httpClient.post<FlashcardDto, FlashcardCreateDto>(
-      "/flashcards",
+      `/flashcards/${flashcard.noteId}`,
       payload
     );
     const validated = flashcardDtoSchema.parse(dto);

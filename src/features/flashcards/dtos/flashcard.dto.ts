@@ -5,7 +5,7 @@ export const flashcardAnswerDtoSchema = z.object({
   flashcard_id: z.uuid(),
   answer_text: z.string().min(1),
   is_correct: z.boolean(),
-  created_at: z.iso.datetime(),
+  created_at: z.string(),
 });
 
 export const flashcardAnswerCreateDtoSchema = z.object({
@@ -21,8 +21,8 @@ export const flashcardDtoSchema = z.object({
   note_id: z.uuid(),
   question: z.string().min(1),
   answers: z.array(flashcardAnswerDtoSchema),
-  created_at: z.iso.datetime(),
-  updated_at: z.iso.datetime(),
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 export const flashcardCreateDtoSchema = z.object({
