@@ -6,10 +6,10 @@ import { FlashcardViewer } from "./FlashcardViewer";
 import { cn } from "@/lib/utils";
 
 interface FlashcardListProps {
-  flashcards: Flashcard[];
+  readonly flashcards: Flashcard[];
 }
 
-export function FlashcardList({ flashcards }: FlashcardListProps) {
+export function FlashcardList({ flashcards }: Readonly<FlashcardListProps>) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleFlashcard = (id: string) => {
@@ -34,9 +34,10 @@ export function FlashcardList({ flashcards }: FlashcardListProps) {
             )}
           >
             <div className="w-full text-left p-3 flex items-center justify-between gap-3 rounded-lg">
-              <div
+              <button
+                type="button"
                 onClick={() => toggleFlashcard(flashcard.id)}
-                className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
+                className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity text-left"
               >
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
                   <Brain className="h-4 w-4 text-primary" />
@@ -49,7 +50,7 @@ export function FlashcardList({ flashcards }: FlashcardListProps) {
                     {flashcard.answers.length} réponse{flashcard.answers.length > 1 ? "s" : ""}
                   </p>
                 </div>
-              </div>
+              </button>
               <Button
                 type="button"
                 size="icon"
