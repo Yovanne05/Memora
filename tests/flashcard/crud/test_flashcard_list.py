@@ -42,7 +42,7 @@ def test_list_flashcards_returns_created_flashcards(client_with_note_data):
 
 
 def test_list_flashcards_for_nonexistent_note_returns_empty(client_with_note_data):
-    client, data = client_with_note_data
+    client, _ = client_with_note_data
 
     response = client.get(
         "/flashcards",

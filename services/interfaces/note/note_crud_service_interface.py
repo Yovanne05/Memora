@@ -8,16 +8,21 @@ class NoteCrudServiceInterface(Protocol):
     def find_many(
         self, params: Optional[NoteSearchParams] = None
     ) -> Tuple[List[NoteDTO], int]:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def find_one(self, note_id: str) -> NoteDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def update(self, note_id: str, note_update_dto: NoteUpdateDTO) -> NoteDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def delete(self, note_id: str) -> None:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
