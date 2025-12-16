@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { collectionsService } from '@/features/collections/services/collections.service'
-import type { Collection } from '@/features/collections/models/collection.model'
+import type { PaginatedCollections } from '../types/paginated-collection'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
 
 interface MutationCallbacks {
@@ -20,10 +20,16 @@ export function useDeleteCollectionMutation(callbacks?: MutationCallbacks) {
         toast.success('Collection supprimée avec succès.')
       }
 
-      queryClient.setQueryData(
+      queryClient.setQueryData<PaginatedCollections>(
         COLLECTIONS_QUERY_KEYS.list(),
-        (old: Collection[] | undefined) =>
-          old?.filter((c) => c.id !== id) ?? []
+        (old) => {
+          if (!old) return old
+          return {
+            ...old,
+            items: old.items.filter((c) => c.id !== id),
+            total: old.total - 1,
+          }
+        }
       )
 
       queryClient.removeQueries({
