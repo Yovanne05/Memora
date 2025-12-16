@@ -13,7 +13,7 @@ class UserCreateDTO(BaseModel):
     display_name: str | None = Field(default=None, min_length=1, max_length=100)
     role: RoleEnum = RoleEnum.CLIENT
 
-    @field_validator("password")
+    @field_validator("password") # NOSONAR
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not is_password_strong(value):

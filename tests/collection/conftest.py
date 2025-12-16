@@ -18,8 +18,8 @@ from services.impl.collection.collection_share_service_impl import (
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 # Test constants
-TEST_PASSWORD_HASH = "test-password-hash"
-TEST_PASSWORD = "ValidPass1!"
+TEST_PASSWORD_HASH = "test-password-hash" # NOSONAR
+TEST_PASSWORD = "ValidPass1!" # NOSONAR
 
 
 @pytest.fixture(autouse=True)
@@ -134,7 +134,7 @@ def client_with_collection_data(collection_test_data):
             "/auth/register",
             json={
                 "email": auth_email,
-                "password": auth_password,
+                "password": auth_password, # NOSONAR
                 "username": f"auth-{uuid4().hex[:6]}",
             },
         )

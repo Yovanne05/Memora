@@ -4,9 +4,9 @@ import config
 import pytest
 
 # Test constants
-TEST_PASSWORD = "StrongPwd1!"
-WEAK_PASSWORD = "weakpass"
-WRONG_PASSWORD = "WrongPwd1!"
+TEST_PASSWORD = "StrongPwd1!" # NOSONAR
+WEAK_PASSWORD = "weakpass" # NOSONAR
+WRONG_PASSWORD = "WrongPwd1!" # NOSONAR
 
 
 @pytest.fixture(autouse=True)
@@ -35,7 +35,7 @@ def _register_user(client):
     password = TEST_PASSWORD
     payload = {
         "email": email,
-        "password": password,
+        "password": password, # NOSONAR
         "username": f"user-{uuid4().hex[:6]}",
         "display_name": "Test User",
     }
@@ -55,7 +55,7 @@ def test_register_returns_token_and_user(client):
 def test_register_rejects_weak_password(client):
     payload = {
         "email": f"weak-{uuid4().hex[:8]}@example.com",
-        "password": WEAK_PASSWORD,
+        "password": WEAK_PASSWORD, # NOSONAR
     }
 
     response = client.post("/auth/register", json=payload)
@@ -65,7 +65,7 @@ def test_register_rejects_weak_password(client):
 
 def test_login_returns_token(client):
     email, password, _ = _register_user(client)
-    login_payload = {"identifier": email, "password": password}
+    login_payload = {"identifier": email, "password": password} # NOSONAR
 
     response = client.post("/auth/login", json=login_payload)
 
@@ -77,7 +77,7 @@ def test_login_returns_token(client):
 
 def test_login_returns_401_on_invalid_password(client):
     email, _, _ = _register_user(client)
-    login_payload = {"identifier": email, "password": WRONG_PASSWORD}
+    login_payload = {"identifier": email, "password": WRONG_PASSWORD} # NOSONAR
 
     response = client.post("/auth/login", json=login_payload)
 
@@ -86,7 +86,7 @@ def test_login_returns_401_on_invalid_password(client):
 
 def test_login_is_rate_limited(client):
     email, _, _ = _register_user(client)
-    payload = {"identifier": email, "password": WRONG_PASSWORD}
+    payload = {"identifier": email, "password": WRONG_PASSWORD} # NOSONAR
 
     for _ in range(5):
         client.post("/auth/login", json=payload)
