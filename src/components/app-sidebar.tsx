@@ -1,131 +1,143 @@
 import {
-    BookOpen,
-    LayoutDashboard,
-    FolderKanban,
-    Network,
-    Search,
-    GraduationCap,
-    History,
-    Settings as SettingsIcon,
-    LogOut,
-    FileText
+  BookOpen,
+  LayoutDashboard,
+  FolderKanban,
+  Network,
+  Search,
+  GraduationCap,
+  History,
+  Settings as SettingsIcon,
+  LogOut,
+  FileText,
 } from "lucide-react"
 
-import { Link } from "@tanstack/react-router"
+import { Link, useRouter } from "@tanstack/react-router"
+import { toast } from "sonner"
 
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarFooter
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
 
 import { Separator } from "@/components/ui/separator"
+import { useAuth } from "@/features/auth/hooks/useAuth"
+import { useState } from "react"
 
 export function AppSidebar() {
+  const router = useRouter()
+  const { logout } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-    const navigationItems = [
-        { title: "Tableau de bord", icon: LayoutDashboard, url: "/app/dashboard" },
-        { title: "Notes", icon: FileText, url: "/app/notes" },
-        { title: "Collections", icon: FolderKanban, url: "/app/collections" },
-        { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
-        { title: "Recherche", icon: Search, url: "/app/search" },
-        { title: "Révision", icon: GraduationCap, url: "/app/revision" },
-        { title: "Journal et stats", icon: History, url: "#" },
-    ]
+  const navigationItems = [
+    { title: "Tableau de bord", icon: LayoutDashboard, url: "/app/dashboard" },
+    { title: "Notes", icon: FileText, url: "/app/notes" },
+    { title: "Collections", icon: FolderKanban, url: "/app/collections" },
+    { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
+    { title: "Recherche", icon: Search, url: "/app/search" },
+    { title: "Révision", icon: GraduationCap, url: "/app/revision" },
+    { title: "Journal et stats", icon: History, url: "#" },
+  ]
 
-    const accountItems = [
-        { title: "Paramètres", icon: SettingsIcon, url: "/app/settings" },
-    ]
+  const accountItems = [{ title: "Paramètres", icon: SettingsIcon, url: "/app/settings" }]
 
-    return (
-        <Sidebar>
-            <SidebarContent>
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logout()
+      toast.success("Déconnexion effectuée.")
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Impossible de vous déconnecter."
+      toast.error(message)
+    } finally {
+      setIsLoggingOut(false)
+      router.navigate({ to: "/auth/login", search: { redirect: "/app/dashboard" } })
+    }
+  }
 
-                <div className="px-6 py-6">
-                    <div className="flex items-center gap-4">
-                        <BookOpen className="h-5 w-5" />
-                        <div>
-                            <h1 className="font-semibold text-lg leading-tight">Memora</h1>
-                            <p className="text-sm text-muted-foreground -mt-1">
-                                Base de connaissances
-                            </p>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <Sidebar>
+      <SidebarContent>
+        <div className="px-6 py-6">
+          <div className="flex items-center gap-4">
+            <BookOpen className="h-5 w-5" />
+            <div>
+              <h1 className="font-semibold text-lg leading-tight">Memora</h1>
+              <p className="text-sm text-muted-foreground -mt-1">Base de connaissances</p>
+            </div>
+          </div>
+        </div>
 
-                <Separator className="-mt-2"/>
+        <Separator className="-mt-2" />
 
-                <SidebarGroup>
-                    <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {navigationItems.map((item) => (
-                                <SidebarMenuItem key={`${item.title}-${item.url}`}>
-                                    <SidebarMenuButton asChild>
-                                        {item.url && item.url.startsWith("/") ? (
-                                            <Link to={item.url} className="inline-flex items-center gap-2">
-                                                <item.icon className="h-4 w-4" />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        ) : (
-                                            <a href={item.url} className="inline-flex items-center gap-2">
-                                                <item.icon className="h-4 w-4" />
-                                                <span>{item.title}</span>
-                                            </a>
-                                        )}
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navigationItems.map((item) => (
+                <SidebarMenuItem key={`${item.title}-${item.url}`}>
+                  <SidebarMenuButton asChild>
+                    {item.url && item.url.startsWith("/") ? (
+                      <Link to={item.url} className="inline-flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    ) : (
+                      <a href={item.url} className="inline-flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-                <SidebarGroup>
-                    <SidebarGroupLabel>Compte</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {accountItems.map((item) => (
-                                <SidebarMenuItem key={`${item.title}-${item.url}`}>
-                                    <SidebarMenuButton asChild>
-                                        {item.url && item.url.startsWith("/") ? (
-                                            <Link to={item.url} className="inline-flex items-center gap-2">
-                                                <item.icon className="h-4 w-4" />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        ) : (
-                                            <a href={item.url} className="inline-flex items-center gap-2">
-                                                <item.icon className="h-4 w-4" />
-                                                <span>{item.title}</span>
-                                            </a>
-                                        )}
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Compte</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {accountItems.map((item) => (
+                <SidebarMenuItem key={`${item.title}-${item.url}`}>
+                  <SidebarMenuButton asChild>
+                    {item.url && item.url.startsWith("/") ? (
+                      <Link to={item.url} className="inline-flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    ) : (
+                      <a href={item.url} className="inline-flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-            </SidebarContent>
-
-            <SidebarFooter>
-                <Separator className="mb-2" />
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <a href="#" className="inline-flex items-center gap-2">
-                                <LogOut className="h-4 w-4" />
-                                <span>Déconnexion</span>
-                            </a>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
-        </Sidebar>
-    )
+      <SidebarFooter>
+        <Separator className="mb-2" />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} className="cursor-pointer" disabled={isLoggingOut}>
+              <LogOut className="h-4 w-4" />
+              <span>{isLoggingOut ? "Déconnexion..." : "Déconnexion"}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  )
 }
