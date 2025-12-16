@@ -31,9 +31,9 @@ def _reload_with_relationships(session: Session, collection_id: str) -> Collecti
 def _scope_to_user(stmt: Select, user) -> Select:
     accessible_ids = accessible_collection_ids(user)
     if accessible_ids is None:
-        return stmt  # admin-like access
+        return stmt
     if not accessible_ids:
-        return stmt.where(Collection.id.is_(None))  # no access to anything
+        return stmt.where(Collection.id.is_(None))
     return stmt.where(Collection.id.in_(accessible_ids))
 
 @dataclass
