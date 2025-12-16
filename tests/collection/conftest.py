@@ -17,6 +17,9 @@ from services.impl.collection.collection_share_service_impl import (
 )
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
+# Test constants
+TEST_PASSWORD = "ValidPass1!"
+
 
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
@@ -125,7 +128,7 @@ def client_with_collection_data(collection_test_data):
             f"12.0.0.{int(uuid4().int % 200) + 1}"
         )
         auth_email = f"auth-{uuid4().hex[:8]}@example.com"
-        auth_password = "ValidPass1!"
+        auth_password = TEST_PASSWORD
         auth_resp = client.post(
             "/auth/register",
             json={

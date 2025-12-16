@@ -3,6 +3,9 @@ from uuid import uuid4
 import config
 import pytest
 
+# Test constants
+TEST_PASSWORD = "StrongPwd1!"
+
 
 @pytest.fixture(autouse=True)
 def configure_env(monkeypatch):
@@ -27,7 +30,7 @@ def client():
 
 def _register_user(client):
     email = f"user-{uuid4().hex[:8]}@example.com"
-    password = "StrongPwd1!"
+    password = TEST_PASSWORD
     payload = {
         "email": email,
         "password": password,
