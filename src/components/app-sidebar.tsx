@@ -72,16 +72,20 @@ export function AppSidebar() {
                             {navigationItems.map((item) => (
                                 <SidebarMenuItem key={`${item.title}-${item.url}`}>
                                     <SidebarMenuButton asChild>
-                                        {item.url && item.url.startsWith("/") ? (
+                                        {item.url?.startsWith("/") ? (
                                             <Link to={item.url} className="inline-flex items-center gap-2">
                                                 <item.icon className="h-4 w-4" />
                                                 <span>{item.title}</span>
                                             </Link>
                                         ) : (
-                                            <a href={item.url} className="inline-flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                disabled
+                                                className="inline-flex items-center gap-2 opacity-50 cursor-not-allowed"
+                                            >
                                                 <item.icon className="h-4 w-4" />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </button>
                                         )}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -97,16 +101,20 @@ export function AppSidebar() {
                             {accountItems.map((item) => (
                                 <SidebarMenuItem key={`${item.title}-${item.url}`}>
                                     <SidebarMenuButton asChild>
-                                        {item.url && item.url.startsWith("/") ? (
+                                        {item.url?.startsWith("/") ? (
                                             <Link to={item.url} className="inline-flex items-center gap-2">
                                                 <item.icon className="h-4 w-4" />
                                                 <span>{item.title}</span>
                                             </Link>
                                         ) : (
-                                            <a href={item.url} className="inline-flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                disabled
+                                                className="inline-flex items-center gap-2 opacity-50 cursor-not-allowed"
+                                            >
                                                 <item.icon className="h-4 w-4" />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </button>
                                         )}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -133,10 +141,17 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            <a href="#" className="inline-flex items-center gap-2">
+                            <button
+                                type="button"
+                                className="inline-flex items-center gap-2"
+                                onClick={() => {
+                                    // TODO: Implement logout logic
+                                    console.log("Logout clicked")
+                                }}
+                            >
                                 <LogOut className="h-4 w-4" />
                                 <span>Déconnexion</span>
-                            </a>
+                            </button>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
