@@ -7,7 +7,7 @@ export function ThemeProvider({
   defaultTheme = "system",
   storageKey = "vite-ui-theme",
 }: Readonly<ThemeProviderProps>) {
-  const [theme, setThemeState] = useState<Theme>(() =>
+  const [theme, setTheme] = useState<Theme>(() =>
     getInitialTheme(storageKey, defaultTheme)
   );
 
@@ -23,9 +23,9 @@ export function ThemeProvider({
       } catch {
         // ignore storage errors
       }
-      setThemeState(t);
+      setTheme(t);
     },
-  }), [theme, storageKey]);
+  }), [theme, storageKey, setTheme]);
 
   return (
     <ThemeProviderContext.Provider value={value}>
