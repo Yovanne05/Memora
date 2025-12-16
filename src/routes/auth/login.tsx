@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { getAccessToken } from "@/features/auth/lib/token-storage"
+import { ApiError, NetworkError, TimeoutError } from "@/lib/errors"
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Renseignez votre email ou nom d'utilisateur."),
@@ -60,6 +61,23 @@ function LoginPage() {
     }
   }, [isAuthenticated, isLoadingUser, router, search.redirect])
 
+  const getFriendlyError = (error: unknown) => {
+    if (error instanceof TimeoutError || error instanceof NetworkError) {
+      return "Impossible de joindre le serveur. Verifiez votre connexion puis reessayez."
+    }
+
+    if (error instanceof ApiError) {
+      if (error.status === 401 || error.status === 400) {
+        return "Identifiants incorrects. Verifiez l'email ou le mot de passe."
+      }
+      if (error.status >= 500) {
+        return "Service momentanement indisponible. Merci de reessayer dans un instant."
+      }
+    }
+
+    return "Connexion impossible. Merci de reessayer."
+  }
+
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setFormError(null)
     try {
@@ -67,7 +85,7 @@ function LoginPage() {
       toast.success("Connexion réussie.")
       await router.navigate({ to: search.redirect || "/app/dashboard" })
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Impossible de vous connecter."
+      const message = getFriendlyError(error)
       toast.error(message)
       setFormError(message)
     }
@@ -106,9 +124,8 @@ function LoginPage() {
             <CardContent>
               {formError ? (
                 <div className="mb-4 flex gap-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                   <div className="space-y-1">
-                    <p className="font-semibold">Une erreur est survenue. Merci de réessayer.</p>
                     <p className="text-destructive/90">{formError}</p>
                   </div>
                 </div>

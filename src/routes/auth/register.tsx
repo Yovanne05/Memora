@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { getAccessToken } from "@/features/auth/lib/token-storage"
+import { ApiError, NetworkError, TimeoutError } from "@/lib/errors"
 
 const registerSchema = z.object({
   displayName: z.string().min(2, "Indiquez votre nom ou pseudo."),
@@ -66,6 +67,26 @@ function RegisterPage() {
     }
   }, [isAuthenticated, isLoadingUser, router, search.redirect])
 
+  const getFriendlyError = (error: unknown) => {
+    if (error instanceof TimeoutError || error instanceof NetworkError) {
+      return "Impossible de joindre le serveur. Verifiez votre connexion puis reessayez."
+    }
+
+    if (error instanceof ApiError) {
+      if (error.status === 409) {
+        return "Un compte existe deja avec cet email ou ce nom d'utilisateur."
+      }
+      if (error.status === 400 || error.status === 422) {
+        return "Informations invalides. Verifiez les champs et reessayez."
+      }
+      if (error.status >= 500) {
+        return "Service momentanement indisponible. Merci de reessayer dans un instant."
+      }
+    }
+
+    return "Impossible de creer votre compte. Merci de reessayer."
+  }
+
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     setFormError(null)
     try {
@@ -74,7 +95,7 @@ function RegisterPage() {
       await router.navigate({ to: search.redirect || "/app/dashboard" })
     } catch (error) {
       console.error("Failed to register user", error)
-      const message = "Erreur, réessayez plus tard."
+      const message = getFriendlyError(error)
       toast.error(message)
       setFormError(message)
     }
@@ -110,9 +131,8 @@ function RegisterPage() {
             <CardContent>
               {formError ? (
                 <div className="mb-4 flex gap-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                   <div className="space-y-1">
-                    <p className="font-semibold">Une erreur est survenue. Merci de réessayer.</p>
                     <p className="text-destructive/90">{formError}</p>
                   </div>
                 </div>
