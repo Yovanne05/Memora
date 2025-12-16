@@ -11,7 +11,7 @@ vi.mock("@/features/collections/lib/collections-query", () => ({
   applyCollectionsQuery: applyCollectionsQueryMock,
 }))
 
-vi.mock("@/features/collections/hooks/useCollectionsQuery", () => ({
+vi.mock("@/features/collections/hooks/useCollectionsListQuery", () => ({
   useCollectionsListQuery: () => useCollectionsListQueryMock(),
 }))
 
@@ -37,7 +37,7 @@ describe("useCollectionsFilters", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useCollectionsListQueryMock.mockReturnValue({
-      data: [collection],
+      data: { items: [collection], total: 1, limit: 10, offset: 0 },
       isPending: false,
       error: null,
       refetch: vi.fn(),

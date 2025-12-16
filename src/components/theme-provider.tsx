@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import type { Theme, ThemeProviderProps } from "../lib/theme-context";
 import { ThemeProviderContext, getInitialTheme, applyThemeToRoot } from "../lib/theme-context";
 
@@ -6,8 +6,8 @@ export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "vite-ui-theme",
-}: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(() =>
+}: Readonly<ThemeProviderProps>) {
+  const [theme, setTheme] = useState<Theme>(() =>
     getInitialTheme(storageKey, defaultTheme)
   );
 
@@ -15,7 +15,7 @@ export function ThemeProvider({
     applyThemeToRoot(theme);
   }, [theme]);
 
-  const value = {
+  const value = useMemo(() => ({
     theme,
     setTheme: (t: Theme) => {
       try {
@@ -23,9 +23,9 @@ export function ThemeProvider({
       } catch {
         // ignore storage errors
       }
-      setThemeState(t);
+      setTheme(t);
     },
-  };
+  }), [theme, storageKey, setTheme]);
 
   return (
     <ThemeProviderContext.Provider value={value}>

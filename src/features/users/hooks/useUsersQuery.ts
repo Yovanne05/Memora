@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { usersService } from '@/features/users/services/users.service'
 import type { User, UserCreate, UserUpdate } from '@/features/users/models/user.model'
-import type { UsersListParams } from '@/features/users/types/paginated-user'
+import type { UsersFilters } from '@/features/users/types/user-query'
+import type { PaginatedUsers } from '@/features/users/types/paginated-user'
 
 export const USERS_QUERY_KEYS = {
   all: ['users'] as const,
   lists: () => [...USERS_QUERY_KEYS.all, 'list'] as const,
-  list: (filters: UsersListParams = {}) => [
+  list: (filters: UsersFilters = {}) => [
     ...USERS_QUERY_KEYS.lists(),
     filters,
   ] as const,
@@ -14,7 +15,7 @@ export const USERS_QUERY_KEYS = {
   detail: (id: string) => [...USERS_QUERY_KEYS.details(), id] as const,
 }
 
-export function useUsersListQuery(params?: UsersListParams) {
+export function useUsersListQuery(params?: UsersFilters) {
   return useQuery({
     queryKey: USERS_QUERY_KEYS.list(params),
     queryFn: () => usersService.list(params),
@@ -46,7 +47,14 @@ export function useCreateUserMutation(callbacks?: MutationCallbacks<User>) {
     onSuccess: (newUser) => {
       queryClient.setQueryData(
         USERS_QUERY_KEYS.list(),
-        (old: User[] | undefined) => [newUser, ...(old ?? [])]
+        (old: PaginatedUsers | undefined) => {
+          if (!old) return { items: [newUser], total: 1, limit: 10, offset: 0 }
+          return {
+            ...old,
+            items: [newUser, ...old.items],
+            total: old.total + 1,
+          }
+        }
       )
 
       queryClient.invalidateQueries({
@@ -71,8 +79,13 @@ export function useUpdateUserMutation(callbacks?: MutationCallbacks<User>) {
     onSuccess: (updated) => {
       queryClient.setQueryData(
         USERS_QUERY_KEYS.list(),
-        (old: User[] | undefined) =>
-          old?.map((u) => (u.id === updated.id ? updated : u)) ?? []
+        (old: PaginatedUsers | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            items: old.items.map((u) => (u.id === updated.id ? updated : u)),
+          }
+        }
       )
 
       queryClient.setQueryData(
@@ -104,8 +117,14 @@ export function useDeleteUserMutation(callbacks?: MutationCallbacks<void>) {
     onSuccess: (_, id) => {
       queryClient.setQueryData(
         USERS_QUERY_KEYS.list(),
-        (old: User[] | undefined) =>
-          old?.filter((u) => u.id !== id) ?? []
+        (old: PaginatedUsers | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            items: old.items.filter((u) => u.id !== id),
+            total: old.total - 1,
+          }
+        }
       )
 
       queryClient.removeQueries({

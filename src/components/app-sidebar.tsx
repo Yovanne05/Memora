@@ -13,6 +13,7 @@ import {
 
 import { Link, useRouter } from "@tanstack/react-router"
 import { toast } from "sonner"
+import { useState } from "react"
 
 import {
   Sidebar,
@@ -28,7 +29,6 @@ import {
 
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import { useState } from "react"
 
 export function AppSidebar() {
   const router = useRouter()
@@ -42,22 +42,27 @@ export function AppSidebar() {
     { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
     { title: "Recherche", icon: Search, url: "/app/search" },
     { title: "Révision", icon: GraduationCap, url: "/app/revision" },
-    { title: "Journal et stats", icon: History, url: "#" },
+    { title: "Journal et stats", icon: History, url: undefined }, // désactivé
   ]
 
-  const accountItems = [{ title: "Paramètres", icon: SettingsIcon, url: "/app/settings" }]
+  const accountItems = [
+    { title: "Paramètres", icon: SettingsIcon, url: "/app/settings" },
+  ]
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
     try {
       await logout()
       toast.success("Déconnexion effectuée.")
+      router.navigate({ to: "/auth/login", search: { redirect: "/app/dashboard" } })
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Impossible de vous déconnecter."
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Impossible de vous déconnecter."
       toast.error(message)
     } finally {
       setIsLoggingOut(false)
-      router.navigate({ to: "/auth/login", search: { redirect: "/app/dashboard" } })
     }
   }
 
@@ -69,7 +74,9 @@ export function AppSidebar() {
             <BookOpen className="h-5 w-5" />
             <div>
               <h1 className="font-semibold text-lg leading-tight">Memora</h1>
-              <p className="text-sm text-muted-foreground -mt-1">Base de connaissances</p>
+              <p className="text-sm text-muted-foreground -mt-1">
+                Base de connaissances
+              </p>
             </div>
           </div>
         </div>
@@ -81,18 +88,22 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationItems.map((item) => (
-                <SidebarMenuItem key={`${item.title}-${item.url}`}>
+                <SidebarMenuItem key={`${item.title}-${item.url ?? "disabled"}`}>
                   <SidebarMenuButton asChild>
-                    {item.url && item.url.startsWith("/") ? (
+                    {item.url ? (
                       <Link to={item.url} className="inline-flex items-center gap-2">
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>
                     ) : (
-                      <a href={item.url} className="inline-flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled
+                        className="inline-flex items-center gap-2 opacity-50 cursor-not-allowed"
+                      >
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
-                      </a>
+                      </button>
                     )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -106,19 +117,12 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {accountItems.map((item) => (
-                <SidebarMenuItem key={`${item.title}-${item.url}`}>
+                <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    {item.url && item.url.startsWith("/") ? (
-                      <Link to={item.url} className="inline-flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    ) : (
-                      <a href={item.url} className="inline-flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </a>
-                    )}
+                    <Link to={item.url} className="inline-flex items-center gap-2">
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -131,7 +135,11 @@ export function AppSidebar() {
         <Separator className="mb-2" />
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} className="cursor-pointer" disabled={isLoggingOut}>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="cursor-pointer"
+            >
               <LogOut className="h-4 w-4" />
               <span>{isLoggingOut ? "Déconnexion..." : "Déconnexion"}</span>
             </SidebarMenuButton>

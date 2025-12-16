@@ -32,7 +32,13 @@ export function FormSelect({
   disabled,
   placeholder,
   options,
-}: FormSelectProps) {
+}: Readonly<FormSelectProps>) {
+  const getAriaDescribedBy = () => {
+    if (error) return `${id}-error`;
+    if (helperText) return `${id}-helper`;
+    return undefined;
+  };
+
   return (
     <FormField
       id={id}
@@ -48,13 +54,7 @@ export function FormSelect({
       >
         <SelectTrigger
           id={id}
-          aria-describedby={
-            error
-              ? `${id}-error`
-              : helperText
-                ? `${id}-helper`
-                : undefined
-          }
+          aria-describedby={getAriaDescribedBy()}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

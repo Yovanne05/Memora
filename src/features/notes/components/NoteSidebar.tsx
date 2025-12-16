@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Note } from "../models/note.model";
 import { cn } from "@/lib/utils";
 import { useResizable } from "@/hooks/useResizable";
+import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection";
 
 interface NoteSidebarProps {
   note: Note | null;
@@ -158,6 +159,8 @@ export function NoteSidebar({
                 </div>
               </div>
             </div>
+
+            <FlashcardsSection noteId={note.id} />
           </div>
         </div>
       </aside>

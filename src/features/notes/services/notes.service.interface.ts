@@ -1,8 +1,9 @@
 import type { Note, NoteCreate, NoteUpdate } from "../models/note.model"
-import type { PaginatedNotes, NotesListParams } from "../types/paginated-note"
+import type { NotesFilters } from "../types/note-query"
+import type { PaginatedNotes } from "../types/paginated-note"
 
 export interface INotesService {
-  list(params?: NotesListParams): Promise<PaginatedNotes>
+  list(params?: NotesFilters): Promise<PaginatedNotes>
   get(id: string): Promise<Note>
   create(payload: NoteCreate): Promise<Note>
   update(id: string, payload: NoteUpdate): Promise<Note>

@@ -1,3 +1,4 @@
+import { useId } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -23,7 +24,9 @@ export function SkeletonCard({
   lines = 3,
   showImage = true,
   imageHeight = "h-48",
-}: SkeletonCardProps) {
+}: Readonly<SkeletonCardProps>) {
+  const cardId = useId();
+
   return (
     <Card>
       {showImage && <Skeleton className={`w-full rounded-none ${imageHeight}`} />}
@@ -39,7 +42,7 @@ export function SkeletonCard({
           {lines > 2 &&
             Array.from({ length: lines - 2 }).map((_, i) => (
               <Skeleton
-                key={i}
+                key={`${cardId}-line-${i}`}
                 className={`h-4 ${i === lines - 3 ? "w-5/6" : "w-full"}`}
               />
             ))}
@@ -63,15 +66,17 @@ export function SkeletonHeader() {
 export function SkeletonContent({
   lines = 4,
   className = "",
-}: {
+}: Readonly<{
   lines?: number
   className?: string
-}) {
+}>) {
+  const contentId = useId();
+
   return (
     <div className={`space-y-3 ${className}`}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
-          key={i}
+          key={`${contentId}-line-${i}`}
           className={`h-4 ${i === lines - 1 ? "w-5/6" : "w-full"}`}
         />
       ))}
@@ -100,14 +105,16 @@ export function SkeletonSection({
   titleHeight = "h-6",
   contentLines = 3,
   className = "",
-}: SkeletonSectionProps) {
+}: Readonly<SkeletonSectionProps>) {
+  const sectionId = useId();
+
   return (
     <div className={`space-y-4 ${className}`}>
       <Skeleton className={`w-48 ${titleHeight}`} />
       <div className="space-y-3 pl-4">
         {Array.from({ length: contentLines }).map((_, i) => (
           <Skeleton
-            key={i}
+            key={`${sectionId}-line-${i}`}
             className={`h-4 ${i === contentLines - 1 ? "w-5/6" : "w-full"}`}
           />
         ))}
