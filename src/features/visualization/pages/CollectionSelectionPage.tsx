@@ -72,13 +72,6 @@ export function CollectionSelectionPage() {
           ))}
         </div>
       )}
-
-      {!isLoading && !isError && (
-        <p className="text-sm text-muted-foreground text-center">
-          {filteredCollections.length} collection{filteredCollections.length > 1 ? "s" : ""} affichée{filteredCollections.length > 1 ? "s" : ""}
-          {searchTerm && ` sur ${collections.length} au total`}
-        </p>
-      )}
     </div>
   );
 }
