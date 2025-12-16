@@ -2,14 +2,12 @@ import React from "react"
 import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { vi } from "vitest"
-import {
-  COLLECTIONS_QUERY_KEYS,
-  useCollectionQuery,
-  useCollectionsListQuery,
-  useCreateCollectionMutation,
-  useUpdateCollectionMutation,
-  useDeleteCollectionMutation,
-} from "@/features/collections/hooks/useCollectionsQuery"
+import { COLLECTIONS_QUERY_KEYS } from "@/features/collections/hooks/collections.keys"
+import { useCollectionQuery } from "@/features/collections/hooks/useCollectionQuery"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCreateCollectionMutation } from "@/features/collections/hooks/useCreateCollectionMutation"
+import { useUpdateCollectionMutation } from "@/features/collections/hooks/useUpdateCollectionMutation"
+import { useDeleteCollectionMutation } from "@/features/collections/hooks/useDeleteCollectionMutation"
 import type { Collection } from "@/features/collections/models/collection.model"
 
 const mockCollectionsService = vi.hoisted(() => ({
@@ -78,7 +76,12 @@ describe("useCollectionsQuery hooks", () => {
   test("useCreateCollectionMutation met a jour le cache liste", async () => {
     const newCollection = { ...collection, id: "col-2" }
     mockCollectionsService.create.mockResolvedValue(newCollection)
-    queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.list(), [collection])
+    queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.list(), {
+      items: [collection],
+      total: 1,
+      offset: 0,
+      limit: 10,
+    })
 
     const { result } = renderHook(() => useCreateCollectionMutation(), {
       wrapper: createWrapper(queryClient),
@@ -91,14 +94,20 @@ describe("useCollectionsQuery hooks", () => {
       visibility: "private",
     })
 
-    const cached = queryClient.getQueryData<Collection[]>(COLLECTIONS_QUERY_KEYS.list())
-    expect(cached?.[0]).toEqual(newCollection)
+    const cached = queryClient.getQueryData<{ items: Collection[], total: number }>(COLLECTIONS_QUERY_KEYS.list())
+    expect(cached?.items[0]).toEqual(newCollection)
+    expect(cached?.total).toBe(2)
   })
 
   test("useUpdateCollectionMutation remplace la collection dans le cache liste et detail", async () => {
     const updated = { ...collection, name: "Maj" }
     mockCollectionsService.update.mockResolvedValue(updated)
-    queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.list(), [collection])
+    queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.list(), {
+      items: [collection],
+      total: 1,
+      offset: 0,
+      limit: 10,
+    })
     queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.detail(collection.id), collection)
 
     const { result } = renderHook(() => useUpdateCollectionMutation(), {
@@ -107,9 +116,8 @@ describe("useCollectionsQuery hooks", () => {
 
     await result.current.mutateAsync({ id: collection.id, data: { name: "Maj" } })
 
-    expect(
-      queryClient.getQueryData<Collection[]>(COLLECTIONS_QUERY_KEYS.list())
-    ).toEqual([updated])
+    const cached = queryClient.getQueryData<{ items: Collection[] }>(COLLECTIONS_QUERY_KEYS.list())
+    expect(cached?.items).toEqual([updated])
     expect(
       queryClient.getQueryData<Collection>(COLLECTIONS_QUERY_KEYS.detail(collection.id))
     ).toEqual(updated)
@@ -117,7 +125,12 @@ describe("useCollectionsQuery hooks", () => {
 
   test("useDeleteCollectionMutation retire la collection du cache", async () => {
     mockCollectionsService.remove.mockResolvedValue(undefined)
-    queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.list(), [collection])
+    queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.list(), {
+      items: [collection],
+      total: 1,
+      offset: 0,
+      limit: 10,
+    })
     queryClient.setQueryData(COLLECTIONS_QUERY_KEYS.detail(collection.id), collection)
 
     const { result } = renderHook(() => useDeleteCollectionMutation(), {
@@ -126,7 +139,9 @@ describe("useCollectionsQuery hooks", () => {
 
     await result.current.mutateAsync(collection.id)
 
-    expect(queryClient.getQueryData(COLLECTIONS_QUERY_KEYS.list())).toEqual([])
+    const cached = queryClient.getQueryData<{ items: Collection[], total: number }>(COLLECTIONS_QUERY_KEYS.list())
+    expect(cached?.items).toEqual([])
+    expect(cached?.total).toBe(0)
     expect(
       queryClient.getQueryData(COLLECTIONS_QUERY_KEYS.detail(collection.id))
     ).toBeUndefined()

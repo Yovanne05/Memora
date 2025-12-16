@@ -1,6 +1,7 @@
 import type { QueryParamValue } from "@/types/query-params"
+import type { PaginationParams } from "@/types/pagination"
 
-export type NotesFilters = Record<string, QueryParamValue> & {
+export type NotesFilters = Record<string, QueryParamValue> & PaginationParams & {
   ownerId?: string
   collectionId?: string
   sharedWithUserId?: string

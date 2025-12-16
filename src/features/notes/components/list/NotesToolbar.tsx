@@ -38,7 +38,7 @@ export function NotesToolbar({
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full min-w-60 lg:w-[28rem]">
+        <div className="relative w-full min-w-60 lg:w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Rechercher une note..."

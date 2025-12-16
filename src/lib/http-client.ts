@@ -1,5 +1,5 @@
 import { ApiError } from "./errors";
-import { addInterceptor, applyInterceptors } from "./interceptors";
+import { applyInterceptors } from "./interceptors";
 import { isRetryable, getRetryDelay, delay } from "./retry-strategy";
 import { parseError, normalizeError } from "./error-handler";
 import { requestWithTimeout } from "./timeout";
@@ -17,8 +17,30 @@ export interface HttpClient {
   delete<T>(path: string, options?: HttpRequestOptions): Promise<T>;
 }
 
+type ParamValue = string | number | boolean;
+type ParamArrayValue = Array<ParamValue>;
+type ParamValueOrArray = ParamValue | ParamArrayValue | null | undefined;
+
 export interface HttpRequestOptions {
-  params?: Record<string, string | number | boolean | Array<string | number | boolean> | null | undefined>;
+  params?: Record<string, ParamValueOrArray>;
+}
+
+function isValidValue(value: unknown): value is ParamValue {
+  return value !== undefined && value !== null;
+}
+
+function appendParamValue(
+  searchParams: URLSearchParams,
+  key: string,
+  value: ParamValue | ParamArrayValue
+): void {
+  if (Array.isArray(value)) {
+    value.filter(isValidValue).forEach((v) => {
+      searchParams.append(key, String(v));
+    });
+  } else {
+    searchParams.append(key, String(value));
+  }
 }
 
 function buildPathWithParams(path: string, params?: HttpRequestOptions["params"]): string {
@@ -26,18 +48,11 @@ function buildPathWithParams(path: string, params?: HttpRequestOptions["params"]
 
   const searchParams = new URLSearchParams();
 
-  for (const [key, value] of Object.entries(params)) {
-    if (value === undefined || value === null) continue;
-
-    if (Array.isArray(value)) {
-      for (const v of value) {
-        if (v === undefined || v === null) continue;
-        searchParams.append(key, String(v));
-      }
-    } else {
-      searchParams.append(key, String(value));
-    }
-  }
+  Object.entries(params)
+    .filter(([, value]) => isValidValue(value))
+    .forEach(([key, value]) => {
+      appendParamValue(searchParams, key, value!);
+    });
 
   const query = searchParams.toString();
   if (!query) return path;
@@ -123,4 +138,4 @@ export function createHttpClient(): HttpClient {
 
 export const httpClient = createHttpClient();
 
-export { addInterceptor };
+export { addInterceptor } from "./interceptors";

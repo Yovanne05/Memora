@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
+import { TagInput } from "@/components/ui/tag-input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
@@ -21,9 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Check, Save, Trash2, X } from "lucide-react"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import type { Collection } from "@/features/collections/models/collection.model"
+import { Check, Save, Trash2 } from "lucide-react"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
 import type { Note, NoteVisibility } from "../../models/note.model"
 import { noteEditFormSchema } from "../../schemas/note.schema"
 
@@ -52,9 +51,9 @@ export function NoteEditForm({
   onDelete,
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
-  const [tagInput, setTagInput] = useState("")
   const [lastSavedAt, setLastSavedAt] = useState<string | undefined>(note?.updatedAt)
-  const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
+  const collections = collectionsData?.items ?? []
 
   const form = useForm({
     resolver: zodResolver(noteEditFormSchema),
@@ -76,10 +75,7 @@ export function NoteEditForm({
       tags: note?.tags ?? [],
     })
     setLastSavedAt(note?.updatedAt)
-    setTagInput("")
   }, [note, form])
-
-  const tags = form.watch("tags") ?? []
 
   const savedTime = useMemo(() => {
     if (!lastSavedAt) return null
@@ -88,22 +84,6 @@ export function NoteEditForm({
       minute: "2-digit",
     }).format(new Date(lastSavedAt))
   }, [lastSavedAt])
-
-  const addTag = () => {
-    const value = tagInput.trim()
-    if (!value) return
-    if (tags.includes(value)) {
-      form.setError("tags", { type: "manual", message: "Ce tag est deja ajoute" })
-      return
-    }
-    form.setValue("tags", [...tags, value])
-    form.clearErrors("tags")
-    setTagInput("")
-  }
-
-  const removeTag = (tag: string) => {
-    form.setValue("tags", tags.filter((t) => t !== tag))
-  }
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
     await onSubmit({
@@ -242,7 +222,7 @@ export function NoteEditForm({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">Aucune collection</SelectItem>
-                          {(collections as Collection[] | undefined)?.map((collection) => (
+                          {collections.map((collection) => (
                             <SelectItem key={collection.id} value={collection.id}>
                               {collection.name}
                             </SelectItem>
@@ -286,43 +266,20 @@ export function NoteEditForm({
               <FormField
                 control={form.control}
                 name="tags"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tags</FormLabel>
                     <FormControl>
-                      <Input
-                        id="note-tags"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === "Tab") {
-                            e.preventDefault()
-                            addTag()
-                          }
-                        }}
-                        placeholder="SQL, avance..."
+                      <TagInput
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        placeholder="Ajouter des tags (Entrée ou virgule pour valider)"
+                        maxTags={20}
                         disabled={isFormDisabled}
+                        error={form.formState.errors.tags?.message}
                       />
                     </FormControl>
                     <FormMessage />
-                    {tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="inline-flex items-center gap-1">
-                            {tag}
-                            <button
-                              type="button"
-                              aria-label={`Supprimer le tag ${tag}`}
-                              className="rounded-full p-1 transition hover:bg-muted-foreground/10 disabled:opacity-60"
-                              onClick={() => removeTag(tag)}
-                              disabled={isFormDisabled}
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
                   </FormItem>
                 )}
               />

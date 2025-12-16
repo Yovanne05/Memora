@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { Badge } from "@/components/ui/badge"
+import { TagList } from "@/components/ui/tag-list"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   DropdownMenu,
@@ -100,13 +101,9 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
 
           <div className="space-y-2">
             {!!note.tags.length && (
-              <div className="flex flex-wrap items-center gap-2">
-                <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                {note.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="border-border bg-background text-xs">
-                    {tag}
-                  </Badge>
-                ))}
+              <div className="flex items-center gap-2">
+                <Tag className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <TagList tags={note.tags} maxVisible={3} size="sm" variant="outline" />
               </div>
             )}
 
