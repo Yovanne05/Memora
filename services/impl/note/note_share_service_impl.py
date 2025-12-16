@@ -28,7 +28,7 @@ class NoteShareService(NoteShareServiceInterface):
     def share_note(
         self, note_id: str, share_dto: NoteShareCreateDTO
     ) -> NoteShareDTO:
-        note_entity = note_repository.find_one(note_id)
+        note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
         user_entity = user_repository.find_one(share_dto.user_id)
@@ -47,7 +47,7 @@ class NoteShareService(NoteShareServiceInterface):
     def update_share(
         self, note_id: str, user_id: str, share_update_dto: NoteShareUpdateDTO
     ) -> NoteShareDTO:
-        note_entity = note_repository.find_one(note_id)
+        note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
         share_entity = note_share_repository.find_one(note_id, user_id)
@@ -59,7 +59,7 @@ class NoteShareService(NoteShareServiceInterface):
         return note_share_to_dto(saved)
 
     def revoke_share(self, note_id: str, user_id: str) -> None:
-        note_entity = note_repository.find_one(note_id)
+        note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
         deleted = note_share_repository.delete(note_id, user_id)

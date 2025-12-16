@@ -33,7 +33,7 @@ class FlashcardService(FlashcardServiceInterface):
         return flashcard_to_dto(flashcard)
 
     def create(self, note_id: str, payload: FlashcardCreateDTO) -> FlashcardDTO:
-        note = note_repository.find_one(note_id)
+        note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
 

@@ -28,10 +28,10 @@ class NoteLinkService(NoteLinkServiceInterface):
     def create_link(
         self, note_id: str, payload: NoteLinkCreateDTO
     ) -> NoteLinkDTO:
-        source_note = note_repository.find_one(note_id)
+        source_note = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(source_note)
 
-        target_note = note_repository.find_one(payload.linked_note_id)
+        target_note = note_repository.find_one_unscoped(payload.linked_note_id)
         ensure_note_exists(target_note)
 
         ensure_not_self_link(note_id, payload.linked_note_id)
@@ -46,10 +46,10 @@ class NoteLinkService(NoteLinkServiceInterface):
         return note_link_to_dto(saved, note_id)
 
     def delete_link(self, note_id: str, linked_note_id: str) -> None:
-        note_entity = note_repository.find_one(note_id)
+        note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
-        linked_note_entity = note_repository.find_one(linked_note_id)
+        linked_note_entity = note_repository.find_one_unscoped(linked_note_id)
         ensure_note_exists(linked_note_entity)
 
         ensure_not_self_link(note_id, linked_note_id)

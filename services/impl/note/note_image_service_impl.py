@@ -40,7 +40,7 @@ class NoteImageService(NoteImageServiceInterface):
         return size <= self.MAX_FILE_SIZE
 
     def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
-        note = note_repository.find_one(note_id)
+        note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
 
@@ -82,7 +82,7 @@ class NoteImageService(NoteImageServiceInterface):
         return note_image_to_dto(saved_entity)
 
     def list_images(self, note_id: str) -> List[NoteImageDTO]:
-        note = note_repository.find_one(note_id)
+        note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
 
@@ -90,7 +90,7 @@ class NoteImageService(NoteImageServiceInterface):
         return [note_image_to_dto(img) for img in images]
 
     def delete_image(self, note_id: str, filename: str) -> None:
-        note = note_repository.find_one(note_id)
+        note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
 

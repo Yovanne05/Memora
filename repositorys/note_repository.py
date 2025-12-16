@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
-from daos.note_dao import Note, NoteShare
+from daos.note_dao import Note
+from utils.access_scope import accessible_note_ids
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -25,12 +26,18 @@ class NoteSearchParams:
     offset: int = 0
 
 
-def find_many(params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], int]:
+def _scope_to_user(stmt, user):
+    accessible_ids = accessible_note_ids(user)
+    if accessible_ids is None:
+        return stmt
+    if not accessible_ids:
+        return stmt.where(Note.id.is_(None))
+    return stmt.where(Note.id.in_(accessible_ids))
+
+
+def list_for_user(user, params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], int]:
     p = params or NoteSearchParams()
     filters = []
-
-    if p.owner_id:
-        filters.append(Note.owner_id == p.owner_id)
 
     if p.collection_id:
         filters.append(Note.collection_id == p.collection_id)
@@ -55,11 +62,8 @@ def find_many(params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], in
         joinedload(Note.collection), joinedload(Note.owner)
     )
 
-    if p.shared_with_user_id:
-        stmt = stmt.join(NoteShare, NoteShare.note_id == Note.id)
-        filters.append(NoteShare.user_id == p.shared_with_user_id)
-
     stmt = stmt.where(*filters)
+    stmt = _scope_to_user(stmt, user)
 
     sort_map = {
         "title": Note.title,
@@ -80,7 +84,18 @@ def find_many(params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], in
     return items, total or 0
 
 
-def find_one(note_id: str) -> Optional[Note]:
+def get_for_user(user, note_id: str) -> Optional[Note]:
+    stmt = (
+        select(Note)
+        .options(joinedload(Note.collection), joinedload(Note.owner))
+        .where(Note.id == note_id)
+    )
+    stmt = _scope_to_user(stmt, user)
+    with get_db_session() as session:
+        return session.execute(stmt).scalar_one_or_none()
+
+
+def find_one_unscoped(note_id: str) -> Optional[Note]:
     stmt = (
         select(Note)
         .options(joinedload(Note.collection), joinedload(Note.owner))
