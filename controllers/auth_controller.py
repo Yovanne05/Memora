@@ -33,9 +33,9 @@ def login():
     return jsonify({"user": user.model_dump(), "access_token": token}), HTTPStatus.OK
 
 
+@jwt_required()
 @bp_auth.get("/me")
 @swag_from("../docs/auth/me.yaml")
-@jwt_required()
 def me():
     user = get_current_user()
     user_dto = auth_service.get_me(user.id)
