@@ -9,6 +9,7 @@ export function dtoToUser(dto: UserDto): User {
     displayName: dto.display_name,
     role: dto.role,
     createdAt: dto.created_at,
+    lastLogin: dto.last_login ?? null,
   }
 }
 
