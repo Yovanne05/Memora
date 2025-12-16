@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
 from utils.enums import RoleEnum
-from daos.mixins import UUIDMixin, CreatedAtMixin
+from daos.base_models import UUIDMixin, CreatedAtMixin
 
 from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note, NoteShare

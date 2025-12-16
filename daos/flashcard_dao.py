@@ -4,7 +4,7 @@ from sqlalchemy import ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
-from daos.mixins import UUIDMixin, TimestampMixin
+from daos.base_models import UUIDMixin, TimestampMixin
 
 if TYPE_CHECKING:
     from daos.flashcard_answer_dao import FlashcardAnswer

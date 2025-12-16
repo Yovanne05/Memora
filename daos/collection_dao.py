@@ -10,7 +10,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
-from daos.mixins import (
+from daos.base_models import (
     UUIDMixin,
     TimestampMixin,
     CreatedAtMixin,
