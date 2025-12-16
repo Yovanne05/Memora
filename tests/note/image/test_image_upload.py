@@ -53,7 +53,7 @@ def test_upload_image_with_invalid_extension_returns_400(client_with_note_data):
 
 
 def test_upload_image_for_nonexistent_note_returns_404(client_with_note_data):
-    client, data = client_with_note_data
+    client, _ = client_with_note_data
 
     fake_note_id = str(uuid4())
     image_data = b"fake image"

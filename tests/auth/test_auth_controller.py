@@ -3,6 +3,11 @@ from uuid import uuid4
 import config
 import pytest
 
+# Test constants
+TEST_PASSWORD = "StrongPwd1!" # NOSONAR
+WEAK_PASSWORD = "weakpass" # NOSONAR
+WRONG_PASSWORD = "WrongPwd1!" # NOSONAR
+
 
 @pytest.fixture(autouse=True)
 def configure_env(monkeypatch):
@@ -27,10 +32,10 @@ def client():
 
 def _register_user(client):
     email = f"user-{uuid4().hex[:8]}@example.com"
-    password = "StrongPwd1!"
+    password = TEST_PASSWORD
     payload = {
         "email": email,
-        "password": password,
+        "password": password, # NOSONAR
         "username": f"user-{uuid4().hex[:6]}",
         "display_name": "Test User",
     }
@@ -50,7 +55,7 @@ def test_register_returns_token_and_user(client):
 def test_register_rejects_weak_password(client):
     payload = {
         "email": f"weak-{uuid4().hex[:8]}@example.com",
-        "password": "weakpass",
+        "password": WEAK_PASSWORD, # NOSONAR
     }
 
     response = client.post("/auth/register", json=payload)
@@ -60,7 +65,7 @@ def test_register_rejects_weak_password(client):
 
 def test_login_returns_token(client):
     email, password, _ = _register_user(client)
-    login_payload = {"identifier": email, "password": password}
+    login_payload = {"identifier": email, "password": password} # NOSONAR
 
     response = client.post("/auth/login", json=login_payload)
 
@@ -72,7 +77,7 @@ def test_login_returns_token(client):
 
 def test_login_returns_401_on_invalid_password(client):
     email, _, _ = _register_user(client)
-    login_payload = {"identifier": email, "password": "WrongPwd1!"}
+    login_payload = {"identifier": email, "password": WRONG_PASSWORD} # NOSONAR
 
     response = client.post("/auth/login", json=login_payload)
 
@@ -81,7 +86,7 @@ def test_login_returns_401_on_invalid_password(client):
 
 def test_login_is_rate_limited(client):
     email, _, _ = _register_user(client)
-    payload = {"identifier": email, "password": "WrongPwd1!"}
+    payload = {"identifier": email, "password": WRONG_PASSWORD} # NOSONAR
 
     for _ in range(5):
         client.post("/auth/login", json=payload)
@@ -89,18 +94,3 @@ def test_login_is_rate_limited(client):
     response = client.post("/auth/login", json=payload)
 
     assert response.status_code == 429
-
-'''
-def test_me_requires_token(client):
-    response = client.get("/auth/me")
-
-    assert response.status_code == 401
-
-
-def test_notes_and_collections_require_auth(client):
-    notes_response = client.get("/notes")
-    collections_response = client.get("/collections")
-
-    assert notes_response.status_code == 401
-    assert collections_response.status_code == 401
-'''

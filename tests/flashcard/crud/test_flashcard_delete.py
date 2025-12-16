@@ -48,7 +48,7 @@ def test_delete_flashcard_removes_answers(client_with_note_data):
 
 
 def test_delete_nonexistent_flashcard_returns_404(client_with_note_data):
-    client, data = client_with_note_data
+    client, _ = client_with_note_data
 
     response = client.delete(
         "/flashcards/00000000-0000-0000-0000-000000000000"

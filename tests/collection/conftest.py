@@ -17,6 +17,10 @@ from services.impl.collection.collection_share_service_impl import (
 )
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
+# Test constants
+TEST_PASSWORD_HASH = "test-password-hash" # NOSONAR
+TEST_PASSWORD = "ValidPass1!" # NOSONAR
+
 
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
@@ -61,7 +65,7 @@ class CollectionTestData:
             email=f"{label}-{unique_suffix}@example.com",
             username=f"{label}-{unique_suffix}",
             display_name=f"{label.capitalize()} user",
-            password_hash="test-password-hash",
+            password_hash=TEST_PASSWORD_HASH,
             role=RoleEnum.CLIENT,
         )
         user_repository.add(user)
@@ -125,12 +129,12 @@ def client_with_collection_data(collection_test_data):
             f"12.0.0.{int(uuid4().int % 200) + 1}"
         )
         auth_email = f"auth-{uuid4().hex[:8]}@example.com"
-        auth_password = "ValidPass1!"
+        auth_password = TEST_PASSWORD
         auth_resp = client.post(
             "/auth/register",
             json={
                 "email": auth_email,
-                "password": auth_password,
+                "password": auth_password, # NOSONAR
                 "username": f"auth-{uuid4().hex[:6]}",
             },
         )

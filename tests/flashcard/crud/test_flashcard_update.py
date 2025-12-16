@@ -74,7 +74,7 @@ def test_update_flashcard_with_empty_answers_returns_400(client_with_note_data):
 
 
 def test_update_nonexistent_flashcard_returns_404(client_with_note_data):
-    client, data = client_with_note_data
+    client, _ = client_with_note_data
     update_payload = {"question": "New question?"}
 
     response = client.patch(
