@@ -11,7 +11,7 @@ class RegisterDTO(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    @field_validator("password")
+    @field_validator("password") # NOSONAR - field name, not a hard-coded credential
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not is_password_strong(value):
@@ -25,7 +25,7 @@ class LoginDTO(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    @field_validator("password")
+    @field_validator("password") # NOSONAR - field name, not a hard-coded credential
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not is_password_strong(value):
