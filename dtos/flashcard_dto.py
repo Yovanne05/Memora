@@ -17,10 +17,6 @@ class FlashcardUpdateDTO(BaseModel):
     )
 
 
-class FlashcardDuplicateDTO(BaseModel):
-    target_note_id: str | None = Field(default=None)
-
-
 class FlashcardDTO(BaseModel):
     id: str
     note_id: str
