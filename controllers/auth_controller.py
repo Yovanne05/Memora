@@ -38,4 +38,5 @@ def login():
 @jwt_required()
 def me():
     user = get_current_user()
-    return jsonify({"user": user.model_dump()}), HTTPStatus.OK
+    user_dto = auth_service.get_me(user.id)
+    return jsonify({"user": user_dto.model_dump()}), HTTPStatus.OK
