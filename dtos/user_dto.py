@@ -3,12 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from utils.enums import RoleEnum
-from utils.security import is_password_strong
-
-PASSWORD_RULE_MESSAGE = (
-    "Password must be at least 8 characters and include one uppercase letter, "
-    "one digit, and one special character."
-)
+from utils.security import is_password_strong, PASSWORD_VALIDATION_ERROR
 
 
 class UserCreateDTO(BaseModel):
@@ -22,7 +17,7 @@ class UserCreateDTO(BaseModel):
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not is_password_strong(value):
-            raise ValueError(PASSWORD_RULE_MESSAGE)
+            raise ValueError(PASSWORD_VALIDATION_ERROR)
         return value
 
 
@@ -39,7 +34,7 @@ class UserUpdateDTO(BaseModel):
         if value is None:
             return value
         if not is_password_strong(value):
-            raise ValueError(PASSWORD_RULE_MESSAGE)
+            raise ValueError(PASSWORD_VALIDATION_ERROR)
         return value
 
 
