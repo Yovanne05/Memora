@@ -1,12 +1,12 @@
-import { config } from "@/lib/config"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 
 export function useCurrentUser() {
-  const userId = config.userHook ?? null
+  const { user, isAuthenticated, isLoadingUser } = useAuth()
 
   return {
-    userId,
-    user: null,
-    isAuthenticated: Boolean(userId),
-    isLoading: false,
+    userId: user?.id ?? null,
+    user,
+    isAuthenticated,
+    isLoading: isLoadingUser,
   }
 }
