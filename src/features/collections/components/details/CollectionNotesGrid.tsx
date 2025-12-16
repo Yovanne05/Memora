@@ -1,3 +1,4 @@
+import { useId } from "react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { NoteCard } from "@/features/notes/components/list/NoteCard"
@@ -5,10 +6,10 @@ import type { Note } from "@/features/notes/models/note.model"
 import { X, FileX } from "lucide-react"
 
 type CollectionNotesGridProps = {
-  notes: Note[]
-  isLoading: boolean
-  isUpdating: boolean
-  onRemoveFromCollection: (noteId: string) => void
+  readonly notes: Note[]
+  readonly isLoading: boolean
+  readonly isUpdating: boolean
+  readonly onRemoveFromCollection: (noteId: string) => void
 }
 
 export function CollectionNotesGrid({
@@ -16,12 +17,14 @@ export function CollectionNotesGrid({
   isLoading,
   isUpdating,
   onRemoveFromCollection,
-}: CollectionNotesGridProps) {
+}: Readonly<CollectionNotesGridProps>) {
+  const gridId = useId();
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+          <div key={`${gridId}-skeleton-${i}`} className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-sm">
             <Skeleton className="h-6 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
             <Skeleton className="h-16 w-full" />

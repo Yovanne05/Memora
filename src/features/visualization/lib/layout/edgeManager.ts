@@ -1,17 +1,42 @@
 import type { NodePosition, EdgeGroup } from "../../types/visualization.type"
 import type { GraphEdge } from "@/features/collections/models/collection.model"
 
+type ConnectionSides = {
+  sourceSide: "top" | "bottom" | "left" | "right"
+  targetSide: "top" | "bottom" | "left" | "right"
+}
+
+function getConnectionByAngle(degrees: number): ConnectionSides {
+  if (degrees >= -22.5 && degrees < 22.5) {
+    return { sourceSide: "right", targetSide: "left" }
+  }
+
+  if (degrees >= 22.5 && degrees < 112.5) {
+    return { sourceSide: "bottom", targetSide: "top" }
+  }
+
+  if (degrees >= 112.5 && degrees < 157.5) {
+    return { sourceSide: "bottom", targetSide: "top" }
+  }
+
+  if (degrees >= 157.5 || degrees < -157.5) {
+    return { sourceSide: "left", targetSide: "right" }
+  }
+
+  if (degrees >= -157.5 && degrees < -67.5) {
+    return { sourceSide: "top", targetSide: "bottom" }
+  }
+
+  return { sourceSide: "top", targetSide: "bottom" }
+}
+
 export function determineConnectionDirection(
   sourcePosition: NodePosition,
   targetPosition: NodePosition
-): {
-  sourceSide: "top" | "bottom" | "left" | "right"
-  targetSide: "top" | "bottom" | "left" | "right"
-} {
+): ConnectionSides {
   const dx = targetPosition.x - sourcePosition.x
   const dy = targetPosition.y - sourcePosition.y
 
-  const angle = Math.atan2(dy, dx)
   const absDx = Math.abs(dx)
   const absDy = Math.abs(dy)
 
@@ -29,33 +54,10 @@ export function determineConnectionDirection(
     }
   }
 
+  const angle = Math.atan2(dy, dx)
   const degrees = (angle * 180) / Math.PI
 
-  if (degrees >= -22.5 && degrees < 22.5) {
-    // Droite
-    return { sourceSide: "right", targetSide: "left" }
-  } else if (degrees >= 22.5 && degrees < 67.5) {
-    // Bas-droite
-    return { sourceSide: "bottom", targetSide: "top" }
-  } else if (degrees >= 67.5 && degrees < 112.5) {
-    // Bas
-    return { sourceSide: "bottom", targetSide: "top" }
-  } else if (degrees >= 112.5 && degrees < 157.5) {
-    // Bas-gauche
-    return { sourceSide: "bottom", targetSide: "top" }
-  } else if (degrees >= 157.5 || degrees < -157.5) {
-    // Gauche
-    return { sourceSide: "left", targetSide: "right" }
-  } else if (degrees >= -157.5 && degrees < -112.5) {
-    // Haut-gauche
-    return { sourceSide: "top", targetSide: "bottom" }
-  } else if (degrees >= -112.5 && degrees < -67.5) {
-    // Haut
-    return { sourceSide: "top", targetSide: "bottom" }
-  } else {
-    // Haut-droite
-    return { sourceSide: "top", targetSide: "bottom" }
-  }
+  return getConnectionByAngle(degrees)
 }
 
 export function calculateEdgeOffset(

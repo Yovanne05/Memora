@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import type { Collection, CollectionUpdate } from '@/features/collections/models/collection.model'
+import type { PaginatedCollections } from '../types/paginated-collection'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
 
 interface MutationCallbacks {
@@ -21,10 +22,15 @@ export function useUpdateCollectionMutation(callbacks?: MutationCallbacks) {
         toast.success('Collection mise à jour.')
       }
 
-      queryClient.setQueryData(
+      queryClient.setQueryData<PaginatedCollections>(
         COLLECTIONS_QUERY_KEYS.list(),
-        (old: Collection[] | undefined) =>
-          old?.map((c) => (c.id === updated.id ? updated : c)) ?? []
+        (old) => {
+          if (!old) return old
+          return {
+            ...old,
+            items: old.items.map((c) => (c.id === updated.id ? updated : c)),
+          }
+        }
       )
 
       queryClient.setQueryData(

@@ -206,9 +206,9 @@ describe("Visualization components", () => {
     )
 
     const orphanButton = screen.getByRole("button", { name: /N2/ })
-    fireEvent.keyDown(orphanButton, { key: "Enter" })
-    fireEvent.keyDown(orphanButton, { key: " " })
-    expect(onSelect).toHaveBeenCalledTimes(2)
+    fireEvent.click(orphanButton)
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    expect(onSelect).toHaveBeenCalledWith("n2")
   })
 
   test("NodeContent affiche le titre, la couleur et la pluralisation", () => {

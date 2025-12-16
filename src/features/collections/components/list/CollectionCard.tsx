@@ -16,15 +16,15 @@ import { useRouter } from "@tanstack/react-router"
 import { VISIBILITY_LABELS, VISIBILITY_BADGE_CLASSES, formatShortDate } from "@/lib/format.utils"
 
 interface CollectionCardProps {
-  collection: Collection
-  onEdit?: (c: Collection) => void
-  onDelete?: (c: Collection) => void
-  onCardClick?: (c: Collection) => void
-  isSelected?: boolean
-  onToggleSelection?: (id: string) => void
-  selectionMode?: boolean
-  compact?: boolean
-  readOnly?: boolean
+  readonly collection: Collection
+  readonly onEdit?: (c: Collection) => void
+  readonly onDelete?: (c: Collection) => void
+  readonly onCardClick?: (c: Collection) => void
+  readonly isSelected?: boolean
+  readonly onToggleSelection?: (id: string) => void
+  readonly selectionMode?: boolean
+  readonly compact?: boolean
+  readonly readOnly?: boolean
 }
 
 export const CollectionCard = memo(function CollectionCard({
@@ -37,7 +37,7 @@ export const CollectionCard = memo(function CollectionCard({
   selectionMode = false,
   compact = false,
   readOnly = false,
-}: CollectionCardProps) {
+}: Readonly<CollectionCardProps>) {
   const router = useRouter()
 
   const handleNavigate = useCallback(() => {
@@ -67,11 +67,6 @@ export const CollectionCard = memo(function CollectionCard({
     onDelete?.(collection)
   }, [onDelete, collection])
 
-  const handleCheckboxChange = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    onToggleSelection?.(collection.id)
-  }, [onToggleSelection, collection.id])
-
   const stopPropagation = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
   }, [])
@@ -86,8 +81,13 @@ export const CollectionCard = memo(function CollectionCard({
       <CardHeader className={`flex flex-row items-start justify-between gap-3 ${compact ? "pb-1" : "pb-2"}`}>
         <div className="flex items-start gap-3 flex-1">
           {selectionMode && (
-            <div onClick={handleCheckboxChange} className="pt-1">
-              <Checkbox checked={isSelected} />
+            <div className="pt-1">
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onToggleSelection?.(collection.id)}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={isSelected ? "Désélectionner la collection" : "Sélectionner la collection"}
+              />
             </div>
           )}
 

@@ -1,3 +1,4 @@
+import { useId } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,6 +19,8 @@ const shortcuts = [
 ]
 
 export function CollectionsKeyboardHelp() {
+  const helpId = useId();
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -33,12 +36,12 @@ export function CollectionsKeyboardHelp() {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-4">
-          {shortcuts.map((shortcut, index) => (
-            <div key={index} className="flex items-center justify-between gap-4">
+          {shortcuts.map((shortcut) => (
+            <div key={`${helpId}-${shortcut.description}`} className="flex items-center justify-between gap-4">
               <span className="text-sm text-muted-foreground">{shortcut.description}</span>
               <div className="flex gap-1">
-                {shortcut.keys.map((key, keyIndex) => (
-                  <Badge key={keyIndex} variant="secondary" className="font-mono text-xs">
+                {shortcut.keys.map((key) => (
+                  <Badge key={`${helpId}-${shortcut.description}-${key}`} variant="secondary" className="font-mono text-xs">
                     {key}
                   </Badge>
                 ))}

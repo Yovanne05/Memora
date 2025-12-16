@@ -27,6 +27,12 @@ export const FormInput = React.forwardRef<
     },
     ref
   ) => {
+    const getAriaDescribedBy = () => {
+      if (error) return `${id}-error`;
+      if (helperText) return `${id}-helper`;
+      return undefined;
+    };
+
     return (
       <FormField
         id={id}
@@ -39,13 +45,7 @@ export const FormInput = React.forwardRef<
           ref={ref}
           id={id}
           disabled={disabled}
-          aria-describedby={
-            error
-              ? `${id}-error`
-              : helperText
-                ? `${id}-helper`
-                : undefined
-          }
+          aria-describedby={getAriaDescribedBy()}
           {...inputProps}
         />
       </FormField>

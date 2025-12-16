@@ -8,16 +8,20 @@ import { CollectionsListSkeleton } from "@/features/collections/components/list/
 import { ErrorState } from "@/components/ui/error-state";
 import type { Collection } from "@/features/collections/models/collection.model";
 
-
 export function CollectionSelectionPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: collections = [], isLoading, isError } = usePublicCollectionsQuery();
+  const {
+    data: collections = [],
+    isLoading,
+    isError,
+  } = usePublicCollectionsQuery();
 
-  const filteredCollections = collections.filter((collection) =>
-    collection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    collection.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCollections = collections.filter(
+    (collection) =>
+      collection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      collection.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCollectionClick = (collection: Collection) => {
@@ -27,6 +31,41 @@ export function CollectionSelectionPage() {
     });
   };
 
+  const renderContent = () => {
+    if (isLoading) {
+      return <CollectionsListSkeleton />;
+    }
+
+    if (isError) {
+      return <ErrorState message="Erreur lors du chargement des collections publiques" />;
+    }
+
+    if (filteredCollections.length === 0) {
+      return (
+        <div className="flex h-48 items-center justify-center rounded-lg border text-muted-foreground">
+          {searchTerm ? (
+            <p>Aucune collection trouvée pour "{searchTerm}"</p>
+          ) : (
+            <p>Aucune collection publique disponible</p>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {filteredCollections.map((collection) => (
+          <CollectionCard
+            key={collection.id}
+            collection={collection}
+            onCardClick={handleCollectionClick}
+            readOnly
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -34,7 +73,8 @@ export function CollectionSelectionPage() {
           Visualisation des collections
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Sélectionnez une collection pour visualiser son graphe de connaissances
+          Sélectionnez une collection pour visualiser son graphe de
+          connaissances
         </p>
       </div>
 
@@ -48,30 +88,7 @@ export function CollectionSelectionPage() {
         />
       </div>
 
-      {isLoading ? (
-        <CollectionsListSkeleton />
-      ) : isError ? (
-        <ErrorState message="Erreur lors du chargement des collections publiques" />
-      ) : filteredCollections.length === 0 ? (
-        <div className="flex h-48 items-center justify-center rounded-lg border text-muted-foreground">
-          {searchTerm ? (
-            <p>Aucune collection trouvée pour "{searchTerm}"</p>
-          ) : (
-            <p>Aucune collection publique disponible</p>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filteredCollections.map((collection) => (
-            <CollectionCard
-              key={collection.id}
-              collection={collection}
-              onCardClick={handleCollectionClick}
-              readOnly
-            />
-          ))}
-        </div>
-      )}
+      {renderContent()}
     </div>
   );
 }

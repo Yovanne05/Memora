@@ -5,13 +5,14 @@ import { Badge } from "./badge"
 import { Input } from "./input"
 
 export interface TagInputProps {
-  value: string[]
-  onChange: (tags: string[]) => void
-  placeholder?: string
-  maxTags?: number
-  className?: string
-  disabled?: boolean
-  error?: string
+  readonly value: string[]
+  readonly onChange: (tags: string[]) => void
+  readonly placeholder?: string
+  readonly maxTags?: number
+  readonly className?: string
+  readonly disabled?: boolean
+  readonly error?: string
+  readonly id?: string
 }
 
 export function TagInput({
@@ -22,9 +23,11 @@ export function TagInput({
   className,
   disabled = false,
   error,
-}: TagInputProps) {
+  id,
+}: Readonly<TagInputProps>) {
   const [inputValue, setInputValue] = React.useState("")
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const tagInputId = React.useId()
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return
@@ -68,18 +71,17 @@ export function TagInput({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <div
+      <label
         className={cn(
-          "flex min-h-10 w-full flex-wrap items-center gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm transition-[color,box-shadow] outline-none",
+          "flex min-h-10 w-full flex-wrap items-center gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm transition-[color,box-shadow] outline-none cursor-text",
           "focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
           error && "border-destructive aria-invalid:ring-destructive/20",
           disabled && "cursor-not-allowed opacity-50"
         )}
-        onClick={() => inputRef.current?.focus()}
       >
-        {value.map((tag, index) => (
+        {value.map((tag) => (
           <Badge
-            key={index}
+            key={`${tagInputId}-tag-${tag}`}
             variant="secondary"
             className="gap-1 pr-1 text-xs"
           >
@@ -87,7 +89,7 @@ export function TagInput({
             {!disabled && (
               <button
                 type="button"
-                onClick={() => removeTag(index)}
+                onClick={() => removeTag(value.indexOf(tag))}
                 className="ml-1 rounded-sm hover:bg-secondary-foreground/20 focus:outline-none focus:ring-1 focus:ring-ring"
                 aria-label={`Supprimer le tag ${tag}`}
               >
@@ -98,6 +100,7 @@ export function TagInput({
         ))}
         <Input
           ref={inputRef}
+          id={id}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -107,7 +110,7 @@ export function TagInput({
           disabled={disabled || value.length >= maxTags}
           className="h-7 flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 min-w-[120px]"
         />
-      </div>
+      </label>
       {error && (
         <p className="text-sm text-destructive">{error}</p>
       )}

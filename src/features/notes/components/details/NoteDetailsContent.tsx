@@ -1,3 +1,4 @@
+import { useId } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -5,8 +6,8 @@ import type { Note } from "../../models/note.model"
 import { CalendarClock, FolderClosed, Globe, Lock, NotebookPen, Tag } from "lucide-react"
 
 interface NoteDetailsContentProps {
-  note: Note
-  paragraphs: string[]
+  readonly note: Note
+  readonly paragraphs: string[]
 }
 
 const formatDateTime = (date: string) =>
@@ -19,13 +20,15 @@ const formatDateTime = (date: string) =>
   }).format(new Date(date))
 
 export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsContentProps>) {
+  const contentId = useId();
+
   return (
     <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
       <Card className="border border-border/70 shadow-sm">
         <CardContent className="space-y-4 text-base leading-relaxed text-foreground">
           {paragraphs.length ? (
             paragraphs.map((block, index) => (
-              <p key={index} className="whitespace-pre-line text-muted-foreground">
+              <p key={`${contentId}-para-${index}`} className="whitespace-pre-line text-muted-foreground">
                 {block}
               </p>
             ))

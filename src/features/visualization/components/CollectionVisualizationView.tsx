@@ -21,8 +21,8 @@ import { NoteSidebar } from "../../notes/components/NoteSidebar"
 import { useNoteQuery } from "../../notes/hooks/useNoteQuery"
 
 interface CollectionVisualizationViewProps {
-  collectionId?: string
-  onBack?: () => void
+  readonly collectionId?: string
+  readonly onBack?: () => void
 }
 
 const NODE_TYPES = {
@@ -32,7 +32,7 @@ const NODE_TYPES = {
 export function CollectionVisualizationView({
   collectionId,
   onBack,
-}: CollectionVisualizationViewProps) {
+}: Readonly<CollectionVisualizationViewProps>) {
   const { data: collection, isLoading, isError } =
     useCollectionVisualizationQuery(collectionId)
 

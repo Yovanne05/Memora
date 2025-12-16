@@ -1,12 +1,13 @@
+  import { useId } from "react"
 import { cn } from "@/lib/utils"
 import { Badge } from "./badge"
 
 export interface TagListProps {
-  tags: string[]
-  maxVisible?: number
-  size?: "sm" | "md"
-  variant?: "default" | "secondary" | "outline"
-  className?: string
+  readonly tags: string[]
+  readonly maxVisible?: number
+  readonly size?: "sm" | "md"
+  readonly variant?: "default" | "secondary" | "outline"
+  readonly className?: string
 }
 
 export function TagList({
@@ -15,7 +16,9 @@ export function TagList({
   size = "sm",
   variant = "secondary",
   className,
-}: TagListProps) {
+}: Readonly<TagListProps>) {
+  const listId = useId();
+
   if (!tags || tags.length === 0) return null
 
   const visibleTags = tags.slice(0, maxVisible)
@@ -23,9 +26,9 @@ export function TagList({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
-      {visibleTags.map((tag, index) => (
+      {visibleTags.map((tag) => (
         <Badge
-          key={index}
+          key={`${listId}-tag-${tag}`}
           variant={variant}
           className={cn(
             size === "sm" && "px-2 py-0 text-xs",

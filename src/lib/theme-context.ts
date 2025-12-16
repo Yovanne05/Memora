@@ -27,7 +27,7 @@ export const useTheme = () => {
 
 export function getInitialTheme(storageKey: string, defaultTheme: Theme): Theme {
   try {
-    if (typeof window === "undefined") return defaultTheme;
+    if (globalThis.window === undefined) return defaultTheme
     return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
   } catch {
     return defaultTheme;
@@ -35,12 +35,12 @@ export function getInitialTheme(storageKey: string, defaultTheme: Theme): Theme 
 }
 
 export function applyThemeToRoot(theme: Theme) {
-  const root = window.document.documentElement;
+  const root = globalThis.window.document.documentElement;
 
   root.classList.remove("light", "dark");
 
   if (theme === "system") {
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    const systemTheme = globalThis.window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
 
