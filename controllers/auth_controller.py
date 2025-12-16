@@ -2,12 +2,13 @@ from http import HTTPStatus
 
 import config
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.auth_dto import LoginDTO, RegisterDTO
 from services.impl.auth_service_impl import auth_service
 from utils.limiter import limiter
+from utils.auth import get_current_user
 
 bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -34,7 +35,7 @@ def login():
 
 @bp_auth.get("/me")
 @swag_from("../docs/auth/me.yaml")
+@jwt_required()
 def me():
-    user_id = get_jwt_identity()
-    user = auth_service.get_me(str(user_id))
+    user = get_current_user()
     return jsonify({"user": user.model_dump()}), HTTPStatus.OK
