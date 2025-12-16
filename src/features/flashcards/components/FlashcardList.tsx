@@ -33,12 +33,11 @@ export function FlashcardList({ flashcards }: FlashcardListProps) {
               isExpanded ? "border-primary bg-card" : "border-border bg-card/50"
             )}
           >
-            <button
-              type="button"
-              onClick={() => toggleFlashcard(flashcard.id)}
-              className="w-full text-left p-3 flex items-center justify-between gap-3 hover:bg-accent/50 rounded-lg transition-colors"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-full text-left p-3 flex items-center justify-between gap-3 rounded-lg">
+              <div
+                onClick={() => toggleFlashcard(flashcard.id)}
+                className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
                   <Brain className="h-4 w-4 text-primary" />
                 </div>
@@ -56,10 +55,7 @@ export function FlashcardList({ flashcards }: FlashcardListProps) {
                 size="icon"
                 variant="ghost"
                 className="h-6 w-6 shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFlashcard(flashcard.id);
-                }}
+                onClick={() => toggleFlashcard(flashcard.id)}
               >
                 {isExpanded ? (
                   <ChevronUp className="h-4 w-4" />
@@ -67,7 +63,7 @@ export function FlashcardList({ flashcards }: FlashcardListProps) {
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-            </button>
+            </div>
 
             {isExpanded && (
               <div className="px-3 pb-3">
