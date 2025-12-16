@@ -19,10 +19,10 @@ import {
 import { cn } from "@/lib/utils";
 
 interface FlashcardFormProps {
-  noteId: string;
-  onSubmit: (data: FlashcardEditForm) => void | Promise<void>;
-  onCancel?: () => void;
-  isSubmitting?: boolean;
+  readonly noteId: string;
+  readonly onSubmit: (data: FlashcardEditForm) => void | Promise<void>;
+  readonly onCancel?: () => void;
+  readonly isSubmitting?: boolean;
 }
 
 export function FlashcardForm({
@@ -30,7 +30,7 @@ export function FlashcardForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
-}: FlashcardFormProps) {
+}: Readonly<FlashcardFormProps>) {
   const form = useForm<FlashcardEditFormInput, unknown, FlashcardEditForm>({
     resolver: zodResolver(flashcardEditFormSchema),
     defaultValues: {

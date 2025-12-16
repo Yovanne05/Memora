@@ -68,6 +68,31 @@ export function CollectionsPagination({
       goToPage(target)
     }
 
+  const pageElements = (() => {
+    let ellipsisIndex = 0
+
+    return pages.map((value) => {
+      if (value === "ellipsis") {
+        const key = `ellipsis-${ellipsisIndex}`
+        ellipsisIndex += 1
+
+        return (
+          <PaginationItem key={key}>
+            <PaginationEllipsis />
+          </PaginationItem>
+        )
+      }
+
+      return (
+        <PaginationItem key={value}>
+          <PaginationLink href="#" isActive={value === currentPage} onClick={handleNavigate(value - 1)}>
+            {value}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    })
+  })()
+
   return (
     <Pagination className="mt-6">
       <PaginationContent>
@@ -85,19 +110,7 @@ export function CollectionsPagination({
           </PaginationPrevious>
         </PaginationItem>
 
-        {pages.map((value, index) =>
-          value === "ellipsis" ? (
-            <PaginationItem key={`ellipsis-${index}`}>
-              <PaginationEllipsis />
-            </PaginationItem>
-          ) : (
-            <PaginationItem key={value}>
-              <PaginationLink href="#" isActive={value === currentPage} onClick={handleNavigate(value - 1)}>
-                {value}
-              </PaginationLink>
-            </PaginationItem>
-          )
-        )}
+        {pageElements}
 
         <PaginationItem>
           <PaginationNext

@@ -22,10 +22,10 @@ import { NoteLinkDialog } from "./NoteLinkDialog"
 import type { Note } from "../models/note.model"
 
 interface NoteLinkManagerProps {
-  note: Note
+  readonly note: Note
 }
 
-export function NoteLinkManager({ note }: NoteLinkManagerProps) {
+export function NoteLinkManager({ note }: Readonly<NoteLinkManagerProps>) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [linkToDelete, setLinkToDelete] = useState<string | null>(null)
 

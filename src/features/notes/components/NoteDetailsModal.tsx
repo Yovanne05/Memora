@@ -11,16 +11,16 @@ import { Calendar, Eye, EyeOff } from "lucide-react";
 import type { Note } from "../models/note.model";
 
 interface NoteDetailsModalProps {
-  note: Note | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  readonly note: Note | null;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
 }
 
 export function NoteDetailsModal({
   note,
   open,
   onOpenChange,
-}: NoteDetailsModalProps) {
+}: Readonly<NoteDetailsModalProps>) {
   if (!note) return null;
 
   const formattedCreatedAt = new Date(note.createdAt).toLocaleString("fr-FR", {

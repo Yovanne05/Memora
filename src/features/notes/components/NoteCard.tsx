@@ -8,11 +8,11 @@ import type { Note } from "../models/note.model"
 import { formatShortDate } from "@/lib/format.utils"
 
 interface NoteCardProps {
-    note: Note
-    onPreview?: (note: Note) => void
+    readonly note: Note
+    readonly onPreview?: (note: Note) => void
 }
 
-export function NoteCard({ note, onPreview }: NoteCardProps) {
+export function NoteCard({ note, onPreview }: Readonly<NoteCardProps>) {
     const handlePreviewClick = (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()

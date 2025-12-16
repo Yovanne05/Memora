@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { CollectionCard } from "./CollectionCard"
 import { CollectionsListSkeleton } from "./CollectionsListSkeleton"
 import type { Collection } from "../../models/collection.model"
@@ -24,7 +25,14 @@ export function CollectionsContent({
   isSelected,
   onToggleSelection,
   selectionMode = false,
-}: CollectionsContentProps) {
+}: Readonly<CollectionsContentProps>) {
+  const handleSelectionCardClick = useCallback(
+    (collection: Collection) => {
+      onToggleSelection?.(collection.id)
+    },
+    [onToggleSelection]
+  )
+
   if (error) {
     return (
       <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -63,6 +71,7 @@ export function CollectionsContent({
           isSelected={isSelected?.(collection.id)}
           onToggleSelection={onToggleSelection}
           selectionMode={selectionMode}
+          onCardClick={selectionMode ? handleSelectionCardClick : undefined}
         />
       ))}
     </section>

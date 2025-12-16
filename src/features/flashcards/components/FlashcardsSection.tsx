@@ -9,10 +9,10 @@ import { FlashcardList } from "./FlashcardList";
 import type { FlashcardEditForm } from "../schemas/flashcard.schema";
 
 interface FlashcardsSectionProps {
-  noteId: string;
+  readonly noteId: string;
 }
 
-export function FlashcardsSection({ noteId }: FlashcardsSectionProps) {
+export function FlashcardsSection({ noteId }: Readonly<FlashcardsSectionProps>) {
   const [isCreating, setIsCreating] = useState(false);
 
   const { data: flashcards = [], isLoading, isError } = useFlashcardsByNoteQuery(noteId);

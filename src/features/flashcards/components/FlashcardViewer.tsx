@@ -5,11 +5,11 @@ import type { Flashcard } from "../models/flashcard.model";
 import { cn } from "@/lib/utils";
 
 interface FlashcardViewerProps {
-  flashcard: Flashcard;
-  onClose?: () => void;
+  readonly flashcard: Flashcard;
+  readonly onClose?: () => void;
 }
 
-export function FlashcardViewer({ flashcard, onClose }: FlashcardViewerProps) {
+export function FlashcardViewer({ flashcard, onClose }: Readonly<FlashcardViewerProps>) {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
 

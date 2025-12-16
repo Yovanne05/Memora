@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 interface SearchInputProps {
-  value: string
-  onChange: (value: string) => void
-  onClear?: () => void
-  placeholder?: string
-  className?: string
+  readonly value: string
+  readonly onChange: (value: string) => void
+  readonly onClear?: () => void
+  readonly placeholder?: string
+  readonly className?: string
 }
 
 export function SearchInput({
@@ -17,7 +17,7 @@ export function SearchInput({
   onClear,
   placeholder = 'Rechercher...',
   className,
-}: SearchInputProps) {
+}: Readonly<SearchInputProps>) {
   return (
     <div className={cn('relative flex items-center', className)}>
       <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />

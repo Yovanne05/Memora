@@ -21,7 +21,7 @@ export function createSearchService(
       const results: SearchResult[] = []
       let totalCount = 0
 
-      const searchType = params.type || 'all'
+      const searchType = params.type ?? 'all'
       const isSearchingCollections = searchType === 'all' || searchType === 'collection'
       const isSearchingNotes = searchType === 'all' || searchType === 'note'
 
@@ -37,7 +37,7 @@ export function createSearchService(
           ...commonParams,
           titleContains: params.query,
           sortBy: params.sortBy === 'alphabetical' ? ('title' as const) : ('created_at' as const),
-          sortDir: params.sortDir || ('desc' as const),
+          sortDir: params.sortDir ?? ('desc' as const),
         }
 
         try {
@@ -55,7 +55,7 @@ export function createSearchService(
           titleContains: params.query,
           contentContains: params.query,
           sortBy: params.sortBy === 'alphabetical' ? ('title' as const) : ('created_at' as const),
-          sortDir: params.sortDir || ('desc' as const),
+          sortDir: params.sortDir ?? ('desc' as const),
         }
 
         try {
