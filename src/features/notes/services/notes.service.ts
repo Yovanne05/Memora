@@ -1,13 +1,14 @@
 import type { NoteCreateDto, NoteDto, NoteUpdateDto, NotesListDto } from "../dtos/note.dto"
 import { dtoToNote, toNoteCreateDto, toNoteUpdateDto } from "../mappers/note.mapper"
 import type { NoteCreate, NoteUpdate } from "../models/note.model"
-import type { PaginatedNotes, NotesListParams } from "../types/paginated-note"
+import type { NotesFilters } from "../types/note-query"
+import type { PaginatedNotes } from "../types/paginated-note"
 import type { INotesService } from "./notes.service.interface"
 import { httpClient, type HttpClient } from "@/lib/http-client"
 
 export function createNotesService(client: HttpClient = httpClient): INotesService {
   return {
-    async list(params?: NotesListParams): Promise<PaginatedNotes> {
+    async list(params?: NotesFilters): Promise<PaginatedNotes> {
       const data = await client.get<NotesListDto>("/notes", { params })
       const items = Array.isArray(data) ? data : data?.items ?? []
       const total = Array.isArray(data) ? items.length : data?.total ?? items.length
@@ -15,8 +16,8 @@ export function createNotesService(client: HttpClient = httpClient): INotesServi
       return {
         items: items.map(dtoToNote),
         total,
-        page: params?.offset && params?.limit ? Math.floor(params.offset / params.limit) : 0,
-        limit: params?.limit,
+        offset: params?.offset && params?.limit ? Math.floor(params.offset / params.limit) : 0,
+        limit: params?.limit ?? 50,
       }
     },
 

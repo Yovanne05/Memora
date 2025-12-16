@@ -1,8 +1,10 @@
 import { useCallback, useMemo, useState } from "react"
 import { useRouter } from "@tanstack/react-router"
-import { useCollectionQuery, useUpdateCollectionMutation, useDeleteCollectionMutation } from "./useCollectionsQuery"
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
-import type { Collection } from "../models/collection.model"
+import type { Collection, CollectionUpdate } from "../models/collection.model"
+import { useCollectionQuery } from "./useCollectionQuery"
+import { useDeleteCollectionMutation } from "./useDeleteCollectionMutation"
+import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
 
 export function useCollectionDetails(id: string) {
   const router = useRouter()
@@ -24,13 +26,19 @@ export function useCollectionDetails(id: string) {
     async (values: CollectionFormValues) => {
       if (!collectionQuery.data || updateMutation.isPending) return
 
+      const data: CollectionUpdate = {
+        name: values.name,
+        description: values.description,
+        visibility: values.visibility,
+      }
+
+      if (values.tags !== undefined) {
+        data.tags = values.tags
+      }
+
       await updateMutation.mutateAsync({
         id: collectionQuery.data.id,
-        data: {
-          name: values.name,
-          description: values.description,
-          visibility: values.visibility,
-        },
+        data,
       })
     },
     [collectionQuery.data, updateMutation]
@@ -56,14 +64,19 @@ export function useCollectionDetails(id: string) {
     deleteMutation.reset()
   }, [deleteMutation])
 
-  const initialValues = useMemo(
-    () => ({
+  const initialValues = useMemo(() => {
+    const base = {
       name: collectionQuery.data?.name ?? "",
       description: collectionQuery.data?.description ?? "",
       visibility: collectionQuery.data?.visibility ?? "private",
-    }),
-    [collectionQuery.data]
-  )
+    }
+
+    if (collectionQuery.data?.tags && collectionQuery.data.tags.length > 0) {
+      return { ...base, tags: collectionQuery.data.tags }
+    }
+
+    return base
+  }, [collectionQuery.data])
 
   return {
     collection: collectionQuery.data ?? null,

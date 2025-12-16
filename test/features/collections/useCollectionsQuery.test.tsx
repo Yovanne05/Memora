@@ -2,14 +2,12 @@ import React from "react"
 import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { vi } from "vitest"
-import {
-  COLLECTIONS_QUERY_KEYS,
-  useCollectionQuery,
-  useCollectionsListQuery,
-  useCreateCollectionMutation,
-  useUpdateCollectionMutation,
-  useDeleteCollectionMutation,
-} from "@/features/collections/hooks/useCollectionsQuery"
+import { COLLECTIONS_QUERY_KEYS } from "@/features/collections/hooks/collections.keys"
+import { useCollectionQuery } from "@/features/collections/hooks/useCollectionQuery"
+import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCreateCollectionMutation } from "@/features/collections/hooks/useCreateCollectionMutation"
+import { useUpdateCollectionMutation } from "@/features/collections/hooks/useUpdateCollectionMutation"
+import { useDeleteCollectionMutation } from "@/features/collections/hooks/useDeleteCollectionMutation"
 import type { Collection } from "@/features/collections/models/collection.model"
 
 const mockCollectionsService = vi.hoisted(() => ({

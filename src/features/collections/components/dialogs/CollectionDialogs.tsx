@@ -53,6 +53,7 @@ export function CollectionDialogs({
             name: editing.name,
             description: editing.description ?? "",
             visibility: editing.visibility,
+            tags: editing.tags ?? [],
           }}
           onSubmit={onEditSubmit}
           onClose={onEditClose}

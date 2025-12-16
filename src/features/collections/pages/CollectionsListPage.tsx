@@ -3,6 +3,7 @@ import { CollectionsContent } from "../components/list/CollectionsContent"
 import { CollectionDialogs } from "../components/dialogs/CollectionDialogs"
 import { CollectionsBulkActions } from "../components/list/CollectionsBulkActions"
 import { CollectionsPageActions } from "../components/list/CollectionsPageActions"
+import { CollectionsPagination } from "../components/list/CollectionsPagination"
 import { useCollectionsFilters } from "../hooks/useCollectionsFilters"
 import { useCollectionCreate } from "../hooks/useCollectionCreate"
 import { useCollectionEdit } from "../hooks/useCollectionEdit"
@@ -34,6 +35,9 @@ export function CollectionsListPage() {
     onSearch: () => searchInputRef.current?.focus(),
     disabled: create.isOpen || !!edit.target || !!deletion.target,
   })
+
+  const pagination = filters.pagination
+  const shouldDisplayPagination = pagination && filters.total > pagination.limit
 
   return (
     <div className="space-y-6 p-6">
@@ -71,6 +75,14 @@ export function CollectionsListPage() {
         onToggleSelection={selection.toggleSelection}
         selectionMode={selection.selectionMode}
       />
+
+      {shouldDisplayPagination && pagination && (
+        <CollectionsPagination
+          page={pagination.page}
+          maxPage={pagination.maxPage}
+          setPage={pagination.setPage}
+        />
+      )}
 
       <CollectionsBulkActions
         selectedCount={selection.selectedCount}
