@@ -9,6 +9,7 @@ export const userDtoSchema = z.object({
   display_name: z.string().min(1).max(100).nullable(),
   role: userRoleSchema,
   created_at: z.iso.datetime(),
+  last_login: z.iso.datetime().nullable().optional(),
 })
 
 export const usersListDtoSchema = z.union([

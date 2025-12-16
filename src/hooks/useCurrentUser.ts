@@ -1,7 +1,12 @@
-import { config } from "../lib/config"
+import { config } from "@/lib/config"
 
 export function useCurrentUser() {
-  // TODO: remplacer par un vrai hook d'authentification
-  const userId = config.userHook
-  return { userId }
+  const userId = config.userHook ?? null
+
+  return {
+    userId,
+    user: null,
+    isAuthenticated: Boolean(userId),
+    isLoading: false,
+  }
 }

@@ -13,6 +13,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRegisterRouteImport } from './routes/auth/register'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AppVisualizationIndexRouteImport } from './routes/app/visualization/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as AppSearchIndexRouteImport } from './routes/app/search/index'
@@ -42,6 +44,16 @@ const AppIndexLazyRoute = AppIndexLazyRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any).lazy(() => import('./routes/app/index.lazy').then((d) => d.Route))
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppVisualizationIndexRoute = AppVisualizationIndexRouteImport.update({
   id: '/visualization/',
   path: '/visualization/',
@@ -102,6 +114,8 @@ const AppNotesIdEditIndexRoute = AppNotesIdEditIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
   '/app/collections': typeof AppCollectionsIndexRoute
   '/app/dashboard': typeof AppDashboardIndexRoute
@@ -117,6 +131,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
   '/app': typeof AppIndexLazyRoute
   '/app/collections': typeof AppCollectionsIndexRoute
   '/app/dashboard': typeof AppDashboardIndexRoute
@@ -134,6 +150,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
   '/app/collections/': typeof AppCollectionsIndexRoute
   '/app/dashboard/': typeof AppDashboardIndexRoute
@@ -152,6 +170,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/auth/login'
+    | '/auth/register'
     | '/app/'
     | '/app/collections'
     | '/app/dashboard'
@@ -167,6 +187,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth/login'
+    | '/auth/register'
     | '/app'
     | '/app/collections'
     | '/app/dashboard'
@@ -183,6 +205,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/app'
+    | '/auth/login'
+    | '/auth/register'
     | '/app/'
     | '/app/collections/'
     | '/app/dashboard/'
@@ -200,6 +224,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,6 +250,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexLazyRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/visualization/': {
       id: '/app/visualization/'
@@ -343,6 +383,8 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

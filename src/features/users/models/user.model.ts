@@ -7,6 +7,7 @@ export interface User {
   displayName: string | null
   role: UserRole
   createdAt: string
+  lastLogin?: string | null
 }
 
 export interface UserCreate {
