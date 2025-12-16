@@ -32,8 +32,8 @@ vi.mock("@/features/notes/hooks/useUpdateNoteMutation", () => ({
   useUpdateNoteMutation: () => mockUpdateNoteMutation,
 }))
 
-vi.mock("@/hooks/useCurrentUser", () => ({
-  useCurrentUser: () => ({ userId: "user-1" }),
+vi.mock("@/features/auth/hooks/useAuth", () => ({
+  useAuth: () => ({ user: { id: "user-1" } }),
 }))
 
 vi.mock("@tanstack/react-router", () => ({

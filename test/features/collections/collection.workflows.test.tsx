@@ -61,8 +61,8 @@ vi.mock("@/features/collections/hooks/useCollectionQuery", () => ({
   useCollectionQuery: (id: string) => mockUseCollectionQuery(id),
 }))
 
-vi.mock("@/hooks/useCurrentUser", () => ({
-  useCurrentUser: () => ({ userId: "user-1" }),
+vi.mock("@/features/auth/hooks/useAuth", () => ({
+  useAuth: () => ({ user: { id: "user-1" } }),
 }))
 
 const navigate = vi.fn()

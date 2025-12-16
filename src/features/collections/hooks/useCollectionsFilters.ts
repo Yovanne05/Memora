@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
 import { applyCollectionsQuery } from "../lib/collections-query"
 import type { CollectionVisibility } from "../models/collection.model"
@@ -8,7 +8,8 @@ import { useCollectionsListQuery } from "./useCollectionsListQuery"
 const DEFAULT_LIMIT = 12
 
 export function useCollectionsFilters() {
-  const { userId } = useCurrentUser()
+  const { user } = useAuth()
+  const userId = user?.id
 
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<CollectionsTab>("mine")

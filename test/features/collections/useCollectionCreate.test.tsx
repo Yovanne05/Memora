@@ -7,8 +7,8 @@ import React from "react";
 
 const mockUserId = "user-123";
 
-vi.mock("@/hooks/useCurrentUser", () => ({
-  useCurrentUser: () => ({ userId: mockUserId }),
+vi.mock("@/features/auth/hooks/useAuth", () => ({
+  useAuth: () => ({ user: { id: mockUserId } }),
 }));
 
 const mockCollectionsService = vi.hoisted(() => ({

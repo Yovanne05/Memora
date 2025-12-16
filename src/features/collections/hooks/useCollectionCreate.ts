@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 import type { CollectionFormValues } from "../components/forms/CollectionEditForm"
 import type { CollectionCreate } from "../models/collection.model"
 import { useCreateCollectionMutation } from "./useCreateCollectionMutation"
 
 export function useCollectionCreate() {
-  const { userId } = useCurrentUser()
+  const { user } = useAuth()
+  const userId = user?.id
   const [isOpen, setIsOpen] = useState(false)
 
   const createMutation = useCreateCollectionMutation({

@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react"
 import { useRouter } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 import { NotesHeader } from "../components/list/NotesHeader"
 import { NotesToolbar } from "../components/list/NotesToolbar"
 import { NotesContent } from "../components/list/NotesContent"
@@ -14,7 +14,8 @@ import { CreateNoteDialog } from "../components/dialogs/CreateNoteDialog"
 export default function NotesPage() {
   const router = useRouter()
   const manager = useNotesManager()
-  const { userId } = useCurrentUser()
+  const { user } = useAuth()
+  const userId = user?.id
   const createNoteMutation = useCreateNoteMutation()
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -96,4 +97,3 @@ export default function NotesPage() {
     </div>
   )
 }
-

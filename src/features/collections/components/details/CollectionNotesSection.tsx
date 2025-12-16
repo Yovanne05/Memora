@@ -1,7 +1,7 @@
 import { useMemo, useCallback, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CollectionNotesHeader, type NotesSort } from "./CollectionNotesHeader";
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation";
 import type { Note } from "@/features/notes/models/note.model";
@@ -10,7 +10,8 @@ import type { AvailableNoteOption } from "../../types/note.types";
 
 export function CollectionNotesSection() {
   const { id } = useParams({ from: "/app/collections/$id/" });
-  const { userId } = useCurrentUser();
+  const { user } = useAuth();
+  const userId = user?.id;
 
   // Notes dans la collection
   const { data, isLoading } = useNotesQuery(0, 20, { collectionId: id });

@@ -5,7 +5,7 @@ import type { Collection } from "@/features/collections/models/collection.model"
 
 const applyCollectionsQueryMock = vi.hoisted(() => vi.fn())
 const useCollectionsListQueryMock = vi.hoisted(() => vi.fn())
-const useCurrentUserMock = vi.hoisted(() => vi.fn())
+const useAuthMock = vi.hoisted(() => vi.fn())
 
 vi.mock("@/features/collections/lib/collections-query", () => ({
   applyCollectionsQuery: applyCollectionsQueryMock,
@@ -15,8 +15,8 @@ vi.mock("@/features/collections/hooks/useCollectionsListQuery", () => ({
   useCollectionsListQuery: () => useCollectionsListQueryMock(),
 }))
 
-vi.mock("@/hooks/useCurrentUser", () => ({
-  useCurrentUser: () => useCurrentUserMock(),
+vi.mock("@/features/auth/hooks/useAuth", () => ({
+  useAuth: () => useAuthMock(),
 }))
 
 const collection: Collection = {
@@ -42,7 +42,7 @@ describe("useCollectionsFilters", () => {
       error: null,
       refetch: vi.fn(),
     })
-    useCurrentUserMock.mockReturnValue({ userId: "user-1" })
+    useAuthMock.mockReturnValue({ user: { id: "user-1" } })
     applyCollectionsQueryMock.mockReturnValue([collection])
   })
 
@@ -62,7 +62,7 @@ describe("useCollectionsFilters", () => {
   })
 
   test("renvoie un tableau vide si aucun utilisateur courant", () => {
-    useCurrentUserMock.mockReturnValueOnce({ userId: undefined })
+    useAuthMock.mockReturnValueOnce({ user: null })
 
     const { result } = renderHook(() => useCollectionsFilters())
 
