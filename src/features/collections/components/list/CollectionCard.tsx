@@ -67,11 +67,6 @@ export const CollectionCard = memo(function CollectionCard({
     onDelete?.(collection)
   }, [onDelete, collection])
 
-  const handleCheckboxChange = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    onToggleSelection?.(collection.id)
-  }, [onToggleSelection, collection.id])
-
   const stopPropagation = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
   }, [])
@@ -86,14 +81,14 @@ export const CollectionCard = memo(function CollectionCard({
       <CardHeader className={`flex flex-row items-start justify-between gap-3 ${compact ? "pb-1" : "pb-2"}`}>
         <div className="flex items-start gap-3 flex-1">
           {selectionMode && (
-            <button
-              type="button"
-              onClick={handleCheckboxChange}
-              className="pt-1 cursor-pointer"
-              aria-label={isSelected ? "Désélectionner la collection" : "Sélectionner la collection"}
-            >
-              <Checkbox checked={isSelected} />
-            </button>
+            <div className="pt-1">
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onToggleSelection?.(collection.id)}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={isSelected ? "Désélectionner la collection" : "Sélectionner la collection"}
+              />
+            </div>
           )}
 
           <div className={`flex items-center justify-center rounded-lg border border-border bg-muted shrink-0 ${compact ? "h-8 w-8" : "h-10 w-10"}`}>
