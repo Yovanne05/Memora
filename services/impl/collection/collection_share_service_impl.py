@@ -23,22 +23,11 @@ from repositorys import (
 )
 from repositorys.collection_share_repository import CollectionShareSearchParams
 from services.interfaces.collection.collection_share_service_interface import CollectionShareServiceInterface
-from utils.auth import get_current_user
-from utils.access_scope import accessible_collection_ids
 
 
 class CollectionShareService(CollectionShareServiceInterface):
     def find_many(self, params: CollectionShareSearchParams) -> Tuple[List[CollectionShareDTO], int]:
-        user = get_current_user()
         shares, total = collection_share_repository.find_many(params)
-        allowed_collections = accessible_collection_ids(user)
-        if allowed_collections is not None:
-            if not allowed_collections:
-                return [], 0
-            shares = [
-                share for share in shares if share.collection_id in allowed_collections
-            ]
-            total = len(shares)
         return [collection_share_to_dto(share) for share in shares], total
 
     def share_collection(
