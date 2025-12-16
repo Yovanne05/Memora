@@ -18,6 +18,7 @@ from services.impl.collection.collection_share_service_impl import (
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 # Test constants
+TEST_PASSWORD_HASH = "test-password-hash"
 TEST_PASSWORD = "ValidPass1!"
 
 
@@ -64,7 +65,7 @@ class CollectionTestData:
             email=f"{label}-{unique_suffix}@example.com",
             username=f"{label}-{unique_suffix}",
             display_name=f"{label.capitalize()} user",
-            password_hash="test-password-hash",
+            password_hash=TEST_PASSWORD_HASH,
             role=RoleEnum.CLIENT,
         )
         user_repository.add(user)
