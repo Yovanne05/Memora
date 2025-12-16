@@ -12,6 +12,7 @@ export interface TagInputProps {
   readonly className?: string
   readonly disabled?: boolean
   readonly error?: string
+  readonly id?: string
 }
 
 export function TagInput({
@@ -22,6 +23,7 @@ export function TagInput({
   className,
   disabled = false,
   error,
+  id,
 }: Readonly<TagInputProps>) {
   const [inputValue, setInputValue] = React.useState("")
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -98,6 +100,7 @@ export function TagInput({
         ))}
         <Input
           ref={inputRef}
+          id={id}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
