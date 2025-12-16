@@ -1,8 +1,8 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { searchService } from '../services/search.service'
-import type { SearchParams } from '../types/search.types'
+import type { SearchFilters } from '../types/search-query'
 
-export function useSearchQuery(params: SearchParams) {
+export function useSearchQuery(params: SearchFilters) {
   return useQuery({
     queryKey: ['search', params],
     queryFn: () => searchService.search(params),

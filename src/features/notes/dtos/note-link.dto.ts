@@ -11,6 +11,8 @@ export const noteLinksListDtoSchema = z.array(noteLinkDtoSchema)
 export const paginatedNoteLinksSchema = z.object({
   items: z.array(noteLinkDtoSchema),
   total: z.number(),
+  limit: z.number(),
+  offset: z.number(),
 })
 
 export const createNoteLinkDtoSchema = z.object({

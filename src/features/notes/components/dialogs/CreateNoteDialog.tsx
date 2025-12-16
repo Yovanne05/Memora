@@ -27,7 +27,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
-import type { Collection } from "@/features/collections/models/collection.model"
 import type { NoteVisibility } from "../../models/note.model"
 import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"
 
@@ -49,7 +48,8 @@ export function CreateNoteDialog({
   onSubmit,
   submitting = false,
 }: Readonly<CreateNoteDialogProps>) {
-  const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
+  const collections = collectionsData?.items ?? []
 
   const form = useForm<NoteCreateFormInput>({
     resolver: zodResolver(noteCreateFormSchema),
@@ -130,7 +130,7 @@ export function CreateNoteDialog({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Aucune collection</SelectItem>
-                        {(collections as Collection[] | undefined)?.map((collection) => (
+                        {collections.map((collection) => (
                           <SelectItem key={collection.id} value={collection.id}>
                             {collection.name}
                           </SelectItem>

@@ -3,13 +3,13 @@ import { notesService } from '@/features/notes/services/notes.service'
 import type { ICollectionsService } from '@/features/collections/services/collections.service.interface'
 import type { INotesService } from '@/features/notes/services/notes.service.interface'
 import type {
-  SearchParams,
   SearchResult,
   PaginatedSearchResponse,
 } from '../types/search.types'
+import type { SearchFilters } from '../types/search-query'
 
 export interface ISearchService {
-  search(params: SearchParams): Promise<PaginatedSearchResponse>
+  search(params: SearchFilters): Promise<PaginatedSearchResponse>
 }
 
 export function createSearchService(
@@ -17,7 +17,7 @@ export function createSearchService(
   notesApi: INotesService = notesService
 ): ISearchService {
   return {
-    async search(params: SearchParams): Promise<PaginatedSearchResponse> {
+    async search(params: SearchFilters): Promise<PaginatedSearchResponse> {
       const results: SearchResult[] = []
       let totalCount = 0
 
@@ -42,8 +42,8 @@ export function createSearchService(
 
         try {
           const collections = await collectionsApi.list(collectionParams)
-          results.push(...collections.map(item => ({ type: 'collection' as const, item })))
-          totalCount += collections.length
+          results.push(...collections.items.map(item => ({ type: 'collection' as const, item })))
+          totalCount += collections.total
         } catch (error) {
           console.error('Error fetching collections:', error)
         }
@@ -76,10 +76,10 @@ export function createSearchService(
       }
 
       return {
-        results,
+        items: results,
         total: totalCount,
-        page: params.offset && params.limit ? Math.floor(params.offset / params.limit) : 0,
-        limit: params.limit,
+        offset: params?.offset && params?.limit ? Math.floor(params.offset / params.limit) : 0,
+        limit: params.limit ?? 50,
       }
     },
   }

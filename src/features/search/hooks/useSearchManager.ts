@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useSearchQuery } from './useSearchQuery'
-import type { SearchFilters } from '../types/search.types'
 import { useDebounce } from '@/hooks/useDebounce'
+import type { SearchFilters } from '../types/search-query'
 
 const DEFAULT_LIMIT = 20
 
@@ -66,11 +66,11 @@ export function useSearchManager() {
     setPage,
     totalPages,
     limit: DEFAULT_LIMIT,
-    results: data?.results ?? [],
+    results: data?.items ?? [],
     total: data?.total ?? 0,
     isLoading,
     error,
     hasSearched,
-    isEmpty: hasSearched && !isLoading && (data?.results.length ?? 0) === 0,
+    isEmpty: hasSearched && !isLoading && (data?.items.length ?? 0) === 0,
   }
 }

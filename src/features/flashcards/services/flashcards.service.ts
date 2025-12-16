@@ -7,7 +7,7 @@ import type {
   FlashcardDuplicate,
 } from "../models/flashcard.model";
 import type { PaginatedFlashcards } from "../types/paginated-flashcard";
-import type { FlashcardsQuery } from "../types/flashcard-query";
+import type { FlashcardsFilters } from "../types/flashcard-query";
 import {
   flashcardDtoSchema,
   flashcardsListDtoSchema,
@@ -26,7 +26,7 @@ import {
 } from "../mappers/flashcard.mapper";
 
 class FlashcardsService implements IFlashcardsService {
-  async list(query?: FlashcardsQuery): Promise<PaginatedFlashcards> {
+  async list(query?: FlashcardsFilters): Promise<PaginatedFlashcards> {
     const params: Record<string, string | number | undefined> = {};
 
     if (query?.noteId) params.noteId = query.noteId;

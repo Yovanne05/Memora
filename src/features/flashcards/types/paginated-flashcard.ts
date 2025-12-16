@@ -1,8 +1,4 @@
-import type { Flashcard } from "../models/flashcard.model";
+import type { PaginatedResponse } from "@/types/pagination"
+import type { Flashcard } from "../models/flashcard.model"
 
-export interface PaginatedFlashcards {
-  items: Flashcard[];
-  total: number;
-  limit?: number;
-  offset?: number;
-}
+export type PaginatedFlashcards = PaginatedResponse<Flashcard>

@@ -35,7 +35,7 @@ describe("collections.service", () => {
     const result = await service.list()
 
     expect(client.get).toHaveBeenCalledWith("/collections", { params: undefined })
-    expect(result[0]).toMatchObject({
+    expect(result.items[0]).toMatchObject({
       id: baseDto.id,
       ownerId: baseDto.owner_id,
       name: baseDto.name,

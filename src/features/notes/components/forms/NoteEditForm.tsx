@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/form"
 import { Check, Save, Trash2 } from "lucide-react"
 import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
-import type { Collection } from "@/features/collections/models/collection.model"
 import type { Note, NoteVisibility } from "../../models/note.model"
 import { noteEditFormSchema } from "../../schemas/note.schema"
 
@@ -53,7 +52,8 @@ export function NoteEditForm({
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
   const [lastSavedAt, setLastSavedAt] = useState<string | undefined>(note?.updatedAt)
-  const { data: collections, isLoading: loadingCollections } = useCollectionsListQuery()
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
+  const collections = collectionsData?.items ?? []
 
   const form = useForm({
     resolver: zodResolver(noteEditFormSchema),
@@ -222,7 +222,7 @@ export function NoteEditForm({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">Aucune collection</SelectItem>
-                          {(collections as Collection[] | undefined)?.map((collection) => (
+                          {collections.map((collection) => (
                             <SelectItem key={collection.id} value={collection.id}>
                               {collection.name}
                             </SelectItem>

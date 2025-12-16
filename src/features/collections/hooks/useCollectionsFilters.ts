@@ -21,7 +21,7 @@ export function useCollectionsFilters() {
 
   const filteredCollections = useMemo(() => {
     if (!userId || !collectionsQuery.data) return []
-    return applyCollectionsQuery(collectionsQuery.data, {
+    return applyCollectionsQuery(collectionsQuery.data.items, {
       currentUserId: userId,
       tab,
       search,

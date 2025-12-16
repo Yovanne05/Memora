@@ -9,7 +9,7 @@ import {
 import { TagInput } from '@/components/ui/tag-input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { SearchFilters as SearchFiltersType } from '../types/search.types'
+import type { SearchFilters as SearchFiltersType } from '../types/search-query'
 
 interface SearchFiltersProps {
   filters: SearchFiltersType

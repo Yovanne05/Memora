@@ -88,7 +88,7 @@ export function dtoToPaginatedFlashcards(
   return {
     items: dto.items.map(dtoToFlashcard),
     total: dto.total,
-    limit: dto.limit,
-    offset: dto.offset,
+    limit: dto.limit ?? 10,
+    offset: dto.offset ?? 0,
   };
 }
