@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { Filter } from 'lucide-react'
 import {
   Select,
@@ -12,10 +13,10 @@ import { cn } from '@/lib/utils'
 import type { SearchFilters as SearchFiltersType } from '../types/search-query'
 
 interface SearchFiltersProps {
-  filters: SearchFiltersType
-  onChange: (filters: Partial<SearchFiltersType>) => void
-  onReset?: () => void
-  className?: string
+  readonly filters: SearchFiltersType
+  readonly onChange: (filters: Partial<SearchFiltersType>) => void
+  readonly onReset?: () => void
+  readonly className?: string
 }
 
 export function SearchFilters({
@@ -23,7 +24,11 @@ export function SearchFilters({
   onChange,
   onReset,
   className,
-}: SearchFiltersProps) {
+}: Readonly<SearchFiltersProps>) {
+  const typeId = useId()
+  const sortById = useId()
+  const sortDirId = useId()
+  const tagsId = useId()
   const hasActiveFilters =
     filters.type !== 'all' ||
     (filters.tags && filters.tags.length > 0)
@@ -45,14 +50,14 @@ export function SearchFilters({
       <div className="grid gap-4 sm:grid-cols-3">
         {/* Type de contenu */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Type de contenu</label>
+          <label htmlFor={typeId} className="text-sm font-medium">Type de contenu</label>
           <Select
             value={filters.type || 'all'}
             onValueChange={(value) =>
               onChange({ type: value as SearchFiltersType['type'] })
             }
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={typeId} className="w-full">
               <SelectValue placeholder="Tous" />
             </SelectTrigger>
             <SelectContent>
@@ -65,14 +70,14 @@ export function SearchFilters({
 
         {/* Tri */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Trier par</label>
+          <label htmlFor={sortById} className="text-sm font-medium">Trier par</label>
           <Select
             value={filters.sortBy || 'date'}
             onValueChange={(value) =>
               onChange({ sortBy: value as SearchFiltersType['sortBy'] })
             }
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={sortById} className="w-full">
               <SelectValue placeholder="Date" />
             </SelectTrigger>
             <SelectContent>
@@ -85,14 +90,14 @@ export function SearchFilters({
 
         {/* Ordre */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Ordre</label>
+          <label htmlFor={sortDirId} className="text-sm font-medium">Ordre</label>
           <Select
             value={filters.sortDir || 'desc'}
             onValueChange={(value) =>
               onChange({ sortDir: value as SearchFiltersType['sortDir'] })
             }
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={sortDirId} className="w-full">
               <SelectValue placeholder="Décroissant" />
             </SelectTrigger>
             <SelectContent>
@@ -105,8 +110,9 @@ export function SearchFilters({
 
       {/* Tags */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Filtrer par tags</label>
+        <label htmlFor={tagsId} className="text-sm font-medium">Filtrer par tags</label>
         <TagInput
+          id={tagsId}
           value={filters.tags || []}
           onChange={(tags) => onChange({ tags })}
           placeholder="Ajouter un tag..."
