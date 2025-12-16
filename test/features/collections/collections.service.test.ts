@@ -53,7 +53,8 @@ describe("collections.service", () => {
     const result = await service.list({ limit: 10 })
 
     expect(client.get).toHaveBeenCalledWith("/collections", { params: { limit: 10 } })
-    expect(result).toHaveLength(1)
+    expect(result.items).toHaveLength(1)
+    expect(result.total).toBe(1)
   })
 
   test("get retourne une collection mappée", async () => {

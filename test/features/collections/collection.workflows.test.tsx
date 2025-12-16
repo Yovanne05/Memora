@@ -92,7 +92,7 @@ describe("hooks collections (workflows)", () => {
     updateMutation.mutateAsync.mockClear()
     deleteMutation.mutateAsync.mockClear()
     mockUseCollectionsListQuery.mockReturnValue({
-      data: [sampleCollection],
+      data: { items: [sampleCollection], total: 1, limit: 10, offset: 0 },
       isPending: false,
       error: null,
       refetch: vi.fn(),

@@ -96,7 +96,12 @@ describe("useUsersQuery hooks", () => {
   test("useCreateUserMutation met à jour le cache liste", async () => {
     const newUser = { ...user, id: "user-2" }
     mockUsersService.create.mockResolvedValue(newUser)
-    queryClient.setQueryData(USERS_QUERY_KEYS.list(), [user])
+    queryClient.setQueryData(USERS_QUERY_KEYS.list(), {
+      items: [user],
+      total: 1,
+      limit: 10,
+      offset: 0,
+    })
 
     const { result } = renderHook(() => useCreateUserMutation(), {
       wrapper: createWrapper(queryClient),
@@ -108,14 +113,19 @@ describe("useUsersQuery hooks", () => {
       password: "password123",
     })
 
-    const cached = queryClient.getQueryData<User[]>(USERS_QUERY_KEYS.list())
-    expect(cached?.[0]).toEqual(newUser)
+    const cached = queryClient.getQueryData<{ items: User[] }>(USERS_QUERY_KEYS.list())
+    expect(cached?.items[0]).toEqual(newUser)
   })
 
   test("useUpdateUserMutation remplace l'utilisateur dans le cache", async () => {
     const updated = { ...user, username: "updated" }
     mockUsersService.update.mockResolvedValue(updated)
-    queryClient.setQueryData(USERS_QUERY_KEYS.list(), [user])
+    queryClient.setQueryData(USERS_QUERY_KEYS.list(), {
+      items: [user],
+      total: 1,
+      limit: 10,
+      offset: 0,
+    })
     queryClient.setQueryData(USERS_QUERY_KEYS.detail(user.id), user)
 
     const { result } = renderHook(() => useUpdateUserMutation(), {
@@ -124,13 +134,19 @@ describe("useUsersQuery hooks", () => {
 
     await result.current.mutateAsync({ id: user.id, data: { username: "updated" } })
 
-    expect(queryClient.getQueryData<User[]>(USERS_QUERY_KEYS.list())).toEqual([updated])
+    const cached = queryClient.getQueryData<{ items: User[] }>(USERS_QUERY_KEYS.list())
+    expect(cached?.items).toEqual([updated])
     expect(queryClient.getQueryData<User>(USERS_QUERY_KEYS.detail(user.id))).toEqual(updated)
   })
 
   test("useDeleteUserMutation retire l'utilisateur du cache", async () => {
     mockUsersService.remove.mockResolvedValue(undefined)
-    queryClient.setQueryData(USERS_QUERY_KEYS.list(), [user])
+    queryClient.setQueryData(USERS_QUERY_KEYS.list(), {
+      items: [user],
+      total: 1,
+      limit: 10,
+      offset: 0,
+    })
     queryClient.setQueryData(USERS_QUERY_KEYS.detail(user.id), user)
 
     const { result } = renderHook(() => useDeleteUserMutation(), {
@@ -139,7 +155,8 @@ describe("useUsersQuery hooks", () => {
 
     await result.current.mutateAsync(user.id)
 
-    expect(queryClient.getQueryData(USERS_QUERY_KEYS.list())).toEqual([])
+    const cached = queryClient.getQueryData<{ items: User[] }>(USERS_QUERY_KEYS.list())
+    expect(cached?.items).toEqual([])
     expect(queryClient.getQueryData(USERS_QUERY_KEYS.detail(user.id))).toBeUndefined()
   })
 

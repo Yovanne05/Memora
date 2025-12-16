@@ -52,7 +52,12 @@ describe("usePublicCollectionsQuery", () => {
   })
 
   test("récupère les collections publiques", async () => {
-    collectionsServiceMock.list.mockResolvedValueOnce(sample)
+    collectionsServiceMock.list.mockResolvedValueOnce({
+      items: sample,
+      total: sample.length,
+      limit: 10,
+      offset: 0,
+    })
 
     const { result } = renderHook(() => usePublicCollectionsQuery(), {
       wrapper: createWrapper(),

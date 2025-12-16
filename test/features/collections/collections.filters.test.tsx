@@ -37,7 +37,7 @@ describe("useCollectionsFilters", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     useCollectionsListQueryMock.mockReturnValue({
-      data: [collection],
+      data: { items: [collection], total: 1, limit: 10, offset: 0 },
       isPending: false,
       error: null,
       refetch: vi.fn(),
