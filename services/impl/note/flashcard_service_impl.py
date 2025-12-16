@@ -19,15 +19,18 @@ from repositorys.flashcard_repository import FlashcardSearchParams
 from services.interfaces.note.flashcard_service_interface import (
     FlashcardServiceInterface,
 )
+from utils.auth import get_current_user
 
 
 class FlashcardService(FlashcardServiceInterface):
     def find_many(self, params: FlashcardSearchParams) -> Tuple[List[FlashcardDTO], int]:
-        flashcards, total = flashcard_repository.find_many(params)
+        user = get_current_user()
+        flashcards, total = flashcard_repository.list_for_user(user, params)
         return [flashcard_to_dto(fc) for fc in flashcards], total
 
     def find_one(self, flashcard_id: str) -> FlashcardDTO:
-        flashcard = flashcard_repository.find_one(flashcard_id)
+        user = get_current_user()
+        flashcard = flashcard_repository.get_for_user(user, flashcard_id)
         if not flashcard:
             raise FlashcardNotFound()
         return flashcard_to_dto(flashcard)
@@ -51,7 +54,7 @@ class FlashcardService(FlashcardServiceInterface):
     def update(
         self, flashcard_id: str, payload: FlashcardUpdateDTO
     ) -> FlashcardDTO:
-        flashcard = flashcard_repository.find_one(flashcard_id)
+        flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:
             raise FlashcardNotFound()
 
@@ -74,7 +77,7 @@ class FlashcardService(FlashcardServiceInterface):
             raise FlashcardNotFound()
 
     def duplicate(self, flashcard_id: str) -> FlashcardDTO:
-        source_flashcard = flashcard_repository.find_one(flashcard_id)
+        source_flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not source_flashcard:
             raise FlashcardNotFound()
 

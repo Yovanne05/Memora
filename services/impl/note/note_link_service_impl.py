@@ -15,14 +15,32 @@ from repositorys.note_link_repository import NoteLinkSearchParams
 from services.interfaces.note.note_link_service_interface import (
     NoteLinkServiceInterface,
 )
+from utils.auth import get_current_user
+from utils.access_scope import accessible_note_ids, can_read_note_links
 
 
 class NoteLinkService(NoteLinkServiceInterface):
     def find_many(
         self, params: NoteLinkSearchParams
     ) -> Tuple[list[NoteLinkDTO], int]:
-        links, total = note_link_repository.find_many(params)
+        user = get_current_user()
         base_note_id = params.note_id
+
+        if base_note_id and not can_read_note_links(user, base_note_id):
+            return [], 0
+
+        links, total = note_link_repository.find_many(params)
+
+        accessible_notes = accessible_note_ids(user)
+        if accessible_notes is not None:
+            if not accessible_notes:
+                return [], 0
+            links = [
+                link for link in links
+                if link.note_id_1 in accessible_notes or link.note_id_2 in accessible_notes
+            ]
+            total = len(links)
+
         return [note_link_to_dto(link, base_note_id) for link in links], total
 
     def create_link(

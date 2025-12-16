@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from daos.flashcard_dao import Flashcard
+from utils.access_scope import accessible_note_ids
 from utils.db import get_db_session
 
 
@@ -20,7 +21,16 @@ class FlashcardSearchParams:
     offset: int = 0
 
 
-def find_many(params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flashcard], int]:
+def _scope_to_user(stmt, user):
+    allowed_note_ids = accessible_note_ids(user)
+    if allowed_note_ids is None:
+        return stmt
+    if not allowed_note_ids:
+        return stmt.where(Flashcard.note_id.is_(None))
+    return stmt.where(Flashcard.note_id.in_(allowed_note_ids))
+
+
+def list_for_user(user, params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flashcard], int]:
     param = params or FlashcardSearchParams()
 
     filters = []
@@ -33,6 +43,8 @@ def find_many(params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flas
 
     stmt = select(Flashcard).where(
         *filters).options(selectinload(Flashcard.answers))
+
+    stmt = _scope_to_user(stmt, user)
 
     sort_map = {
         "question": Flashcard.question,
@@ -52,6 +64,27 @@ def find_many(params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flas
     return items, total or 0
 
 
+def get_for_user(user, flashcard_id: str) -> Optional[Flashcard]:
+    stmt = select(Flashcard).where(Flashcard.id == flashcard_id).options(
+        selectinload(Flashcard.answers)
+    )
+    stmt = _scope_to_user(stmt, user)
+    with get_db_session() as session:
+        return session.execute(stmt).scalar_one_or_none()
+
+
+def find_one_unscoped(flashcard_id: str) -> Optional[Flashcard]:
+    stmt = select(Flashcard).where(Flashcard.id == flashcard_id).options(
+        selectinload(Flashcard.answers)
+    )
+    with get_db_session() as session:
+        return session.execute(stmt).scalar_one_or_none()
+
+
+def find_many(params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flashcard], int]:
+    raise NotImplementedError("Use list_for_user with an authenticated user context.")
+
+
 def find_by_note(note_id: str) -> List[Flashcard]:
     stmt = (
         select(Flashcard)
@@ -63,11 +96,7 @@ def find_by_note(note_id: str) -> List[Flashcard]:
 
 
 def find_one(flashcard_id: str) -> Optional[Flashcard]:
-    stmt = select(Flashcard).where(Flashcard.id == flashcard_id).options(
-        selectinload(Flashcard.answers)
-    )
-    with get_db_session() as session:
-        return session.execute(stmt).scalar_one_or_none()
+    raise NotImplementedError("Use get_for_user or find_one_unscoped explicitly.")
 
 
 def add(flashcard: Flashcard) -> Flashcard:

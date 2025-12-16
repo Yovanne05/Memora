@@ -18,11 +18,20 @@ from repositorys.note_share_repository import NoteShareSearchParams
 from services.interfaces.note.note_share_service_interface import (
     NoteShareServiceInterface,
 )
+from utils.auth import get_current_user
+from utils.access_scope import accessible_note_ids
 
 
 class NoteShareService(NoteShareServiceInterface):
     def find_many(self, params: NoteShareSearchParams) -> Tuple[List[NoteShareDTO], int]:
+        user = get_current_user()
         shares, total = note_share_repository.find_many(params)
+        allowed_notes = accessible_note_ids(user)
+        if allowed_notes is not None:
+            if not allowed_notes:
+                return [], 0
+            shares = [share for share in shares if share.note_id in allowed_notes]
+            total = len(shares)
         return [note_share_to_dto(share) for share in shares], total
 
     def share_note(

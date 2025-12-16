@@ -17,6 +17,8 @@ from exceptions.note_image_exception import (
     NoFileProvided,
     NoteImageNotFound,
 )
+from utils.auth import get_current_user
+from utils.access_scope import can_read_note_image
 
 
 class NoteImageService(NoteImageServiceInterface):
@@ -82,8 +84,8 @@ class NoteImageService(NoteImageServiceInterface):
         return note_image_to_dto(saved_entity)
 
     def list_images(self, note_id: str) -> List[NoteImageDTO]:
-        note = note_repository.find_one_unscoped(note_id)
-        if not note:
+        user = get_current_user()
+        if not can_read_note_image(user, note_id):
             raise NoteNotFound()
 
         images = note_image_repository.find_by_note(note_id)

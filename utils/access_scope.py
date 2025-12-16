@@ -90,3 +90,26 @@ def note_read_ids_for_collections(collection_ids: Iterable[str]) -> Set[str]:
     with get_db_session() as session:
         stmt = select(Note.id).where(Note.collection_id.in_(collection_ids))
         return set(session.scalars(stmt).all())
+
+
+def can_read_note(user, note_id: str) -> bool:
+    return note_permission(user, note_id) != AccessLevel.NONE
+
+
+def can_read_collection(user, collection_id: str) -> bool:
+    return collection_permission(user, collection_id) != AccessLevel.NONE
+
+
+def can_read_flashcard(user, note_id: str) -> bool:
+    # Flashcards inherit read access from their parent note.
+    return can_read_note(user, note_id)
+
+
+def can_read_note_image(user, note_id: str) -> bool:
+    # Note images inherit read access from the note.
+    return can_read_note(user, note_id)
+
+
+def can_read_note_links(user, note_id: str) -> bool:
+    # Access to note links requires access to the base note.
+    return can_read_note(user, note_id)
