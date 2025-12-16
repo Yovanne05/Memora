@@ -12,7 +12,7 @@ import type { PaginatedNoteLinks } from "../types/paginated-note-link"
 export function createNoteLinksService(client: HttpClient = httpClient): INoteLinksService {
   return {
     async list(params?: NoteLinksFilters): Promise<PaginatedNoteLinks> {
-      const data = await client.get<PaginatedNoteLinksDto>(`/notes`, { params })
+      const data = await client.get<PaginatedNoteLinksDto>(`/note-links`, { params })
       return {
         items: (data?.items ?? []).map(dtoToNoteLink),
         total: data?.total ?? 0,
@@ -22,13 +22,13 @@ export function createNoteLinksService(client: HttpClient = httpClient): INoteLi
     },
     async create(noteId: string, payload: CreateNoteLink) {
       const dto = await client.post<NoteLinkDto, CreateNoteLinkDto>(
-        `/notes/${noteId}/links`,
+        `/note-links/${noteId}`,
         toCreateNoteLinkDto(payload)
       )
       return dtoToNoteLink(dto)
     },
     async remove(noteId: string, linkedNoteId: string) {
-      await client.delete<void>(`/notes/${noteId}/links/${linkedNoteId}`)
+      await client.delete<void>(`/note-links/${noteId}/links/${linkedNoteId}`)
     },
   }
 }
