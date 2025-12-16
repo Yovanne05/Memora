@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { vi } from "vitest"
+import type { ReactNode } from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { CollectionsListPage } from "@/features/collections/pages/CollectionsListPage"
 import { CollectionsDetailsPage } from "@/features/collections/pages/CollectionsDetailsPage"
 import type { Collection } from "@/features/collections/models/collection.model"
@@ -106,7 +108,7 @@ vi.mock("@/features/collections/hooks/useCollectionDetails", () => ({
 vi.mock("@tanstack/react-router", () => ({
   useParams: () => ({ id: "col-1" }),
   useRouter: () => ({ navigate: vi.fn() }),
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
 
 vi.mock("@/features/notes/hooks/useNotesQuery", () => ({
@@ -117,9 +119,22 @@ vi.mock("@/features/notes/hooks/useUpdateNoteMutation", () => ({
   useUpdateNoteMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }))
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
 describe("Pages des collections", () => {
   test("CollectionsListPage affiche les cartes depuis les filtres", () => {
-    render(<CollectionsListPage />)
+    render(<CollectionsListPage />, { wrapper: createWrapper() })
     expect(screen.getByText("Titre")).toBeInTheDocument()
   })
 
@@ -130,7 +145,8 @@ describe("Pages des collections", () => {
       error: null,
       reload: vi.fn(),
     })
-    const { rerender } = render(<CollectionsDetailsPage />)
+    const wrapper = createWrapper()
+    const { rerender } = render(<CollectionsDetailsPage />, { wrapper })
     expect(mockDetails).toHaveBeenCalledWith("col-1")
 
     mockDetails.mockReturnValue({
@@ -171,7 +187,7 @@ describe("Pages des collections", () => {
       },
     })
 
-    render(<CollectionsDetailsPage />)
+    render(<CollectionsDetailsPage />, { wrapper: createWrapper() })
     expect(screen.getByText(sampleCollection.name)).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText(/Retour aux collections/))
   })
