@@ -33,7 +33,7 @@ class CollectionShareService(CollectionShareServiceInterface):
     def share_collection(
         self, collection_id: str, share_dto: CollectionShareCreateDTO
     ) -> CollectionShareDTO:
-        collection_entity = collection_repository.find_one(collection_id)
+        collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
         user_entity = user_repository.find_one(share_dto.user_id)
@@ -53,7 +53,7 @@ class CollectionShareService(CollectionShareServiceInterface):
     def update_share(
         self, collection_id: str, user_id: str, share_update_dto: CollectionShareUpdateDTO
     ) -> CollectionShareDTO:
-        collection_entity = collection_repository.find_one(collection_id)
+        collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
         share_entity = collection_share_repository.find_one(
@@ -67,7 +67,7 @@ class CollectionShareService(CollectionShareServiceInterface):
         return collection_share_to_dto(saved)
 
     def revoke_share(self, collection_id: str, user_id: str) -> None:
-        collection_entity = collection_repository.find_one(collection_id)
+        collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
         deleted = collection_share_repository.delete(collection_id, user_id)

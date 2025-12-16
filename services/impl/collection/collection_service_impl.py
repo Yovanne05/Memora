@@ -9,15 +9,18 @@ from repositorys.collection_repository import CollectionSearchParams
 from services.interfaces.collection.collection_service_interface import (CollectionServiceInterface)
 from typing import List, Optional, Tuple
 from repositorys import collection_repository
+from utils.auth import get_current_user
 
 
 class CollectionService(CollectionServiceInterface) :
     def find_many(self, params : Optional[CollectionSearchParams] = None) -> Tuple[List[CollectionDTO], int] :
-        entities, total = collection_repository.find_many(params)
+        user = get_current_user()
+        entities, total = collection_repository.list_for_user(user, params)
         return [collection_to_dto(entity) for entity in entities], total
 
     def find_one(self, collection_id : str) -> CollectionDTO :
-        collection_entity = collection_repository.find_one(collection_id)
+        user = get_current_user()
+        collection_entity = collection_repository.get_for_user(user, collection_id)
         ensure_collection_exists(collection_entity)
         return collection_to_dto(collection_entity)
 
@@ -27,7 +30,7 @@ class CollectionService(CollectionServiceInterface) :
         return collection_to_dto(saved)
 
     def update(self, collection_id : str, collection_update_dto : CollectionUpdateDTO) -> CollectionDTO :
-        collection_entity = collection_repository.find_one(collection_id)
+        collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
         updated_entity = apply_collection_update(collection_entity, collection_update_dto)

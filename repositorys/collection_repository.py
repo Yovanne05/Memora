@@ -7,8 +7,9 @@ from typing_extensions import Literal
 from sqlalchemy import func, select, Select
 from sqlalchemy.orm import selectinload, Session
 
-from daos.collection_dao import Collection, CollectionShare
+from daos.collection_dao import Collection
 from daos.note_dao import Note
+from utils.access_scope import accessible_collection_ids
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -25,6 +26,15 @@ def _reload_with_relationships(session: Session, collection_id: str) -> Collecti
     stmt = select(Collection).where(Collection.id == collection_id)
     stmt = _apply_eager_loading(stmt)
     return session.execute(stmt).scalar_one()
+
+
+def _scope_to_user(stmt: Select, user) -> Select:
+    accessible_ids = accessible_collection_ids(user)
+    if accessible_ids is None:
+        return stmt  # admin-like access
+    if not accessible_ids:
+        return stmt.where(Collection.id.is_(None))  # no access to anything
+    return stmt.where(Collection.id.in_(accessible_ids))
 
 @dataclass
 class CollectionSearchParams :
@@ -44,7 +54,16 @@ class CollectionSearchParams :
     limit : int = 50
     offset : int = 0
     
-def find_one(collection_id: str) -> Optional[Collection]:
+def get_for_user(user, collection_id: str) -> Optional[Collection]:
+    with get_db_session() as session:
+        stmt = select(Collection).where(Collection.id == collection_id)
+        stmt = _scope_to_user(stmt, user)
+        stmt = _apply_eager_loading(stmt)
+        return session.execute(stmt).scalar_one_or_none()
+
+
+def find_one_unscoped(collection_id: str) -> Optional[Collection]:
+    """Temporary helper for non-read flows. Avoid using for GET responses."""
     with get_db_session() as session:
         stmt = select(Collection).where(Collection.id == collection_id)
         stmt = _apply_eager_loading(stmt)
@@ -85,12 +104,10 @@ def delete(collection_id: str) -> bool:
         return True
 
 
-def find_many(params: Optional[CollectionSearchParams] = None) -> Tuple[List[Collection], int]:
+def list_for_user(user, params: Optional[CollectionSearchParams] = None) -> Tuple[List[Collection], int]:
     param = params or CollectionSearchParams()
 
     filters = []
-    if param.owner_id:
-        filters.append(Collection.owner_id == param.owner_id)
 
     if param.visibility:
         filters.append(Collection.visibility == param.visibility)
@@ -107,13 +124,6 @@ def find_many(params: Optional[CollectionSearchParams] = None) -> Tuple[List[Col
 
     stmt = select(Collection)
 
-    if param.shared_with_user_id:
-        stmt = stmt.join(
-            CollectionShare,
-            CollectionShare.collection_id == Collection.id,
-        )
-        filters.append(CollectionShare.user_id == param.shared_with_user_id)
-
     if param.only_with_notes:
         note_exists = (
             select(1)
@@ -123,6 +133,7 @@ def find_many(params: Optional[CollectionSearchParams] = None) -> Tuple[List[Col
         filters.append(note_exists)
 
     stmt = stmt.where(*filters)
+    stmt = _scope_to_user(stmt, user)
 
     sort_map = {
         "title": Collection.name,
