@@ -28,7 +28,7 @@ def test_delete_nonexistent_image_returns_404(client_with_note_data):
 
 
 def test_delete_image_for_nonexistent_note_returns_404(client_with_note_data):
-    client, data = client_with_note_data
+    client, _ = client_with_note_data
 
     fake_note_id = str(uuid4())
 

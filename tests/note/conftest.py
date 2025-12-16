@@ -6,6 +6,9 @@ import pytest
 from werkzeug.test import Client
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
+# Test constants
+TEST_PASSWORD_PREFIX = "TestPwd"
+
 
 @pytest.fixture(autouse=True)
 def disable_swagger(monkeypatch):
@@ -60,7 +63,7 @@ class NoteTestData:
         unique = uuid4().hex[:8]
         payload = {
             "email": f"{label}-{self.base_slug}-{unique}@example.com",
-            "password": f"TestPwd-{self.base_slug}-{unique}-1!",
+            "password": f"{TEST_PASSWORD_PREFIX}-{self.base_slug}-{unique}-1!", # NOSONAR
             "username": f"{label}-{self.base_slug}-{unique}",
             "display_name": f"{label.capitalize()} user {unique}",
             "role": RoleEnum.CLIENT.value,
@@ -73,7 +76,7 @@ class NoteTestData:
         self._user_credentials[user_id] = {
             "email": payload["email"],
             "username": payload["username"],
-            "password": payload["password"],
+            "password": payload["password"], # NOSONAR
         }
         return user_id
 
@@ -83,7 +86,7 @@ class NoteTestData:
             "/auth/login",
             json={
                 "identifier": creds["email"],
-                "password": creds["password"],
+                "password": creds["password"], # NOSONAR
             },
         )
         assert response.status_code == 200, response.get_data(as_text=True)

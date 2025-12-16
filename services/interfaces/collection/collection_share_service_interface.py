@@ -11,12 +11,15 @@ class CollectionShareServiceInterface(Protocol):
     def share_collection(
         self, collection_id: str, share_dto: CollectionShareCreateDTO
     ) -> CollectionShareDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def update_share(
         self, collection_id: str, user_id: str, share_update_dto: CollectionShareUpdateDTO
     ) -> CollectionShareDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def revoke_share(self, collection_id: str, user_id: str) -> None:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...

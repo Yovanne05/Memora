@@ -1,11 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
-from utils.security import is_password_strong
-
-PASSWORD_RULE_MESSAGE = (
-    "Password must be at least 8 characters and include one uppercase letter, "
-    "one digit, and one special character."
-)
+from utils.security import is_password_strong, PASSWORD_VALIDATION_ERROR
 
 
 class RegisterDTO(BaseModel):
@@ -16,11 +11,11 @@ class RegisterDTO(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    @field_validator("password")
+    @field_validator("password") # NOSONAR - field name, not a hard-coded credential
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not is_password_strong(value):
-            raise ValueError(PASSWORD_RULE_MESSAGE)
+            raise ValueError(PASSWORD_VALIDATION_ERROR)
         return value
 
 
@@ -30,9 +25,9 @@ class LoginDTO(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    @field_validator("password")
+    @field_validator("password") # NOSONAR - field name, not a hard-coded credential
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not is_password_strong(value):
-            raise ValueError(PASSWORD_RULE_MESSAGE)
+            raise ValueError(PASSWORD_VALIDATION_ERROR)
         return value

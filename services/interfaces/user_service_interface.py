@@ -8,16 +8,21 @@ class UserServiceInterface(Protocol):
     def find_many(
         self, params: Optional[UserSearchParams] = None
     ) -> Tuple[List[UserDTO], int]:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def find_one(self, user_id: str) -> UserDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def create(self, user_create_dto: UserCreateDTO) -> UserDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def update(self, user_id: str, user_update_dto: UserUpdateDTO) -> UserDTO:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...
 
     def delete(self, user_id: str) -> None:
-        pass
+        """Protocol method - implemented by concrete service"""
+        ...

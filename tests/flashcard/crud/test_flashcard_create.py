@@ -87,7 +87,7 @@ def test_create_flashcard_without_correct_answer_returns_400(client_with_note_da
 
 
 def test_create_flashcard_for_nonexistent_note_returns_404(client_with_note_data):
-    client, data = client_with_note_data
+    client, _ = client_with_note_data
     payload = {
         "question": "Test",
         "answers": [{"answer_text": "Answer", "is_correct": True}],
