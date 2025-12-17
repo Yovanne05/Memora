@@ -81,7 +81,7 @@ def _create_user(email_prefix: str) -> User:
         email=f"{email_prefix}-{unique}@example.com",
         username=f"{email_prefix}-{unique}",
         display_name=f"{email_prefix} user",
-        password_hash="test-hash",
+        password_hash="test-hash", # NOSONAR
         role=RoleEnum.CLIENT,
     )
     return user_repository.add(user)
