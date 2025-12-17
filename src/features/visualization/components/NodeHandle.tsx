@@ -14,7 +14,7 @@ const createHandleId = (side: HandleSide, type: HandleType): string => {
   return `${side}-${type}`
 }
 
-export function NodeHandle({ position, side }: NodeHandleProps) {
+export function NodeHandle({ position, side }: Readonly<NodeHandleProps>) {
   return (
     <>
       <Handle

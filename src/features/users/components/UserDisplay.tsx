@@ -6,7 +6,7 @@ interface UserDisplayProps {
   fallback?: string
 }
 
-export function UserDisplay({ userId, fallback = "Utilisateur inconnu" }: UserDisplayProps) {
+export function UserDisplay({ userId, fallback = "Utilisateur inconnu" }: Readonly<UserDisplayProps>) {
   const { data: user, isLoading, isError } = useUserDetails(userId)
 
   if (isLoading) {
@@ -17,5 +17,5 @@ export function UserDisplay({ userId, fallback = "Utilisateur inconnu" }: UserDi
     return <span className="text-muted-foreground">{fallback}</span>
   }
 
-  return <span>{user.username || user.email || fallback}</span>
+  return <span>{user.username ?? user.email ?? fallback}</span>
 }

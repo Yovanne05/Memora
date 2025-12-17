@@ -1,5 +1,4 @@
-import type { Collection } from "../models/collection.model"
-import type { CollectionVisibility } from "../models/collection.model"
+import type { Collection, CollectionVisibility } from "../models/collection.model"
 
 export type CollectionsTab = "mine" | "shared"
 export type CollectionsSort = "recent" | "alphabetical" | "notes-count"

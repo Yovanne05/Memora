@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button"
 import { CollectionsKeyboardHelp } from "./CollectionsKeyboardHelp"
 
 interface CollectionsPageActionsProps {
-  selectionMode: boolean
-  onToggleSelectionMode: () => void
-  onCreateClick: () => void
+  readonly selectionMode: boolean
+  readonly onToggleSelectionMode: () => void
+  readonly onCreateClick: () => void
 }
 
 export function CollectionsPageActions({
   selectionMode,
   onToggleSelectionMode,
   onCreateClick,
-}: CollectionsPageActionsProps) {
+}: Readonly<CollectionsPageActionsProps>) {
   return (
     <div className="flex gap-2">
       <CollectionsKeyboardHelp />

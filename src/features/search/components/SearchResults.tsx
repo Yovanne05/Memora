@@ -4,11 +4,11 @@ import type { SearchResult } from '../types/search.types'
 import { cn } from '@/lib/utils'
 
 interface SearchResultsProps {
-  results: SearchResult[]
-  isLoading?: boolean
-  isEmpty?: boolean
-  hasSearched?: boolean
-  className?: string
+  readonly results: SearchResult[]
+  readonly isLoading?: boolean
+  readonly isEmpty?: boolean
+  readonly hasSearched?: boolean
+  readonly className?: string
 }
 
 export function SearchResults({
@@ -17,7 +17,7 @@ export function SearchResults({
   isEmpty,
   hasSearched,
   className,
-}: SearchResultsProps) {
+}: Readonly<SearchResultsProps>) {
   if (isLoading) {
     return (
       <div className={cn('flex flex-col items-center justify-center py-12', className)}>
@@ -52,8 +52,8 @@ export function SearchResults({
 
   return (
     <div className={cn('grid gap-4 sm:grid-cols-2 lg:grid-cols-3', className)}>
-      {results.map((result, index) => (
-        <SearchResultCard key={`${result.type}-${result.item.id}-${index}`} result={result} />
+      {results.map((result) => (
+        <SearchResultCard key={`${result.type}-${result.item.id}`} result={result} />
       ))}
     </div>
   )

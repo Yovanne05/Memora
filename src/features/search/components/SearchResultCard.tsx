@@ -9,7 +9,7 @@ import type { Note } from '@/features/notes/models/note.model'
 import { VISIBILITY_LABELS, VISIBILITY_BADGE_CLASSES, formatShortDate } from '@/lib/format.utils'
 
 interface SearchResultCardProps {
-  result: SearchResult
+  readonly result: SearchResult
 }
 
 function isCollection(item: Collection | Note): item is Collection {
@@ -20,7 +20,7 @@ function isNote(item: Collection | Note): item is Note {
   return 'content' in item
 }
 
-export function SearchResultCard({ result }: SearchResultCardProps) {
+export function SearchResultCard({ result }: Readonly<SearchResultCardProps>) {
   const { type, item } = result
 
   if (type === 'collection' && isCollection(item)) {

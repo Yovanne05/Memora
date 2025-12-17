@@ -18,10 +18,10 @@ import type { Note } from "../models/note.model"
 import type { NoteLink } from "../models/note-link.model"
 
 interface NoteLinkDialogProps {
-  note: Note
-  existingLinks: NoteLink[]
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  readonly note: Note
+  readonly existingLinks: NoteLink[]
+  readonly open: boolean
+  readonly onOpenChange: (open: boolean) => void
 }
 
 export function NoteLinkDialog({
@@ -29,7 +29,7 @@ export function NoteLinkDialog({
   existingLinks,
   open,
   onOpenChange
-}: NoteLinkDialogProps) {
+}: Readonly<NoteLinkDialogProps>) {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
 
@@ -114,6 +114,7 @@ export function NoteLinkDialog({
 
             {!isLoading && availableNotes.map(availableNote => (
               <button
+                type="button"
                 key={availableNote.id}
                 onClick={() => setSelectedNoteId(availableNote.id)}
                 className={`w-full text-left p-4 border-b last:border-b-0 hover:bg-accent transition-colors ${

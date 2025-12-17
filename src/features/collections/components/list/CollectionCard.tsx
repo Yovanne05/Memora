@@ -48,14 +48,18 @@ export const CollectionCard = memo(function CollectionCard({
   }, [router, collection.id])
 
   const handleCardClick = useCallback(() => {
+    if (onCardClick) {
+      onCardClick(collection)
+      return
+    }
+
     if (selectionMode && onToggleSelection) {
       onToggleSelection(collection.id)
-    } else if (onCardClick) {
-      onCardClick(collection)
-    } else {
-      handleNavigate()
+      return
     }
-  }, [selectionMode, onToggleSelection, onCardClick, collection, handleNavigate])
+
+    handleNavigate()
+  }, [onCardClick, selectionMode, onToggleSelection, collection, handleNavigate])
 
   const handleEdit = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()

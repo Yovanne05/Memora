@@ -24,7 +24,7 @@ import { ApiError, NetworkError, TimeoutError } from "@/lib/errors"
 
 const registerSchema = z.object({
   displayName: z.string().min(2, "Indiquez votre nom ou pseudo."),
-  email: z.string().email("Email invalide."),
+  email: z.email("Email invalide."),
   username: z.string().min(3, "Nom d'utilisateur trop court.").max(50, "Nom d'utilisateur trop long."),
   password: z.string().min(8, "Au moins 8 caractères sont requis."),
 })
@@ -102,7 +102,7 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-500/15 via-amber-400/10 to-sky-600/15">
+    <div className="min-h-screen bg-linear-to-br from-emerald-500/15 via-amber-400/10 to-sky-600/15">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row lg:items-center">
         <div className="hidden flex-1 flex-col gap-6 rounded-2xl border bg-background/60 p-10 shadow-lg backdrop-blur lg:flex">
           <div className="text-sm font-semibold uppercase tracking-[0.35em] text-muted-foreground">
@@ -247,7 +247,7 @@ function RegisterPage() {
   )
 }
 
-function Highlight({ title, description }: { title: string; description: string }) {
+function Highlight({ title, description }: { readonly title: string; readonly description: string }) {
   return (
     <div className="rounded-xl border bg-card/70 p-4 shadow-sm backdrop-blur">
       <div className="text-sm font-semibold">{title}</div>

@@ -52,7 +52,7 @@ export function SearchFilters({
         <div className="space-y-2">
           <label htmlFor={typeId} className="text-sm font-medium">Type de contenu</label>
           <Select
-            value={filters.type || 'all'}
+            value={filters.type ?? 'all'}
             onValueChange={(value) =>
               onChange({ type: value as SearchFiltersType['type'] })
             }
@@ -72,7 +72,7 @@ export function SearchFilters({
         <div className="space-y-2">
           <label htmlFor={sortById} className="text-sm font-medium">Trier par</label>
           <Select
-            value={filters.sortBy || 'date'}
+            value={filters.sortBy ?? 'date'}
             onValueChange={(value) =>
               onChange({ sortBy: value as SearchFiltersType['sortBy'] })
             }
@@ -92,7 +92,7 @@ export function SearchFilters({
         <div className="space-y-2">
           <label htmlFor={sortDirId} className="text-sm font-medium">Ordre</label>
           <Select
-            value={filters.sortDir || 'desc'}
+            value={filters.sortDir ?? 'desc'}
             onValueChange={(value) =>
               onChange({ sortDir: value as SearchFiltersType['sortDir'] })
             }
@@ -113,7 +113,7 @@ export function SearchFilters({
         <label htmlFor={tagsId} className="text-sm font-medium">Filtrer par tags</label>
         <TagInput
           id={tagsId}
-          value={filters.tags || []}
+          value={filters.tags ?? []}
           onChange={(tags) => onChange({ tags })}
           placeholder="Ajouter un tag..."
           maxTags={10}
