@@ -1,0 +1,276 @@
+import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { vi } from "vitest"
+import type { ReactNode, MouseEvent as ReactMouseEvent } from "react"
+
+import { CollectionVisualizationView } from "@/features/visualization/components/CollectionVisualizationView"
+import type { Note } from "@/features/notes/models/note.model"
+import type {
+  ReactFlowNode,
+  ReactFlowEdge,
+} from "@/features/visualization/types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
+
+interface OrphanNotesZoneProps {
+  orphanNodeIds: Set<string>
+  onSelect?: (id: string) => void
+}
+
+interface VisualizationHeaderProps {
+  notesCount: number
+  connectionsCount: number
+}
+
+interface NoteSidebarProps {
+  open: boolean
+  onClose: () => void
+  relatedNotes: Note[]
+}
+
+interface ReactFlowProps {
+  nodes: ReactFlowNode[]
+  edges: ReactFlowEdge[]
+  onNodeClick?: (event: ReactMouseEvent, node: ReactFlowNode) => void
+  onPaneClick?: (event: ReactMouseEvent) => void
+}
+
+const mockUseCollectionVisualizationQuery = vi.hoisted(() => vi.fn())
+const mockUseVisualizationLayout = vi.hoisted(() => vi.fn())
+const mockUseNodeSelection = vi.hoisted(() => vi.fn())
+const mockUseNoteSidebar = vi.hoisted(() => vi.fn())
+const mockUseRelatedNotes = vi.hoisted(() => vi.fn())
+const mockUseNoteQuery = vi.hoisted(() => vi.fn())
+
+vi.mock("@/features/visualization/hooks/useCollectionVisualizationQuery", () => ({
+  useCollectionVisualizationQuery: (...args: unknown[]) =>
+    mockUseCollectionVisualizationQuery(...args),
+}))
+
+vi.mock("@/features/visualization/hooks/useVisualizationLayout", () => ({
+  useVisualizationLayout: (...args: unknown[]) => mockUseVisualizationLayout(...args),
+}))
+
+vi.mock("@/features/visualization/hooks/useNodeSelection", () => ({
+  useNodeSelection: (...args: unknown[]) => mockUseNodeSelection(...args),
+}))
+
+vi.mock("@/features/visualization/hooks/useNoteSidebar", () => ({
+  useNoteSidebar: () => mockUseNoteSidebar(),
+}))
+
+vi.mock("@/features/visualization/hooks/useRelatedNotes", () => ({
+  useRelatedNotes: (...args: unknown[]) => mockUseRelatedNotes(...args),
+}))
+
+vi.mock("@/features/notes/hooks/useNoteQuery", () => ({
+  useNoteQuery: (...args: unknown[]) => mockUseNoteQuery(...args),
+}))
+
+vi.mock("@/components/ui/empty-state", () => ({
+  EmptyState: ({ message }: { message: string }) => (
+    <div data-testid="empty-state">{message}</div>
+  ),
+}))
+
+vi.mock("@/components/ui/error-state", () => ({
+  ErrorState: ({ message }: { message: string }) => (
+    <div data-testid="error-state">{message}</div>
+  ),
+}))
+
+vi.mock("@/features/visualization/components/VisualizationSkeleton", () => ({
+  LoadingState: ({ message }: { message: string }) => (
+    <div data-testid="loading-state">{message}</div>
+  ),
+}))
+
+vi.mock("@/features/visualization/components/OrphanNotesZone", () => ({
+  OrphanNotesZone: ({ orphanNodeIds, onSelect }: OrphanNotesZoneProps) => (
+    <button data-testid="orphan-zone" onClick={() => onSelect?.("orphan-click")}>
+      {`Orphelins: ${orphanNodeIds.size}`}
+    </button>
+  ),
+}))
+
+vi.mock("@/features/visualization/components/VisualizationLegend", () => ({
+  VisualizationLegend: () => <div data-testid="legend" />,
+}))
+
+vi.mock("@/features/visualization/components/VisualizationHeader", () => ({
+  VisualizationHeader: ({ notesCount, connectionsCount }: VisualizationHeaderProps) => (
+    <div data-testid="header">{`${notesCount}-${connectionsCount}`}</div>
+  ),
+}))
+
+vi.mock("@/features/notes/components/NoteSidebar", () => ({
+  NoteSidebar: ({ open, onClose, relatedNotes }: NoteSidebarProps) => (
+    <div data-testid="note-sidebar">
+      {open ? "open" : "closed"}
+      <button onClick={onClose}>close</button>
+      <span>{relatedNotes.length}</span>
+    </div>
+  ),
+}))
+
+vi.mock("@tanstack/react-router", () => ({
+  useParams: () => ({ id: "col-1" }),
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
+}))
+
+vi.mock("reactflow", () => ({
+  __esModule: true,
+  default: ({ nodes, edges, onNodeClick, onPaneClick }: ReactFlowProps) => (
+    <div data-testid="reactflow" onClick={(e) => onPaneClick?.(e)}>
+      <div data-testid="nodes-count">{nodes.length}</div>
+      <div data-testid="edges-count">{edges.length}</div>
+
+      {nodes.map((node) => (
+        <button key={node.id} onClick={(e) => onNodeClick?.(e, node)}>
+          {node.id}
+        </button>
+      ))}
+    </div>
+  ),
+  Background: () => null,
+  Controls: () => null,
+  MiniMap: () => null,
+  Position: { Top: "top", Right: "right", Bottom: "bottom", Left: "left" },
+}))
+
+const sampleData: Collection = {
+  id: "c1",
+  ownerId: "owner",
+  name: "Sample Collection",
+  description: null,
+  visibility: "private",
+  tags: [],
+  notes: [],
+  nodes: [
+    {
+      id: "n1",
+      data: { label: "N1", note_id: "n1", title: "N1", tags: [] },
+    },
+    {
+      id: "orphan",
+      data: { label: "Orphan", note_id: "orphan", title: "Orphan", tags: [] },
+    },
+  ],
+  edges: [{ id: "e1", source: "n1", target: "orphan" }],
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-02T00:00:00.000Z",
+}
+
+describe("CollectionVisualizationView", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    mockUseNoteSidebar.mockReturnValue({
+      isOpen: false,
+      activeNoteId: null,
+      openWithNote: vi.fn(),
+      close: vi.fn(),
+    })
+
+    mockUseRelatedNotes.mockReturnValue([])
+    mockUseNoteQuery.mockReturnValue({ data: null })
+
+    mockUseVisualizationLayout.mockReturnValue({
+      nodes: [],
+      edges: [],
+      orphanNodeIds: new Set<string>(),
+    })
+
+    mockUseNodeSelection.mockReturnValue({
+      selectedNodeId: null,
+      styledNodes: [],
+      styledEdges: [],
+      selectNode: vi.fn(),
+      clearSelection: vi.fn(),
+    })
+  })
+
+  test("affiche l'état vide sans collectionId", () => {
+    mockUseCollectionVisualizationQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+    })
+
+    const { getByTestId } = render(
+      <CollectionVisualizationView collectionId={undefined} />
+    )
+
+    expect(getByTestId("empty-state")).toBeInTheDocument()
+  })
+
+  test("affiche le chargement puis l'erreur", () => {
+    mockUseCollectionVisualizationQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+    })
+
+    const { rerender } = render(<CollectionVisualizationView collectionId="c1" />)
+    expect(screen.getByTestId("loading-state")).toBeInTheDocument()
+
+    mockUseCollectionVisualizationQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+    })
+
+    rerender(<CollectionVisualizationView collectionId="c1" />)
+    expect(screen.getByTestId("error-state")).toBeInTheDocument()
+  })
+
+  test("affiche la visualisation avec nodes/edges et interactions", async () => {
+    const user = userEvent.setup()
+
+    const selectNode = vi.fn()
+    const clearSelection = vi.fn()
+
+    const sidebar = {
+      isOpen: false,
+      activeNoteId: null,
+      openWithNote: vi.fn(),
+      close: vi.fn(),
+    }
+
+    mockUseNoteSidebar.mockReturnValue(sidebar)
+
+    mockUseCollectionVisualizationQuery.mockReturnValue({
+      data: sampleData,
+      isLoading: false,
+      isError: false,
+    })
+
+    mockUseVisualizationLayout.mockReturnValue({
+      nodes: [{ id: "n1" }],
+      edges: [{ id: "e1", source: "n1", target: "orphan" }],
+      orphanNodeIds: new Set<string>(["orphan"]),
+    })
+
+    mockUseNodeSelection.mockReturnValue({
+      selectedNodeId: null,
+      styledNodes: [{ id: "n1", data: { title: "N1", connections: 1 } }],
+      styledEdges: [{ id: "e1", source: "n1", target: "orphan" }],
+      selectNode,
+      clearSelection,
+    })
+
+    render(<CollectionVisualizationView collectionId="c1" onBack={vi.fn()} />)
+
+    expect(screen.getByTestId("header")).toHaveTextContent("1-1")
+    expect(screen.getByTestId("legend")).toBeInTheDocument()
+    expect(screen.getByTestId("orphan-zone")).toHaveTextContent("1")
+    expect(screen.getByTestId("note-sidebar")).toHaveTextContent("closed")
+
+    await user.click(screen.getByText("n1"))
+    expect(selectNode).toHaveBeenCalledWith("n1")
+    expect(sidebar.openWithNote).toHaveBeenCalledWith("n1")
+
+    await user.click(screen.getByTestId("reactflow"))
+    expect(clearSelection).toHaveBeenCalled()
+    expect(sidebar.close).toHaveBeenCalled()
+  })
+})
