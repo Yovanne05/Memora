@@ -1,7 +1,7 @@
 definitions:
   AuthRegisterPayload:
     type: object
-    required: ["email", "password"]
+    required: ["email", "password"] # NOSONAR
     properties:
       email:
         type: string
@@ -36,7 +36,7 @@ definitions:
 
   AuthLoginPayload:
     type: object
-    required: ["identifier", "password"]
+    required: ["identifier", "password"] # NOSONAR
     properties:
       identifier:
         type: string

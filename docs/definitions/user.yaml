@@ -43,7 +43,7 @@ definitions:
 
   UserCreatePayload:
     type: object
-    required: ["email", "password"]
+    required: ["email", "password"] # NOSONAR
     properties:
       email:
         type: string

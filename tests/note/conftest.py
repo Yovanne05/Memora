@@ -7,7 +7,7 @@ from werkzeug.test import Client
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 # Test constants
-TEST_PASSWORD_PREFIX = "TestPwd"
+TEST_PASSWORD_PREFIX = "TestPwd" # NOSONAR
 
 
 @pytest.fixture(autouse=True)
