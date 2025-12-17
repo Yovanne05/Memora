@@ -1,0 +1,115 @@
+definitions:
+  User:
+    type: object
+    description: Profil d'utilisateur expose par l'API MEMORA.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique.
+        example: "d9aeac85-71b5-4fd8-b7fd-58ab2e07f05b"
+      email:
+        type: string
+        format: email
+        description: Adresse e-mail verifiee de l'utilisateur.
+        example: "lea.dupont@example.com"
+      username:
+        type: string
+        nullable: true
+        description: Alias public (unique mais facultatif).
+        example: "leadu"
+      display_name:
+        type: string
+        nullable: true
+        description: Nom complet ou pseudo long affiche dans l'interface.
+        example: "Lea Dupont"
+      role:
+        type: string
+        enum: ["client", "admin", "super_admin"]
+        description: Niveau d'autorisation du compte.
+        example: "client"
+      last_login:
+        type: string
+        format: date-time
+        nullable: true
+        description: Derniere connexion reussie.
+        example: "2025-06-01T10:00:00Z"
+      created_at:
+        type: string
+        format: date-time
+        description: Date d'inscription.
+        example: "2025-05-15T08:22:44Z"
+    required: ["id", "email", "created_at", "role"]
+
+  UserCreatePayload:
+    type: object
+    required: ["email", "password"] # NOSONAR
+    properties:
+      email:
+        type: string
+        format: email
+        description: Adresse e-mail unique de connexion.
+      password:
+        type: string
+        format: password
+        minLength: 8
+        description: Mot de passe en clair (sera hash avant stockage).
+      username:
+        type: string
+        minLength: 3
+        maxLength: 50
+        nullable: true
+        description: Alias court a afficher publiquement.
+      display_name:
+        type: string
+        maxLength: 100
+        nullable: true
+        description: Nom complet ou signature.
+      role:
+        type: string
+        enum: ["client", "admin", "super_admin"]
+        default: "client"
+        description: Role attribue au compte (defaut client).
+
+  UserUpdatePayload:
+    type: object
+    description: Champs modifiables du profil.
+    properties:
+      email:
+        type: string
+        format: email
+        description: Nouvelle adresse e-mail.
+      password:
+        type: string
+        format: password
+        minLength: 8
+        description: Nouveau mot de passe (si fourni).
+      username:
+        type: string
+        minLength: 3
+        maxLength: 50
+        nullable: true
+        description: Nouvel alias public (mettre null pour le retirer).
+      display_name:
+        type: string
+        maxLength: 100
+        nullable: true
+        description: Nouveau nom d'affichage (null pour effacer).
+      role:
+        type: string
+        enum: ["client", "admin", "super_admin"]
+        description: Nouveau role a appliquer.
+
+  UserListResponse:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total d'utilisateurs correspondant aux filtres.
+        example: 42
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/User"
+    required: ["total", "items"]

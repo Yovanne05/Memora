@@ -6,6 +6,9 @@ python-dotenv==1.0.0
 email-validator>=1.3.1
 bcrypt
 flask_jwt_extended==4.6.0
+flask-limiter==3.10.1
 pytz
-pymysql
+psycopg2-binary
 SQLAlchemy
+cryptography
+pytest

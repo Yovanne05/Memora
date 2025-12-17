@@ -1,0 +1,29 @@
+tags:
+  - collection-shares
+summary: Partager une collection avec un utilisateur
+description: >
+  Cree une entree de partage pour donner un acces en lecture ou ecriture
+  a un autre utilisateur.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Collection a partager.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/CollectionShareCreatePayload"
+responses:
+  201:
+    description: Partage cree.
+    schema:
+      $ref: "#/definitions/CollectionShare"
+  404:
+    description: Collection introuvable.
+  409:
+    description: Ce destinataire possede deja un partage pour cette collection.
+  422:
+    description: Utilisateur cible invalide ou tentative de partage avec le proprietaire.

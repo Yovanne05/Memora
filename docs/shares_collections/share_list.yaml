@@ -1,0 +1,20 @@
+tags:
+  - collection-shares
+summary: Lister les partages d'une collection
+description: >
+  Retourne les utilisateurs avec lesquels la collection est partagee
+  ainsi que leur niveau de permission.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la collection.
+responses:
+  200:
+    description: Liste des partages.
+    schema:
+      $ref: "#/definitions/CollectionShareListResponse"
+  404:
+    description: Collection introuvable.

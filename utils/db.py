@@ -2,10 +2,10 @@ from contextlib import contextmanager
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, Session
 from sqlalchemy import create_engine
 from typing import Generator
-from config import SQLALCHEMY_DATABASE_URI
+from config import get_database_uri
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URI,
+    get_database_uri(),
     echo=False,
     future=True,
     pool_pre_ping=True,
@@ -36,3 +36,11 @@ def get_db_session() -> Generator[Session, None, None]:
         raise
     finally:
         session.close()
+
+
+def create_all() -> None:
+    Base.metadata.create_all(bind=engine)
+
+
+def drop_all() -> None:
+    Base.metadata.drop_all(bind=engine)

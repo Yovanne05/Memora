@@ -1,0 +1,20 @@
+tags:
+  - notes
+summary: Lister les liens d'une note
+description: >
+  Retourne toutes les notes reliées à la note demandée. Les liens sont limités aux
+  notes d'une même collection.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+responses:
+  200:
+    description: Liste des liens.
+    schema:
+      $ref: "#/definitions/NoteLinkListResponse"
+  404:
+    description: Note introuvable.

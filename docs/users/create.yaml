@@ -1,0 +1,17 @@
+tags:
+  - users
+summary: Créer un utilisateur
+description: Inscrit un nouvel utilisateur avec une adresse e-mail unique.
+parameters:
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/UserCreatePayload"
+responses:
+  201:
+    description: Utilisateur créé.
+    schema:
+      $ref: "#/definitions/User"
+  409:
+    description: L’e-mail ou le nom d’utilisateur est déjà utilisé.

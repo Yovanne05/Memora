@@ -1,0 +1,19 @@
+tags:
+  - flashcards
+summary: Récupérer une flashcard
+description: >
+  Retourne les détails d'une flashcard spécifique par son identifiant.
+parameters:
+  - in: path
+    name: flashcard_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la flashcard.
+responses:
+  200:
+    description: Flashcard trouvée.
+    schema:
+      $ref: "#/definitions/Flashcard"
+  404:
+    description: Flashcard introuvable.

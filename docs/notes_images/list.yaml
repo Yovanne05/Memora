@@ -1,0 +1,44 @@
+tags:
+  - note-images
+summary: Lister toutes les images d'une note
+description: >
+  Retourne la liste de toutes les images associées à une note.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+responses:
+  200:
+    description: Liste des images retournée avec succès.
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: "abc-123-456"
+          note_id:
+            type: string
+            example: "note-uuid-123"
+          file_name:
+            type: string
+            example: "image-uuid.jpg"
+          file_path:
+            type: string
+            example: "uploads/notes/note-uuid-123/image-uuid.jpg"
+          file_size:
+            type: integer
+            example: 204800
+          mime_type:
+            type: string
+            example: "image/jpeg"
+          uploaded_at:
+            type: string
+            format: date-time
+            example: "2025-12-14T10:30:00.000000Z"
+  404:
+    description: Note introuvable.
