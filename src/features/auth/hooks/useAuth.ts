@@ -23,8 +23,8 @@ export function useAuth() {
 
   useEffect(() => {
     const handleStorage = () => setToken(getAccessToken())
-    window.addEventListener("storage", handleStorage)
-    return () => window.removeEventListener("storage", handleStorage)
+    globalThis.window.addEventListener("storage", handleStorage)
+    return () => globalThis.window.removeEventListener("storage", handleStorage)
   }, [])
 
   useEffect(() => {

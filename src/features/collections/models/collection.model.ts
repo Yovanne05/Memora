@@ -25,6 +25,7 @@ export interface Collection {
   visibility: CollectionVisibility
   tags: string[]
   notes: Note[]
+  notesCount?: number
   nodes: GraphNode[]
   edges: GraphEdge[]
   createdAt: string
