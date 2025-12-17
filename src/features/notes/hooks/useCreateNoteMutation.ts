@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 
 import { notesService } from "../services/notes.service"
 import type { Note, NoteCreate } from "../models/note.model"
@@ -10,7 +10,8 @@ type NoteCreateInput = Omit<NoteCreate, "ownerId"> & Partial<Pick<NoteCreate, "o
 
 export function useCreateNoteMutation(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient()
-  const { userId } = useCurrentUser()
+  const { user } = useAuth()
+  const userId = user?.id
 
   return useMutation({
     mutationFn: (payload: NoteCreateInput) => {
