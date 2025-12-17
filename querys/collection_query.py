@@ -34,8 +34,8 @@ class CollectionFindQuery(BaseModel) :
 
     def to_params(self) -> CollectionSearchParams :
         return CollectionSearchParams(
-            owner_id = str(self.owner_id) if self.owner_id else None,
-            shared_with_user_id=str(self.shared_with_user_id) if self.shared_with_user_id else None,
+            owner_id = None,
+            shared_with_user_id=None,
             visibility = self.visibility,
             title_contains = self.title_contains,
             only_with_notes = self.only_with_notes,

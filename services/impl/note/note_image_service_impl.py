@@ -17,6 +17,8 @@ from exceptions.note_image_exception import (
     NoFileProvided,
     NoteImageNotFound,
 )
+from utils.auth import get_current_user
+from utils.access_scope import can_read_note_image
 
 
 class NoteImageService(NoteImageServiceInterface):
@@ -40,7 +42,7 @@ class NoteImageService(NoteImageServiceInterface):
         return size <= self.MAX_FILE_SIZE
 
     def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
-        note = note_repository.find_one(note_id)
+        note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
 
@@ -82,15 +84,15 @@ class NoteImageService(NoteImageServiceInterface):
         return note_image_to_dto(saved_entity)
 
     def list_images(self, note_id: str) -> List[NoteImageDTO]:
-        note = note_repository.find_one(note_id)
-        if not note:
+        user = get_current_user()
+        if not can_read_note_image(user, note_id):
             raise NoteNotFound()
 
         images = note_image_repository.find_by_note(note_id)
         return [note_image_to_dto(img) for img in images]
 
     def delete_image(self, note_id: str, filename: str) -> None:
-        note = note_repository.find_one(note_id)
+        note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
 

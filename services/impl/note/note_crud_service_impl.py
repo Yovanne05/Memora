@@ -21,17 +21,20 @@ from repositorys.note_repository import NoteSearchParams
 from services.interfaces.note.note_crud_service_interface import (
     NoteCrudServiceInterface,
 )
+from utils.auth import get_current_user
 
 
 class NoteCrudService(NoteCrudServiceInterface):
     def find_many(
         self, params: Optional[NoteSearchParams] = None
     ) -> Tuple[List[NoteDTO], int]:
-        entities, total = note_repository.find_many(params)
+        user = get_current_user()
+        entities, total = note_repository.list_for_user(user, params)
         return [note_to_dto(entity) for entity in entities], total
 
     def find_one(self, note_id: str) -> NoteDTO:
-        note_entity = note_repository.find_one(note_id)
+        user = get_current_user()
+        note_entity = note_repository.get_for_user(user, note_id)
         ensure_note_exists(note_entity)
         return note_to_dto(note_entity)
 
@@ -59,7 +62,7 @@ class NoteCrudService(NoteCrudServiceInterface):
     def update(
         self, note_id: str, note_update_dto: NoteUpdateDTO
     ) -> NoteDTO:
-        note_entity = note_repository.find_one(note_id)
+        note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
         if "collection_id" in note_update_dto.model_fields_set:

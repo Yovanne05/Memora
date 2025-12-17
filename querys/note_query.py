@@ -40,13 +40,11 @@ class NoteFindQuery(BaseModel):
 
     def to_params(self) -> NoteSearchParams:
         return NoteSearchParams(
-            owner_id=str(self.owner_id) if self.owner_id else None,
+            owner_id=None,
             collection_id=str(self.collection_id)
             if self.collection_id
             else None,
-            shared_with_user_id=str(self.shared_with_user_id)
-            if self.shared_with_user_id
-            else None,
+            shared_with_user_id=None,
             visibility=self.visibility,
             title_contains=self.title_contains,
             content_contains=self.content_contains,
@@ -57,4 +55,3 @@ class NoteFindQuery(BaseModel):
             limit=self.limit,
             offset=self.offset,
         )
-

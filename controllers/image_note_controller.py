@@ -8,6 +8,8 @@ from flasgger import swag_from
 
 from services.impl.note.note_image_service_impl import note_image_service
 from exceptions.note_image_exception import NoFileProvided, NoteImageNotFound
+from utils.auth import get_current_user
+from utils.access_scope import can_read_note_image
 
 bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 
@@ -22,6 +24,10 @@ def find_many(note_id: UUID):
 @bp_note_images.get("/<uuid:note_id>/images/<filename>")
 @swag_from("../docs/notes_images/get.yaml")
 def find_one(note_id: UUID, filename: str):
+    user = get_current_user()
+    if not can_read_note_image(user, str(note_id)):
+        raise NoteImageNotFound()
+
     filepath = os.path.join("uploads/notes", str(note_id), filename)
 
     if not os.path.exists(filepath):
