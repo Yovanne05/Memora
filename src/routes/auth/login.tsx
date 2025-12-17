@@ -92,7 +92,7 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-500/15 via-rose-500/10 to-sky-600/15">
+    <div className="min-h-screen bg-linear-to-br from-amber-500/15 via-rose-500/10 to-sky-600/15">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-10 lg:flex-row lg:items-center">
         <div className="hidden flex-1 flex-col gap-6 rounded-2xl border bg-background/60 p-10 shadow-lg backdrop-blur lg:flex">
           <div className="text-sm font-semibold uppercase tracking-[0.35em] text-muted-foreground">

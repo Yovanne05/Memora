@@ -1,24 +1,12 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { flashcardsService } from "../services/flashcards.service";
-import type { Flashcard, FlashcardCreate } from "../models/flashcard.model";
-import { FLASHCARDS_QUERY_KEYS } from "./flashcards.keys";
+import type { FlashcardCreate } from "../models/flashcard.model";
+import { useFlashcardMutation } from "./useFlashcardMutationFactory";
 
 export function useCreateFlashcardMutation(options?: { onSuccess?: () => void }) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useFlashcardMutation({
     mutationFn: (payload: FlashcardCreate) => flashcardsService.create(payload),
-    onSuccess: (data: Flashcard) => {
-      toast.success("Flashcard créée avec succès.");
-      queryClient.invalidateQueries({ queryKey: FLASHCARDS_QUERY_KEYS.lists() });
-      queryClient.invalidateQueries({ queryKey: FLASHCARDS_QUERY_KEYS.byNote(data.noteId) });
-      queryClient.setQueryData(FLASHCARDS_QUERY_KEYS.detail(data.id), data);
-      options?.onSuccess?.();
-    },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "La création de la flashcard a échoué.";
-      toast.error(message);
-    },
+    successMessage: "Flashcard créée avec succès.",
+    errorMessage: "La création de la flashcard a échoué.",
+    onSuccess: options?.onSuccess,
   });
 }
