@@ -21,6 +21,16 @@ export async function parseError(response: Response): Promise<string> {
   }
 }
 
+interface ValidationError {
+  msg: string;
+  loc?: unknown[];
+}
+
+interface ErrorWithMessage {
+  message?: string;
+  msg?: string;
+}
+
 function normalizeDetail(detail: unknown): string | null {
   if (!detail) return null;
 
@@ -33,10 +43,11 @@ function normalizeDetail(detail: unknown): string | null {
       .map((item) => {
         if (typeof item === "string") return item;
         if (item && typeof item === "object" && "msg" in item) {
-          const path = Array.isArray((item as any).loc)
-            ? (item as any).loc.join(".")
+          const validationError = item as ValidationError;
+          const path = Array.isArray(validationError.loc)
+            ? validationError.loc.join(".")
             : undefined;
-          return path ? `${path}: ${(item as any).msg}` : String((item as any).msg);
+          return path ? `${path}: ${validationError.msg}` : String(validationError.msg);
         }
         return null;
       })
@@ -45,11 +56,12 @@ function normalizeDetail(detail: unknown): string | null {
   }
 
   if (typeof detail === "object" && detail !== null) {
-    if ("message" in detail && typeof (detail as any).message === "string") {
-      return (detail as any).message;
+    const errorObj = detail as ErrorWithMessage;
+    if ("message" in errorObj && typeof errorObj.message === "string") {
+      return errorObj.message;
     }
-    if ("msg" in detail && typeof (detail as any).msg === "string") {
-      return (detail as any).msg;
+    if ("msg" in errorObj && typeof errorObj.msg === "string") {
+      return errorObj.msg;
     }
   }
 

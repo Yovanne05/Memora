@@ -4,7 +4,7 @@ interface LoadingStateProps {
   message?: string
 }
 
-export function LoadingState({ message = "Chargement..." }: LoadingStateProps) {
+export function LoadingState({ message = "Chargement..." }: Readonly<LoadingStateProps>) {
   return (
     <div className="flex h-full w-full flex-col gap-4 p-6">
       <div className="flex items-center justify-between">

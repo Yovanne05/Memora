@@ -23,7 +23,7 @@ type CollectionNotesGridWithLinksProps = {
   readonly onRemoveFromCollection: (noteId: string) => void
 }
 
-function NoteLinkButton({ note, availableNotes }: { note: Note; availableNotes: Note[] }) {
+function NoteLinkButton({ note, availableNotes }: { readonly note: Note; readonly availableNotes: Note[] }) {
   const [isOpen, setIsOpen] = useState(false)
   const { data: links } = useNoteLinksQuery(note.id)
   const createLink = useCreateNoteLinkMutation(note.id)

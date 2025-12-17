@@ -9,7 +9,7 @@ const getConnectionText = (connections: number): string => {
   return `${connections} connexion${connections !== 1 ? "s" : ""}`
 }
 
-export function NodeContent({ title, connections }: NodeContentProps) {
+export function NodeContent({ title, connections }: Readonly<NodeContentProps>) {
   const connectionText = getConnectionText(connections)
 
   return (

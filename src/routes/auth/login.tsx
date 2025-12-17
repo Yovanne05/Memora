@@ -198,7 +198,7 @@ function LoginPage() {
   )
 }
 
-function Highlight({ title, description }: { title: string; description: string }) {
+function Highlight({ title, description }: { readonly title: string; readonly description: string }) {
   return (
     <div className="rounded-xl border bg-card/70 p-4 shadow-sm backdrop-blur">
       <div className="text-sm font-semibold">{title}</div>
