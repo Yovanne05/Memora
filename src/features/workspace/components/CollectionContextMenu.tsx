@@ -53,8 +53,8 @@ export function CollectionContextMenu({
   const handleToggleVisibility = async () => {
     const newVisibility = collection.visibility === "private" ? "public" : "private"
     await updateMutation.mutateAsync({
-      collectionId: collection.id,
-      payload: { visibility: newVisibility }
+      id: collection.id,
+      data: { visibility: newVisibility }
     })
   }
 

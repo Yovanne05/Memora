@@ -4,7 +4,6 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  Copy,
   ExternalLink
 } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"

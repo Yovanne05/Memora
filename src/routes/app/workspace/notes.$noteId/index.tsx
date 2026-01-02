@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import NoteEditView from "@/features/workspace/views/NoteEditView"
+import NoteEditView from "@/features/workspace/pages/NoteEditView"
 
 export const Route = createFileRoute("/app/workspace/notes/$noteId/")({
   component: RouteComponent,

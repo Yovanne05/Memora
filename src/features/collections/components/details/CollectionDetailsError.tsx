@@ -13,7 +13,7 @@ export function CollectionDetailsError({
   const router = useRouter()
 
   const handleBack = () => {
-    router.navigate({ to: "/app/collections" })
+    router.navigate({ to: "/app/workspace" })
   }
 
   return (

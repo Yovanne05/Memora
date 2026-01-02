@@ -8,7 +8,6 @@ import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutat
 import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutation"
 import { useWorkspaceContext } from "../context/WorkspaceContext"
 import { useWorkspaceNavigation } from "../hooks/useWorkspaceNavigation"
-import { useToast } from "@/hooks/use-toast"
 
 interface NoteEditViewProps {
   readonly noteId: string
@@ -17,7 +16,6 @@ interface NoteEditViewProps {
 
 export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps) {
   const router = useRouter()
-  const { toast } = useToast()
   const { actions } = useWorkspaceContext()
   const { navigateToCollection, navigateToAllNotes } = useWorkspaceNavigation()
 
@@ -45,17 +43,10 @@ export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps
           tags: values.tags,
         },
       })
-
-      toast({
-        title: "Note mise à jour",
-        description: "Vos modifications ont été enregistrées",
-      })
+      // Toast de succès géré automatiquement par useUpdateNoteMutation
     } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la note",
-        variant: "destructive",
-      })
+      // Toast d'erreur géré automatiquement par useUpdateNoteMutation
+      console.error("Failed to update note:", error)
     }
   }
 
@@ -63,23 +54,16 @@ export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps
     try {
       await deleteMutation.mutateAsync(noteId)
 
-      toast({
-        title: "Note supprimée",
-        description: "La note a été supprimée avec succès",
-      })
-
       // Navigate back to collection or all notes
       if (collectionId) {
         navigateToCollection(collectionId)
       } else {
         navigateToAllNotes()
       }
+      // Toast de succès géré automatiquement par useDeleteNoteMutation
     } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la note",
-        variant: "destructive",
-      })
+      // Toast d'erreur géré automatiquement par useDeleteNoteMutation
+      console.error("Failed to delete note:", error)
     }
   }
 
