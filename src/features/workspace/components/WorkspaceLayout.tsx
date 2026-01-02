@@ -39,7 +39,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       const newNote = await createNoteMutation.mutateAsync({
         ownerId: user.id,
         title: payload.title,
-        content: "",
+        content: " ",
         collectionId: payload.collectionId,
         visibility: payload.visibility,
         tags: payload.tags,

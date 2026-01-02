@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ChevronRight } from "lucide-react"
+import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 
 const Breadcrumb = React.forwardRef<
@@ -17,7 +18,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
+      "flex flex-wrap items-center gap-1.5 wrap-break-word text-sm text-muted-foreground sm:gap-2.5",
       className
     )}
     {...props}
@@ -43,11 +44,11 @@ const BreadcrumbLink = React.forwardRef<
     asChild?: boolean
   }
 >(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? React.Fragment : "a"
+  const Comp = asChild ? Slot : "a"
 
   return (
     <Comp
-      ref={asChild ? undefined : ref}
+      ref={ref}
       className={cn("transition-colors hover:text-foreground", className)}
       {...props}
     />
