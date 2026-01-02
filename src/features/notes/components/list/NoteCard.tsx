@@ -30,8 +30,8 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
 
   return (
     <Link
-      to="/app/notes/$id"
-      params={{ id: note.id }}
+      to="/app/workspace/notes/$noteId"
+      params={{ noteId: note.id }}
       className="block h-full"
       aria-label={`Ouvrir la note ${note.title}`}
     >

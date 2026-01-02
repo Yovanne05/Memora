@@ -2,7 +2,7 @@ import {
   createContext,
   useContext,
   useReducer,
-  useCallback,
+  useMemo,
   type ReactNode,
   useEffect,
 } from "react"
@@ -182,67 +182,70 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [state.view])
 
   // Actions
-  const actions: WorkspaceActions = {
-    selectNote: useCallback((id: string | null) => {
-      dispatch({ type: "SELECT_NOTE", payload: id })
-    }, []),
+  const actions: WorkspaceActions = useMemo(
+    () => ({
+      selectNote: (id: string | null) => {
+        dispatch({ type: "SELECT_NOTE", payload: id })
+      },
 
-    selectCollection: useCallback((id: string | null) => {
-      dispatch({ type: "SELECT_COLLECTION", payload: id })
-    }, []),
+      selectCollection: (id: string | null) => {
+        dispatch({ type: "SELECT_COLLECTION", payload: id })
+      },
 
-    toggleCollection: useCallback((id: string) => {
-      dispatch({ type: "TOGGLE_COLLECTION", payload: id })
-    }, []),
+      toggleCollection: (id: string) => {
+        dispatch({ type: "TOGGLE_COLLECTION", payload: id })
+      },
 
-    expandCollection: useCallback((id: string) => {
-      dispatch({ type: "EXPAND_COLLECTION", payload: id })
-    }, []),
+      expandCollection: (id: string) => {
+        dispatch({ type: "EXPAND_COLLECTION", payload: id })
+      },
 
-    collapseCollection: useCallback((id: string) => {
-      dispatch({ type: "COLLAPSE_COLLECTION", payload: id })
-    }, []),
+      collapseCollection: (id: string) => {
+        dispatch({ type: "COLLAPSE_COLLECTION", payload: id })
+      },
 
-    setView: useCallback((view: WorkspaceView) => {
-      dispatch({ type: "SET_VIEW", payload: view })
-    }, []),
+      setView: (view: WorkspaceView) => {
+        dispatch({ type: "SET_VIEW", payload: view })
+      },
 
-    setSearch: useCallback((search: string) => {
-      dispatch({ type: "SET_SEARCH", payload: search })
-    }, []),
+      setSearch: (search: string) => {
+        dispatch({ type: "SET_SEARCH", payload: search })
+      },
 
-    setSort: useCallback((sort: NotesSort) => {
-      dispatch({ type: "SET_SORT", payload: sort })
-    }, []),
+      setSort: (sort: NotesSort) => {
+        dispatch({ type: "SET_SORT", payload: sort })
+      },
 
-    setPage: useCallback((page: number) => {
-      dispatch({ type: "SET_PAGE", payload: page })
-    }, []),
+      setPage: (page: number) => {
+        dispatch({ type: "SET_PAGE", payload: page })
+      },
 
-    openCreateNote: useCallback(() => {
-      dispatch({ type: "OPEN_CREATE_NOTE" })
-    }, []),
+      openCreateNote: () => {
+        dispatch({ type: "OPEN_CREATE_NOTE" })
+      },
 
-    closeCreateNote: useCallback(() => {
-      dispatch({ type: "CLOSE_CREATE_NOTE" })
-    }, []),
+      closeCreateNote: () => {
+        dispatch({ type: "CLOSE_CREATE_NOTE" })
+      },
 
-    openCreateCollection: useCallback(() => {
-      dispatch({ type: "OPEN_CREATE_COLLECTION" })
-    }, []),
+      openCreateCollection: () => {
+        dispatch({ type: "OPEN_CREATE_COLLECTION" })
+      },
 
-    closeCreateCollection: useCallback(() => {
-      dispatch({ type: "CLOSE_CREATE_COLLECTION" })
-    }, []),
+      closeCreateCollection: () => {
+        dispatch({ type: "CLOSE_CREATE_COLLECTION" })
+      },
 
-    openGraphView: useCallback(() => {
-      dispatch({ type: "OPEN_GRAPH_VIEW" })
-    }, []),
+      openGraphView: () => {
+        dispatch({ type: "OPEN_GRAPH_VIEW" })
+      },
 
-    closeGraphView: useCallback(() => {
-      dispatch({ type: "CLOSE_GRAPH_VIEW" })
-    }, []),
-  }
+      closeGraphView: () => {
+        dispatch({ type: "CLOSE_GRAPH_VIEW" })
+      },
+    }),
+    [dispatch]
+  )
 
   return (
     <WorkspaceContext.Provider value={{ state, actions }}>

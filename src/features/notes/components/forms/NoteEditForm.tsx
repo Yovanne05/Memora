@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -51,7 +51,6 @@ export function NoteEditForm({
   onDelete,
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
-  const [lastSavedAt, setLastSavedAt] = useState<string | undefined>(note?.updatedAt)
   const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
   const collections = collectionsData?.items ?? []
 
@@ -66,16 +65,7 @@ export function NoteEditForm({
     },
   })
 
-  useEffect(() => {
-    form.reset({
-      title: note?.title ?? "",
-      content: note?.content ?? "",
-      visibility: note?.visibility ?? "private",
-      collectionId: note?.collectionId ?? null,
-      tags: note?.tags ?? [],
-    })
-    setLastSavedAt(note?.updatedAt)
-  }, [note, form])
+  const lastSavedAt = note?.updatedAt
 
   const savedTime = useMemo(() => {
     if (!lastSavedAt) return null
@@ -93,13 +83,12 @@ export function NoteEditForm({
       collectionId: values.collectionId ?? null,
       tags: values.tags,
     })
-    setLastSavedAt(new Date().toISOString())
   })
 
   const isFormDisabled = loading || form.formState.isSubmitting
 
   return (
-    <Form {...form}>
+    <Form {...form} key={note?.id}>
       <form className="space-y-6" onSubmit={handleFormSubmit}>
         <Card className="border border-border/70 shadow-sm">
           <CardContent className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

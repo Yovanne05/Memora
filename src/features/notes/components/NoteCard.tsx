@@ -21,8 +21,8 @@ export function NoteCard({ note, onPreview }: Readonly<NoteCardProps>) {
 
     return (
         <Link
-            to="/app/notes/$id"
-            params={{ id: note.id }}
+            to="/app/workspace/notes/$noteId"
+            params={{ noteId: note.id }}
             className="block"
         >
             <Card className="h-full border border-border/60 shadow-sm transition hover:-translate-y-1 hover:shadow-md">

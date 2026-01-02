@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -58,9 +57,12 @@ export function WorkspaceHeader() {
               <div key={index} className="contents">
                 <BreadcrumbItem>
                   {item.href ? (
-                    <BreadcrumbLink asChild>
-                      <Link to={item.href}>{item.label}</Link>
-                    </BreadcrumbLink>
+                    <Link
+                      to={item.href}
+                      className="transition-colors hover:text-foreground"
+                    >
+                      {item.label}
+                    </Link>
                   ) : (
                     <BreadcrumbPage>{item.label}</BreadcrumbPage>
                   )}

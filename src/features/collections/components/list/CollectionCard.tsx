@@ -42,8 +42,8 @@ export const CollectionCard = memo(function CollectionCard({
 
   const handleNavigate = useCallback(() => {
     router.navigate({
-      to: "/app/collections/$id",
-      params: { id: collection.id },
+      to: "/app/workspace/collections/$collectionId",
+      params: { collectionId: collection.id },
     })
   }, [router, collection.id])
 
