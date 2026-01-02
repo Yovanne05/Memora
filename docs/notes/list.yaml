@@ -45,6 +45,11 @@ parameters:
     required: false
     description: Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
   - in: query
+    name: isFavorite
+    type: boolean
+    required: false
+    description: Si true, ne renvoie que les notes favorites de l'utilisateur courant.
+  - in: query
     name: tagIds
     type: string
     required: false

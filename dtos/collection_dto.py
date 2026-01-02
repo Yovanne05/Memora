@@ -29,6 +29,7 @@ class CollectionDTO(BaseModel) :
     visibility : VisibilityEnum
     owner_id : str
     tags : List[str] = Field(default_factory = list)
+    is_favorite: bool = False
     created_at : datetime
     updated_at : datetime
     notes : List[NoteDTO] = Field(default_factory = list)

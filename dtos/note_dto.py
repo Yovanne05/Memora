@@ -35,6 +35,7 @@ class NoteDTO(BaseModel):
     collection_id: str | None = None
     collection_name: str | None = None
     tags: List[str] = Field(default_factory=list)
+    is_favorite: bool = False
     created_at: datetime
     updated_at: datetime
 

@@ -1,7 +1,7 @@
 definitions:
   Note:
     type: object
-    description: Représentation complète d'une note dans MEMORA.
+    description: ReprÇ¸sentation complÇùte d'une note dans MEMORA.
     properties:
       id:
         type: string
@@ -10,52 +10,56 @@ definitions:
         example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
       title:
         type: string
-        description: Titre court affiché dans les listes.
+        description: Titre court affichÇ¸ dans les listes.
         example: "Cours de SQL - Chapitre 1"
       content:
         type: string
-        description: Contenu riche de la note (Markdown accepté).
+        description: Contenu riche de la note (Markdown acceptÇ¸).
         example: "Rappel sur les jointures INNER/LEFT..."
       owner_id:
         type: string
         format: uuid
-        description: Identifiant du propriétaire de la note.
+        description: Identifiant du propriÇ¸taire de la note.
         example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
       owner_username:
         type: string
-        description: Nom d'utilisateur du propriétaire (chargé automatiquement).
+        description: Nom d'utilisateur du propriÇ¸taire (chargÇ¸ automatiquement).
         example: "jean.dupont"
       collection_id:
         type: string
         format: uuid
         nullable: true
-        description: Collection à laquelle la note appartient (facultatif).
+        description: Collection Çÿ laquelle la note appartient (facultatif).
         example: "3eeaa924-c2e4-49a2-8123-4613ef7f27b9"
       collection_name:
         type: string
         nullable: true
-        description: Nom de la collection (chargé automatiquement si collection_id est défini).
+        description: Nom de la collection (chargÇ¸ automatiquement si collection_id est dÇ¸fini).
         example: "Mes cours de maths"
       visibility:
         type: string
         enum: ["private", "public"]
-        description: Contrôle qui peut consulter la note.
+        description: ContrÇïle qui peut consulter la note.
         example: "private"
       tags:
         type: array
-        description: Tags associés à cette note.
+        description: Tags associÇ¸s Çÿ cette note.
         items:
           type: string
-        example: ["SQL", "bases de données", "chapitre 1"]
+        example: ["SQL", "bases de donnÇ¸es", "chapitre 1"]
+      is_favorite:
+        type: boolean
+        description: Indique si la note est dans les favoris de l'utilisateur courant.
+        example: true
       created_at:
         type: string
         format: date-time
-        description: Date de création.
+        description: Date de crÇ¸ation.
         example: "2025-05-12T09:23:41Z"
       updated_at:
         type: string
         format: date-time
-        description: Dernière mise à jour.
+        description: DerniÇùre mise Çÿ jour.
         example: "2025-05-15T16:02:07Z"
     required: ["id", "title", "content", "owner_id", "owner_username", "visibility", "created_at", "updated_at"]
 
@@ -66,30 +70,30 @@ definitions:
       title:
         type: string
         maxLength: 255
-        description: Titre à afficher.
+        description: Titre Çÿ afficher.
       content:
         type: string
         description: Corps de la note.
       owner_id:
         type: string
         format: uuid
-        description: Identifiant de l'utilisateur qui crée la note.
+        description: Identifiant de l'utilisateur qui crÇ¸e la note.
       collection_id:
         type: string
         format: uuid
         nullable: true
-        description: Collection cible si la note doit être rangée.
+        description: Collection cible si la note doit Ç¦tre rangÇ¸e.
       visibility:
         type: string
         enum: ["private", "public"]
         default: "private"
-        description: Niveau de partage (private = visible uniquement par le propriétaire).
+        description: Niveau de partage (private = visible uniquement par le propriÇ¸taire).
       tags:
         type: array
-        description: Tags à associer à la note.
+        description: Tags Çÿ associer Çÿ la note.
         items:
           type: string
-        example: ["SQL", "bases de données"]
+        example: ["SQL", "bases de donnÇ¸es"]
 
   NoteUpdatePayload:
     type: object
@@ -106,127 +110,47 @@ definitions:
         type: string
         format: uuid
         nullable: true
-        description: Nouvelle collection ou null pour détacher la note.
+        description: Nouvelle collection ou null pour dÇ¸tacher la note.
       visibility:
         type: string
         enum: ["private", "public"]
-        description: Nouvelle visibilité.
+        description: Nouvelle visibilitÇ¸.
       tags:
         type: array
         description: Nouveaux tags pour la note.
         items:
           type: string
-        example: ["SQL", "avancé"]
+        example: ["SQL", "avancÇ¸"]
 
   NoteListResponse:
     type: object
+    description: RÇ¸ponse paginÇ¸e contenant une liste de notes.
     properties:
       total:
         type: integer
         format: int32
         description: Nombre total de notes correspondant au filtre.
-        example: 128
+        example: 12
       items:
         type: array
         items:
           $ref: "#/definitions/Note"
     required: ["total", "items"]
 
-  NoteShare:
+  NoteFavorite:
     type: object
-    description: Configuration de partage pour une note.
-    properties:
-      note_id:
-        type: string
-        format: uuid
-        description: Identifiant de la note partagée.
-      user_id:
-        type: string
-        format: uuid
-        description: Identifiant de l'utilisateur destinataire.
-      permission:
-        type: string
-        enum: ["read", "write"]
-        description: Niveau d'accès accordé.
-      created_at:
-        type: string
-        format: date-time
-        description: Date de création du partage.
-    required: ["note_id", "user_id", "permission", "created_at"]
-
-  NoteShareCreatePayload:
-    type: object
-    required: ["user_id"]
+    description: Lien de favori entre un utilisateur et une note.
     properties:
       user_id:
         type: string
         format: uuid
-        description: Utilisateur à qui donner accès.
-      permission:
-        type: string
-        enum: ["read", "write"]
-        default: "read"
-        description: Niveau de droit accordé.
-
-  NoteShareUpdatePayload:
-    type: object
-    required: ["permission"]
-    properties:
-      permission:
-        type: string
-        enum: ["read", "write"]
-        description: Nouveau niveau d'accès.
-
-  NoteShareListResponse:
-    type: object
-    properties:
-      total:
-        type: integer
-        format: int32
-        description: Nombre total de partages pour la note.
-        example: 2
-      items:
-        type: array
-        items:
-          $ref: "#/definitions/NoteShare"
-    required: ["total", "items"]
-
-  NoteLink:
-    type: object
-    description: Lien entre deux notes d'une même collection.
-    properties:
+        description: Identifiant de l'utilisateur.
       note_id:
         type: string
         format: uuid
-        description: Note de référence utilisée dans la requête.
-      linked_note_id:
-        type: string
-        format: uuid
-        description: Note liée (dans la même collection).
+        description: Identifiant de la note.
       created_at:
         type: string
         format: date-time
-        description: Date de création du lien.
-    required: ["note_id", "linked_note_id", "created_at"]
-
-  NoteLinkCreatePayload:
-    type: object
-    required: ["linked_note_id"]
-    properties:
-      linked_note_id:
-        type: string
-        format: uuid
-        description: Identifiant de la note à relier (même collection obligatoire).
-
-  NoteLinkListResponse:
-    type: object
-    properties:
-      total:
-        type: integer
-        format: int32
-        description: Nombre total de liens pour la note.
-      items:
-        type: array
-        items:
-          $ref: "#/definitions/NoteLink"
-    required: ["total", "items"]
+        description: Date d'ajout aux favoris.
+    required: ["user_id", "note_id", "created_at"]

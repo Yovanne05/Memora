@@ -1,0 +1,16 @@
+tags:
+  - collections
+summary: Retirer une collection des favoris
+description: Supprime la collection des favoris de l'utilisateur authentifie.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la collection a retirer des favoris.
+responses:
+  204:
+    description: Collection retiree des favoris.
+  404:
+    description: Collection ou favori introuvable.

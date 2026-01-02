@@ -8,6 +8,9 @@ from flasgger import swag_from
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
+from services.impl.favorite.note_favorite_service_impl import (
+    note_favorite_service,
+)
 
 
 bp_notes = Blueprint("notes", __name__, url_prefix="/notes")
@@ -56,4 +59,18 @@ def update(note_id: UUID):
 @swag_from("../docs/notes/delete.yaml")
 def delete(note_id: UUID):
     note_crud_service.delete(str(note_id))
+    return "", HTTPStatus.NO_CONTENT
+
+
+@bp_notes.post("/<uuid:note_id>/favorite")
+@swag_from("../docs/notes/favorite_add.yaml")
+def add_favorite(note_id: UUID):
+    favorite = note_favorite_service.add_favorite(str(note_id))
+    return jsonify(favorite.model_dump()), HTTPStatus.CREATED
+
+
+@bp_notes.delete("/<uuid:note_id>/favorite")
+@swag_from("../docs/notes/favorite_delete.yaml")
+def remove_favorite(note_id: UUID):
+    note_favorite_service.remove_favorite(str(note_id))
     return "", HTTPStatus.NO_CONTENT

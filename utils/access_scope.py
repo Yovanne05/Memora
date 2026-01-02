@@ -4,12 +4,14 @@ from enum import Enum, auto
 from typing import Iterable, Optional, Set
 
 from flask import g
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from daos.collection_dao import Collection
 from daos.note_dao import Note
+from daos.note_dao import NoteShare
+from daos.collection_dao import CollectionShare
 from utils.db import get_db_session
-from utils.enums import RoleEnum
+from utils.enums import RoleEnum, VisibilityEnum
 
 
 class AccessLevel(Enum):
@@ -35,14 +37,27 @@ def _cached(name: str, loader):
 def accessible_collection_ids(user) -> Optional[Set[str]]:
     """
     Returns the set of collection ids the user can read.
-    For now: owner-based only. None means full access (admin).
+    Includes ownership, public collections, and direct shares. None means full access (admin).
     """
     if _is_admin_user(user):
         return None
 
     def _load():
         with get_db_session() as session:
-            stmt = select(Collection.id).where(Collection.owner_id == user.id)
+            stmt = (
+                select(Collection.id)
+                .outerjoin(
+                    CollectionShare,
+                    CollectionShare.collection_id == Collection.id,
+                )
+                .where(
+                    or_(
+                        Collection.owner_id == user.id,
+                        Collection.visibility == VisibilityEnum.PUBLIC,
+                        CollectionShare.user_id == user.id,
+                    )
+                )
+            )
             return set(session.scalars(stmt).all())
 
     return _cached("accessible_collection_ids", _load)
@@ -51,14 +66,32 @@ def accessible_collection_ids(user) -> Optional[Set[str]]:
 def accessible_note_ids(user) -> Optional[Set[str]]:
     """
     Returns the set of note ids the user can read.
-    For now: owner-based only. None means full access (admin).
+    Includes ownership, public notes, direct note shares, and collection shares. None means full access (admin).
     """
     if _is_admin_user(user):
         return None
 
     def _load():
         with get_db_session() as session:
-            stmt = select(Note.id).where(Note.owner_id == user.id)
+            stmt = (
+                select(Note.id)
+                .outerjoin(NoteShare, NoteShare.note_id == Note.id)
+                .outerjoin(Collection, Note.collection_id == Collection.id)
+                .outerjoin(
+                    CollectionShare,
+                    CollectionShare.collection_id == Collection.id,
+                )
+                .where(
+                    or_(
+                        Note.owner_id == user.id,
+                        Note.visibility == VisibilityEnum.PUBLIC,
+                        NoteShare.user_id == user.id,
+                        CollectionShare.user_id == user.id,
+                        Collection.visibility == VisibilityEnum.PUBLIC,
+                        Collection.owner_id == user.id,
+                    )
+                )
+            )
             return set(session.scalars(stmt).all())
 
     return _cached("accessible_note_ids", _load)

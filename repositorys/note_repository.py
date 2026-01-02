@@ -4,6 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from daos.note_dao import Note
 from utils.access_scope import accessible_note_ids
+from repositorys.note_favorite_repository import favorite_note_ids_for_user
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -18,6 +19,7 @@ class NoteSearchParams:
     content_contains: Optional[str] = None
     ids: Optional[list[str]] = None
     tags: Optional[list[str]] = None
+    is_favorite: bool = False
 
     sort_by: Literal["title", "created_at", "updated_at"] = "created_at"
     sort_dir: Literal["asc", "desc"] = "desc"
@@ -38,6 +40,7 @@ def _scope_to_user(stmt, user):
 def list_for_user(user, params: Optional[NoteSearchParams] = None) -> Tuple[List[Note], int]:
     p = params or NoteSearchParams()
     filters = []
+    favorite_ids: set[str] | None = None
 
     if p.collection_id:
         filters.append(Note.collection_id == p.collection_id)
@@ -57,6 +60,12 @@ def list_for_user(user, params: Optional[NoteSearchParams] = None) -> Tuple[List
     if p.tags:
         for tag in p.tags:
             filters.append(Note.tags.contains([tag]))
+
+    if p.is_favorite:
+        favorite_ids = favorite_note_ids_for_user(user.id)
+        if not favorite_ids:
+            return [], 0
+        filters.append(Note.id.in_(favorite_ids))
 
     stmt = select(Note).options(
         joinedload(Note.collection), joinedload(Note.owner)
