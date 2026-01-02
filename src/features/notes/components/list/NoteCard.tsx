@@ -2,20 +2,13 @@ import { Link } from "@tanstack/react-router"
 import { Badge } from "@/components/ui/badge"
 import { TagList } from "@/components/ui/tag-list"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { CalendarClock, Eye, FileText, FolderClosed, Lock, MoreHorizontal, Tag, User2 } from "lucide-react"
+import { CalendarClock, Eye, FileText, FolderClosed, Lock, Tag, User2 } from "lucide-react"
 import type { Note } from "../../models/note.model"
+import { NoteQuickActions } from "../NoteQuickActions"
 
 interface NoteCardProps {
   note: Note
-  onEdit?: (note: Note) => void
-  onDelete?: (note: Note) => void
+  onActionComplete?: () => void
 }
 
 const formatDate = (date: string) =>
@@ -25,7 +18,7 @@ const formatDate = (date: string) =>
     day: "numeric",
   }).format(new Date(date))
 
-export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
+export function NoteCard({ note, onActionComplete }: Readonly<NoteCardProps>) {
   const isPublic = note.visibility === "public"
 
   return (
@@ -52,45 +45,13 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
             </div>
           </div>
 
-          {(onEdit || onDelete) && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                {onEdit && (
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      onEdit(note)
-                    }}
-                  >
-                    Modifier
-                  </DropdownMenuItem>
-                )}
-                {onDelete && (
-                  <DropdownMenuItem
-                    className="cursor-pointer text-destructive focus:text-destructive"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      onDelete(note)
-                    }}
-                  >
-                    Supprimer
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div onClick={(e) => e.preventDefault()}>
+            <NoteQuickActions
+              note={note}
+              onActionComplete={onActionComplete}
+              triggerVariant="ghost"
+            />
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-3 pt-0 text-sm text-muted-foreground">
