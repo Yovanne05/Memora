@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useRouter } from "@tanstack/react-router"
 import { Loader2 } from "lucide-react"
 import { NoteEditForm, type NoteFormValues } from "@/features/notes/components/forms/NoteEditForm"
+import { NoteLinkManager } from "@/features/notes/components/NoteLinkManager"
 import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
 import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutation"
@@ -106,7 +107,7 @@ export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl space-y-6">
       <NoteEditForm
         note={noteQuery.data}
         loading={updateMutation.isPending}
@@ -115,6 +116,11 @@ export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps
         onCancel={handleCancel}
         onDelete={handleDelete}
       />
+
+      {/* Section de liaison de notes - visible uniquement si la note est dans une collection */}
+      {noteQuery.data.collectionId && (
+        <NoteLinkManager note={noteQuery.data} />
+      )}
     </div>
   )
 }
