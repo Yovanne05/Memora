@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Index, String, Text
+from sqlalchemy import Enum as SAEnum, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
 from daos.base_models import UUIDMixin, TimestampMixin
+from utils.enums import DifficultyEnum
 
 if TYPE_CHECKING:
     from daos.flashcard_answer_dao import FlashcardAnswer
@@ -21,6 +22,15 @@ class Flashcard(UUIDMixin, TimestampMixin, Base):
         nullable=False,
     )
     question: Mapped[str] = mapped_column(Text, nullable=False)
+    difficulty: Mapped[DifficultyEnum | None] = mapped_column(
+        SAEnum(
+            DifficultyEnum,
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+            name="difficultyenum",
+            validate_strings=True,
+        ),
+        nullable=True,
+    )
 
     note: Mapped["Note"] = relationship(back_populates="flashcards")
     answers: Mapped[list["FlashcardAnswer"]] = relationship(

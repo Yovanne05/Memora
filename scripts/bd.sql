@@ -12,10 +12,12 @@ DROP TABLE IF EXISTS flashcard_answers CASCADE;
 
 DROP TYPE IF EXISTS visibility_enum;
 DROP TYPE IF EXISTS permission_enum;
+DROP TYPE IF EXISTS difficulty_enum;
 
 
 CREATE TYPE visibility_enum AS ENUM ('private', 'public');
 CREATE TYPE permission_enum AS ENUM ('read', 'write');
+CREATE TYPE difficulty_enum AS ENUM ('easy', 'medium', 'hard');
 
 -- ===== TABLES =====
 
@@ -158,6 +160,7 @@ CREATE TABLE flashcards (
     id             CHAR(36) PRIMARY KEY,
     note_id        CHAR(36) NOT NULL,
     question       TEXT NOT NULL,
+    difficulty     difficulty_enum,
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_flashcards_note

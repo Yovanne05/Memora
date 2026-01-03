@@ -15,3 +15,9 @@ class RoleEnum(str, Enum):
     CLIENT = "client"
     ADMIN = "admin"
     SUPER_ADMIN = "super_admin"
+
+
+class DifficultyEnum(str, Enum):
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
