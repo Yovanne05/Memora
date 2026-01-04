@@ -21,9 +21,6 @@ class ReviewStatistics(NamedTuple):
 
 
 def upsert_review(review: Review) -> Review:
-    """
-    Crée ou met à jour une review (UPSERT sur PK composite user_id, flashcard_id).
-    """
     with get_db_session() as session:
         stmt = insert(Review).values(
             user_id=review.user_id,
@@ -55,7 +52,6 @@ def upsert_review(review: Review) -> Review:
         session.execute(stmt)
         session.commit()
 
-        # Récupérer la review mise à jour
         result = session.execute(
             select(Review).where(
                 and_(
@@ -69,7 +65,6 @@ def upsert_review(review: Review) -> Review:
 
 
 def get_review(user_id: str, flashcard_id: str) -> Review | None:
-    """Récupère une review spécifique."""
     with get_db_session() as session:
         stmt = select(Review).where(
             and_(
@@ -81,12 +76,6 @@ def get_review(user_id: str, flashcard_id: str) -> Review | None:
 
 
 def get_upcoming_reviews(user_id: str) -> dict[str, list[tuple[str, str, datetime]]]:
-    """
-    Récupère les flashcards à réviser, groupées par date.
-
-    Returns:
-        Dict[date_str, List[(flashcard_id, question, next_review_at)]]
-    """
     with get_db_session() as session:
         stmt = (
             select(
@@ -101,7 +90,6 @@ def get_upcoming_reviews(user_id: str) -> dict[str, list[tuple[str, str, datetim
 
         results = session.execute(stmt).all()
 
-        # Grouper par date
         grouped: dict[str, list[tuple[str, str, datetime]]] = defaultdict(list)
         for flashcard_id, question, next_review_at in results:
             date_key = next_review_at.date().isoformat()
@@ -117,13 +105,11 @@ def get_review_statistics(user_id: str) -> ReviewStatistics:
     thirty_days_ago = now - timedelta(days=30)
 
     with get_db_session() as session:
-        # Total reviews
         total_stmt = select(func.count(Review.user_id)).where(
             Review.user_id == user_id
         )
         total = session.scalar(total_stmt) or 0
 
-        # Reviews last 7 days
         last_7_stmt = select(func.count(Review.user_id)).where(
             and_(
                 Review.user_id == user_id,
@@ -132,7 +118,6 @@ def get_review_statistics(user_id: str) -> ReviewStatistics:
         )
         last_7 = session.scalar(last_7_stmt) or 0
 
-        # Reviews last 30 days
         last_30_stmt = select(func.count(Review.user_id)).where(
             and_(
                 Review.user_id == user_id,
@@ -141,7 +126,6 @@ def get_review_statistics(user_id: str) -> ReviewStatistics:
         )
         last_30 = session.scalar(last_30_stmt) or 0
 
-        # Average quality (mapping difficulty -> quality score)
         quality_case = case(
             (Review.difficulty == ReviewDifficultyEnum.AGAIN, 0),
             (Review.difficulty == ReviewDifficultyEnum.HARD, 1),
@@ -153,7 +137,6 @@ def get_review_statistics(user_id: str) -> ReviewStatistics:
         avg_stmt = select(func.avg(quality_case)).where(Review.user_id == user_id)
         avg_quality = session.scalar(avg_stmt) or 0.0
 
-        # Quality distribution
         dist_stmt = (
             select(Review.difficulty, func.count(Review.difficulty))
             .where(Review.user_id == user_id)
@@ -164,7 +147,6 @@ def get_review_statistics(user_id: str) -> ReviewStatistics:
         for difficulty, count in session.execute(dist_stmt):
             distribution[difficulty.value] = count
 
-        # S'assurer que toutes les difficultés sont présentes
         for diff in ReviewDifficultyEnum:
             if diff.value not in distribution:
                 distribution[diff.value] = 0

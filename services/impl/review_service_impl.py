@@ -18,23 +18,19 @@ class ReviewService(ReviewServiceInterface):
     def submit_review(
         self, user_id: str, flashcard_id: str, selected_answer_id: str, difficulty: str
     ) -> ReviewDTO:
-        # Vérifier que la flashcard existe
         flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:
             raise FlashcardNotFoundForReview()
 
-        # Vérifier que la réponse appartient bien à cette flashcard
         answer_ids = [answer.id for answer in flashcard.answers]
         if selected_answer_id not in answer_ids:
             raise InvalidAnswerForFlashcard()
 
-        # Vérifier si la réponse est correcte
         is_correct = any(
             answer.id == selected_answer_id and answer.is_correct
             for answer in flashcard.answers
         )
 
-        # Récupérer la review existante ou utiliser les valeurs par défaut
         existing_review = review_repository.get_review(user_id, flashcard_id)
 
         if existing_review:
@@ -46,7 +42,6 @@ class ReviewService(ReviewServiceInterface):
             current_repetitions = 0
             current_interval = 0
 
-        # Calculer le prochain intervalle avec SM-2
         difficulty_enum = ReviewDifficultyEnum(difficulty)
         sm2_result = calculate_next_review(
             difficulty=difficulty_enum,
@@ -55,7 +50,6 @@ class ReviewService(ReviewServiceInterface):
             current_interval_days=current_interval,
         )
 
-        # Créer/mettre à jour la review
         review = Review(
             user_id=user_id,
             flashcard_id=flashcard_id,
