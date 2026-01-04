@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { memo } from "react"
 import { Search } from "lucide-react"
 import {
   Dialog,
@@ -11,9 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-
-import { useNotesQuery } from "../hooks/useNotesQuery"
-import { useCreateNoteLinkMutation } from "../hooks/useCreateNoteLinkMutation"
+import { useLinkNotes } from "../hooks/useLinkNotes"
 import type { Note } from "../models/note.model"
 import type { NoteLink } from "../models/note-link.model"
 
@@ -24,55 +22,38 @@ interface NoteLinkDialogProps {
   readonly onOpenChange: (open: boolean) => void
 }
 
-export function NoteLinkDialog({
+export const NoteLinkDialog = memo(function NoteLinkDialog({
   note,
   existingLinks,
   open,
   onOpenChange
 }: Readonly<NoteLinkDialogProps>) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null)
-
-  const { data: notesData, isLoading } = useNotesQuery(0, 100, {
-    collection_id: note.collectionId,
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedNoteId,
+    setSelectedNoteId,
+    availableNotes,
+    isLoading,
+    isPending,
+    handleCreateLink,
+    resetState,
+  } = useLinkNotes({
+    note,
+    existingLinks,
+    onSuccess: () => onOpenChange(false),
   })
 
-  const createLink = useCreateNoteLinkMutation(note.id)
-
-  const existingLinkIds = useMemo(
-    () => new Set(existingLinks.map(l => l.linkedNoteId)),
-    [existingLinks]
-  )
-
-  const availableNotes = useMemo(() => {
-    const notes = notesData?.items ?? []
-    return notes
-      .filter(n => n.id !== note.id)
-      .filter(n => !existingLinkIds.has(n.id))
-      .filter(n =>
-        searchQuery === "" ||
-        n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        n.content.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-  }, [notesData, note.id, existingLinkIds, searchQuery])
-
-  const handleCreateLink = async () => {
+  const handleSubmit = async () => {
     if (!selectedNoteId) return
-
-    try {
-      await createLink.mutateAsync({ linkedNoteId: selectedNoteId })
-      setSelectedNoteId(null)
-      setSearchQuery("")
-      onOpenChange(false)
-    } catch (error) {
-      console.error("Failed to create link:", error)
-      alert(error instanceof Error ? error.message : "Impossible de créer le lien")
+    const success = await handleCreateLink(selectedNoteId)
+    if (!success) {
+      alert("Impossible de créer le lien")
     }
   }
 
   const handleClose = () => {
-    setSelectedNoteId(null)
-    setSearchQuery("")
+    resetState()
     onOpenChange(false)
   }
 
@@ -135,13 +116,13 @@ export function NoteLinkDialog({
             Annuler
           </Button>
           <Button
-            onClick={handleCreateLink}
-            disabled={!selectedNoteId || createLink.isPending}
+            onClick={handleSubmit}
+            disabled={!selectedNoteId || isPending}
           >
-            {createLink.isPending ? "Liaison..." : "Lier la note"}
+            {isPending ? "Liaison..." : "Lier la note"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
-}
+})

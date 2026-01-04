@@ -1,7 +1,6 @@
-import { useState } from "react"
+import { useState, memo } from "react"
 import { Link2, Search } from "lucide-react"
 import { toast } from "sonner"
-
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -11,10 +10,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-
-import { useNotesQuery } from "../hooks/useNotesQuery"
-import { useCreateNoteLinkMutation } from "../hooks/useCreateNoteLinkMutation"
 import { useNoteLinksQuery } from "../hooks/useNoteLinksQuery"
+import { useLinkNotes } from "../hooks/useLinkNotes"
 import type { Note } from "../models/note.model"
 
 interface QuickLinkNoteProps {
@@ -25,7 +22,7 @@ interface QuickLinkNoteProps {
   readonly showLabel?: boolean
 }
 
-export function QuickLinkNote({
+export const QuickLinkNote = memo(function QuickLinkNote({
   note,
   onSuccess,
   triggerVariant = "outline",
@@ -33,35 +30,38 @@ export function QuickLinkNote({
   showLabel = true
 }: Readonly<QuickLinkNoteProps>) {
   const [open, setOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-
-  const { data: notesData, isLoading } = useNotesQuery(0, 50, {
-    collection_id: note.collectionId,
-  })
-
   const { data: existingLinks = [] } = useNoteLinksQuery(note.id)
-  const createLinkMutation = useCreateNoteLinkMutation(note.id)
 
-  const existingLinkIds = new Set(existingLinks.map(l => l.linkedNoteId))
-
-  const availableNotes = (notesData?.items ?? [])
-    .filter(n => n.id !== note.id)
-    .filter(n => !existingLinkIds.has(n.id))
-    .filter(n =>
-      searchQuery === "" ||
-      n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.content.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-
-  const handleLinkNote = async (targetNoteId: string, targetNoteTitle: string) => {
-    try {
-      await createLinkMutation.mutateAsync({ linkedNoteId: targetNoteId })
-      toast.success(`Note liée à "${targetNoteTitle}"`)
-      setSearchQuery("")
+  const {
+    searchQuery,
+    setSearchQuery,
+    availableNotes,
+    isLoading,
+    isPending,
+    handleCreateLink,
+    resetState,
+  } = useLinkNotes({
+    note,
+    existingLinks,
+    onSuccess: () => {
       setOpen(false)
       onSuccess?.()
-    } catch (error) {
+    },
+  })
+
+  const handleLinkNote = async (targetNoteId: string, targetNoteTitle: string) => {
+    const success = await handleCreateLink(targetNoteId)
+    if (success) {
+      toast.success(`Note liée à "${targetNoteTitle}"`)
+    } else {
       toast.error("Erreur lors de la liaison de la note")
+    }
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+    if (!newOpen) {
+      resetState()
     }
   }
 
@@ -81,7 +81,7 @@ export function QuickLinkNote({
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant={triggerVariant}
@@ -125,7 +125,7 @@ export function QuickLinkNote({
                 key={availableNote.id}
                 type="button"
                 onClick={() => handleLinkNote(availableNote.id, availableNote.title)}
-                disabled={createLinkMutation.isPending}
+                disabled={isPending}
                 className="w-full text-left p-3 border-b last:border-b-0 hover:bg-accent transition-colors disabled:opacity-50"
               >
                 <div className="flex items-start justify-between gap-2">
@@ -148,4 +148,4 @@ export function QuickLinkNote({
       </PopoverContent>
     </Popover>
   )
-}
+})
