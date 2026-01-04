@@ -1,7 +1,7 @@
 from daos.collection_dao import Collection
 from dtos.collection_dto import CollectionUpdateDTO
-from exceptions.collection_exception import (
-    CollectionNotFound,
+from exceptions.collection_exception import CollectionNotFound
+from exceptions.share_collection_exception import (
     CollectionShareAlreadyExists,
     CollectionShareTargetDoesNotExist,
     CollectionShareWithOwnerForbidden,
