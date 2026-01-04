@@ -1,6 +1,3 @@
-"""
-Fixtures pour les tests de reviews
-"""
 from dataclasses import dataclass, field
 import pytest
 from tests.note.conftest import app_client, note_test_data, client_with_note_data
@@ -55,9 +52,10 @@ class ReviewTestData:
         return incorrect[0] if incorrect else None
 
     def cleanup(self):
-        """Cleanup des flashcards créées"""
-        for flashcard_id in self.flashcard_ids:
-            self.client.delete(f"/flashcards/{flashcard_id}")
+        """
+        Cleanup désactivé car le conftest racine recrée la BD à chaque test.
+        """
+        pass
 
 
 @pytest.fixture

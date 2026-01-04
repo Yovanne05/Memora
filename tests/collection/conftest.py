@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import uuid4
 
-import config
 import pytest
 from daos.user_dao import User
 from dtos.collection_dto import CollectionCreateDTO
@@ -22,18 +21,6 @@ TEST_PASSWORD_HASH = "test-password-hash" # NOSONAR
 TEST_PASSWORD = "ValidPass1!" # NOSONAR
 
 
-@pytest.fixture(autouse=True)
-def disable_swagger(monkeypatch):
-    monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def ensure_test_app_schema():
-    """Create the in-memory schema once so repository calls succeed."""
-    from app import create_app
-    app = create_app()
-    with app.app_context():
-        return
 
 
 @dataclass
@@ -100,14 +87,10 @@ class CollectionTestData:
         self.created_shares.add((collection_id, user_id))
 
     def cleanup(self) -> None:
-        for collection_id, user_id in self.created_shares:
-            collection_share_repository.delete(collection_id, user_id)
-
-        for collection_id in self.created_collections:
-            collection_repository.delete(collection_id)
-
-        for user_id in self.created_users:
-            user_repository.delete(user_id)
+        """
+        Cleanup désactivé car le conftest racine recrée la BD à chaque test.
+        """
+        pass
 
 
 @pytest.fixture
