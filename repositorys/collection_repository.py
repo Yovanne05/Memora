@@ -46,7 +46,7 @@ class CollectionSearchParams :
     ids : Optional[list[str]] = None
     tags: Optional[list[str]] = None
     shared_with_user_id: Optional[str] = None
-    is_favorite: bool = False
+    is_favorite: Optional[bool] = False
 
     only_with_notes: bool = False
 

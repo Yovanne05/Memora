@@ -18,7 +18,7 @@ class NoteFindQuery(BaseModel):
     )
     ids: Optional[list[UUID]] = None
     tags: Optional[list[str]] = None
-    is_favorite: bool = Field(default=False, alias="isFavorite")
+    is_favorite: Optional[bool] = Field(default=None, alias="isFavorite")
 
     sort_by: Literal["title", "created_at", "updated_at"] = Field(
         default="created_at", alias="sortBy"
