@@ -12,6 +12,7 @@ from daos.note_dao import Note
 from utils.access_scope import accessible_collection_ids
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
+from repositorys.collection_favorite_repository import favorite_collection_ids_for_user
 
 
 def _apply_eager_loading(stmt: Select) -> Select:
@@ -45,6 +46,7 @@ class CollectionSearchParams :
     ids : Optional[list[str]] = None
     tags: Optional[list[str]] = None
     shared_with_user_id: Optional[str] = None
+    is_favorite: bool = False
 
     only_with_notes: bool = False
 
@@ -108,6 +110,7 @@ def list_for_user(user, params: Optional[CollectionSearchParams] = None) -> Tupl
     param = params or CollectionSearchParams()
 
     filters = []
+    favorite_ids: set[str] | None = None
 
     if param.visibility:
         filters.append(Collection.visibility == param.visibility)
@@ -131,6 +134,12 @@ def list_for_user(user, params: Optional[CollectionSearchParams] = None) -> Tupl
             .exists()
         )
         filters.append(note_exists)
+
+    if param.is_favorite:
+        favorite_ids = favorite_collection_ids_for_user(user.id)
+        if not favorite_ids:
+            return [], 0
+        filters.append(Collection.id.in_(favorite_ids))
 
     stmt = stmt.where(*filters)
     stmt = _scope_to_user(stmt, user)

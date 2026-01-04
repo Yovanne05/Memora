@@ -11,3 +11,4 @@ def test_find_many_returns_notes(client_with_note_data):
     payload = response.get_json()
     assert payload["total"] == 1
     assert payload["items"][0]["id"] == data.note_id
+    assert payload["items"][0]["is_favorite"] is False
