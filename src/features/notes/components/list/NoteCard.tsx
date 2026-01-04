@@ -6,6 +6,7 @@ import { CalendarClock, Eye, FileText, FolderClosed, Lock, Tag, User2 } from "lu
 import type { Note } from "../../models/note.model"
 import { NoteQuickActions } from "../NoteQuickActions"
 import { formatShortDate } from "@/lib/format.utils"
+import { getContentPreview } from "@/lib/html-utils"
 
 interface NoteCardProps {
   note: Note
@@ -14,6 +15,7 @@ interface NoteCardProps {
 
 export function NoteCard({ note, onActionComplete }: Readonly<NoteCardProps>) {
   const isPublic = note.visibility === "public"
+  const contentPreview = getContentPreview(note.content, 100)
 
   return (
     <Link
@@ -34,7 +36,7 @@ export function NoteCard({ note, onActionComplete }: Readonly<NoteCardProps>) {
                 {note.title}
               </CardTitle>
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {note.content || "Aucun contenu"}
+                {contentPreview || "Aucun contenu"}
               </p>
             </div>
           </div>

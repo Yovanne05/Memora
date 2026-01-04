@@ -26,6 +26,7 @@ import { useCollectionsQuery } from "@/features/collections/hooks/useCollections
 import type { Note, NoteVisibility } from "../../models/note.model"
 import { noteEditFormSchema } from "../../schemas/note.schema"
 import { formatTime } from "@/lib/format.utils"
+import { RichTextEditor } from "@/components/editor/RichTextEditor"
 
 export interface NoteFormValues {
   title: string
@@ -170,12 +171,11 @@ export function NoteEditForm({
                   <FormItem>
                     <FormLabel>Contenu</FormLabel>
                     <FormControl>
-                      <textarea
-                        {...field}
-                        id="note-content"
-                        placeholder="Commencez a rediger votre note..."
-                        className="min-h-[360px] w-full rounded-lg border border-input bg-background px-3 py-3 text-base leading-relaxed shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-70"
-                        disabled={isFormDisabled}
+                      <RichTextEditor
+                        content={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Commencez à rédiger votre note..."
+                        editable={!isFormDisabled}
                       />
                     </FormControl>
                     <FormMessage />
