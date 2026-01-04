@@ -1,8 +1,8 @@
 import { useMemo } from "react"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 
 export function useWorkspaceCollections() {
-  const collectionsQuery = useCollectionsListQuery()
+  const collectionsQuery = useCollectionsQuery()
 
   const collectionsTree = useMemo(() => {
     if (!collectionsQuery.data?.items) {

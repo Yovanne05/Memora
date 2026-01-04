@@ -15,7 +15,7 @@ export function NoteDetailsHeader({ note, onEdit, onDelete, isDeleting }: Readon
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <FileText className="h-4 w-4" />
-        <Link to="/app/notes" className="hover:text-foreground">
+        <Link to="/app/workspace/notes" className="hover:text-foreground">
           Notes
         </Link>
         <span className="text-muted-foreground">/</span>

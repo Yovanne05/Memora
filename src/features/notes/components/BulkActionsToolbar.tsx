@@ -35,7 +35,7 @@ import {
 
 import { useUpdateNoteMutation } from "../hooks/useUpdateNoteMutation"
 import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { NoteVisibility } from "../models/note.model"
 
 interface BulkActionsToolbarProps {
@@ -54,7 +54,7 @@ export function BulkActionsToolbar({
 
   const updateMutation = useUpdateNoteMutation()
   const deleteMutation = useDeleteNoteMutation()
-  const { data: collectionsData } = useCollectionsListQuery()
+  const { data: collectionsData } = useCollectionsQuery()
   const collections = collectionsData?.items ?? []
 
   const handleBulkDelete = async () => {

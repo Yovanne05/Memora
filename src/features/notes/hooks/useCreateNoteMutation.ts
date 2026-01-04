@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useAuth } from "@/features/auth/hooks/useAuth"
+import type { MutationCallbacks } from "@/lib/mutation-callbacks"
 
 import { notesService } from "../services/notes.service"
 import type { Note, NoteCreate } from "../models/note.model"
-import { NOTES_QUERY_KEYS } from "./useNotesQuery"
+import { NOTES_QUERY_KEYS } from "./notes.keys"
 
 type NoteCreateInput = Omit<NoteCreate, "ownerId"> & Partial<Pick<NoteCreate, "ownerId">>
 
-export function useCreateNoteMutation(options?: { onSuccess?: () => void }) {
+export function useCreateNoteMutation(callbacks?: MutationCallbacks<Note>) {
   const queryClient = useQueryClient()
   const { user } = useAuth()
   const userId = user?.id
@@ -22,14 +23,20 @@ export function useCreateNoteMutation(options?: { onSuccess?: () => void }) {
       return notesService.create({ ...payload, ownerId })
     },
     onSuccess: (data: Note) => {
-      toast.success("Note créée avec succès.")
+      if (!callbacks?.silent) {
+        toast.success("Note créée avec succès.")
+      }
       queryClient.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
       queryClient.setQueryData(NOTES_QUERY_KEYS.detail(data.id), data)
-      options?.onSuccess?.()
+      callbacks?.onSuccess?.(data)
     },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "La création de la note a échoué."
-      toast.error(message)
+    onError: (error: Error) => {
+      if (!callbacks?.silent) {
+        const message = error instanceof Error ? error.message : "La création de la note a échoué."
+        toast.error(message)
+      }
+      console.error("Failed to create note:", error)
+      callbacks?.onError?.(error)
     },
   })
 }

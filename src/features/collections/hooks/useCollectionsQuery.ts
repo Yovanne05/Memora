@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
 
-export function useCollectionsListQuery() {
+export function useCollectionsQuery() {
   return useQuery({
     queryKey: COLLECTIONS_QUERY_KEYS.list(),
     queryFn: () => collectionsService.list(),

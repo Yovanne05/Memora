@@ -22,9 +22,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Check, Save, Trash2 } from "lucide-react"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Note, NoteVisibility } from "../../models/note.model"
 import { noteEditFormSchema } from "../../schemas/note.schema"
+import { formatTime } from "@/lib/format.utils"
 
 export interface NoteFormValues {
   title: string
@@ -51,7 +52,7 @@ export function NoteEditForm({
   onDelete,
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
-  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsQuery()
   const collections = collectionsData?.items ?? []
 
   const form = useForm({
@@ -69,10 +70,7 @@ export function NoteEditForm({
 
   const savedTime = useMemo(() => {
     if (!lastSavedAt) return null
-    return new Intl.DateTimeFormat("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(lastSavedAt))
+    return formatTime(lastSavedAt)
   }, [lastSavedAt])
 
   const handleFormSubmit = form.handleSubmit(async (values) => {

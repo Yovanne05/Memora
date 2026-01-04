@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { NoteCard } from "@/features/notes/components/NoteCard"
+import { NoteCard } from "@/features/notes/components/list/NoteCard"
 import type { Note } from "@/features/notes/models/note.model"
 import { X, Link2 } from "lucide-react"
 import { GridLoadingState, GridEmptyState } from "./GridStates"

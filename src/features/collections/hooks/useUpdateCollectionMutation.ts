@@ -1,17 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { MutationCallbacks } from '@/lib/mutation-callbacks'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import type { Collection, CollectionUpdate } from '@/features/collections/models/collection.model'
 import type { PaginatedCollections } from '../types/paginated-collection'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
 
-interface MutationCallbacks {
-  onSuccess?: (data: Collection) => void
-  onError?: (error: Error) => void
-  silent?: boolean
-}
-
-export function useUpdateCollectionMutation(callbacks?: MutationCallbacks) {
+export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collection>) {
   const queryClient = useQueryClient()
 
   return useMutation({

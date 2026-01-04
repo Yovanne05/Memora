@@ -5,18 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CalendarClock, Eye, FileText, FolderClosed, Lock, Tag, User2 } from "lucide-react"
 import type { Note } from "../../models/note.model"
 import { NoteQuickActions } from "../NoteQuickActions"
+import { formatShortDate } from "@/lib/format.utils"
 
 interface NoteCardProps {
   note: Note
   onActionComplete?: () => void
 }
-
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat("fr-FR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(new Date(date))
 
 export function NoteCard({ note, onActionComplete }: Readonly<NoteCardProps>) {
   const isPublic = note.visibility === "public"
@@ -87,7 +81,7 @@ export function NoteCard({ note, onActionComplete }: Readonly<NoteCardProps>) {
               </span>
               <span className="flex items-center gap-1">
                 <CalendarClock className="h-3.5 w-3.5" />
-                Mis à jour le {formatDate(note.updatedAt)}
+                Mis à jour le {formatShortDate(note.updatedAt)}
               </span>
             </div>
           </div>

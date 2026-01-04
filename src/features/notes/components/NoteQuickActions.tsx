@@ -37,7 +37,7 @@ import {
 import { useUpdateNoteMutation } from "../hooks/useUpdateNoteMutation"
 import { useDeleteNoteMutation } from "../hooks/useDeleteNoteMutation"
 import { useCreateNoteMutation } from "../hooks/useCreateNoteMutation"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Note } from "../models/note.model"
 
 interface NoteQuickActionsProps {
@@ -59,7 +59,7 @@ export function NoteQuickActions({
   const updateMutation = useUpdateNoteMutation({ onSuccess: onActionComplete })
   const deleteMutation = useDeleteNoteMutation({ onSuccess: onActionComplete })
   const duplicateMutation = useCreateNoteMutation({ onSuccess: onActionComplete })
-  const { data: collectionsData } = useCollectionsListQuery()
+  const { data: collectionsData } = useCollectionsQuery()
   const collections = collectionsData?.items ?? []
 
   const handleToggleVisibility = async () => {

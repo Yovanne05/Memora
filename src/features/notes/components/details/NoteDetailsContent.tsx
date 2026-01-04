@@ -4,20 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import type { Note } from "../../models/note.model"
 import { CalendarClock, FolderClosed, Globe, Lock, NotebookPen, Tag } from "lucide-react"
+import { formatLongDateTime } from "@/lib/format.utils"
 
 interface NoteDetailsContentProps {
   readonly note: Note
   readonly paragraphs: string[]
 }
-
-const formatDateTime = (date: string) =>
-  new Intl.DateTimeFormat("fr-FR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(date))
 
 export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsContentProps>) {
   const contentId = useId();
@@ -84,13 +76,13 @@ export function NoteDetailsContent({ note, paragraphs }: Readonly<NoteDetailsCon
           <div className="flex items-center gap-2">
             <CalendarClock className="h-4 w-4" />
             <span className="text-foreground">Créée</span>
-            <span>{formatDateTime(note.createdAt)}</span>
+            <span>{formatLongDateTime(note.createdAt)}</span>
           </div>
 
           <div className="flex items-center gap-2">
             <CalendarClock className="h-4 w-4" />
             <span className="text-foreground">Mise à jour</span>
-            <span>{formatDateTime(note.updatedAt)}</span>
+            <span>{formatLongDateTime(note.updatedAt)}</span>
           </div>
         </CardContent>
       </Card>
