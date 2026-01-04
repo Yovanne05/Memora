@@ -6,6 +6,7 @@ import type { Note } from "../models/note.model";
 import { cn } from "@/lib/utils";
 import { useResizable } from "@/hooks/useResizable";
 import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection";
+import { RichTextDisplay } from "@/components/editor/RichTextDisplay";
 
 interface NoteSidebarProps {
   readonly note: Note | null;
@@ -140,15 +141,7 @@ export function NoteSidebar({
             <h3 className="text-sm font-semibold text-muted-foreground mb-3">
               Contenu
             </h3>
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <p className="text-foreground whitespace-pre-wrap leading-relaxed">
-                {note.content || (
-                  <span className="text-muted-foreground italic">
-                    Aucun contenu
-                  </span>
-                )}
-              </p>
-            </div>
+            <RichTextDisplay content={note.content} />
           </div>
 
           <Separator />
