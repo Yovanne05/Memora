@@ -7,7 +7,7 @@ def test_get_statistics_counts_created_notes(
     create_note(token, user_id)
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 200
@@ -23,7 +23,7 @@ def test_get_statistics_counts_created_collections(
     create_collection(token, user_id)
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 200
@@ -41,7 +41,7 @@ def test_get_statistics_counts_created_flashcards(
     create_flashcard(token, note_id)
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 200

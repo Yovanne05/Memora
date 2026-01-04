@@ -1,10 +1,10 @@
-"""Tests for review statistics in /auth/me/statistics endpoint"""
+"""Tests for review statistics in /users/me/statistics endpoint"""
 
 
 def test_statistics_review_stats_empty_initially(client_with_review_data):
     client, _ = client_with_review_data
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -32,7 +32,7 @@ def test_statistics_review_stats_after_single_review(client_with_review_data):
     }
     client.post("/reviews", json=payload)
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -63,7 +63,7 @@ def test_statistics_review_stats_multiple_reviews(client_with_review_data):
     }
     client.post("/reviews", json=payload2)
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -89,7 +89,7 @@ def test_statistics_quality_distribution(client_with_review_data):
         }
         client.post("/reviews", json=payload)
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -127,7 +127,7 @@ def test_statistics_quality_distribution_all_difficulties(client_with_review_dat
         }
         client.post("/reviews", json=payload)
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -158,7 +158,7 @@ def test_statistics_updates_on_review_update(client_with_review_data):
     }
     client.post("/reviews", json=payload1)
 
-    response1 = client.get("/auth/me/statistics")
+    response1 = client.get("/users/me/statistics")
     assert response1.status_code == 200
     body1 = response1.get_json()
     assert body1["reviewStatistics"]["totalReviews"] == 1
@@ -171,7 +171,7 @@ def test_statistics_updates_on_review_update(client_with_review_data):
     }
     client.post("/reviews", json=payload2)
 
-    response2 = client.get("/auth/me/statistics")
+    response2 = client.get("/users/me/statistics")
     assert response2.status_code == 200
     body2 = response2.get_json()
     assert body2["reviewStatistics"]["totalReviews"] == 1
@@ -195,7 +195,7 @@ def test_statistics_only_shows_current_user_reviews(client_with_review_data):
 
     data.note_data._authenticate_client(other_user_id)
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -209,7 +209,7 @@ def test_statistics_only_shows_current_user_reviews(client_with_review_data):
 def test_statistics_content_stats_unaffected(client_with_review_data):
     client, data = client_with_review_data
 
-    response = client.get("/auth/me/statistics")
+    response = client.get("/users/me/statistics")
 
     assert response.status_code == 200
     body = response.get_json()

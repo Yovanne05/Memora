@@ -9,7 +9,7 @@ def test_get_statistics_counts_shared_notes(
     share_note(token1, note2_id, user2_id)
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token1}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token1}"}
     )
 
     assert response.status_code == 200
@@ -26,7 +26,7 @@ def test_get_statistics_counts_shared_collections(
     share_collection(token1, collection_id, user2_id)
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token1}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token1}"}
     )
 
     assert response.status_code == 200

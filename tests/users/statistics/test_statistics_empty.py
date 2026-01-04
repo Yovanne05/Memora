@@ -2,7 +2,7 @@ def test_get_statistics_returns_empty_stats_for_new_user(client, register_user):
     _, _, _, token = register_user()
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 200
