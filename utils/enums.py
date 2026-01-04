@@ -15,3 +15,10 @@ class RoleEnum(str, Enum):
     CLIENT = "client"
     ADMIN = "admin"
     SUPER_ADMIN = "super_admin"
+
+
+class ReviewDifficultyEnum(str, Enum):
+    AGAIN = "again"
+    HARD = "hard"
+    GOOD = "good"
+    EASY = "easy"

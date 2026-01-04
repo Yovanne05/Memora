@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum as SAEnum, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -9,6 +10,9 @@ from daos.base_models import UUIDMixin, CreatedAtMixin
 
 from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note, NoteShare
+
+if TYPE_CHECKING:
+    from daos.review_dao import Review
 
 
 class User(UUIDMixin, CreatedAtMixin, Base):
@@ -44,3 +48,4 @@ class User(UUIDMixin, CreatedAtMixin, Base):
     note_shares: Mapped[list["NoteShare"]] = relationship(
         back_populates="user"
     )
+    reviews: Mapped[list["Review"]] = relationship(back_populates="user")

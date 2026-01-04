@@ -12,10 +12,12 @@ DROP TABLE IF EXISTS flashcard_answers CASCADE;
 
 DROP TYPE IF EXISTS visibility_enum;
 DROP TYPE IF EXISTS permission_enum;
+DROP TYPE IF EXISTS review_difficulty_enum;
 
 
 CREATE TYPE visibility_enum AS ENUM ('private', 'public');
 CREATE TYPE permission_enum AS ENUM ('read', 'write');
+CREATE TYPE review_difficulty_enum AS ENUM ('again', 'hard', 'good', 'easy');
 
 -- ===== TABLES =====
 
@@ -183,27 +185,35 @@ CREATE TABLE flashcard_answers (
 CREATE INDEX idx_flashcard_answers_flashcard ON flashcard_answers (flashcard_id);
 
 CREATE TABLE reviews (
-    id             CHAR(36) PRIMARY KEY,
-    flashcard_id   CHAR(36) NOT NULL,
-    user_id        CHAR(36) NOT NULL,
-    quality        INT NOT NULL,
-    applied_interval INT NOT NULL,
-    reviewed_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    next_due_at    TIMESTAMP NOT NULL,
+    user_id              CHAR(36) NOT NULL,
+    flashcard_id         CHAR(36) NOT NULL,
+    selected_answer_id   CHAR(36) NOT NULL,
+    is_correct           BOOLEAN NOT NULL,
+    difficulty           review_difficulty_enum NOT NULL,
+    e_factor             DECIMAL(4,2) NOT NULL DEFAULT 2.5,
+    repetitions          INT NOT NULL DEFAULT 0,
+    interval_days        INT NOT NULL DEFAULT 0,
+    next_review_at       TIMESTAMP NOT NULL,
+    reviewed_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, flashcard_id),
+    CONSTRAINT fk_reviews_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     CONSTRAINT fk_reviews_flashcard
         FOREIGN KEY (flashcard_id) REFERENCES flashcards(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_reviews_user
-        FOREIGN KEY (user_id) REFERENCES users(id)
+    CONSTRAINT fk_reviews_answer
+        FOREIGN KEY (selected_answer_id) REFERENCES flashcard_answers(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
-CREATE INDEX idx_reviews_flashcard ON reviews (flashcard_id);
 CREATE INDEX idx_reviews_user ON reviews (user_id);
-CREATE INDEX idx_reviews_date ON reviews (reviewed_at);
-CREATE INDEX idx_reviews_quality ON reviews (quality);
+CREATE INDEX idx_reviews_flashcard ON reviews (flashcard_id);
+CREATE INDEX idx_reviews_next_review ON reviews (user_id, next_review_at);
+CREATE INDEX idx_reviews_reviewed_at ON reviews (user_id, reviewed_at);
 
 -- ===== TRIGGERS =====
 
