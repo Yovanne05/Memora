@@ -1,25 +1,17 @@
 from uuid import uuid4
 
-import config
 import pytest
 
 TEST_PASSWORD = "StrongPwd1!"  # NOSONAR
 
 
-@pytest.fixture(autouse=True)
-def configure_env(monkeypatch):
-    monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
-
-
 @pytest.fixture
 def client():
+    """Client de test Flask"""
     from app import create_app
-
     app = create_app()
-    app.testing = False
-    app.config["TESTING"] = False
-    with app.test_client() as client:
-        yield client
+    with app.test_client() as test_client:
+        yield test_client
 
 
 def _register_user(client):

@@ -1,18 +1,12 @@
 ﻿from dataclasses import dataclass, field
 from uuid import uuid4
 
-import config
 import pytest
 from werkzeug.test import Client
 from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 # Test constants
 TEST_PASSWORD_PREFIX = "TestPwd" # NOSONAR
-
-
-@pytest.fixture(autouse=True)
-def disable_swagger(monkeypatch):
-    monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
 
 
 @dataclass
@@ -234,29 +228,11 @@ class NoteTestData:
             )
 
     def cleanup(self) -> None:
-        for note_id in self.created_note_favorites:
-            self.remove_note_favorite(note_id)
-
-        for collection_id in self.created_collection_favorites:
-            self.remove_collection_favorite(collection_id)
-
-        for note_id, linked_note_id in self.created_links:
-            self._delete_if_exists(f"/note-links/{note_id}/links/{linked_note_id}")
-
-        for note_id, user_id in self.created_shares:
-            self._delete_if_exists(f"/note-shares/{note_id}/shares/{user_id}")
-
-        for note_id in self.created_note_ids:
-            self._delete_if_exists(f"/notes/{note_id}")
-
-        for tag_id in self.created_tag_ids:
-            self._delete_if_exists(f"/tags/{tag_id}")
-
-        for collection_id in self.created_collection_ids:
-            self._delete_if_exists(f"/collections/{collection_id}")
-
-        for user_id in self.created_user_ids:
-            self._delete_if_exists(f"/users/{user_id}")
+        """
+        Cleanup désactivé car le conftest racine recrée la BD à chaque test.
+        Garder le cleanup actif causait des erreurs de contraintes FK avec les reviews.
+        """
+        pass
 
     def _delete_if_exists(self, path: str) -> None:
         response = self.client.delete(path)

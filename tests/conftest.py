@@ -6,12 +6,14 @@ from utils import db as db_utils
 
 
 def _clear_scope_cache():
+    """Nettoie le cache des scopes d'accès"""
     g.pop("accessible_collection_ids", None)
     g.pop("accessible_note_ids", None)
 
 
 @pytest.fixture(autouse=True)
 def configure_test_env(monkeypatch):
+    """Configure l'environnement de test avec SQLite en mémoire pour tous les tests"""
     old_engine = db_utils.engine
     test_uri = "sqlite+pysqlite:///:memory:"
     monkeypatch.setenv("APP_ENV", "test")
@@ -45,6 +47,7 @@ def configure_test_env(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def app_context(configure_test_env):
+    """Fournit un contexte d'application Flask pour tous les tests"""
     from app import create_app
     app = create_app()
     with app.app_context():

@@ -25,7 +25,7 @@ def test_get_statistics_with_complete_scenario(
     share_collection(token1, collection1_id, user2_id)
 
     response = client.get(
-        "/auth/me/statistics", headers={"Authorization": f"Bearer {token1}"}
+        "/users/me/statistics", headers={"Authorization": f"Bearer {token1}"}
     )
 
     assert response.status_code == 200
