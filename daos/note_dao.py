@@ -57,17 +57,25 @@ class Note(
         back_populates="notes", lazy="selectin"
     )
     owner: Mapped["User"] = relationship(back_populates="notes", lazy="selectin")
-    shares: Mapped[list["NoteShare"]] = relationship(back_populates="note")
+    shares: Mapped[list["NoteShare"]] = relationship(
+        back_populates="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     flashcards: Mapped[list["Flashcard"]] = relationship(
         back_populates="note", passive_deletes=True
     )
     outgoing_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_1],
         back_populates="source_note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     incoming_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_2],
         back_populates="target_note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
 
