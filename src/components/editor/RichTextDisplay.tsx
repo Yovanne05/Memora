@@ -1,24 +1,78 @@
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Link from '@tiptap/extension-link'
+import TextAlign from '@tiptap/extension-text-align'
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { common, createLowlight } from 'lowlight'
 import { cn } from '@/lib/utils'
+import { useMemo } from 'react'
+import './editor.css'
+
+const lowlight = createLowlight(common)
 
 interface RichTextDisplayProps {
   content: string
   className?: string
 }
 
-/**
- * Composant pour afficher le contenu riche des notes.
- * Gère la compatibilité avec les notes en texte simple (ancien format)
- * et les notes en HTML (nouveau format avec TipTap).
- */
-export function RichTextDisplay({ content, className }: Readonly<RichTextDisplayProps>) {
-  // Détection si le contenu est du HTML ou du texte simple
-  const isHTML = content.trim().startsWith('<')
+function isJSONContent(content: string): boolean {
+  if (!content || content.trim().length === 0) return false
 
-  if (isHTML) {
-    // Affichage du contenu HTML enrichi
-    return (
-      <div
-        className={cn(
+  try {
+    const parsed = JSON.parse(content)
+    return parsed && typeof parsed === 'object' && 'type' in parsed
+  } catch {
+    return false
+  }
+}
+
+export function RichTextDisplay({ content, className }: Readonly<RichTextDisplayProps>) {
+  const parsedContent = useMemo(() => {
+    if (!content || content.trim().length === 0) {
+      return ''
+    }
+
+    if (isJSONContent(content)) {
+      try {
+        return JSON.parse(content)
+      } catch {
+        return content
+      }
+    }
+
+    return content
+  }, [content])
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+      Underline,
+      Link.configure({
+        openOnClick: true,
+        HTMLAttributes: {
+          class: 'text-primary underline cursor-pointer hover:text-primary/80',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+        HTMLAttributes: {
+          class: 'bg-muted rounded-md p-4 font-mono text-sm',
+        },
+      }),
+    ],
+    content: parsedContent,
+    editable: false,
+    editorProps: {
+      attributes: {
+        class: cn(
           'prose prose-sm max-w-none',
           'prose-headings:font-semibold prose-headings:tracking-tight',
           'prose-p:leading-relaxed prose-p:text-muted-foreground',
@@ -30,22 +84,26 @@ export function RichTextDisplay({ content, className }: Readonly<RichTextDisplay
           'prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground',
           'prose-strong:font-semibold prose-strong:text-foreground',
           'prose-em:italic',
-          className
-        )}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+        ),
+      },
+    },
+  })
+
+  if (!editor) {
+    return null
+  }
+
+  if (!content || content.trim().length === 0) {
+    return (
+      <div className={cn('text-muted-foreground italic p-4', className)}>
+        Aucun contenu
+      </div>
     )
   }
 
-  // Affichage du texte simple (ancien format) avec préservation des sauts de ligne
   return (
-    <div
-      className={cn(
-        'prose prose-sm max-w-none text-muted-foreground leading-relaxed whitespace-pre-wrap',
-        className
-      )}
-    >
-      {content}
+    <div className={cn('rich-text-display', className)}>
+      <EditorContent editor={editor} />
     </div>
   )
 }

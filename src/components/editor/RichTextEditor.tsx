@@ -21,6 +21,33 @@ interface RichTextEditorProps {
   className?: string
 }
 
+
+function isJSONContent(content: string): boolean {
+  if (!content || content.trim().length === 0) return false
+
+  try {
+    const parsed = JSON.parse(content)
+    return parsed && typeof parsed === 'object' && 'type' in parsed
+  } catch {
+    return false
+  }
+}
+
+function parseContent(content: string) {
+  if (!content || content.trim().length === 0) {
+    return ''
+  }
+
+  if (isJSONContent(content)) {
+    try {
+      return JSON.parse(content)
+    } catch {
+      return content
+    }
+  }
+  return content
+}
+
 export function RichTextEditor({
   content,
   onChange,
@@ -31,7 +58,7 @@ export function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // Désactiver le codeBlock par défaut pour utiliser lowlight
+        codeBlock: false,
       }),
       Underline,
       Link.configure({
@@ -53,10 +80,11 @@ export function RichTextEditor({
         },
       }),
     ],
-    content,
+    content: parseContent(content),
     editable,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      const json = editor.getJSON()
+      onChange(JSON.stringify(json))
     },
     editorProps: {
       attributes: {
@@ -75,10 +103,21 @@ export function RichTextEditor({
     },
   })
 
-  // Mettre à jour le contenu quand il change de l'extérieur
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content)
+    if (!editor) return
+
+    const currentContent = JSON.stringify(editor.getJSON())
+    const newContent = parseContent(content)
+
+    if (typeof newContent === 'string') {
+      if (currentContent !== newContent) {
+        editor.commands.setContent(newContent)
+      }
+    } else {
+      const newContentStr = JSON.stringify(newContent)
+      if (currentContent !== newContentStr) {
+        editor.commands.setContent(newContent)
+      }
     }
   }, [content, editor])
 

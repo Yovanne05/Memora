@@ -1,33 +1,54 @@
-/**
- * Extrait le texte brut du contenu HTML.
- * Utile pour afficher des aperçus de notes enrichies dans les cartes.
- *
- * @param content - Le contenu HTML ou texte simple
- * @returns Le texte brut sans balises HTML
- */
+interface TipTapNode {
+  type: string
+  content?: TipTapNode[]
+  text?: string
+  attrs?: Record<string, unknown>
+  marks?: Array<{ type: string; attrs?: Record<string, unknown> }>
+}
+
+interface TipTapDocument {
+  type: 'doc'
+  content: TipTapNode[]
+}
+
+function isJSONContent(content: string): boolean {
+  if (!content || content.trim().length === 0) return false
+
+  try {
+    const parsed = JSON.parse(content)
+    return parsed && typeof parsed === 'object' && 'type' in parsed
+  } catch {
+    return false
+  }
+}
+
+function extractTextFromNode(node: TipTapNode): string {
+  if (node.text) {
+    return node.text
+  }
+
+  if (node.content && Array.isArray(node.content)) {
+    return node.content.map(child => extractTextFromNode(child)).join('')
+  }
+
+  return ''
+}
+
 export function stripHTML(content: string): string {
   if (!content) return ''
 
-  // Si ce n'est pas du HTML, retourner tel quel
-  if (!content.trim().startsWith('<')) {
-    return content
+  if (isJSONContent(content)) {
+    try {
+      const doc: TipTapDocument = JSON.parse(content)
+      return extractTextFromNode(doc)
+    } catch {
+      return content
+    }
   }
 
-  // Créer un élément temporaire pour parser le HTML
-  const temp = document.createElement('div')
-  temp.innerHTML = content
-
-  // Extraire le texte
-  return temp.textContent || temp.innerText || ''
+  return content
 }
 
-/**
- * Tronque le texte à une longueur donnée en préservant les mots.
- *
- * @param text - Le texte à tronquer
- * @param maxLength - Longueur maximale
- * @returns Le texte tronqué avec "..." si nécessaire
- */
 export function truncateText(text: string, maxLength: number = 150): string {
   if (text.length <= maxLength) return text
 
@@ -39,13 +60,6 @@ export function truncateText(text: string, maxLength: number = 150): string {
     : truncated + '...'
 }
 
-/**
- * Extrait et tronque le texte pour un aperçu de note.
- *
- * @param content - Le contenu HTML ou texte simple
- * @param maxLength - Longueur maximale de l'aperçu
- * @returns L'aperçu du contenu
- */
 export function getContentPreview(content: string, maxLength: number = 150): string {
   const plainText = stripHTML(content)
   return truncateText(plainText, maxLength)
