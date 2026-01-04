@@ -9,6 +9,7 @@ export type NotesFilters = Record<string, QueryParamValue> & PaginationParams & 
   titleContains?: string
   contentContains?: string
   ids?: string
+  isFavorite? : boolean
   tagIds?: string
   sortBy?: "title" | "created_at" | "updated_at"
   sortDir?: "asc" | "desc"

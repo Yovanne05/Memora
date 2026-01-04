@@ -8,4 +8,6 @@ export interface ICollectionsService {
   create(payload: CollectionCreate): Promise<Collection>
   update(id: string, payload: CollectionUpdate): Promise<Collection>
   remove(id: string): Promise<void>
+  addFavorite(id: string): Promise<void>
+  removeFavorite(id: string): Promise<void>
 }

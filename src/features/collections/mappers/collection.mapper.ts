@@ -17,6 +17,7 @@ export function dtoToCollection(dto: CollectionDto): Collection {
     name: dto.name,
     description: dto.description ?? null,
     visibility: dto.visibility ?? "private",
+      isFavorite: dto.is_favorite ?? false,
     tags: dto.tags ?? [],
     notes: dto.notes.map(dtoToNote),
     nodes: dto.nodes ?? [],
