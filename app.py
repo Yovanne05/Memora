@@ -12,6 +12,8 @@ from controllers.share_note_controller import bp_note_shares
 from controllers.share_collection_controller import bp_collection_shares
 from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards
+from controllers.user_statistics_controller import bp_user_statistics
+from controllers.review_controller import bp_reviews
 from utils import db
 from utils.jwt import init_jwt
 from utils.limiter import init_limiter
@@ -47,6 +49,8 @@ def create_app() -> Flask:
     app.register_blueprint(bp_collection_shares)
     app.register_blueprint(bp_note_images)
     app.register_blueprint(bp_flashcards)
+    app.register_blueprint(bp_user_statistics)
+    app.register_blueprint(bp_reviews)
 
     return app
 

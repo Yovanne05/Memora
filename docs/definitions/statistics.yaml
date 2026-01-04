@@ -1,0 +1,92 @@
+definitions:
+  ContentStatistics:
+    type: object
+    description: Statistiques sur le contenu cree par l'utilisateur.
+    properties:
+      notesCreated:
+        type: integer
+        format: int32
+        description: Nombre de notes creees par l'utilisateur.
+        example: 42
+      collectionsCreated:
+        type: integer
+        format: int32
+        description: Nombre de collections creees par l'utilisateur.
+        example: 8
+      flashcardsCreated:
+        type: integer
+        format: int32
+        description: Nombre de flashcards creees par l'utilisateur.
+        example: 156
+      notesSharedByUser:
+        type: integer
+        format: int32
+        description: Nombre de notes partagees avec d'autres utilisateurs.
+        example: 12
+      collectionsSharedByUser:
+        type: integer
+        format: int32
+        description: Nombre de collections partagees avec d'autres utilisateurs.
+        example: 3
+    required:
+      - notesCreated
+      - collectionsCreated
+      - flashcardsCreated
+      - notesSharedByUser
+      - collectionsSharedByUser
+
+  ReviewStatistics:
+    type: object
+    description: Statistiques sur les revisions de flashcards.
+    properties:
+      totalReviews:
+        type: integer
+        format: int32
+        description: Nombre total de revisions effectuees.
+        example: 523
+      reviewsLast7Days:
+        type: integer
+        format: int32
+        description: Nombre de revisions dans les 7 derniers jours.
+        example: 45
+      reviewsLast30Days:
+        type: integer
+        format: int32
+        description: Nombre de revisions dans les 30 derniers jours.
+        example: 178
+      averageQuality:
+        type: number
+        format: float
+        description: Moyenne des notes de qualite (0-5).
+        example: 3.8
+      qualityDistribution:
+        type: object
+        description: Distribution des notes de qualite.
+        additionalProperties:
+          type: integer
+        example:
+          "0": 12
+          "1": 23
+          "2": 45
+          "3": 89
+          "4": 234
+          "5": 120
+    required:
+      - totalReviews
+      - reviewsLast7Days
+      - reviewsLast30Days
+      - averageQuality
+      - qualityDistribution
+
+  UserStatistics:
+    type: object
+    description: Statistiques globales de l'utilisateur.
+    properties:
+      contentStatistics:
+        $ref: "#/definitions/ContentStatistics"
+      reviewStatistics:
+        $ref: "#/definitions/ReviewStatistics"
+        nullable: true
+        description: Statistiques de revision (null si non encore implementees).
+    required:
+      - contentStatistics

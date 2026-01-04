@@ -20,7 +20,11 @@ def _safe_collection_name(note: Note) -> Optional[str]:
     return note.collection.name if note.collection else None
 
 
-def note_to_dto(note: Note) -> NoteDTO:
+def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None) -> NoteDTO:
+    is_favorite = False
+    if favorite_note_ids is not None:
+        is_favorite = note.id in favorite_note_ids
+
     data = {
         "id": note.id,
         "title": note.title,
@@ -33,6 +37,7 @@ def note_to_dto(note: Note) -> NoteDTO:
         "updated_at": note.updated_at,
         "owner_username": _safe_owner_username(note),
         "collection_name": _safe_collection_name(note),
+        "is_favorite": is_favorite,
     }
     return NoteDTO.model_validate(data)
 

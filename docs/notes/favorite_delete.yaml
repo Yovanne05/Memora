@@ -1,0 +1,16 @@
+tags:
+  - notes
+summary: Retirer une note des favoris
+description: Supprime la note des favoris de l'utilisateur authentifie.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note a retirer des favoris.
+responses:
+  204:
+    description: Note retiree des favoris.
+  404:
+    description: Note ou favori introuvable.

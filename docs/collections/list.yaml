@@ -41,6 +41,12 @@ parameters:
     description: >
       Liste CSV de tags (ex. `mathematiques,universite`) pour filtrer les collections par tags.
   - in: query
+    name: isFavorite
+    type: boolean
+    required: false
+    description: >
+      Si `true`, ne renvoie que les collections favorites de l'utilisateur courant.
+  - in: query
     name: onlyWithNotes
     type: boolean
     required: false

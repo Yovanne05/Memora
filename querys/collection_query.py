@@ -13,6 +13,7 @@ class CollectionFindQuery(BaseModel) :
     ids : Optional[list[UUID]] = None
     tags : Optional[list[str]] = None
     only_with_notes : bool = Field(default = False, alias = "onlyWithNotes")
+    is_favorite: bool = Field(default=False, alias="isFavorite")
 
     sort_by : Literal["title", "created_at", "updated_at"] = Field(
         default = "created_at", alias = "sortBy"
@@ -41,6 +42,7 @@ class CollectionFindQuery(BaseModel) :
             only_with_notes = self.only_with_notes,
             ids = [str(item) for item in self.ids] if self.ids else None,
             tags=self.tags,
+            is_favorite=self.is_favorite,
             sort_by = self.sort_by,
             sort_dir = self.sort_dir,
             limit = self.limit,

@@ -4,11 +4,12 @@ from daos.note_dao import Note
 
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from dtos.note_dto import NoteDTO
+from mappers.note_mapper import note_to_dto
 
 
-def _build_note_dtos(notes: List[Note]) -> List[NoteDTO]:
+def _build_note_dtos(notes: List[Note], note_favorite_ids: set[str] | None) -> List[NoteDTO]:
     return [
-        NoteDTO.model_validate(note)
+        note_to_dto(note, favorite_note_ids=note_favorite_ids)
         for note in notes
     ]
 
@@ -60,9 +61,16 @@ def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
     return edges
 
 
-def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
+def collection_to_dto(
+    collection_entity: Collection,
+    collection_favorite_ids: set[str] | None = None,
+    note_favorite_ids: set[str] | None = None,
+) -> CollectionDTO:
     notes = collection_entity.notes
     note_ids = {note.id for note in notes}
+    is_favorite = False
+    if collection_favorite_ids is not None:
+        is_favorite = collection_entity.id in collection_favorite_ids
 
     return CollectionDTO.model_validate(
         {
@@ -72,9 +80,10 @@ def collection_to_dto(collection_entity: Collection) -> CollectionDTO:
             "visibility": collection_entity.visibility,
             "owner_id": collection_entity.owner_id,
             "tags": collection_entity.tags,
+            "is_favorite": is_favorite,
             "created_at": collection_entity.created_at,
             "updated_at": collection_entity.updated_at,
-            "notes": _build_note_dtos(notes),
+            "notes": _build_note_dtos(notes, note_favorite_ids),
             "nodes": _build_graph_nodes(notes),
             "edges": _build_graph_edges(notes, note_ids),
         }

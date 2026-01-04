@@ -11,6 +11,9 @@ from dtos.collection_dto import (
 )
 from querys.collection_query import CollectionFindQuery
 from services.impl.collection.collection_service_impl import collection_service
+from services.impl.favorite.collection_favorite_service_impl import (
+    collection_favorite_service,
+)
 
 bp_collections = Blueprint(
     "collections", __name__, url_prefix="/collections"
@@ -63,4 +66,18 @@ def update(collection_id: UUID):
 @swag_from("../docs/collections/delete.yaml")
 def delete(collection_id: UUID):
     collection_service.delete(str(collection_id))
+    return "", HTTPStatus.NO_CONTENT
+
+
+@bp_collections.post("/<uuid:collection_id>/favorite")
+@swag_from("../docs/collections/favorite_add.yaml")
+def add_favorite(collection_id: UUID):
+    favorite = collection_favorite_service.add_favorite(str(collection_id))
+    return jsonify(favorite.model_dump()), HTTPStatus.CREATED
+
+
+@bp_collections.delete("/<uuid:collection_id>/favorite")
+@swag_from("../docs/collections/favorite_delete.yaml")
+def remove_favorite(collection_id: UUID):
+    collection_favorite_service.remove_favorite(str(collection_id))
     return "", HTTPStatus.NO_CONTENT

@@ -32,7 +32,11 @@ definitions:
         description: Tags associated with this collection.
         items:
           type: string
-        example: ["mathématiques", "algèbre", "université"]
+        example: ["mathゼmatiques", "algЁbre", "universitゼ"]
+      is_favorite:
+        type: boolean
+        description: Whether the collection is favorited by the current user.
+        example: true
       created_at:
         type: string
         format: date-time
@@ -103,7 +107,7 @@ definitions:
         description: Tags to associate with the collection.
         items:
           type: string
-        example: ["mathématiques", "université"]
+        example: ["mathゼmatiques", "universitゼ"]
 
   CollectionUpdatePayload:
     type: object
@@ -129,7 +133,7 @@ definitions:
         description: New tags for the collection.
         items:
           type: string
-        example: ["algèbre", "licence"]
+        example: ["algЁbre", "licence"]
 
   CollectionListResponse:
     type: object
@@ -161,26 +165,25 @@ definitions:
       permission:
         type: string
         enum: ["read", "write"]
-        description: Access level granted.
+        description: Niveau d'acces partage.
       created_at:
         type: string
         format: date-time
-        description: Date when the share was created.
+        description: Date de creation du partage.
     required: ["collection_id", "user_id", "permission", "created_at"]
 
   CollectionShareCreatePayload:
     type: object
-    required: ["user_id"]
+    required: ["user_id", "permission"]
     properties:
       user_id:
         type: string
         format: uuid
-        description: User to grant access to.
+        description: Identifiant de l'utilisateur cible.
       permission:
         type: string
         enum: ["read", "write"]
-        default: "read"
-        description: Access level to grant.
+        description: Niveau d'acces souhaite.
 
   CollectionShareUpdatePayload:
     type: object
@@ -189,18 +192,36 @@ definitions:
       permission:
         type: string
         enum: ["read", "write"]
-        description: New access level.
+        description: Nouveau niveau d'acces.
 
   CollectionShareListResponse:
     type: object
+    description: Liste paginee des partages d'une collection.
     properties:
       total:
         type: integer
         format: int32
-        description: Number of shares for the collection.
-        example: 2
+        description: Nombre total de partages.
       items:
         type: array
         items:
           $ref: "#/definitions/CollectionShare"
     required: ["total", "items"]
+
+  CollectionFavorite:
+    type: object
+    description: Lien de favori entre un utilisateur et une collection.
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant de l'utilisateur.
+      collection_id:
+        type: string
+        format: uuid
+        description: Identifiant de la collection.
+      created_at:
+        type: string
+        format: date-time
+        description: Date d'ajout aux favoris.
+    required: ["user_id", "collection_id", "created_at"]

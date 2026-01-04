@@ -11,7 +11,7 @@ from dtos.collection_share_dto import (
     CollectionShareDTO,
     CollectionShareUpdateDTO,
 )
-from exceptions.collection_exception import CollectionShareNotFound
+from exceptions.share_collection_exception import CollectionShareNotFound
 from mappers.collection_share_mapper import (
     collection_share_to_dto,
     dto_to_collection_share,
