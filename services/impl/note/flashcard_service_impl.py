@@ -83,7 +83,6 @@ class FlashcardService(FlashcardServiceInterface):
 
         create_dto = FlashcardCreateDTO(
             question=source_flashcard.question,
-            difficulty=source_flashcard.difficulty,
             answers=[
                 FlashcardAnswerCreateDTO(
                     answer_text=answer.answer_text, is_correct=answer.is_correct

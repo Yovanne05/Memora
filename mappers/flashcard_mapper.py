@@ -11,7 +11,6 @@ def flashcard_to_dto(flashcard_entity: Flashcard) -> FlashcardDTO:
         id=flashcard_entity.id,
         note_id=flashcard_entity.note_id,
         question=flashcard_entity.question,
-        difficulty=flashcard_entity.difficulty,
         answers=[flashcard_answer_to_dto(a) for a in flashcard_entity.answers],
         created_at=flashcard_entity.created_at,
         updated_at=flashcard_entity.updated_at,
@@ -24,7 +23,6 @@ def dto_to_flashcard(flashcard_dto: FlashcardCreateDTO, note_id: str) -> Flashca
     flashcard = Flashcard(
         note_id=note_id,
         question=flashcard_dto.question,
-        difficulty=flashcard_dto.difficulty,
     )
 
     flashcard.answers = [

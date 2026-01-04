@@ -1,0 +1,42 @@
+tags:
+  - reviews
+summary: Récupérer les flashcards à réviser
+description: >
+  Retourne toutes les flashcards que l'utilisateur doit réviser, groupées par date.
+  Les flashcards sont organisées chronologiquement pour faciliter la planification
+  des sessions de révision.
+
+  **Utilisation :**
+  - Afficher une page "À réviser" avec les flashcards groupées par date
+  - Format :
+    - 10/10/2025
+      - Flashcard A
+      - Flashcard B
+    - 12/11/2025
+      - Flashcard C
+      - Flashcard D
+
+  **Note :** Seules les flashcards qui ont été révisées au moins une fois apparaissent ici.
+  Les nouvelles flashcards (jamais révisées) ne sont pas incluses dans cette liste.
+responses:
+  200:
+    description: >
+      Liste des révisions à venir, groupées par date.
+      Chaque groupe contient la date et les flashcards associées.
+    schema:
+      $ref: "#/definitions/UpcomingReviewsResponse"
+    examples:
+      application/json:
+        - date: "2025-05-20"
+          flashcards:
+            - flashcardId: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+              question: "Quelle est la capitale de la France ?"
+              nextReviewAt: "2025-05-20T09:00:00Z"
+            - flashcardId: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+              question: "Combien font 2+2 ?"
+              nextReviewAt: "2025-05-20T14:30:00Z"
+        - date: "2025-05-25"
+          flashcards:
+            - flashcardId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+              question: "Qu'est-ce que Python ?"
+              nextReviewAt: "2025-05-25T10:00:00Z"

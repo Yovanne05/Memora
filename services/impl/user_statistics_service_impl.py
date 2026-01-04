@@ -1,8 +1,9 @@
 from dtos.user_statistics_dto import (
     ContentStatisticsDTO,
+    ReviewStatisticsDTO,
     UserStatisticsDTO,
 )
-from repositorys import user_statistics_repository
+from repositorys import user_statistics_repository, review_repository
 from services.interfaces.user_statistics_service_interface import (
     UserStatisticsServiceInterface,
 )
@@ -26,8 +27,19 @@ class UserStatisticsService(UserStatisticsServiceInterface):
             ),
         )
 
+        # Récupérer les statistiques de reviews
+        review_stats_data = review_repository.get_review_statistics(user_id)
+
+        review_stats = ReviewStatisticsDTO(
+            total_reviews=review_stats_data.total_reviews,
+            reviews_last_7_days=review_stats_data.reviews_last_7_days,
+            reviews_last_30_days=review_stats_data.reviews_last_30_days,
+            average_quality=review_stats_data.average_quality,
+            quality_distribution=review_stats_data.quality_distribution,
+        )
+
         return UserStatisticsDTO(
-            content_statistics=content_stats, review_statistics=None
+            content_statistics=content_stats, review_statistics=review_stats
         )
 
 

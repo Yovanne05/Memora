@@ -9,9 +9,6 @@ def apply_flashcard_update(
     if flashcard_update_dto.question is not None:
         flashcard_entity.question = flashcard_update_dto.question
 
-    if flashcard_update_dto.difficulty is not None:
-        flashcard_entity.difficulty = flashcard_update_dto.difficulty
-
     if flashcard_update_dto.answers is not None:
         flashcard_entity.answers.clear()
         flashcard_entity.answers = [
