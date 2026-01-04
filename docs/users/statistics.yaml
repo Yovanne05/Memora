@@ -1,10 +1,10 @@
 tags:
-  - auth
+  - users
 summary: Statistiques utilisateur
 description: >
   Retourne les statistiques de l'utilisateur connecte : nombre de notes,
   collections et flashcards crees, ainsi que le nombre de partages effectues.
-  Les statistiques de revision seront ajoutees dans une version future.
+  Inclut egalement les statistiques de revision (nombre de revisions, moyenne de qualite, etc.).
 responses:
   200:
     description: Statistiques de l'utilisateur.
