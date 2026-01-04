@@ -31,6 +31,8 @@ class NoteTestData:
     created_tag_ids: set[str] = field(default_factory=set)
     created_shares: set[tuple[str, str]] = field(default_factory=set)
     created_links: set[tuple[str, str]] = field(default_factory=set)
+    created_note_favorites: set[str] = field(default_factory=set)
+    created_collection_favorites: set[str] = field(default_factory=set)
     _user_credentials: dict[str, dict[str, str]] = field(default_factory=dict)
     access_token: str | None = None
 
@@ -203,7 +205,41 @@ class NoteTestData:
     def track_created_link(self, note_id: str, linked_note_id: str) -> None:
         self.created_links.add((note_id, linked_note_id))
 
+    def add_note_favorite(self, note_id: str | None = None):
+        target = note_id or self.note_id
+        response = self.client.post(f"/notes/{target}/favorite")
+        assert response.status_code in (200, 201), response.get_data(as_text=True)
+        self.created_note_favorites.add(target)
+        return response.get_json()
+
+    def remove_note_favorite(self, note_id: str):
+        response = self.client.delete(f"/notes/{note_id}/favorite")
+        if response.status_code not in (204, 404):
+            raise AssertionError(
+                f"Favorite cleanup failed for note {note_id}: {response.status_code} {response.get_data(as_text=True)}"
+            )
+
+    def add_collection_favorite(self, collection_id: str | None = None):
+        target = collection_id or self.collection_id
+        response = self.client.post(f"/collections/{target}/favorite")
+        assert response.status_code in (200, 201), response.get_data(as_text=True)
+        self.created_collection_favorites.add(target)
+        return response.get_json()
+
+    def remove_collection_favorite(self, collection_id: str):
+        response = self.client.delete(f"/collections/{collection_id}/favorite")
+        if response.status_code not in (204, 404):
+            raise AssertionError(
+                f"Favorite cleanup failed for collection {collection_id}: {response.status_code} {response.get_data(as_text=True)}"
+            )
+
     def cleanup(self) -> None:
+        for note_id in self.created_note_favorites:
+            self.remove_note_favorite(note_id)
+
+        for collection_id in self.created_collection_favorites:
+            self.remove_collection_favorite(collection_id)
+
         for note_id, linked_note_id in self.created_links:
             self._delete_if_exists(f"/note-links/{note_id}/links/{linked_note_id}")
 

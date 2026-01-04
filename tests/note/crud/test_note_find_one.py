@@ -10,6 +10,7 @@ def test_find_one_returns_single_note(client_with_note_data):
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["id"] == data.note_id
+    assert payload["is_favorite"] is False
 
 
 def test_find_one_returns_404_when_note_missing(client_with_note_data):
