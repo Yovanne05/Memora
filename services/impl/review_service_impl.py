@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from daos.review_dao import Review
@@ -60,7 +60,7 @@ class ReviewService(ReviewServiceInterface):
             repetitions=sm2_result.repetitions,
             interval_days=sm2_result.interval_days,
             next_review_at=sm2_result.next_review_at,
-            reviewed_at=datetime.utcnow(),
+            reviewed_at=datetime.now(timezone.utc),
         )
 
         saved_review = review_repository.upsert_review(review)

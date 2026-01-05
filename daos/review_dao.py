@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy import Boolean, Enum as SAEnum, ForeignKey, Index, Integer, DECIMAL, String, TIMESTAMP
@@ -52,7 +52,7 @@ class Review(Base):
     repetitions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     interval_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     next_review_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False)
-    reviewed_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    reviewed_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False, default=lambda: datetime.now(timezone.utc))
 
     user: Mapped["User"] = relationship(back_populates="reviews")
     flashcard: Mapped["Flashcard"] = relationship()

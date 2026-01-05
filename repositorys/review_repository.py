@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import NamedTuple
 from collections import defaultdict
 
@@ -100,7 +100,7 @@ def get_upcoming_reviews(user_id: str) -> dict[str, list[tuple[str, str, datetim
 
 def get_review_statistics(user_id: str) -> ReviewStatistics:
     """Récupère les statistiques de review pour un utilisateur."""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     seven_days_ago = now - timedelta(days=7)
     thirty_days_ago = now - timedelta(days=30)
 

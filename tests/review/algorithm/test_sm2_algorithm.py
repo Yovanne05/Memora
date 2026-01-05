@@ -1,6 +1,6 @@
 """Tests for SM-2 algorithm implementation"""
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from domain_services.sm2_algorithm import calculate_next_review
 from utils.enums import ReviewDifficultyEnum
 
@@ -185,7 +185,7 @@ def test_sm2_interval_calculation_third_review():
 
 def test_sm2_next_review_date_calculation():
     """Test that next_review_at is calculated correctly"""
-    before = datetime.utcnow()
+    before = datetime.now(timezone.utc)
 
     result = calculate_next_review(
         difficulty=ReviewDifficultyEnum.GOOD,
@@ -194,7 +194,7 @@ def test_sm2_next_review_date_calculation():
         current_interval_days=6,
     )
 
-    after = datetime.utcnow()
+    after = datetime.now(timezone.utc)
 
     # Next review should be interval_days in the future
     expected_min = before + timedelta(days=result.interval_days)
