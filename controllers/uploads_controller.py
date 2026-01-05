@@ -23,7 +23,10 @@ def serve_upload(key: str):
     except StorageError:
         raise UploadInvalidKey()
 
-    if not path or not os.path.isfile(path):
+    if not path:
+        raise UploadInvalidKey()
+
+    if not os.path.isfile(path):
         raise UploadNotFound()
 
     return send_file(path)
