@@ -1,23 +1,29 @@
 DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS flashcard_answers CASCADE;
 DROP TABLE IF EXISTS flashcards CASCADE;
 DROP TABLE IF EXISTS note_images CASCADE;
 DROP TABLE IF EXISTS note_links CASCADE;
 DROP TABLE IF EXISTS note_shares CASCADE;
 DROP TABLE IF EXISTS collection_shares CASCADE;
+DROP TABLE IF EXISTS note_favorites CASCADE;
+DROP TABLE IF EXISTS collection_favorites CASCADE;
 DROP TABLE IF EXISTS notes CASCADE;
 DROP TABLE IF EXISTS collections CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS flashcard_answers CASCADE;
 
 
+DROP TYPE IF EXISTS visibilityenum;
+DROP TYPE IF EXISTS sharepermissionenum;
+DROP TYPE IF EXISTS review_difficulty_enum;
+DROP TYPE IF EXISTS roleenum;
 DROP TYPE IF EXISTS visibility_enum;
 DROP TYPE IF EXISTS permission_enum;
-DROP TYPE IF EXISTS review_difficulty_enum;
 
 
-CREATE TYPE visibility_enum AS ENUM ('private', 'public');
-CREATE TYPE permission_enum AS ENUM ('read', 'write');
+CREATE TYPE visibilityenum AS ENUM ('private', 'public');
+CREATE TYPE sharepermissionenum AS ENUM ('read', 'write');
 CREATE TYPE review_difficulty_enum AS ENUM ('again', 'hard', 'good', 'easy');
+CREATE TYPE roleenum AS ENUM ('client', 'admin', 'super_admin');
 
 -- ===== TABLES =====
 
@@ -29,17 +35,15 @@ CREATE TABLE users (
     password_hash   TEXT NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login      TIMESTAMP,
-    role            VARCHAR(20) NOT NULL DEFAULT 'client'
+    role            roleenum NOT NULL DEFAULT 'client'
 );
-
-CREATE INDEX idx_users_role ON users (role);
 
 CREATE TABLE collections (
     id           CHAR(36) PRIMARY KEY,
     owner_id     CHAR(36) NOT NULL,
     name         VARCHAR(200) NOT NULL,
     description  TEXT,
-    visibility   visibility_enum NOT NULL DEFAULT 'private',
+    visibility   visibilityenum NOT NULL DEFAULT 'private',
     tags         TEXT[] NOT NULL DEFAULT '{}',
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -58,8 +62,8 @@ CREATE TABLE notes (
     owner_id       CHAR(36) NOT NULL,
     title          VARCHAR(255) NOT NULL,
     content        TEXT NOT NULL,
-    visibility     visibility_enum NOT NULL DEFAULT 'private',
-    tags           TEXT[] DEFAULT '{}',
+    visibility     visibilityenum NOT NULL DEFAULT 'private',
+    tags           TEXT[] NOT NULL DEFAULT '{}',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_notes_collection
@@ -100,7 +104,7 @@ CREATE INDEX idx_note_images_note ON note_images (note_id);
 CREATE TABLE collection_shares (
     collection_id  CHAR(36) NOT NULL,
     user_id        CHAR(36) NOT NULL,
-    permission     permission_enum NOT NULL,
+    permission     sharepermissionenum NOT NULL,
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (collection_id, user_id),
     CONSTRAINT fk_coll_shares_collection
@@ -119,7 +123,7 @@ CREATE INDEX idx_collection_shares_user
 CREATE TABLE note_shares (
     note_id     CHAR(36) NOT NULL,
     user_id     CHAR(36) NOT NULL,
-    permission  permission_enum NOT NULL,
+    permission  sharepermissionenum NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (note_id, user_id),
     CONSTRAINT fk_note_shares_note
@@ -214,6 +218,40 @@ CREATE INDEX idx_reviews_user ON reviews (user_id);
 CREATE INDEX idx_reviews_flashcard ON reviews (flashcard_id);
 CREATE INDEX idx_reviews_next_review ON reviews (user_id, next_review_at);
 CREATE INDEX idx_reviews_reviewed_at ON reviews (user_id, reviewed_at);
+
+CREATE TABLE note_favorites (
+    user_id    CHAR(36) NOT NULL,
+    note_id    CHAR(36) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, note_id),
+    CONSTRAINT fk_note_favorites_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_note_favorites_note
+        FOREIGN KEY (note_id) REFERENCES notes(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE INDEX idx_note_favorites_user ON note_favorites (user_id);
+
+CREATE TABLE collection_favorites (
+    user_id       CHAR(36) NOT NULL,
+    collection_id CHAR(36) NOT NULL,
+    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, collection_id),
+    CONSTRAINT fk_collection_favorites_user
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_collection_favorites_collection
+        FOREIGN KEY (collection_id) REFERENCES collections(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE INDEX idx_collection_favorites_user ON collection_favorites (user_id);
 
 -- ===== TRIGGERS =====
 
