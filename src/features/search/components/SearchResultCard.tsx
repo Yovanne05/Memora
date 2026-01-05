@@ -26,8 +26,8 @@ export function SearchResultCard({ result }: Readonly<SearchResultCardProps>) {
   if (type === 'collection' && isCollection(item)) {
     return (
       <Link
-        to="/app/collections/$id"
-        params={{ id: item.id }}
+        to="/app/workspace/collections/$collectionId"
+        params={{ collectionId: item.id }}
         className="block h-full"
         aria-label={`Ouvrir la collection ${item.name}`}
       >
@@ -79,8 +79,8 @@ export function SearchResultCard({ result }: Readonly<SearchResultCardProps>) {
 
     return (
       <Link
-        to="/app/notes/$id"
-        params={{ id: item.id }}
+        to="/app/workspace/notes/$noteId"
+        params={{ noteId: item.id }}
         className="block h-full"
         aria-label={`Ouvrir la note ${item.title}`}
       >

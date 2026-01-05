@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { notesService } from "../services/notes.service"
 import type { Note } from "../models/note.model"
-import { NOTES_QUERY_KEYS } from "./useNotesQuery"
+import { NOTES_QUERY_KEYS } from "./notes.keys"
 
 export function useNoteQuery(noteId: string) {
   return useQuery<Note>({

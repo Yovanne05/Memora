@@ -97,7 +97,7 @@ export function NoteLinkManager({ note }: Readonly<NoteLinkManagerProps>) {
                 size="sm"
                 asChild
               >
-                <Link to="/app/notes/$id" params={{ id: linkedNote.id }}>
+                <Link to="/app/workspace/notes/$noteId" params={{ noteId: linkedNote.id }}>
                   Voir
                 </Link>
               </Button>

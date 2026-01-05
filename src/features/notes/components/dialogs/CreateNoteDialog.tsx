@@ -26,7 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { NoteVisibility } from "../../models/note.model"
 import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"
 
@@ -48,7 +48,7 @@ export function CreateNoteDialog({
   onSubmit,
   submitting = false,
 }: Readonly<CreateNoteDialogProps>) {
-  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsQuery()
   const collections = collectionsData?.items ?? []
 
   const form = useForm<NoteCreateFormInput>({

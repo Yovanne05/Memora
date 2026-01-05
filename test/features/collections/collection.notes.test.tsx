@@ -32,12 +32,16 @@ vi.mock("@/features/notes/hooks/useUpdateNoteMutation", () => ({
   useUpdateNoteMutation: () => mockUpdateNoteMutation,
 }))
 
+vi.mock("@/features/notes/components/NoteQuickActions", () => ({
+  NoteQuickActions: () => null,
+}))
+
 vi.mock("@/features/auth/hooks/useAuth", () => ({
   useAuth: () => ({ user: { id: "user-1" } }),
 }))
 
 vi.mock("@tanstack/react-router", () => ({
-  useParams: () => ({ id: "col-1" }),
+  useParams: () => ({ collectionId: "col-1" }),
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
 

@@ -26,6 +26,7 @@ export interface Collection {
   tags: string[]
   notes: Note[]
   isFavorite? : boolean
+  notesCount?: number
   nodes: GraphNode[]
   edges: GraphEdge[]
   createdAt: string

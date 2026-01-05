@@ -1,14 +1,13 @@
 import {
   BookOpen,
   LayoutDashboard,
-  FolderKanban,
+  LayoutGrid,
   Network,
   Search,
   GraduationCap,
   History,
   Settings as SettingsIcon,
   LogOut,
-  FileText,
 } from "lucide-react"
 
 import { Link, useRouter } from "@tanstack/react-router"
@@ -37,8 +36,7 @@ export function AppSidebar() {
 
   const navigationItems = [
     { title: "Tableau de bord", icon: LayoutDashboard, url: "/app/dashboard" },
-    { title: "Notes", icon: FileText, url: "/app/notes" },
-    { title: "Collections", icon: FolderKanban, url: "/app/collections" },
+    { title: "Workspace", icon: LayoutGrid, url: "/app/workspace" },
     { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
     { title: "Recherche", icon: Search, url: "/app/search" },
     { title: "Révision", icon: GraduationCap, url: "/app/revision" },

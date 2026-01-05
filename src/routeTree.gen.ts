@@ -15,17 +15,17 @@ import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AppWorkspaceRouteRouteImport } from './routes/app/workspace/route'
+import { Route as AppWorkspaceIndexRouteImport } from './routes/app/workspace/index'
 import { Route as AppVisualizationIndexRouteImport } from './routes/app/visualization/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as AppSearchIndexRouteImport } from './routes/app/search/index'
 import { Route as AppRevisionIndexRouteImport } from './routes/app/revision/index'
-import { Route as AppNotesIndexRouteImport } from './routes/app/notes/index'
 import { Route as AppDashboardIndexRouteImport } from './routes/app/dashboard/index'
-import { Route as AppCollectionsIndexRouteImport } from './routes/app/collections/index'
-import { Route as AppNotesIdIndexRouteImport } from './routes/app/notes/$id/index'
-import { Route as AppCollectionsIdIndexRouteImport } from './routes/app/collections/$id/index'
+import { Route as AppWorkspaceNotesNoteIdIndexRouteImport } from './routes/app/workspace/notes.$noteId/index'
+import { Route as AppWorkspaceCollectionsCollectionIdIndexRouteImport } from './routes/app/workspace/collections.$collectionId/index'
 import { Route as AppVisualizationCollectionsIdIndexRouteImport } from './routes/app/visualization/collections/$id/index'
-import { Route as AppNotesIdEditIndexRouteImport } from './routes/app/notes/$id/edit/index'
+import { Route as AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRouteImport } from './routes/app/workspace/collections.$collectionId/notes.$noteId/index'
 
 const AppIndexLazyRouteImport = createFileRoute('/app/')()
 
@@ -54,6 +54,16 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWorkspaceRouteRoute = AppWorkspaceRouteRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppWorkspaceIndexRoute = AppWorkspaceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppWorkspaceRouteRoute,
+} as any)
 const AppVisualizationIndexRoute = AppVisualizationIndexRouteImport.update({
   id: '/visualization/',
   path: '/visualization/',
@@ -74,151 +84,142 @@ const AppRevisionIndexRoute = AppRevisionIndexRouteImport.update({
   path: '/revision/',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppNotesIndexRoute = AppNotesIndexRouteImport.update({
-  id: '/notes/',
-  path: '/notes/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppCollectionsIndexRoute = AppCollectionsIndexRouteImport.update({
-  id: '/collections/',
-  path: '/collections/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppNotesIdIndexRoute = AppNotesIdIndexRouteImport.update({
-  id: '/notes/$id/',
-  path: '/notes/$id/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppCollectionsIdIndexRoute = AppCollectionsIdIndexRouteImport.update({
-  id: '/collections/$id/',
-  path: '/collections/$id/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
+const AppWorkspaceNotesNoteIdIndexRoute =
+  AppWorkspaceNotesNoteIdIndexRouteImport.update({
+    id: '/notes/$noteId/',
+    path: '/notes/$noteId/',
+    getParentRoute: () => AppWorkspaceRouteRoute,
+  } as any)
+const AppWorkspaceCollectionsCollectionIdIndexRoute =
+  AppWorkspaceCollectionsCollectionIdIndexRouteImport.update({
+    id: '/collections/$collectionId/',
+    path: '/collections/$collectionId/',
+    getParentRoute: () => AppWorkspaceRouteRoute,
+  } as any)
 const AppVisualizationCollectionsIdIndexRoute =
   AppVisualizationCollectionsIdIndexRouteImport.update({
     id: '/visualization/collections/$id/',
     path: '/visualization/collections/$id/',
     getParentRoute: () => AppRouteRoute,
   } as any)
-const AppNotesIdEditIndexRoute = AppNotesIdEditIndexRouteImport.update({
-  id: '/notes/$id/edit/',
-  path: '/notes/$id/edit/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
+const AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute =
+  AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRouteImport.update({
+    id: '/collections/$collectionId/notes/$noteId/',
+    path: '/collections/$collectionId/notes/$noteId/',
+    getParentRoute: () => AppWorkspaceRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/app/workspace': typeof AppWorkspaceRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
-  '/app/collections': typeof AppCollectionsIndexRoute
   '/app/dashboard': typeof AppDashboardIndexRoute
-  '/app/notes': typeof AppNotesIndexRoute
   '/app/revision': typeof AppRevisionIndexRoute
   '/app/search': typeof AppSearchIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
   '/app/visualization': typeof AppVisualizationIndexRoute
-  '/app/collections/$id': typeof AppCollectionsIdIndexRoute
-  '/app/notes/$id': typeof AppNotesIdIndexRoute
-  '/app/notes/$id/edit': typeof AppNotesIdEditIndexRoute
+  '/app/workspace/': typeof AppWorkspaceIndexRoute
   '/app/visualization/collections/$id': typeof AppVisualizationCollectionsIdIndexRoute
+  '/app/workspace/collections/$collectionId': typeof AppWorkspaceCollectionsCollectionIdIndexRoute
+  '/app/workspace/notes/$noteId': typeof AppWorkspaceNotesNoteIdIndexRoute
+  '/app/workspace/collections/$collectionId/notes/$noteId': typeof AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app': typeof AppIndexLazyRoute
-  '/app/collections': typeof AppCollectionsIndexRoute
   '/app/dashboard': typeof AppDashboardIndexRoute
-  '/app/notes': typeof AppNotesIndexRoute
   '/app/revision': typeof AppRevisionIndexRoute
   '/app/search': typeof AppSearchIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
   '/app/visualization': typeof AppVisualizationIndexRoute
-  '/app/collections/$id': typeof AppCollectionsIdIndexRoute
-  '/app/notes/$id': typeof AppNotesIdIndexRoute
-  '/app/notes/$id/edit': typeof AppNotesIdEditIndexRoute
+  '/app/workspace': typeof AppWorkspaceIndexRoute
   '/app/visualization/collections/$id': typeof AppVisualizationCollectionsIdIndexRoute
+  '/app/workspace/collections/$collectionId': typeof AppWorkspaceCollectionsCollectionIdIndexRoute
+  '/app/workspace/notes/$noteId': typeof AppWorkspaceNotesNoteIdIndexRoute
+  '/app/workspace/collections/$collectionId/notes/$noteId': typeof AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/app/workspace': typeof AppWorkspaceRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
-  '/app/collections/': typeof AppCollectionsIndexRoute
   '/app/dashboard/': typeof AppDashboardIndexRoute
-  '/app/notes/': typeof AppNotesIndexRoute
   '/app/revision/': typeof AppRevisionIndexRoute
   '/app/search/': typeof AppSearchIndexRoute
   '/app/settings/': typeof AppSettingsIndexRoute
   '/app/visualization/': typeof AppVisualizationIndexRoute
-  '/app/collections/$id/': typeof AppCollectionsIdIndexRoute
-  '/app/notes/$id/': typeof AppNotesIdIndexRoute
-  '/app/notes/$id/edit/': typeof AppNotesIdEditIndexRoute
+  '/app/workspace/': typeof AppWorkspaceIndexRoute
   '/app/visualization/collections/$id/': typeof AppVisualizationCollectionsIdIndexRoute
+  '/app/workspace/collections/$collectionId/': typeof AppWorkspaceCollectionsCollectionIdIndexRoute
+  '/app/workspace/notes/$noteId/': typeof AppWorkspaceNotesNoteIdIndexRoute
+  '/app/workspace/collections/$collectionId/notes/$noteId/': typeof AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/app'
+    | '/app/workspace'
     | '/auth/login'
     | '/auth/register'
     | '/app/'
-    | '/app/collections'
     | '/app/dashboard'
-    | '/app/notes'
     | '/app/revision'
     | '/app/search'
     | '/app/settings'
     | '/app/visualization'
-    | '/app/collections/$id'
-    | '/app/notes/$id'
-    | '/app/notes/$id/edit'
+    | '/app/workspace/'
     | '/app/visualization/collections/$id'
+    | '/app/workspace/collections/$collectionId'
+    | '/app/workspace/notes/$noteId'
+    | '/app/workspace/collections/$collectionId/notes/$noteId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth/login'
     | '/auth/register'
     | '/app'
-    | '/app/collections'
     | '/app/dashboard'
-    | '/app/notes'
     | '/app/revision'
     | '/app/search'
     | '/app/settings'
     | '/app/visualization'
-    | '/app/collections/$id'
-    | '/app/notes/$id'
-    | '/app/notes/$id/edit'
+    | '/app/workspace'
     | '/app/visualization/collections/$id'
+    | '/app/workspace/collections/$collectionId'
+    | '/app/workspace/notes/$noteId'
+    | '/app/workspace/collections/$collectionId/notes/$noteId'
   id:
     | '__root__'
     | '/'
     | '/app'
+    | '/app/workspace'
     | '/auth/login'
     | '/auth/register'
     | '/app/'
-    | '/app/collections/'
     | '/app/dashboard/'
-    | '/app/notes/'
     | '/app/revision/'
     | '/app/search/'
     | '/app/settings/'
     | '/app/visualization/'
-    | '/app/collections/$id/'
-    | '/app/notes/$id/'
-    | '/app/notes/$id/edit/'
+    | '/app/workspace/'
     | '/app/visualization/collections/$id/'
+    | '/app/workspace/collections/$collectionId/'
+    | '/app/workspace/notes/$noteId/'
+    | '/app/workspace/collections/$collectionId/notes/$noteId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -265,6 +266,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/workspace': {
+      id: '/app/workspace'
+      path: '/workspace'
+      fullPath: '/app/workspace'
+      preLoaderRoute: typeof AppWorkspaceRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/workspace/': {
+      id: '/app/workspace/'
+      path: '/'
+      fullPath: '/app/workspace/'
+      preLoaderRoute: typeof AppWorkspaceIndexRouteImport
+      parentRoute: typeof AppWorkspaceRouteRoute
+    }
     '/app/visualization/': {
       id: '/app/visualization/'
       path: '/visualization'
@@ -293,13 +308,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRevisionIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/app/notes/': {
-      id: '/app/notes/'
-      path: '/notes'
-      fullPath: '/app/notes'
-      preLoaderRoute: typeof AppNotesIndexRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/app/dashboard/': {
       id: '/app/dashboard/'
       path: '/dashboard'
@@ -307,26 +315,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/app/collections/': {
-      id: '/app/collections/'
-      path: '/collections'
-      fullPath: '/app/collections'
-      preLoaderRoute: typeof AppCollectionsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/app/workspace/notes/$noteId/': {
+      id: '/app/workspace/notes/$noteId/'
+      path: '/notes/$noteId'
+      fullPath: '/app/workspace/notes/$noteId'
+      preLoaderRoute: typeof AppWorkspaceNotesNoteIdIndexRouteImport
+      parentRoute: typeof AppWorkspaceRouteRoute
     }
-    '/app/notes/$id/': {
-      id: '/app/notes/$id/'
-      path: '/notes/$id'
-      fullPath: '/app/notes/$id'
-      preLoaderRoute: typeof AppNotesIdIndexRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/app/collections/$id/': {
-      id: '/app/collections/$id/'
-      path: '/collections/$id'
-      fullPath: '/app/collections/$id'
-      preLoaderRoute: typeof AppCollectionsIdIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/app/workspace/collections/$collectionId/': {
+      id: '/app/workspace/collections/$collectionId/'
+      path: '/collections/$collectionId'
+      fullPath: '/app/workspace/collections/$collectionId'
+      preLoaderRoute: typeof AppWorkspaceCollectionsCollectionIdIndexRouteImport
+      parentRoute: typeof AppWorkspaceRouteRoute
     }
     '/app/visualization/collections/$id/': {
       id: '/app/visualization/collections/$id/'
@@ -335,43 +336,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVisualizationCollectionsIdIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/app/notes/$id/edit/': {
-      id: '/app/notes/$id/edit/'
-      path: '/notes/$id/edit'
-      fullPath: '/app/notes/$id/edit'
-      preLoaderRoute: typeof AppNotesIdEditIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/app/workspace/collections/$collectionId/notes/$noteId/': {
+      id: '/app/workspace/collections/$collectionId/notes/$noteId/'
+      path: '/collections/$collectionId/notes/$noteId'
+      fullPath: '/app/workspace/collections/$collectionId/notes/$noteId'
+      preLoaderRoute: typeof AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRouteImport
+      parentRoute: typeof AppWorkspaceRouteRoute
     }
   }
 }
 
+interface AppWorkspaceRouteRouteChildren {
+  AppWorkspaceIndexRoute: typeof AppWorkspaceIndexRoute
+  AppWorkspaceCollectionsCollectionIdIndexRoute: typeof AppWorkspaceCollectionsCollectionIdIndexRoute
+  AppWorkspaceNotesNoteIdIndexRoute: typeof AppWorkspaceNotesNoteIdIndexRoute
+  AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute: typeof AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute
+}
+
+const AppWorkspaceRouteRouteChildren: AppWorkspaceRouteRouteChildren = {
+  AppWorkspaceIndexRoute: AppWorkspaceIndexRoute,
+  AppWorkspaceCollectionsCollectionIdIndexRoute:
+    AppWorkspaceCollectionsCollectionIdIndexRoute,
+  AppWorkspaceNotesNoteIdIndexRoute: AppWorkspaceNotesNoteIdIndexRoute,
+  AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute:
+    AppWorkspaceCollectionsCollectionIdNotesNoteIdIndexRoute,
+}
+
+const AppWorkspaceRouteRouteWithChildren =
+  AppWorkspaceRouteRoute._addFileChildren(AppWorkspaceRouteRouteChildren)
+
 interface AppRouteRouteChildren {
+  AppWorkspaceRouteRoute: typeof AppWorkspaceRouteRouteWithChildren
   AppIndexLazyRoute: typeof AppIndexLazyRoute
-  AppCollectionsIndexRoute: typeof AppCollectionsIndexRoute
   AppDashboardIndexRoute: typeof AppDashboardIndexRoute
-  AppNotesIndexRoute: typeof AppNotesIndexRoute
   AppRevisionIndexRoute: typeof AppRevisionIndexRoute
   AppSearchIndexRoute: typeof AppSearchIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppVisualizationIndexRoute: typeof AppVisualizationIndexRoute
-  AppCollectionsIdIndexRoute: typeof AppCollectionsIdIndexRoute
-  AppNotesIdIndexRoute: typeof AppNotesIdIndexRoute
-  AppNotesIdEditIndexRoute: typeof AppNotesIdEditIndexRoute
   AppVisualizationCollectionsIdIndexRoute: typeof AppVisualizationCollectionsIdIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppWorkspaceRouteRoute: AppWorkspaceRouteRouteWithChildren,
   AppIndexLazyRoute: AppIndexLazyRoute,
-  AppCollectionsIndexRoute: AppCollectionsIndexRoute,
   AppDashboardIndexRoute: AppDashboardIndexRoute,
-  AppNotesIndexRoute: AppNotesIndexRoute,
   AppRevisionIndexRoute: AppRevisionIndexRoute,
   AppSearchIndexRoute: AppSearchIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppVisualizationIndexRoute: AppVisualizationIndexRoute,
-  AppCollectionsIdIndexRoute: AppCollectionsIdIndexRoute,
-  AppNotesIdIndexRoute: AppNotesIdIndexRoute,
-  AppNotesIdEditIndexRoute: AppNotesIdEditIndexRoute,
   AppVisualizationCollectionsIdIndexRoute:
     AppVisualizationCollectionsIdIndexRoute,
 }

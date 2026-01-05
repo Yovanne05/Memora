@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -22,9 +22,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Check, Save, Trash2 } from "lucide-react"
-import { useCollectionsListQuery } from "@/features/collections/hooks/useCollectionsListQuery"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { Note, NoteVisibility } from "../../models/note.model"
 import { noteEditFormSchema } from "../../schemas/note.schema"
+import { formatTime } from "@/lib/format.utils"
+import { RichTextEditor } from "@/components/editor/RichTextEditor"
 
 export interface NoteFormValues {
   title: string
@@ -51,8 +53,7 @@ export function NoteEditForm({
   onDelete,
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
-  const [lastSavedAt, setLastSavedAt] = useState<string | undefined>(note?.updatedAt)
-  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsListQuery()
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsQuery()
   const collections = collectionsData?.items ?? []
 
   const form = useForm({
@@ -66,23 +67,11 @@ export function NoteEditForm({
     },
   })
 
-  useEffect(() => {
-    form.reset({
-      title: note?.title ?? "",
-      content: note?.content ?? "",
-      visibility: note?.visibility ?? "private",
-      collectionId: note?.collectionId ?? null,
-      tags: note?.tags ?? [],
-    })
-    setLastSavedAt(note?.updatedAt)
-  }, [note, form])
+  const lastSavedAt = note?.updatedAt
 
   const savedTime = useMemo(() => {
     if (!lastSavedAt) return null
-    return new Intl.DateTimeFormat("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(lastSavedAt))
+    return formatTime(lastSavedAt)
   }, [lastSavedAt])
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
@@ -93,13 +82,12 @@ export function NoteEditForm({
       collectionId: values.collectionId ?? null,
       tags: values.tags,
     })
-    setLastSavedAt(new Date().toISOString())
   })
 
   const isFormDisabled = loading || form.formState.isSubmitting
 
   return (
-    <Form {...form}>
+    <Form {...form} key={note?.id}>
       <form className="space-y-6" onSubmit={handleFormSubmit}>
         <Card className="border border-border/70 shadow-sm">
           <CardContent className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -183,12 +171,11 @@ export function NoteEditForm({
                   <FormItem>
                     <FormLabel>Contenu</FormLabel>
                     <FormControl>
-                      <textarea
-                        {...field}
-                        id="note-content"
-                        placeholder="Commencez a rediger votre note..."
-                        className="min-h-[360px] w-full rounded-lg border border-input bg-background px-3 py-3 text-base leading-relaxed shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-70"
-                        disabled={isFormDisabled}
+                      <RichTextEditor
+                        content={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Commencez à rédiger votre note..."
+                        editable={!isFormDisabled}
                       />
                     </FormControl>
                     <FormMessage />
