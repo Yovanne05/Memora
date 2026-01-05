@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { vi } from "vitest"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import type { ReactNode } from "react"
 import { CollectionCard } from "@/features/collections/components/list/CollectionCard"
 import { CollectionsContent } from "@/features/collections/components/list/CollectionsContent"
 import { CollectionsBulkActions } from "@/features/collections/components/list/CollectionsBulkActions"
@@ -29,13 +31,27 @@ const collection: Collection = {
   updatedAt: "2024-01-02T00:00:00.000Z",
 }
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
 describe("Composants liste des collections", () => {
   test("CollectionCard navigue ou toggle selon le mode", async () => {
+    const wrapper = createWrapper()
     const firstRender = render(
       <CollectionCard
         collection={collection}
         onCardClick={(c) => navigate({ to: "/app/collections/" + c.id })}
-      />
+      />,
+      { wrapper }
     )
 
     await userEvent.click(screen.getByText("Titre"))
@@ -50,13 +66,15 @@ describe("Composants liste des collections", () => {
         selectionMode
         isSelected={false}
         onToggleSelection={toggle}
-      />
+      />,
+      { wrapper }
     )
     await userEvent.click(screen.getByText("Titre"))
     expect(toggle).toHaveBeenCalledWith("col-1")
   })
 
   test("CollectionsContent gere erreur, vide et rendu des cartes", async () => {
+    const wrapper = createWrapper()
     const retry = vi.fn()
     const { rerender } = render(
       <CollectionsContent
@@ -66,7 +84,8 @@ describe("Composants liste des collections", () => {
         onRetry={retry}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
-      />
+      />,
+      { wrapper }
     )
 
     await userEvent.click(screen.getByRole("button", { name: /essayer/i }))

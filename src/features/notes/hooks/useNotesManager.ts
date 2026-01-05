@@ -4,6 +4,7 @@ import { useNotesQuery } from "./useNotesQuery"
 
 export type NotesView = "grid" | "list"
 export type NotesSort = "recent" | "oldest" | "title-asc" | "title-desc"
+export type NotesScope = "all" | "favorites"
 
 const SORT_MAP: Record<NotesSort, Pick<NotesFilters, "sortBy" | "sortDir">> = {
   recent: { sortBy: "updated_at", sortDir: "desc" },
@@ -20,15 +21,20 @@ export function useNotesManager(initialLimit = 12) {
   const [sort, setSort] = useState<NotesSort>("recent")
   const [view, setView] = useState<NotesView>("grid")
 
+  const [scope, setScope] = useState<NotesScope>("all")
+
   const filters = useMemo<NotesFilters>(() => {
     const sortConfig = SORT_MAP[sort]
     const title = search.trim()
+
     return {
       ...sortConfig,
       titleContains: title || undefined,
       visibility,
+
+      isFavorite: scope === "favorites" ? true : undefined,
     }
-  }, [search, sort, visibility])
+  }, [search, sort, visibility, scope])
 
   const query = useNotesQuery(page, limit, filters)
 
@@ -36,6 +42,7 @@ export function useNotesManager(initialLimit = 12) {
     setSearch("")
     setVisibility(undefined)
     setSort("recent")
+    setScope("all")
     setPage(0)
   }, [])
 
@@ -53,7 +60,7 @@ export function useNotesManager(initialLimit = 12) {
     sort,
     visibility,
     search,
-
+    scope,
     loading: query.isLoading,
     error: query.error,
     refetch: query.refetch,
@@ -63,6 +70,7 @@ export function useNotesManager(initialLimit = 12) {
     setSort,
     setSearch,
     setVisibility,
+    setScope,
     reset,
   }
 }

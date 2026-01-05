@@ -27,6 +27,7 @@ export const collectionDtoSchema = z.object({
   visibility: collectionVisibilitySchema.default('private'),
   tags: z.array(z.string()).default([]),
   notes: z.array(noteDtoSchema),
+  is_favorite: z.boolean().optional().default(false),
   nodes: z.array(graphNodeDtoSchema).default([]),
   edges: z.array(graphEdgeDtoSchema).default([]),
   created_at: z.iso.datetime(),

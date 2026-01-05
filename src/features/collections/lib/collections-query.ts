@@ -1,6 +1,6 @@
 import type { Collection, CollectionVisibility } from "../models/collection.model"
 
-export type CollectionsTab = "mine" | "shared"
+export type CollectionsTab = "mine" | "shared" | "favorites"
 export type CollectionsSort = "recent" | "alphabetical" | "notes-count"
 
 export interface CollectionsQuery {

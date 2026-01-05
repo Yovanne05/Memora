@@ -9,8 +9,10 @@ import {
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { LayoutGrid, List, Search } from "lucide-react"
-import type { NotesSort, NotesView } from "../../hooks/useNotesManager"
+import type { NotesScope, NotesSort, NotesView } from "../../hooks/useNotesManager"
 import type { NotesFilters } from "../../types/note-query"
+
+type NotesTabValue = "all" | "favorites" | "public" | "private"
 
 interface NotesToolbarProps {
   search: string
@@ -21,7 +23,18 @@ interface NotesToolbarProps {
   onVisibilityChange: (value: NotesFilters["visibility"]) => void
   view: NotesView
   onViewChange: (value: NotesView) => void
+
+  scope: NotesScope
+  onScopeChange: (value: NotesScope) => void
+
   onSubmitSearch?: () => void
+}
+
+function deriveTabsValue(scope: NotesScope, visibility: NotesFilters["visibility"]): NotesTabValue {
+  if (scope === "favorites") return "favorites"
+  if (visibility === "public") return "public"
+  if (visibility === "private") return "private"
+  return "all"
 }
 
 export function NotesToolbar({
@@ -33,8 +46,12 @@ export function NotesToolbar({
   onVisibilityChange,
   view,
   onViewChange,
+  scope,
+  onScopeChange,
   onSubmitSearch,
 }: Readonly<NotesToolbarProps>) {
+  const tabValue = deriveTabsValue(scope, visibility)
+
   return (
     <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -51,14 +68,36 @@ export function NotesToolbar({
 
         <div className="flex flex-wrap items-center gap-3">
           <Tabs
-            value={visibility ?? "all"}
-            onValueChange={(value) =>
-              onVisibilityChange(value === "all" ? undefined : (value as NotesFilters["visibility"]))
-            }
+            value={tabValue}
+            onValueChange={(value) => {
+              const v = value as NotesTabValue
+
+              if (v === "favorites") {
+                onScopeChange("favorites")
+                onVisibilityChange(undefined)
+                return
+              }
+
+              if (v === "public") {
+                onScopeChange("all")
+                onVisibilityChange("public")
+                return
+              }
+
+              if (v === "private") {
+                onScopeChange("all")
+                onVisibilityChange("private")
+                return
+              }
+
+              onScopeChange("all")
+              onVisibilityChange(undefined)
+            }}
             className="w-full md:w-auto"
           >
-            <TabsList className="grid h-9 grid-cols-3">
+            <TabsList className="grid h-9 grid-cols-4">
               <TabsTrigger value="all">Toutes</TabsTrigger>
+              <TabsTrigger value="favorites">Mes favoris</TabsTrigger>
               <TabsTrigger value="public">Publiques</TabsTrigger>
               <TabsTrigger value="private">Privées</TabsTrigger>
             </TabsList>

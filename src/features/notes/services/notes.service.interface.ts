@@ -8,5 +8,7 @@ export interface INotesService {
   create(payload: NoteCreate): Promise<Note>
   update(id: string, payload: NoteUpdate): Promise<Note>
   remove(id: string): Promise<void>
+  addFavorite(id: string): Promise<void>
+  removeFavorite(id: string): Promise<void>
 }
 

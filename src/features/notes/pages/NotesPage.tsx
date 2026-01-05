@@ -76,6 +76,12 @@ export default function NotesPage() {
         view={manager.view}
         onViewChange={manager.setView}
         onSubmitSearch={() => manager.setPage(0)}
+
+        scope={manager.scope}
+        onScopeChange={(value) => {
+          manager.setScope(value)
+          manager.setPage(0)
+        }}
       />
 
       <NotesContent
@@ -86,7 +92,11 @@ export default function NotesPage() {
         onRetry={manager.refetch}
       />
 
-      <NotesPagination page={manager.page} maxPage={manager.maxPage} setPage={manager.setPage} />
+      <NotesPagination
+        page={manager.page}
+        maxPage={manager.maxPage}
+        setPage={manager.setPage}
+      />
 
       <CreateNoteDialog
         open={dialogOpen}

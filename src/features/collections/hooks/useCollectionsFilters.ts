@@ -18,10 +18,25 @@ export function useCollectionsFilters() {
   const [showFilters, setShowFilters] = useState(false)
   const [page, setPage] = useState(0)
 
-  const collectionsQuery = useCollectionsListQuery()
+  const serverParams = useMemo(() => {
+    if (!userId) return {}
+
+    if (tab === "mine") {
+      return { ownerId: userId }
+    }
+
+    if (tab === "shared") {
+      return { sharedWithUserId: userId }
+    }
+
+    return { isFavorite: true }
+  }, [tab, userId])
+
+  const collectionsQuery = useCollectionsListQuery(serverParams)
 
   const filteredCollections = useMemo(() => {
     if (!userId || !collectionsQuery.data) return []
+
     return applyCollectionsQuery(collectionsQuery.data.items, {
       currentUserId: userId,
       tab,
