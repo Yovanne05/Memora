@@ -122,6 +122,9 @@ class S3StorageClient(StorageClient):
         # Buckets are assumed public; return object URL.
         return self._object_url(key)
 
+    def resolve_local_path(self, key: str) -> Optional[str]:
+        return None
+
 
 def get_storage_client() -> StorageClient:
     if config.STORAGE_DRIVER == "s3":
