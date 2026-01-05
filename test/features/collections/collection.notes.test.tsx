@@ -117,6 +117,7 @@ describe("Notes des collections", () => {
   test("CollectionNotesGrid appelle le callback de suppression", async () => {
     const user = userEvent.setup()
     const onRemove = vi.fn()
+    const wrapper = createWrapper()
 
     render(
       <CollectionNotesGrid
@@ -124,7 +125,8 @@ describe("Notes des collections", () => {
         isLoading={false}
         isUpdating={false}
         onRemoveFromCollection={onRemove}
-      />
+      />,
+      { wrapper }
     )
 
     await user.click(screen.getByRole("button", { name: /Retirer/ }))
