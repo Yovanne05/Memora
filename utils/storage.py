@@ -1,13 +1,8 @@
 import os
 from dataclasses import dataclass
 from typing import Optional
-
-try:
-    import boto3
-    from botocore.client import Config
-except ImportError:  # pragma: no cover - optional when local storage only
-    boto3 = None
-    Config = None
+import boto3
+from botocore.client import Config
 from werkzeug.datastructures import FileStorage
 
 import config
@@ -95,14 +90,12 @@ class S3StorageClient(StorageClient):
         access_key: str,
         secret_key: str,
         public_base_url: str | None = None,
-        presign_seconds: int = 3600,
     ):
         if not boto3 or not Config:
             raise StorageError("boto3 is required for S3 storage but is not installed.")
         self.bucket = bucket
         self.endpoint_url = endpoint_url.rstrip("/")
         self.public_base_url = public_base_url.rstrip("/") if public_base_url else None
-        self.presign_seconds = presign_seconds
         self.client = boto3.client(
             "s3",
             endpoint_url=self.endpoint_url,
@@ -150,7 +143,6 @@ def get_storage_client() -> StorageClient:
             access_key=config.STORAGE_S3_ACCESS_KEY,
             secret_key=config.STORAGE_S3_SECRET_KEY,
             public_base_url=config.STORAGE_S3_PUBLIC_BASE_URL,
-            presign_seconds=config.STORAGE_S3_URL_EXPIRATION_SECONDS,
         )
 
     return LocalStorageClient(
