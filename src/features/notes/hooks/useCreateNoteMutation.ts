@@ -1,6 +1,6 @@
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import type { MutationCallbacks } from "@/lib/mutation-callbacks"
-import { useCreateMutation } from "@/lib/hooks/useResourceMutation"
+import { useCreateMutation } from "@/hooks/useResourceMutation"
 
 import { notesService } from "../services/notes.service"
 import type { Note, NoteCreate } from "../models/note.model"

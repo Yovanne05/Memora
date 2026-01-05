@@ -1,13 +1,13 @@
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import type { MutationCallbacks } from "@/lib/mutation-callbacks"
 
 export interface ResourceMutationConfig<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>
-  queryKey: unknown[]
+  queryKey: readonly unknown[]
   successMessage?: string
   errorMessage?: string
-  onSuccessInvalidate?: unknown[][]
+  onSuccessInvalidate?: readonly (readonly unknown[])[]
   onSuccessUpdate?: (data: TData, queryClient: ReturnType<typeof useQueryClient>) => void
 }
 
@@ -33,31 +33,25 @@ export function useResourceMutation<TData = unknown, TVariables = unknown>(
   return useMutation<TData, Error, TVariables>({
     mutationFn,
     onSuccess: (data) => {
-      // Toast de succès
       if (!callbacks?.silent && successMessage) {
         toast.success(successMessage)
       }
 
-      // Mise à jour du cache si fournie
       if (onSuccessUpdate) {
         onSuccessUpdate(data, queryClient)
       }
 
-      // Mettre à jour le cache pour l'élément spécifique
       queryClient.setQueryData(queryKey, data)
 
-      // Invalider les queries liées
       if (onSuccessInvalidate) {
         onSuccessInvalidate.forEach((key) => {
           queryClient.invalidateQueries({ queryKey: key })
         })
       }
 
-      // Callback custom
       callbacks?.onSuccess?.(data)
     },
     onError: (error: Error) => {
-      // Toast d'erreur
       if (!callbacks?.silent) {
         const message = error instanceof Error ? error.message : errorMessage || "Une erreur est survenue"
         toast.error(message)
@@ -65,20 +59,17 @@ export function useResourceMutation<TData = unknown, TVariables = unknown>(
 
       console.error("Mutation error:", error)
 
-      // Callback custom
       callbacks?.onError?.(error)
     },
   })
 }
 
-/**
- * Helper pour créer une mutation de création
- */
-export function useCreateMutation<TData, TVariables>(
-  config: Omit<ResourceMutationConfig<TData, TVariables>, 'queryKey'> & {
-    listQueryKey: unknown[]
-    detailQueryKey: (data: TData) => unknown[]
-    optimisticUpdate?: (old: any, newItem: TData) => any
+
+export function useCreateMutation<TData, TVariables, TListData = unknown>(
+  config: Omit<ResourceMutationConfig<TData, TVariables>, 'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'> & {
+    listQueryKey: readonly unknown[]
+    detailQueryKey: (data: TData) => readonly unknown[]
+    optimisticUpdate?: (old: TListData | undefined, newItem: TData) => TListData
   },
   callbacks?: MutationCallbacks<TData>
 ) {
@@ -90,12 +81,10 @@ export function useCreateMutation<TData, TVariables>(
       queryKey: listQueryKey,
       onSuccessInvalidate: [listQueryKey],
       onSuccessUpdate: (data, queryClient) => {
-        // Mettre à jour le cache de détail
         queryClient.setQueryData(detailQueryKey(data), data)
 
-        // Mise à jour optimiste de la liste si fournie
         if (optimisticUpdate) {
-          queryClient.setQueryData(listQueryKey, (old: any) => optimisticUpdate(old, data))
+          queryClient.setQueryData(listQueryKey, (old: TListData | undefined) => optimisticUpdate(old, data))
         }
       },
     },
@@ -106,10 +95,10 @@ export function useCreateMutation<TData, TVariables>(
 /**
  * Helper pour créer une mutation de mise à jour
  */
-export function useUpdateMutation<TData, TVariables extends { id: string }>(
-  config: Omit<ResourceMutationConfig<TData, TVariables>, 'queryKey'> & {
-    listQueryKey: unknown[]
-    detailQueryKey: (id: string) => unknown[]
+export function useUpdateMutation<TData extends { id: string }, TVariables extends { id: string }>(
+  config: Omit<ResourceMutationConfig<TData, TVariables>, 'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'> & {
+    listQueryKey: readonly unknown[]
+    detailQueryKey: (id: string) => readonly unknown[]
   },
   callbacks?: MutationCallbacks<TData>
 ) {
@@ -123,7 +112,7 @@ export function useUpdateMutation<TData, TVariables extends { id: string }>(
       onSuccessUpdate: (data, queryClient) => {
         // Invalider aussi le détail spécifique
         queryClient.invalidateQueries({
-          queryKey: detailQueryKey((data as any).id),
+          queryKey: detailQueryKey(data.id),
         })
       },
     },
@@ -135,22 +124,18 @@ export function useUpdateMutation<TData, TVariables extends { id: string }>(
  * Helper pour créer une mutation de suppression
  */
 export function useDeleteMutation<TVariables extends { id: string }>(
-  config: Omit<ResourceMutationConfig<void, TVariables>, 'queryKey'> & {
-    listQueryKey: unknown[]
-    detailQueryKey: (id: string) => unknown[]
+  config: Omit<ResourceMutationConfig<void, TVariables>, 'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'> & {
+    listQueryKey: readonly unknown[]
   },
   callbacks?: MutationCallbacks<void>
 ) {
-  const { listQueryKey, detailQueryKey, ...restConfig } = config
+  const { listQueryKey, ...restConfig } = config
 
   return useResourceMutation<void, TVariables>(
     {
       ...restConfig,
       queryKey: listQueryKey,
       onSuccessInvalidate: [listQueryKey],
-      onSuccessUpdate: (_data, queryClient) => {
-        // Le détail sera invalidé via les callbacks si nécessaire
-      },
     },
     callbacks
   )

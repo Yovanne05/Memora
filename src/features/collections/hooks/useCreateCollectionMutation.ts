@@ -1,12 +1,12 @@
 import type { MutationCallbacks } from '@/lib/mutation-callbacks'
-import { useCreateMutation } from '@/lib/hooks/useResourceMutation'
+import { useCreateMutation } from '@/hooks/useResourceMutation'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import type { Collection, CollectionCreate } from '@/features/collections/models/collection.model'
 import type { PaginatedCollections } from '../types/paginated-collection'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
 
 export function useCreateCollectionMutation(callbacks?: MutationCallbacks<Collection>) {
-  return useCreateMutation<Collection, CollectionCreate>(
+  return useCreateMutation<Collection, CollectionCreate, PaginatedCollections>(
     {
       mutationFn: (data: CollectionCreate) => collectionsService.create(data),
       listQueryKey: COLLECTIONS_QUERY_KEYS.lists(),
