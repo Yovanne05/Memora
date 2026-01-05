@@ -18,7 +18,7 @@ export function useCollectionDetails(id: string) {
   const deleteMutation = useDeleteCollectionMutation({
     onSuccess: () => {
       setDeleteTarget(null)
-      router.navigate({ to: "/app/collections" })
+      router.navigate({ to: "/app/workspace" })
     },
   })
 
@@ -45,7 +45,7 @@ export function useCollectionDetails(id: string) {
   )
 
   const handleBack = useCallback(() => {
-    router.navigate({ to: "/app/collections" })
+    router.navigate({ to: "/app/workspace" })
   }, [router])
 
   const handleDelete = useCallback(() => {

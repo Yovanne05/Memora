@@ -7,8 +7,7 @@ import {
   Trash2,
   MoreVertical,
   Folder,
-  FolderMinus,
-  Link2
+  FolderMinus
 } from "lucide-react"
 import { toast } from "sonner"
 

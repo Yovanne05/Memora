@@ -9,12 +9,16 @@ import { CollectionNotesGridWithLinks } from "./CollectionNotesGridWithLinks";
 import type { AvailableNoteOption } from "../../types/note.types";
 
 export function CollectionNotesSection() {
-  const { id } = useParams({ from: "/app/collections/$id/" });
+  const { collectionId } = useParams({
+    from: "/app/workspace/collections/$collectionId/",
+  });
   const { user } = useAuth();
   const userId = user?.id;
 
   // Notes dans la collection
-  const { data, isLoading } = useNotesQuery(0, 20, { collectionId: id });
+  const { data, isLoading } = useNotesQuery(0, 20, {
+    collectionId: collectionId,
+  });
 
   // Notes dispo à ajouter
   const { data: allNotes } = useNotesQuery(0, 100, {});
@@ -38,12 +42,12 @@ export function CollectionNotesSection() {
     async (noteId?: string) => {
       if (!noteId) return;
       try {
-        await mutateAsync({ noteId, payload: { collectionId: id } });
+        await mutateAsync({ noteId, payload: { collectionId: collectionId } });
       } catch (err) {
         console.error("Failed to add note to collection", err);
       }
     },
-    [id, mutateAsync]
+    [collectionId, mutateAsync]
   );
 
   const handleRemoveFromCollection = useCallback(

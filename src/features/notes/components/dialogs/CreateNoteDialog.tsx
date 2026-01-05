@@ -29,7 +29,6 @@ import {
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { NoteVisibility } from "../../models/note.model"
 import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"
-import { RichTextEditor } from "@/components/editor/RichTextEditor"
 
 interface CreateNoteDialogProps {
   open: boolean

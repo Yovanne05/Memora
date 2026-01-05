@@ -41,7 +41,7 @@ vi.mock("@/features/auth/hooks/useAuth", () => ({
 }))
 
 vi.mock("@tanstack/react-router", () => ({
-  useParams: () => ({ id: "col-1" }),
+  useParams: () => ({ collectionId: "col-1" }),
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
 

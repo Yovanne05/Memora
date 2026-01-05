@@ -120,7 +120,7 @@ describe("useCollectionDetails", () => {
 
     result.current.handlers.onBack()
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/collections" })
+    expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/workspace" })
   })
 
   test("handleDelete définit deleteTarget", async () => {
@@ -162,7 +162,7 @@ describe("useCollectionDetails", () => {
     })
 
     await waitFor(() => {
-      expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/collections" })
+      expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/workspace" })
     })
   })
 
