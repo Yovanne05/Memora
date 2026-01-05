@@ -32,6 +32,10 @@ vi.mock("@/features/notes/hooks/useUpdateNoteMutation", () => ({
   useUpdateNoteMutation: () => mockUpdateNoteMutation,
 }))
 
+vi.mock("@/features/notes/components/NoteQuickActions", () => ({
+  NoteQuickActions: () => null,
+}))
+
 vi.mock("@/features/auth/hooks/useAuth", () => ({
   useAuth: () => ({ user: { id: "user-1" } }),
 }))
