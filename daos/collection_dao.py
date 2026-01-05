@@ -50,6 +50,11 @@ class Collection(
     shares: Mapped[list["CollectionShare"]] = relationship(
         back_populates="collection"
     )
+    share_links: Mapped[list["CollectionShareLink"]] = relationship(
+        back_populates="collection",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
 
 class CollectionShare(SharePermissionMixin, CreatedAtMixin, Base):

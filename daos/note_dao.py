@@ -62,6 +62,11 @@ class Note(
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+    share_links: Mapped[list["NoteShareLink"]] = relationship(
+        back_populates="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     flashcards: Mapped[list["Flashcard"]] = relationship(
         back_populates="note", passive_deletes=True
     )
