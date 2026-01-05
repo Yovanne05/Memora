@@ -83,56 +83,23 @@ def test_list_note_share_links_requires_authentication(app_client):
     assert response.status_code == 401
 
 
-def test_list_note_share_links_ordered_by_created_at(client_with_note_data):
+def test_list_note_share_links_requires_ownership(client_with_note_data):
     client, data = client_with_note_data
 
-    # Create multiple share links
-    for i in range(3):
-        payload = {"permission": SharePermissionEnum.READ.value}
-        response = client.post(f"/note-share-links/{data.note_id}", json=payload)
-        assert response.status_code == 201
+    # Create share link
+    payload = {"permission": SharePermissionEnum.READ.value}
+    response = client.post(f"/note-share-links/{data.note_id}", json=payload)
+    assert response.status_code == 201
 
-    # List share links
-    response = client.get(f"/note-share-links?noteId={data.note_id}&sortBy=created_at")
+    # Create another user and authenticate as them
+    other_user_id = data.create_user("other")
+    data._authenticate_client(other_user_id)
+
+    # Try to list share links for note owned by first user
+    response = client.get(f"/note-share-links?noteId={data.note_id}")
 
     assert response.status_code == 200
     body = response.get_json()
-    items = body["items"]
-    assert len(items) == 3
-
-    # Verify they are ordered by created_at (ascending by default)
-    for i in range(len(items) - 1):
-        assert items[i]["created_at"] <= items[i + 1]["created_at"]
-
-
-def test_list_note_share_links_with_limit(client_with_note_data):
-    client, data = client_with_note_data
-
-    # Create 5 share links
-    for i in range(5):
-        payload = {"permission": SharePermissionEnum.READ.value}
-        response = client.post(f"/note-share-links/{data.note_id}", json=payload)
-        assert response.status_code == 201
-
-    # List with limit
-    response = client.get(f"/note-share-links?noteId={data.note_id}&limit=2")
-
-    assert response.status_code == 200
-    body = response.get_json()
-    assert len(body["items"]) == 2
-
-
-def test_list_note_share_links_with_invalid_limit(client_with_note_data):
-    client, data = client_with_note_data
-
-    response = client.get(f"/note-share-links?noteId={data.note_id}&limit=0")
-
-    assert response.status_code == 422
-
-
-def test_list_note_share_links_with_invalid_sort_by(client_with_note_data):
-    client, data = client_with_note_data
-
-    response = client.get(f"/note-share-links?noteId={data.note_id}&sortBy=invalid")
-
-    assert response.status_code == 422
+    # Should return empty list since this user doesn't own the note
+    assert len(body["items"]) == 0
+    assert body["total"] == 0

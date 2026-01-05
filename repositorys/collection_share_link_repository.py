@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Literal, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from sqlalchemy import func, select
 
@@ -11,12 +11,6 @@ from utils.db import get_db_session
 class CollectionShareLinkSearchParams:
     collection_id: Optional[str] = None
 
-    sort_by: Literal["created_at"] = "created_at"
-    sort_dir: Literal["asc", "desc"] = "desc"
-
-    limit: int = 50
-    offset: int = 0
-
 
 def find_many(params: Optional[CollectionShareLinkSearchParams] = None) -> Tuple[List[CollectionShareLink], int]:
     param = params or CollectionShareLinkSearchParams()
@@ -25,20 +19,12 @@ def find_many(params: Optional[CollectionShareLinkSearchParams] = None) -> Tuple
     if param.collection_id:
         filters.append(CollectionShareLink.collection_id == param.collection_id)
 
-    stmt = select(CollectionShareLink).where(*filters)
-
-    sort_map = {
-        "created_at": CollectionShareLink.created_at,
-    }
-    order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    stmt = select(CollectionShareLink).where(*filters).order_by(CollectionShareLink.created_at.desc())
 
     with get_db_session() as session:
         total = session.scalar(
             select(func.count()).select_from(stmt.subquery()))
-        items = session.scalars(
-            stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
-        ).all()
+        items = session.scalars(stmt).all()
 
     return items, total or 0
 

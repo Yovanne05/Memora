@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Literal, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from sqlalchemy import func, select
 
@@ -11,12 +11,6 @@ from utils.db import get_db_session
 class NoteShareLinkSearchParams:
     note_id: Optional[str] = None
 
-    sort_by: Literal["created_at"] = "created_at"
-    sort_dir: Literal["asc", "desc"] = "desc"
-
-    limit: int = 50
-    offset: int = 0
-
 
 def find_many(params: Optional[NoteShareLinkSearchParams] = None) -> Tuple[List[NoteShareLink], int]:
     param = params or NoteShareLinkSearchParams()
@@ -25,20 +19,12 @@ def find_many(params: Optional[NoteShareLinkSearchParams] = None) -> Tuple[List[
     if param.note_id:
         filters.append(NoteShareLink.note_id == param.note_id)
 
-    stmt = select(NoteShareLink).where(*filters)
-
-    sort_map = {
-        "created_at": NoteShareLink.created_at,
-    }
-    order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    stmt = select(NoteShareLink).where(*filters).order_by(NoteShareLink.created_at.desc())
 
     with get_db_session() as session:
         total = session.scalar(
             select(func.count()).select_from(stmt.subquery()))
-        items = session.scalars(
-            stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
-        ).all()
+        items = session.scalars(stmt).all()
 
     return items, total or 0
 

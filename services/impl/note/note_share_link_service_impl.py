@@ -9,12 +9,25 @@ from repositorys.note_share_link_repository import NoteShareLinkSearchParams
 from services.interfaces.note.note_share_link_service_interface import (
     NoteShareLinkServiceInterface,
 )
+from utils.auth import get_current_user
 
 
 class NoteShareLinkService(NoteShareLinkServiceInterface):
     def find_many(self, params: NoteShareLinkSearchParams) -> Tuple[List[NoteShareLinkDTO], int]:
+        user = get_current_user()
         share_links, total = note_share_link_repository.find_many(params)
-        return [note_share_link_to_dto(link) for link in share_links], total
+        
+        # Filter to only include links for notes owned by current user
+        filtered_links = [
+            link for link in share_links 
+            if self._user_owns_note(user.id, link.note_id)
+        ]
+        
+        return [note_share_link_to_dto(link) for link in filtered_links], len(filtered_links)
+
+    def _user_owns_note(self, user_id: str, note_id: str) -> bool:
+        note = note_repository.find_one_unscoped(note_id)
+        return note is not None and note.owner_id == user_id
 
     def create_share_link(
         self, note_id: str, share_link_dto: NoteShareLinkCreateDTO
