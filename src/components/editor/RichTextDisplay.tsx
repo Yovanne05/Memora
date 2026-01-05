@@ -4,6 +4,7 @@ import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import Image from '@tiptap/extension-image'
 import { common, createLowlight } from 'lowlight'
 import { cn } from '@/lib/utils'
 import { useMemo } from 'react'
@@ -67,6 +68,13 @@ export function RichTextDisplay({ content, className }: Readonly<RichTextDisplay
           class: 'bg-muted rounded-md p-4 font-mono text-sm',
         },
       }),
+      Image.configure({
+        inline: true,
+        allowBase64: false,
+        HTMLAttributes: {
+          class: 'rounded-lg max-w-full h-auto',
+        },
+      }),
     ],
     content: parsedContent,
     editable: false,
@@ -84,6 +92,7 @@ export function RichTextDisplay({ content, className }: Readonly<RichTextDisplay
           'prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground',
           'prose-strong:font-semibold prose-strong:text-foreground',
           'prose-em:italic',
+          'prose-img:rounded-lg prose-img:shadow-md prose-img:my-4',
         ),
       },
     },

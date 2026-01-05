@@ -176,6 +176,7 @@ export function NoteEditForm({
                         onChange={field.onChange}
                         placeholder="Commencez à rédiger votre note..."
                         editable={!isFormDisabled}
+                        noteId={note?.id}
                       />
                     </FormControl>
                     <FormMessage />
