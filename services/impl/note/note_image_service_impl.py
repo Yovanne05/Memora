@@ -1,3 +1,4 @@
+import mimetypes
 import os
 from uuid import uuid4
 from werkzeug.datastructures import FileStorage
@@ -65,7 +66,11 @@ class NoteImageService(NoteImageServiceInterface):
 
         mime = sniff_mime(file)
         if not is_allowed_mime(mime, self.ALLOWED_MIME_TYPES):
-            raise InvalidFileType()
+            guessed_mime, _ = mimetypes.guess_type(file.filename)
+            if guessed_mime and is_allowed_mime(guessed_mime, self.ALLOWED_MIME_TYPES):
+                mime = guessed_mime
+            else:
+                raise InvalidFileType()
 
         filename = f"{uuid4()}.{ext}"
         storage_key = self._build_storage_key(str(note.owner_id), note_id, filename)
