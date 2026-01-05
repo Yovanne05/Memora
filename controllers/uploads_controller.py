@@ -20,8 +20,8 @@ def serve_upload(key: str):
 
     try:
         path = storage.resolve_local_path(key)
-    except StorageError:
-        raise UploadInvalidKey()
+    except StorageError as e:
+        raise UploadInvalidKey() from e
 
     if not path:
         raise UploadInvalidKey()

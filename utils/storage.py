@@ -31,8 +31,7 @@ class StorageClient:
         raise NotImplementedError
 
     def resolve_local_path(self, key: str) -> Optional[str]:
-        """Return a filesystem path for local storage, or None for remote drivers."""
-        return None
+        raise NotImplementedError
 
 
 class LocalStorageClient(StorageClient):
