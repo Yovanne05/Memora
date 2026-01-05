@@ -10,6 +10,7 @@ from controllers.user_controller import bp_users
 from controllers.collection_controller import bp_collections
 from controllers.share_note_controller import bp_note_shares
 from controllers.share_collection_controller import bp_collection_shares
+from controllers.uploads_controller import bp_uploads
 from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
@@ -45,6 +46,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_collections)
     app.register_blueprint(bp_note_shares)
     app.register_blueprint(bp_collection_shares)
+    app.register_blueprint(bp_uploads)
     app.register_blueprint(bp_note_images)
     app.register_blueprint(bp_flashcards)
     app.register_blueprint(bp_user_statistics)

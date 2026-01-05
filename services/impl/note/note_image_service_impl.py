@@ -45,9 +45,9 @@ class NoteImageService(NoteImageServiceInterface):
 
     def _build_public_url(self, key: str) -> str:
         if self.storage.driver == "local":
-            if config.UPLOAD_PUBLIC_BASE_URL:
-                return f"{config.UPLOAD_PUBLIC_BASE_URL}/{key}"
-            return f"/{key}"
+            base = config.UPLOAD_PUBLIC_BASE_URL or "/uploads"
+            base = base.rstrip("/")
+            return f"{base}/{key}"
         return self.storage.get_public_url(key)
 
     def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
