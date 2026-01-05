@@ -1,0 +1,23 @@
+tags:
+  - note-share-links
+summary: Supprimer un lien de partage
+description: >
+  Révoque un lien de partage. L'accès via ce lien sera immédiatement invalidé.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note.
+  - in: path
+    name: link_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant du lien de partage à supprimer.
+responses:
+  204:
+    description: Lien supprimé avec succès.
+  404:
+    description: Lien ou note introuvable.

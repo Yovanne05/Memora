@@ -164,7 +164,7 @@ definitions:
         description: Target user.
       permission:
         type: string
-        enum: ["read", "write"]
+        enum: ["read", "write", "owner"]
         description: Niveau d'acces partage.
       created_at:
         type: string
@@ -182,7 +182,7 @@ definitions:
         description: Identifiant de l'utilisateur cible.
       permission:
         type: string
-        enum: ["read", "write"]
+        enum: ["read", "write", "owner"]
         description: Niveau d'acces souhaite.
 
   CollectionShareUpdatePayload:
@@ -191,7 +191,7 @@ definitions:
     properties:
       permission:
         type: string
-        enum: ["read", "write"]
+        enum: ["read", "write", "owner"]
         description: Nouveau niveau d'acces.
 
   CollectionShareListResponse:
@@ -225,3 +225,49 @@ definitions:
         format: date-time
         description: Date d'ajout aux favoris.
     required: ["user_id", "collection_id", "created_at"]
+
+  CollectionShareLink:
+    type: object
+    description: Lien de partage public pour une collection (accessible via URL).
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique du lien (utilisé dans l'URL publique).
+        example: "b2c3d4e5-6789-01bc-def0-234567890abc"
+      collection_id:
+        type: string
+        format: uuid
+        description: Identifiant de la collection partagée.
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        description: Niveau d'accès accordé via ce lien.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du lien.
+    required: ["id", "collection_id", "permission", "created_at"]
+
+  CollectionShareLinkCreatePayload:
+    type: object
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        default: "read"
+        description: Niveau d'accès à accorder via le lien.
+
+  CollectionShareLinkListResponse:
+    type: object
+    description: Liste paginée des liens de partage d'une collection.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de liens.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/CollectionShareLink"
+    required: ["total", "items"]

@@ -1,0 +1,23 @@
+tags:
+  - shared
+summary: Accéder à une note via un lien de partage public
+description: >
+  Récupère une note en utilisant l'ID du lien de partage.
+  Aucune authentification n'est requise.
+parameters:
+  - in: path
+    name: link_id
+    type: string
+    format: uuid
+    required: true
+    description: ID du lien de partage (clé primaire).
+    example: "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+responses:
+  200:
+    description: Note récupérée avec succès.
+    schema:
+      $ref: "#/definitions/Note"
+  404:
+    description: Lien de partage non trouvé ou invalide.
+  422:
+    description: ID malformé.

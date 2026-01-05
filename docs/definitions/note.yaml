@@ -154,3 +154,107 @@ definitions:
         format: date-time
         description: Date d'ajout aux favoris.
     required: ["user_id", "note_id", "created_at"]
+
+  NoteShare:
+    type: object
+    description: Configuration de partage d'une note avec un utilisateur.
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note partagée.
+      user_id:
+        type: string
+        format: uuid
+        description: Utilisateur cible.
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        description: Niveau d'accès partagé.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du partage.
+    required: ["note_id", "user_id", "permission", "created_at"]
+
+  NoteShareCreatePayload:
+    type: object
+    required: ["user_id", "permission"]
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant de l'utilisateur cible.
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        description: Niveau d'accès souhaité.
+
+  NoteShareUpdatePayload:
+    type: object
+    required: ["permission"]
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        description: Nouveau niveau d'accès.
+
+  NoteShareListResponse:
+    type: object
+    description: Liste paginée des partages d'une note.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de partages.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/NoteShare"
+    required: ["total", "items"]
+
+  NoteShareLink:
+    type: object
+    description: Lien de partage public pour une note (accessible via URL).
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique du lien (utilisé dans l'URL publique).
+        example: "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+      note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note partagée.
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        description: Niveau d'accès accordé via ce lien.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du lien.
+    required: ["id", "note_id", "permission", "created_at"]
+
+  NoteShareLinkCreatePayload:
+    type: object
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write", "owner"]
+        default: "read"
+        description: Niveau d'accès à accorder via le lien.
+
+  NoteShareLinkListResponse:
+    type: object
+    description: Liste paginée des liens de partage d'une note.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de liens.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/NoteShareLink"
+    required: ["total", "items"]
