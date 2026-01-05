@@ -5,7 +5,7 @@ import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import TextAlign from '@tiptap/extension-text-align'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import Image from '@tiptap/extension-image'
+import { ResizableImage } from './extensions/ResizableImage'
 import { common, createLowlight } from 'lowlight'
 import { MenuBar } from './MenuBar'
 import { cn } from '@/lib/utils'
@@ -82,11 +82,11 @@ export function RichTextEditor({
           class: 'bg-muted rounded-md p-4 font-mono text-sm',
         },
       }),
-      Image.configure({
+      ResizableImage.configure({
         inline: true,
         allowBase64: false,
         HTMLAttributes: {
-          class: 'rounded-lg max-w-full h-auto cursor-pointer',
+          class: 'rounded-lg max-w-full h-auto',
         },
       }),
     ],

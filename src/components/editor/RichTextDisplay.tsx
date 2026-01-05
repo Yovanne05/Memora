@@ -4,7 +4,7 @@ import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import Image from '@tiptap/extension-image'
+import { ResizableImage } from './extensions/ResizableImage'
 import { common, createLowlight } from 'lowlight'
 import { cn } from '@/lib/utils'
 import { useMemo } from 'react'
@@ -68,7 +68,7 @@ export function RichTextDisplay({ content, className }: Readonly<RichTextDisplay
           class: 'bg-muted rounded-md p-4 font-mono text-sm',
         },
       }),
-      Image.configure({
+      ResizableImage.configure({
         inline: true,
         allowBase64: false,
         HTMLAttributes: {
