@@ -1,4 +1,4 @@
-import type { Note } from "../../models/note.model"
+import type { Note } from "../models/note.model"
 import { NoteCard } from "./NoteCard"
 
 interface NotesGridProps {

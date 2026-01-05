@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react"
-import { NotesGrid } from "@/features/notes/components/list/NotesGrid"
-import { NotesPagination } from "@/features/notes/components/list/NotesPagination"
+import { NotesGrid } from "@/features/notes/components/NotesGrid"
+import { NotesPagination } from "@/features/notes/components/NotesPagination"
 import { useWorkspaceNotes } from "../hooks/useWorkspaceNotes"
 import { useWorkspaceContext } from "../context/WorkspaceContext"
 import { useMemo } from "react"

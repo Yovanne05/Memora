@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react"
-import type { Collection } from "../../models/collection.model"
+import type { Collection } from "../models/collection.model"
 import { ResourceCard, type ResourceCardAction } from "@/components/shared/ResourceCard"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import {
   VISIBILITY_BADGE_CLASSES,
   formatShortDate,
 } from "@/lib/format.utils"
-import { useToggleCollectionFavoriteMutation } from "../../hooks/useToggleCollectionFavorite"
+import { useToggleCollectionFavoriteMutation } from "../hooks/useToggleCollectionFavoriteMutation"
 
 interface CollectionCardProps {
   readonly collection: Collection
@@ -53,7 +53,7 @@ export const CollectionCard = memo(function CollectionCard({
       return
     }
     handleNavigate()
-  }, [onCardClick, handleNavigate])
+  }, [onCardClick, collection, handleNavigate])
 
   const handleFavoriteClick = useCallback(
     (e: React.MouseEvent) => {

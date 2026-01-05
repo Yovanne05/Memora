@@ -6,8 +6,8 @@ import { FormInput } from "@/components/ui/form-input"
 import { FormTextarea } from "@/components/ui/form-textarea"
 import { FormSelect } from "@/components/ui/form-select"
 import { TagInput } from "@/components/ui/tag-input"
-import type { CollectionVisibility } from "../../models/collection.model"
-import { collectionFormSchema, type CollectionFormInput } from "../../schemas/collection.schema"
+import type { CollectionVisibility } from "../models/collection.model"
+import { collectionFormSchema, type CollectionFormInput } from "../schemas/collection.schema"
 
 export interface CollectionFormValues {
   name: string

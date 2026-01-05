@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import type { Note } from "../../models/note.model"
+import type { Note } from "../models/note.model"
 import { ResourceCard, type ResourceCardAction } from "@/components/shared/ResourceCard"
 import { CalendarClock, Eye, FileText, Lock, User2 } from "lucide-react"
 
