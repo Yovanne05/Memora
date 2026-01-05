@@ -20,9 +20,6 @@ def client():
     app = create_app()
     app.testing = False
     app.config["TESTING"] = False
-    from utils.limiter import limiter
-    limiter.enabled = True
-    limiter.reset()
     with app.test_client() as client:
         client.environ_base["REMOTE_ADDR"] = (
             f"10.0.0.{int(uuid4().int % 200) + 1}"
@@ -82,15 +79,3 @@ def test_login_returns_401_on_invalid_password(client):
     response = client.post("/auth/login", json=login_payload)
 
     assert response.status_code == 401
-
-
-def test_login_is_rate_limited(client):
-    email, _, _ = _register_user(client)
-    payload = {"identifier": email, "password": WRONG_PASSWORD} # NOSONAR
-
-    for _ in range(5):
-        client.post("/auth/login", json=payload)
-
-    response = client.post("/auth/login", json=payload)
-
-    assert response.status_code == 429

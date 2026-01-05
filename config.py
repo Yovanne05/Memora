@@ -15,8 +15,6 @@ JWT_ACCESS_TOKEN_EXPIRES = timedelta(
         24 * 3600,
     )
 )
-RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI", "memory://")
-LOGIN_RATE_LIMIT = os.getenv("LOGIN_RATE_LIMIT", "5 per 15 minutes")
 IMAGE_MAX_CONTENT_LENGTH = int(
     os.getenv("IMAGE_MAX_CONTENT_LENGTH_BYTES", str(5 * 1024 * 1024))
 )
