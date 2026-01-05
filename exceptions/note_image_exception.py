@@ -1,9 +1,4 @@
-from werkzeug.exceptions import BadRequest, NotFound
-
-
-class NoteImageNotFound(NotFound):
-    def __init__(self, description: str = "Image not found for this note."):
-        super().__init__(description=description)
+from werkzeug.exceptions import BadRequest
 
 
 class NoFileProvided(BadRequest):

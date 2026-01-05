@@ -24,7 +24,6 @@ from daos.user_dao import User
 from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note, NoteLink, NoteShare
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
-from daos.note_image_dao import NoteImage
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
 
@@ -201,22 +200,6 @@ def seed() -> None:
             ]
         )
         print("Flashcards inserted.")
-
-        # Note images
-        uploads_dir = pathlib.Path("uploads")
-        uploads_dir.mkdir(exist_ok=True)
-        session.add(
-            NoteImage(
-                id=generate_uuid(),
-                note_id=note_archi.id,
-                file_name="schema-architecture.png",
-                file_path=str(uploads_dir / "schema-architecture.png"),
-                file_size=204800,
-                mime_type="image/png",
-                uploaded_at=datetime.now(timezone.utc),
-            )
-        )
-        print("Note images inserted.")
 
         session.flush()
         print("Seed completed successfully.")
