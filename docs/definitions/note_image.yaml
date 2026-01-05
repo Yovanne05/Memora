@@ -2,13 +2,8 @@ definitions:
   NoteImageUploadResponse:
     type: object
     properties:
-      note_id:
-        type: string
-        format: uuid
-        example: "note-uuid-123"
       url:
         type: string
         example: "https://cdn.example.com/users/user-uuid/notes/note-uuid/image-uuid.jpg"
     required:
-      - note_id
       - url

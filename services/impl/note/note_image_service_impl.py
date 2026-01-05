@@ -77,10 +77,7 @@ class NoteImageService(NoteImageServiceInterface):
 
         file_url = self._build_public_url(storage_key)
 
-        return NoteImageDTO(
-            note_id=note_id,
-            url=file_url,
-        )
+        return NoteImageDTO(url=file_url)
 
 
 note_image_service = NoteImageService()
