@@ -1,13 +1,11 @@
 from http import HTTPStatus
 
-import config
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.auth_dto import LoginDTO, RegisterDTO
 from services.impl.auth_service_impl import auth_service
-from utils.limiter import limiter
 from utils.auth import get_current_user
 
 bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
@@ -25,7 +23,6 @@ def register():
 
 
 @bp_auth.post("/login")
-@limiter.limit(config.LOGIN_RATE_LIMIT)
 @swag_from("../docs/auth/login.yaml")
 def login():
     payload = LoginDTO.model_validate_json(request.data)

@@ -54,11 +54,6 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
         "security": [
             {"bearerAuth": []}
         ],
-        "responses": {
-            "UnauthorizedError": {
-                "description": "Access token is missing or invalid"
-            }
-        }
     }
 
     docs_dir = Path(__file__).resolve().parents[1] / "docs" / "definitions"

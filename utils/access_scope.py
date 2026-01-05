@@ -146,3 +146,8 @@ def can_read_note_image(user, note_id: str) -> bool:
 def can_read_note_links(user, note_id: str) -> bool:
     # Access to note links requires access to the base note.
     return can_read_note(user, note_id)
+
+
+def can_write_note(user, note) -> bool:
+    """Write access is limited to the owner or admins."""
+    return _is_admin_user(user) or getattr(note, "owner_id", None) == getattr(user, "id", None)
