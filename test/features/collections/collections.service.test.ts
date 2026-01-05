@@ -9,6 +9,7 @@ const baseDto: CollectionDto = {
   name: "Titre",
   description: null,
   visibility: "private",
+  is_favorite : false,
   notes: [],
   tags: [],
   nodes: [],
