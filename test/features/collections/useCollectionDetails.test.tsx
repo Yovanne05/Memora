@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react"
+import { act, renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { vi } from "vitest"
 import { useCollectionDetails } from "@/features/collections/hooks/useCollectionDetails"
@@ -94,10 +94,12 @@ describe("useCollectionDetails", () => {
 
     await waitFor(() => expect(result.current.collection).toEqual(collection))
 
-    result.current.handlers.onEdit({
-      name: "Updated",
-      description: "Description",
-      visibility: "private",
+    await act(async () => {
+      await result.current.handlers.onEdit({
+        name: "Updated",
+        description: "Description",
+        visibility: "private",
+      })
     })
 
     await waitFor(() => {
@@ -118,7 +120,9 @@ describe("useCollectionDetails", () => {
 
     await waitFor(() => expect(result.current.collection).toEqual(collection))
 
-    result.current.handlers.onBack()
+    act(() => {
+      result.current.handlers.onBack()
+    })
 
     expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/workspace" })
   })
@@ -132,7 +136,9 @@ describe("useCollectionDetails", () => {
 
     await waitFor(() => expect(result.current.collection).toEqual(collection))
 
-    result.current.handlers.onDelete()
+    act(() => {
+      result.current.handlers.onDelete()
+    })
 
     await waitFor(() => {
       expect(result.current.deletion.target).toEqual(collection)
@@ -149,13 +155,17 @@ describe("useCollectionDetails", () => {
 
     await waitFor(() => expect(result.current.collection).toEqual(collection))
 
-    result.current.handlers.onDelete()
+    act(() => {
+      result.current.handlers.onDelete()
+    })
 
     await waitFor(() => {
       expect(result.current.deletion.target).toEqual(collection)
     })
 
-    result.current.deletion.confirmDelete()
+    await act(async () => {
+      await result.current.deletion.confirmDelete()
+    })
 
     await waitFor(() => {
       expect(mockCollectionsService.remove).toHaveBeenCalledWith("col-1")
@@ -177,7 +187,9 @@ describe("useCollectionDetails", () => {
 
     expect(result.current.isEditing).toBe(false)
 
-    result.current.setIsEditing(true)
+    act(() => {
+      result.current.setIsEditing(true)
+    })
 
     await waitFor(() => {
       expect(result.current.isEditing).toBe(true)
