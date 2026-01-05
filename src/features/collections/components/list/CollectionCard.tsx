@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react"
+import { memo, useCallback } from "react"
 import type { Collection } from "../../models/collection.model"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -44,9 +44,9 @@ export const CollectionCard = memo(function CollectionCard({
   readOnly = false,
 }: Readonly<CollectionCardProps>) {
   const router = useRouter()
-
   const toggleFavorite = useToggleCollectionFavoriteMutation()
-  const [favorite, setFavorite] = useState<boolean>(!!collection.isFavorite)
+
+  const favorite = collection.isFavorite === true
 
   const handleNavigate = useCallback(() => {
     router.navigate({
@@ -92,16 +92,9 @@ export const CollectionCard = memo(function CollectionCard({
   const handleFavoriteClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
-
-      const next = !favorite
-      setFavorite(next)
-
-      toggleFavorite.mutate(
-        { collectionId: collection.id, next },
-        { onError: () => setFavorite(!next) }
-      )
+      toggleFavorite.mutate({ collectionId: collection.id, next: !favorite })
     },
-    [favorite, toggleFavorite, collection.id]
+    [toggleFavorite, collection.id, favorite]
   )
 
   return (
@@ -175,9 +168,7 @@ export const CollectionCard = memo(function CollectionCard({
             >
               <Star
                 className={`h-4 w-4 transition ${
-                  favorite
-                    ? "fill-current text-primary"
-                    : "text-muted-foreground"
+                  favorite ? "fill-current text-primary" : "text-muted-foreground"
                 }`}
                 aria-hidden="true"
               />
@@ -197,10 +188,7 @@ export const CollectionCard = memo(function CollectionCard({
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" onClick={stopPropagation}>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={handleEdit}
-                >
+                <DropdownMenuItem className="cursor-pointer" onClick={handleEdit}>
                   Modifier
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -217,10 +205,7 @@ export const CollectionCard = memo(function CollectionCard({
 
       <CardContent className={`space-y-3 ${compact ? "pt-0 pb-2" : "pt-0"}`}>
         <div className="flex items-center justify-between gap-2">
-          <Badge
-            variant="outline"
-            className={VISIBILITY_BADGE_CLASSES[collection.visibility]}
-          >
+          <Badge variant="outline" className={VISIBILITY_BADGE_CLASSES[collection.visibility]}>
             {VISIBILITY_LABELS[collection.visibility]}
           </Badge>
 
