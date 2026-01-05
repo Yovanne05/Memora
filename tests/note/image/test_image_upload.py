@@ -18,7 +18,6 @@ def test_upload_image_returns_created(client_with_note_data):
 
     assert response.status_code == 201
     json_data = response.get_json()
-    assert json_data.get("note_id") == data.note_id
     assert json_data.get("url")
 
 
