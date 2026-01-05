@@ -11,6 +11,7 @@ import type {
   WorkspaceActions,
   WorkspaceView,
   NotesSort,
+  WorkspaceMode,
 } from "../types/workspace.types"
 
 interface WorkspaceContextValue {
@@ -29,6 +30,7 @@ type WorkspaceAction =
   | { type: "COLLAPSE_COLLECTION"; payload: string }
   | { type: "SET_VIEW"; payload: WorkspaceView }
   | { type: "SET_SEARCH"; payload: string }
+  | { type: "SET_MODE"; payload: WorkspaceMode }
   | { type: "SET_SORT"; payload: NotesSort }
   | { type: "SET_PAGE"; payload: number }
   | { type: "OPEN_CREATE_NOTE" }
@@ -43,6 +45,7 @@ type WorkspaceAction =
 const INITIAL_STATE: WorkspaceState = {
   selectedNoteId: null,
   selectedCollectionId: null,
+  mode : "notes",
   view: "grid",
   sidebarExpanded: new Set<string>(),
   search: "",
@@ -96,6 +99,15 @@ function workspaceReducer(
 
     case "SET_VIEW":
       return { ...state, view: action.payload }
+
+    case "SET_MODE":
+      return {
+        ...state,
+        mode: action.payload,
+        selectedCollectionId: null,
+        selectedNoteId: null,
+        page: 0,
+      }
 
     case "SET_SEARCH":
       return { ...state, search: action.payload, page: 0 }
@@ -208,6 +220,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "SET_VIEW", payload: view })
       },
 
+      setMode: (mode: WorkspaceMode) => {
+        dispatch({ type: "SET_MODE", payload: mode })
+      },
+      
       setSearch: (search: string) => {
         dispatch({ type: "SET_SEARCH", payload: search })
       },
