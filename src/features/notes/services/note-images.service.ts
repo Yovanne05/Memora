@@ -21,6 +21,16 @@ async function uploadWithTimeout(
   return Promise.race([promise, timeoutPromise])
 }
 
+function normalizeImageUrl(url: string): string {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+
+  const baseUrl = config.apiUrl.replace(/\/$/, '')
+  const path = url.startsWith('/') ? url : `/${url}`
+  return `${baseUrl}${path}`
+}
+
 export function createNoteImagesService(): INoteImagesService {
   return {
     async upload(payload: NoteImageUploadPayload): Promise<NoteImage> {
@@ -45,7 +55,12 @@ export function createNoteImagesService(): INoteImagesService {
         const data = await response.json()
         const dto = noteImageDtoSchema.parse(data) as NoteImageDto
 
-        return mapNoteImageDtoToModel(dto)
+        const normalizedDto: NoteImageDto = {
+          ...dto,
+          url: normalizeImageUrl(dto.url),
+        }
+
+        return mapNoteImageDtoToModel(normalizedDto)
       } catch (error) {
         normalizeError(error)
       }
