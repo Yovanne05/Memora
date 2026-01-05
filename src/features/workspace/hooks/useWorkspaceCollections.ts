@@ -1,8 +1,18 @@
 import { useMemo } from "react"
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 
-export function useWorkspaceCollections() {
-  const collectionsQuery = useCollectionsQuery()
+export type WorkspaceMode = "default" | "favorites"
+
+interface UseWorkspaceCollectionsOptions {
+  mode?: WorkspaceMode
+}
+
+export function useWorkspaceCollections(options: UseWorkspaceCollectionsOptions = {}) {
+  const mode = options.mode ?? "default"
+
+  const collectionsQuery = useCollectionsQuery(
+    mode === "favorites" ? { isFavorite: true } : {}
+  )
 
   const collectionsTree = useMemo(() => {
     if (!collectionsQuery.data?.items) {

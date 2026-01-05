@@ -7,6 +7,7 @@ export interface WorkspaceState {
   selectedNoteId: string | null
   selectedCollectionId: string | null
 
+  mode : WorkspaceMode
   // UI State
   view: WorkspaceView
   sidebarExpanded: Set<string> // IDs des collections dépliées
@@ -32,6 +33,7 @@ export interface WorkspaceActions {
   toggleCollection: (id: string) => void
   expandCollection: (id: string) => void
   collapseCollection: (id: string) => void
+  setMode : (mode : WorkspaceMode) => void
 
   // UI
   setView: (view: WorkspaceView) => void
@@ -47,3 +49,5 @@ export interface WorkspaceActions {
   openGraphView: () => void
   closeGraphView: () => void
 }
+
+export type WorkspaceMode = "notes" | "favorites" | "collection"

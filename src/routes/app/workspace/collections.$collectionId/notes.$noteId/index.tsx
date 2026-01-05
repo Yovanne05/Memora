@@ -9,5 +9,5 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { collectionId, noteId } = Route.useParams()
-  return <NoteEditView noteId={noteId} collectionId={collectionId} />
+  return <NoteEditView key={`${collectionId}:${noteId}`} noteId={noteId} collectionId={collectionId} />
 }

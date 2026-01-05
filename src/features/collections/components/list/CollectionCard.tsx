@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { FileText, MoreHorizontal, Files, Star } from "lucide-react"
+import { FileText, MoreHorizontal, Files } from "lucide-react"
 import { useRouter } from "@tanstack/react-router"
 import {
   VISIBILITY_LABELS,
@@ -19,6 +19,8 @@ import {
   formatShortDate,
 } from "@/lib/format.utils"
 import { useToggleCollectionFavoriteMutation } from "../../hooks/useToggleCollectionFavorite"
+import { FavoriteButton } from "@/components/favorite-button"
+import { cn } from "@/lib/utils"
 
 interface CollectionCardProps {
   readonly collection: Collection
@@ -156,23 +158,18 @@ export const CollectionCard = memo(function CollectionCard({
 
         {!selectionMode && !readOnly && (
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0"
-              onClick={handleFavoriteClick}
-              aria-pressed={favorite}
-              aria-label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
-              title={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+            <FavoriteButton
+              pressed={favorite}
+              label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
               disabled={toggleFavorite.isPending}
-            >
-              <Star
-                className={`h-4 w-4 transition ${
-                  favorite ? "fill-current text-primary" : "text-muted-foreground"
-                }`}
-                aria-hidden="true"
-              />
-            </Button>
+              onClick={handleFavoriteClick}
+              size="sm"
+              className={cn(
+                "text-muted-foreground hover:text-foreground",
+                !favorite && "opacity-0 group-hover:opacity-100"
+              )}
+            />
+
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -205,7 +202,10 @@ export const CollectionCard = memo(function CollectionCard({
 
       <CardContent className={`space-y-3 ${compact ? "pt-0 pb-2" : "pt-0"}`}>
         <div className="flex items-center justify-between gap-2">
-          <Badge variant="outline" className={VISIBILITY_BADGE_CLASSES[collection.visibility]}>
+          <Badge
+            variant="outline"
+            className={VISIBILITY_BADGE_CLASSES[collection.visibility]}
+          >
             {VISIBILITY_LABELS[collection.visibility]}
           </Badge>
 
@@ -216,7 +216,11 @@ export const CollectionCard = memo(function CollectionCard({
         </div>
 
         {collection.tags && collection.tags.length > 0 && (
-          <TagList tags={collection.tags} maxVisible={compact ? 2 : 3} size="sm" />
+          <TagList
+            tags={collection.tags}
+            maxVisible={compact ? 2 : 3}
+            size="sm"
+          />
         )}
 
         {!compact && (

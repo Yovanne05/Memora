@@ -7,5 +7,5 @@ export const Route = createFileRoute("/app/workspace/notes/$noteId/")({
 
 function RouteComponent() {
   const { noteId } = Route.useParams()
-  return <NoteEditView noteId={noteId} />
+  return <NoteEditView key={noteId} noteId={noteId} />
 }

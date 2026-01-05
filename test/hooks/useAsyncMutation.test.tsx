@@ -30,12 +30,13 @@ describe('useAsyncMutation', () => {
   test('handles success and onSuccess callback', async () => {
     const action = vi.fn().mockResolvedValue('OK')
     const onSuccess = vi.fn()
+    const user = userEvent.setup()
 
     render(
       <TestComponent action={action} errorMessage="Erreur" onSuccess={onSuccess} />
     )
 
-    userEvent.click(screen.getByText('run'))
+    await user.click(screen.getByText('run'))
 
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith('OK', expect.any(Array))
@@ -47,15 +48,21 @@ describe('useAsyncMutation', () => {
 
   test('handles error and sets error message', async () => {
     const action = vi.fn().mockRejectedValue(new Error('boom'))
+    const user = userEvent.setup()
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    render(<TestComponent action={action} errorMessage="Erreur" />)
+    try {
+      render(<TestComponent action={action} errorMessage="Erreur" />)
 
-    userEvent.click(screen.getByText('run'))
+      await user.click(screen.getByText('run'))
 
-    await waitFor(() => {
-      expect(screen.getByText(/error:boom/)).toBeTruthy()
-    })
+      await waitFor(() => {
+        expect(screen.getByText(/error:boom/)).toBeTruthy()
+      })
 
-    expect(screen.getByText('loading:no')).toBeTruthy()
+      expect(screen.getByText('loading:no')).toBeTruthy()
+    } finally {
+      consoleErrorSpy.mockRestore()
+    }
   })
 })

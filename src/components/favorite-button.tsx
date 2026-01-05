@@ -8,6 +8,7 @@ type Props = {
   readonly disabled?: boolean
   readonly onClick: (e: React.MouseEvent) => void
   readonly size?: "sm" | "md"
+  readonly className?: string
 }
 
 export function FavoriteButton({
@@ -16,13 +17,14 @@ export function FavoriteButton({
   disabled,
   onClick,
   size = "md",
+  className,
 }: Readonly<Props>) {
   return (
     <Button
       type="button"
       variant="ghost"
       size="icon"
-      className={cn(size === "md" ? "h-9 w-9" : "h-8 w-8")}
+      className={cn(size === "md" ? "h-9 w-9" : "h-8 w-8", className)}
       onClick={onClick}
       aria-pressed={pressed}
       aria-label={label}

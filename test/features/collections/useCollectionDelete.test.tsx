@@ -137,21 +137,26 @@ describe("useCollectionDelete", () => {
   test("error est défini en cas d'échec", async () => {
     const error = new Error("Delete failed");
     mockCollectionsService.remove.mockRejectedValue(error);
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const { result } = renderHook(() => useCollectionDelete(), {
-      wrapper: createWrapper(queryClient),
-    });
+    try {
+      const { result } = renderHook(() => useCollectionDelete(), {
+        wrapper: createWrapper(queryClient),
+      });
 
-    act(() => {
-      result.current.open(collection);
-    });
+      act(() => {
+        result.current.open(collection);
+      });
 
-    await act(async () => {
-      await result.current.confirm().catch(() => {});
-    });
+      await act(async () => {
+        await result.current.confirm().catch(() => {});
+      });
 
-    await waitFor(() => {
-      expect(result.current.error).toBeTruthy();
-    });
+      await waitFor(() => {
+        expect(result.current.error).toBeTruthy();
+      });
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
   });
 });

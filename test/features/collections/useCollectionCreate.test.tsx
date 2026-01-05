@@ -110,7 +110,7 @@ describe("useCollectionCreate", () => {
   });
 
   test("loading est vrai pendant la création", async () => {
-    let resolveCreate: (value: Collection) => void;
+    let resolveCreate: (value: Collection) => void = () => {};
     mockCollectionsService.create.mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -122,17 +122,23 @@ describe("useCollectionCreate", () => {
       wrapper: createWrapper(queryClient),
     });
 
+    let submitPromise!: Promise<void>;
+
     await act(async () => {
-      const promise = result.current.submit({
+      submitPromise = result.current.submit({
         name: "New Collection",
         description: "New Description",
         visibility: "private",
       });
-      await waitFor(() => {
-        expect(result.current.loading).toBe(true);
-      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(true);
+    });
+
+    await act(async () => {
       resolveCreate(newCollection);
-      await promise;
+      await submitPromise;
     });
 
     expect(result.current.loading).toBe(false);
@@ -141,23 +147,28 @@ describe("useCollectionCreate", () => {
   test("error est défini en cas d'échec", async () => {
     const error = new Error("Creation failed");
     mockCollectionsService.create.mockRejectedValue(error);
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const { result } = renderHook(() => useCollectionCreate(), {
-      wrapper: createWrapper(queryClient),
-    });
+    try {
+      const { result } = renderHook(() => useCollectionCreate(), {
+        wrapper: createWrapper(queryClient),
+      });
 
-    await act(async () => {
-      await result.current
-        .submit({
-          name: "New Collection",
-          description: "New Description",
-          visibility: "private",
-        })
-        .catch(() => {});
-    });
+      await act(async () => {
+        await result.current
+          .submit({
+            name: "New Collection",
+            description: "New Description",
+            visibility: "private",
+          })
+          .catch(() => {});
+      });
 
-    await waitFor(() => {
-      expect(result.current.error).toBeTruthy();
-    });
+      await waitFor(() => {
+        expect(result.current.error).toBeTruthy();
+      });
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
   });
 });
