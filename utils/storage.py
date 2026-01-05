@@ -59,7 +59,6 @@ class LocalStorageClient(StorageClient):
         path = self._full_path(key)
         if os.path.exists(path):
             os.remove(path)
-        # Cleanup empty parent directories
         parent = os.path.dirname(path)
         while parent.startswith(self.root_dir):
             if os.path.exists(parent) and not os.listdir(parent):
@@ -74,7 +73,6 @@ class LocalStorageClient(StorageClient):
     def get_public_url(self, key: str) -> str:
         if self.public_base_url:
             return f"{self.public_base_url}/{key}"
-        # Fallback: let the controller build a route-based URL using the key pattern.
         return f"/{key}"
 
 
@@ -119,7 +117,6 @@ class S3StorageClient(StorageClient):
         return f"{self.endpoint_url}/{self.bucket}/{key}"
 
     def get_public_url(self, key: str) -> str:
-        # Buckets are assumed public; return object URL.
         return self._object_url(key)
 
     def resolve_local_path(self, key: str) -> Optional[str]:
