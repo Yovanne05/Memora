@@ -36,6 +36,7 @@ class NoteDTO(BaseModel):
     collection_name: str | None = None
     tags: List[str] = Field(default_factory=list)
     is_favorite: bool = False
+    user_permission: str | None = None  # "read", "write", "owner", or None
     created_at: datetime
     updated_at: datetime
 

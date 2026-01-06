@@ -19,7 +19,7 @@ from services.interfaces.note.note_share_service_interface import (
     NoteShareServiceInterface,
 )
 from utils.auth import get_current_user
-from utils.access_scope import accessible_note_ids
+from utils.access_scope import accessible_note_ids, is_note_owner
 
 
 class NoteShareService(NoteShareServiceInterface):
@@ -37,8 +37,14 @@ class NoteShareService(NoteShareServiceInterface):
     def share_note(
         self, note_id: str, share_dto: NoteShareCreateDTO
     ) -> NoteShareDTO:
+        current_user = get_current_user()
+
         note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
+
+        if not is_note_owner(current_user, note_id):
+            from exceptions.note_share_exception import NoteSharePermissionDenied
+            raise NoteSharePermissionDenied()
 
         user_entity = user_repository.find_one(share_dto.user_id)
         ensure_share_target_exists(user_entity)
@@ -56,8 +62,14 @@ class NoteShareService(NoteShareServiceInterface):
     def update_share(
         self, note_id: str, user_id: str, share_update_dto: NoteShareUpdateDTO
     ) -> NoteShareDTO:
+        current_user = get_current_user()
+
         note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
+
+        if not is_note_owner(current_user, note_id):
+            from exceptions.note_share_exception import NoteSharePermissionDenied
+            raise NoteSharePermissionDenied()
 
         share_entity = note_share_repository.find_one(note_id, user_id)
         if not share_entity:
@@ -68,8 +80,14 @@ class NoteShareService(NoteShareServiceInterface):
         return note_share_to_dto(saved)
 
     def revoke_share(self, note_id: str, user_id: str) -> None:
+        current_user = get_current_user()
+
         note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
+
+        if not is_note_owner(current_user, note_id):
+            from exceptions.note_share_exception import NoteSharePermissionDenied
+            raise NoteSharePermissionDenied()
 
         deleted = note_share_repository.delete(note_id, user_id)
         if not deleted:

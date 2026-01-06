@@ -33,7 +33,7 @@ class NoteCrudService(NoteCrudServiceInterface):
         entities, total = note_repository.list_for_user(user, params)
         favorite_ids = note_favorite_repository.favorite_note_ids_for_user(user.id)
         return [
-            note_to_dto(entity, favorite_note_ids=favorite_ids)
+            note_to_dto(entity, favorite_note_ids=favorite_ids, current_user=user)
             for entity in entities
         ], total
 
@@ -42,7 +42,7 @@ class NoteCrudService(NoteCrudServiceInterface):
         note_entity = note_repository.get_for_user(user, note_id)
         ensure_note_exists(note_entity)
         favorite_ids = note_favorite_repository.favorite_note_ids_for_user(user.id)
-        return note_to_dto(note_entity, favorite_note_ids=favorite_ids)
+        return note_to_dto(note_entity, favorite_note_ids=favorite_ids, current_user=user)
 
     def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
         user_entity = user_repository.find_one(note_create_dto.owner_id)

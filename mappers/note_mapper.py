@@ -2,6 +2,7 @@ from typing import Optional
 from sqlalchemy import inspect
 from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
+from utils.access_scope import note_permission, AccessLevel
 
 
 def _safe_owner_username(note: Note) -> Optional[str]:
@@ -20,10 +21,23 @@ def _safe_collection_name(note: Note) -> Optional[str]:
     return note.collection.name if note.collection else None
 
 
-def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None) -> NoteDTO:
+def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None, current_user=None) -> NoteDTO:
     is_favorite = False
     if favorite_note_ids is not None:
         is_favorite = note.id in favorite_note_ids
+
+    # Calculate user permission
+    user_permission_str = None
+    if current_user:
+        perm_level = note_permission(current_user, note.id)
+        if perm_level == AccessLevel.OWNER:
+            user_permission_str = "owner"
+        elif perm_level == AccessLevel.WRITE:
+            user_permission_str = "write"
+        elif perm_level == AccessLevel.READ:
+            user_permission_str = "read"
+        elif perm_level == AccessLevel.ADMIN:
+            user_permission_str = "owner"  # Admin has owner-level access
 
     data = {
         "id": note.id,
@@ -38,6 +52,7 @@ def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None) -> NoteDT
         "owner_username": _safe_owner_username(note),
         "collection_name": _safe_collection_name(note),
         "is_favorite": is_favorite,
+        "user_permission": user_permission_str,
     }
     return NoteDTO.model_validate(data)
 

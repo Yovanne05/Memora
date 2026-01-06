@@ -23,6 +23,8 @@ from repositorys import (
 )
 from repositorys.collection_share_repository import CollectionShareSearchParams
 from services.interfaces.collection.collection_share_service_interface import CollectionShareServiceInterface
+from utils.auth import get_current_user
+from utils.access_scope import is_collection_owner
 
 
 class CollectionShareService(CollectionShareServiceInterface):
@@ -33,8 +35,14 @@ class CollectionShareService(CollectionShareServiceInterface):
     def share_collection(
         self, collection_id: str, share_dto: CollectionShareCreateDTO
     ) -> CollectionShareDTO:
+        current_user = get_current_user()
+
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
+
+        if not is_collection_owner(current_user, collection_id):
+            from exceptions.share_collection_exception import CollectionSharePermissionDenied
+            raise CollectionSharePermissionDenied()
 
         user_entity = user_repository.find_one(share_dto.user_id)
         ensure_user_exists(user_entity)
@@ -53,8 +61,14 @@ class CollectionShareService(CollectionShareServiceInterface):
     def update_share(
         self, collection_id: str, user_id: str, share_update_dto: CollectionShareUpdateDTO
     ) -> CollectionShareDTO:
+        current_user = get_current_user()
+
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
+
+        if not is_collection_owner(current_user, collection_id):
+            from exceptions.share_collection_exception import CollectionSharePermissionDenied
+            raise CollectionSharePermissionDenied()
 
         share_entity = collection_share_repository.find_one(
             collection_id, user_id
@@ -67,8 +81,14 @@ class CollectionShareService(CollectionShareServiceInterface):
         return collection_share_to_dto(saved)
 
     def revoke_share(self, collection_id: str, user_id: str) -> None:
+        current_user = get_current_user()
+
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
+
+        if not is_collection_owner(current_user, collection_id):
+            from exceptions.share_collection_exception import CollectionSharePermissionDenied
+            raise CollectionSharePermissionDenied()
 
         deleted = collection_share_repository.delete(collection_id, user_id)
         if not deleted:
