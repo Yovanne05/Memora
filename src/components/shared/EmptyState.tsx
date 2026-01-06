@@ -9,10 +9,6 @@ export interface EmptyStateProps {
   className?: string
 }
 
-/**
- * Composant générique pour afficher un état vide
- * Remplace NotesEmptyState, CollectionsEmptyState, etc.
- */
 export function EmptyState({
   icon: Icon,
   title,

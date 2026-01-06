@@ -44,10 +44,6 @@ export interface ResourceCardProps {
   className?: string
 }
 
-/**
- * Composant Card générique réutilisable pour Notes, Collections, etc.
- * Élimine la duplication entre NoteCard et CollectionCard
- */
 export const ResourceCard = memo(function ResourceCard({
   id,
   title,
