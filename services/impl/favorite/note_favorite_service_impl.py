@@ -10,7 +10,7 @@ from repositorys.note_favorite_repository import NoteFavoriteSearchParams
 from services.interfaces.favorite.note_favorite_service_interface import (
     NoteFavoriteServiceInterface,
 )
-from utils.access_scope import accessible_note_ids
+from domain_services.permission_domain_service import permission_domain_service
 from utils.auth import get_current_user
 
 
@@ -20,7 +20,11 @@ class NoteFavoriteService(NoteFavoriteServiceInterface):
     ) -> Tuple[List[NoteFavoriteDTO], int]:
         user = get_current_user()
         favorites, total = note_favorite_repository.find_many(user.id, params)
-        allowed = accessible_note_ids(user)
+
+        # Filter favorites based on accessible notes
+        allowed = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
         if allowed is not None:
             if not allowed:
                 return [], 0

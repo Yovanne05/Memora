@@ -17,15 +17,15 @@ from exceptions.note_image_exception import (
     NoFileProvided,
     NoteImageNotFound,
 )
+from domain_services.permission_domain_service import permission_domain_service
 from utils.auth import get_current_user
-from utils.access_scope import can_read_note_image
 
 
 class NoteImageService(NoteImageServiceInterface):
     UPLOAD_FOLDER = "uploads/notes"
     ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
-    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-
+    MAX_FILE_SIZE = 5 * 1024 * 1024
+    
     def __init__(self):
         os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
 
@@ -85,7 +85,7 @@ class NoteImageService(NoteImageServiceInterface):
 
     def list_images(self, note_id: str) -> List[NoteImageDTO]:
         user = get_current_user()
-        if not can_read_note_image(user, note_id):
+        if not permission_domain_service.can_read_note(note_id, user.id, user.role):
             raise NoteNotFound()
 
         images = note_image_repository.find_by_note(note_id)

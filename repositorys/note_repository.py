@@ -3,7 +3,7 @@ from typing import List, Literal, Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 from daos.note_dao import Note
-from utils.access_scope import accessible_note_ids
+from domain_services.permission_domain_service import permission_domain_service
 from repositorys.note_favorite_repository import favorite_note_ids_for_user
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
@@ -29,7 +29,9 @@ class NoteSearchParams:
 
 
 def _scope_to_user(stmt, user):
-    accessible_ids = accessible_note_ids(user)
+    accessible_ids = permission_domain_service.get_accessible_note_ids(
+        user.id, user.role
+    )
     if accessible_ids is None:
         return stmt
     if not accessible_ids:

@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload, Session
 
 from daos.collection_dao import Collection
 from daos.note_dao import Note
-from utils.access_scope import accessible_collection_ids
+from domain_services.permission_domain_service import permission_domain_service
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 from repositorys.collection_favorite_repository import favorite_collection_ids_for_user
@@ -30,7 +30,9 @@ def _reload_with_relationships(session: Session, collection_id: str) -> Collecti
 
 
 def _scope_to_user(stmt: Select, user) -> Select:
-    accessible_ids = accessible_collection_ids(user)
+    accessible_ids = permission_domain_service.get_accessible_collection_ids(
+        user.id, user.role
+    )
     if accessible_ids is None:
         return stmt
     if not accessible_ids:

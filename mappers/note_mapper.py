@@ -2,7 +2,8 @@ from typing import Optional
 from sqlalchemy import inspect
 from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
-from utils.access_scope import note_permission, AccessLevel
+from utils.permission_models import AccessLevel
+from domain_services.permission_domain_service import permission_domain_service
 
 
 def _safe_owner_username(note: Note) -> Optional[str]:
@@ -29,7 +30,10 @@ def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None, current_u
     # Calculate user permission
     user_permission_str = None
     if current_user:
-        perm_level = note_permission(current_user, note.id)
+        perm = permission_domain_service.get_note_permission(
+            note.id, current_user.id, current_user.role
+        )
+        perm_level = perm.access_level
         if perm_level == AccessLevel.OWNER:
             user_permission_str = "owner"
         elif perm_level == AccessLevel.WRITE:

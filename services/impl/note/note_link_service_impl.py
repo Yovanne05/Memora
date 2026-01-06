@@ -15,8 +15,8 @@ from repositorys.note_link_repository import NoteLinkSearchParams
 from services.interfaces.note.note_link_service_interface import (
     NoteLinkServiceInterface,
 )
+from domain_services.permission_domain_service import permission_domain_service
 from utils.auth import get_current_user
-from utils.access_scope import accessible_note_ids, can_read_note_links
 
 
 class NoteLinkService(NoteLinkServiceInterface):
@@ -26,12 +26,16 @@ class NoteLinkService(NoteLinkServiceInterface):
         user = get_current_user()
         base_note_id = params.note_id
 
-        if base_note_id and not can_read_note_links(user, base_note_id):
+        if base_note_id and not permission_domain_service.can_read_note(
+            base_note_id, user.id, user.role
+        ):
             return [], 0
 
         links, total = note_link_repository.find_many(params)
 
-        accessible_notes = accessible_note_ids(user)
+        accessible_notes = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
         if accessible_notes is not None:
             if not accessible_notes:
                 return [], 0

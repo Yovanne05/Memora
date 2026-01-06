@@ -5,7 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from daos.flashcard_dao import Flashcard
-from utils.access_scope import accessible_note_ids
+from domain_services.permission_domain_service import permission_domain_service
 from utils.db import get_db_session
 
 
@@ -22,7 +22,9 @@ class FlashcardSearchParams:
 
 
 def _scope_to_user(stmt, user):
-    allowed_note_ids = accessible_note_ids(user)
+    allowed_note_ids = permission_domain_service.get_accessible_note_ids(
+        user.id, user.role
+    )
     if allowed_note_ids is None:
         return stmt
     if not allowed_note_ids:

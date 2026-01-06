@@ -23,8 +23,8 @@ from repositorys import (
 )
 from repositorys.collection_share_repository import CollectionShareSearchParams
 from services.interfaces.collection.collection_share_service_interface import CollectionShareServiceInterface
+from domain_services.permission_domain_service import permission_domain_service
 from utils.auth import get_current_user
-from utils.access_scope import is_collection_owner
 
 
 class CollectionShareService(CollectionShareServiceInterface):
@@ -40,7 +40,9 @@ class CollectionShareService(CollectionShareServiceInterface):
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
-        if not is_collection_owner(current_user, collection_id):
+        if not permission_domain_service.can_manage_collection(
+            collection_id, current_user.id, current_user.role
+        ):
             from exceptions.share_collection_exception import CollectionSharePermissionDenied
             raise CollectionSharePermissionDenied()
 
@@ -66,7 +68,9 @@ class CollectionShareService(CollectionShareServiceInterface):
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
-        if not is_collection_owner(current_user, collection_id):
+        if not permission_domain_service.can_manage_collection(
+            collection_id, current_user.id, current_user.role
+        ):
             from exceptions.share_collection_exception import CollectionSharePermissionDenied
             raise CollectionSharePermissionDenied()
 
@@ -86,7 +90,9 @@ class CollectionShareService(CollectionShareServiceInterface):
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
-        if not is_collection_owner(current_user, collection_id):
+        if not permission_domain_service.can_manage_collection(
+            collection_id, current_user.id, current_user.role
+        ):
             from exceptions.share_collection_exception import CollectionSharePermissionDenied
             raise CollectionSharePermissionDenied()
 

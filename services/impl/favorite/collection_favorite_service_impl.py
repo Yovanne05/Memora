@@ -12,7 +12,7 @@ from repositorys.collection_favorite_repository import (
 from services.interfaces.favorite.collection_favorite_service_interface import (
     CollectionFavoriteServiceInterface,
 )
-from utils.access_scope import accessible_collection_ids
+from domain_services.permission_domain_service import permission_domain_service
 from utils.auth import get_current_user
 
 
@@ -24,7 +24,11 @@ class CollectionFavoriteService(CollectionFavoriteServiceInterface):
         favorites, total = collection_favorite_repository.find_many(
             user.id, params
         )
-        allowed = accessible_collection_ids(user)
+
+        # Filter favorites based on accessible collections
+        allowed = permission_domain_service.get_accessible_collection_ids(
+            user.id, user.role
+        )
         if allowed is not None:
             if not allowed:
                 return [], 0
