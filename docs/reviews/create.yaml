@@ -7,9 +7,14 @@ description: >
   en fonction de la performance et de l'historique de l'utilisateur.
 
   **Workflow :**
-  - Utilisateur répond à une flashcard QCM
-  - Si la réponse est correcte : afficher "Comment c'était ?" avec les 4 niveaux de difficulté
-  - Si la réponse est incorrecte : enregistrer automatiquement avec un niveau de difficulté
+  - L'utilisateur répond à une flashcard en sélectionnant une réponse
+  - Le backend valide automatiquement si la réponse est correcte (calcul côté serveur)
+  - La réponse contient `is_correct: true/false` pour indiquer le résultat
+  - L'utilisateur évalue ensuite la difficulté (again/hard/good/easy)
+
+  **Sécurité :**
+  - Le champ `is_correct` n'est PAS envoyé dans GET /flashcards pour éviter la triche
+  - Il est calculé côté backend et renvoyé uniquement après soumission de la review
 
   **Niveaux de difficulté (SM-2 standard) :**
   - `again` (0) : Très difficile, à revoir rapidement (intervalle court)
