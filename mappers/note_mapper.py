@@ -1,9 +1,11 @@
 from typing import Optional
+
 from sqlalchemy import inspect
+
 from daos.note_dao import Note
+from domain_services.permission_domain_service import permission_domain_service
 from dtos.note_dto import NoteCreateDTO, NoteDTO
 from utils.permission_models import AccessLevel
-from domain_services.permission_domain_service import permission_domain_service
 
 
 def _safe_owner_username(note: Note) -> Optional[str]:
@@ -22,7 +24,11 @@ def _safe_collection_name(note: Note) -> Optional[str]:
     return note.collection.name if note.collection else None
 
 
-def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None, current_user=None) -> NoteDTO:
+def note_to_dto(
+    note: Note,
+    favorite_note_ids: set[str] | None = None,
+    current_user=None,
+) -> NoteDTO:
     is_favorite = False
     if favorite_note_ids is not None:
         is_favorite = note.id in favorite_note_ids
