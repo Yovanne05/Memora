@@ -19,6 +19,7 @@ from repositorys.flashcard_repository import FlashcardSearchParams
 from services.interfaces.note.flashcard_service_interface import (
     FlashcardServiceInterface,
 )
+from utils.access_scope import can_write_flashcard, can_delete_flashcard
 from utils.auth import get_current_user
 
 
@@ -36,9 +37,16 @@ class FlashcardService(FlashcardServiceInterface):
         return flashcard_to_dto(flashcard)
 
     def create(self, note_id: str, payload: FlashcardCreateDTO) -> FlashcardDTO:
+        user = get_current_user()
+        
+        # Verify note exists
         note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
+        
+        # Verify user has WRITE permission on the note
+        if not can_write_flashcard(user, note_id):
+            raise NoteNotFound()  # Hide existence if no permission
 
         if not payload.answers or len(payload.answers) == 0:
             raise FlashcardMustHaveAnswers()
@@ -54,9 +62,15 @@ class FlashcardService(FlashcardServiceInterface):
     def update(
         self, flashcard_id: str, payload: FlashcardUpdateDTO
     ) -> FlashcardDTO:
+        user = get_current_user()
+        
         flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:
             raise FlashcardNotFound()
+        
+        # Verify user has WRITE permission on the note
+        if not can_write_flashcard(user, flashcard.note_id):
+            raise FlashcardNotFound()  # Hide existence if no permission
 
         if payload.answers is not None:
             if len(payload.answers) == 0:
@@ -72,13 +86,27 @@ class FlashcardService(FlashcardServiceInterface):
         return flashcard_to_dto(saved)
 
     def delete(self, flashcard_id: str) -> None:
-        deleted = flashcard_repository.delete(flashcard_id)
-        if not deleted:
+        user = get_current_user()
+        
+        flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
+        if not flashcard:
             raise FlashcardNotFound()
+        
+        # Verify user has OWNER permission on the note
+        if not can_delete_flashcard(user, flashcard.note_id):
+            raise FlashcardNotFound()  # Hide existence if no permission
+        
+        flashcard_repository.delete(flashcard_id)
 
     def duplicate(self, flashcard_id: str) -> FlashcardDTO:
+        user = get_current_user()
+        
         source_flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not source_flashcard:
+            raise FlashcardNotFound()
+        
+        # To duplicate, need WRITE permission on the note
+        if not can_write_flashcard(user, source_flashcard.note_id):
             raise FlashcardNotFound()
 
         create_dto = FlashcardCreateDTO(
