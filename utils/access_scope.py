@@ -35,6 +35,10 @@ def _cached(name: str, loader):
 
 
 def accessible_collection_ids(user) -> Optional[Set[str]]:
+    """
+    Returns the set of collection ids the user can read.
+    Includes ownership, public collections, and direct shares. None means full access (admin).
+    """
     if _is_admin_user(user):
         return None
 
@@ -60,6 +64,10 @@ def accessible_collection_ids(user) -> Optional[Set[str]]:
 
 
 def accessible_note_ids(user) -> Optional[Set[str]]:
+    """
+    Returns the set of note ids the user can read.
+    Includes ownership, public notes, direct note shares, and collection shares. None means full access (admin).
+    """
     if _is_admin_user(user):
         return None
 
@@ -93,63 +101,9 @@ def collection_permission(user, collection_id: str) -> AccessLevel:
     if _is_admin_user(user):
         return AccessLevel.ADMIN
 
-    with get_db_session() as session:
-        collection = session.query(Collection).filter(Collection.id == collection_id).first()
-        if not collection:
-            return AccessLevel.NONE
-
-        if collection.owner_id == user.id:
-            return AccessLevel.OWNER
-
-        share = session.query(CollectionShare).filter(
-            CollectionShare.collection_id == collection_id,
-            CollectionShare.user_id == user.id
-        ).first()
-
-        if share:
-            from utils.enums import SharePermissionEnum
-            if share.permission == SharePermissionEnum.OWNER:
-                return AccessLevel.OWNER
-            elif share.permission == SharePermissionEnum.WRITE:
-                return AccessLevel.WRITE
-            else:
-                return AccessLevel.READ
-
-        if collection.visibility == VisibilityEnum.PUBLIC:
-            return AccessLevel.READ
-
-        return AccessLevel.NONE
-
-
-def _share_permission_to_access_level(permission) -> AccessLevel:
-    from utils.enums import SharePermissionEnum
-    if permission == SharePermissionEnum.OWNER:
+    accessible_ids = accessible_collection_ids(user)
+    if accessible_ids is None or collection_id in accessible_ids:
         return AccessLevel.OWNER
-    elif permission == SharePermissionEnum.WRITE:
-        return AccessLevel.WRITE
-    return AccessLevel.READ
-
-
-def _check_note_share_permission(session, note_id: str, user_id: str) -> AccessLevel:
-    note_share = session.query(NoteShare).filter(
-        NoteShare.note_id == note_id,
-        NoteShare.user_id == user_id
-    ).first()
-    return _share_permission_to_access_level(note_share.permission) if note_share else AccessLevel.NONE
-
-
-def _check_collection_share_permission(session, collection_id: str, user_id: str) -> AccessLevel:
-    collection_share = session.query(CollectionShare).filter(
-        CollectionShare.collection_id == collection_id,
-        CollectionShare.user_id == user_id
-    ).first()
-    if collection_share:
-        return _share_permission_to_access_level(collection_share.permission)
-
-    collection = session.query(Collection).filter(Collection.id == collection_id).first()
-    if collection and collection.visibility == VisibilityEnum.PUBLIC:
-        return AccessLevel.READ
-
     return AccessLevel.NONE
 
 
@@ -157,30 +111,15 @@ def note_permission(user, note_id: str) -> AccessLevel:
     if _is_admin_user(user):
         return AccessLevel.ADMIN
 
-    with get_db_session() as session:
-        note = session.query(Note).filter(Note.id == note_id).first()
-        if not note:
-            return AccessLevel.NONE
-
-        if note.owner_id == user.id:
-            return AccessLevel.OWNER
-
-        share_level = _check_note_share_permission(session, note_id, user.id)
-        if share_level != AccessLevel.NONE:
-            return share_level
-
-        if note.collection_id:
-            collection_level = _check_collection_share_permission(session, note.collection_id, user.id)
-            if collection_level != AccessLevel.NONE:
-                return collection_level
-
-        if note.visibility == VisibilityEnum.PUBLIC:
-            return AccessLevel.READ
-
-        return AccessLevel.NONE
+    accessible_ids = accessible_note_ids(user)
+    if accessible_ids is None or note_id in accessible_ids:
+        return AccessLevel.OWNER
+    return AccessLevel.NONE
 
 
+# Placeholder helpers for future inheritance/expansion to shares.
 def note_read_ids_for_collections(collection_ids: Iterable[str]) -> Set[str]:
+    """Given collection ids, return readable note ids (owner-only baseline)."""
     with get_db_session() as session:
         stmt = select(Note.id).where(Note.collection_id.in_(collection_ids))
         return set(session.scalars(stmt).all())
@@ -195,32 +134,20 @@ def can_read_collection(user, collection_id: str) -> bool:
 
 
 def can_read_flashcard(user, note_id: str) -> bool:
+    # Flashcards inherit read access from their parent note.
     return can_read_note(user, note_id)
 
 
 def can_read_note_image(user, note_id: str) -> bool:
+    # Note images inherit read access from the note.
     return can_read_note(user, note_id)
 
 
 def can_read_note_links(user, note_id: str) -> bool:
+    # Access to note links requires access to the base note.
     return can_read_note(user, note_id)
 
 
-def can_write_note(user, note_id: str) -> bool:
-    level = note_permission(user, note_id)
-    return level in {AccessLevel.WRITE, AccessLevel.OWNER, AccessLevel.ADMIN}
-
-
-def can_write_collection(user, collection_id: str) -> bool:
-    level = collection_permission(user, collection_id)
-    return level in {AccessLevel.WRITE, AccessLevel.OWNER, AccessLevel.ADMIN}
-
-
-def is_note_owner(user, note_id: str) -> bool:
-    level = note_permission(user, note_id)
-    return level in {AccessLevel.OWNER, AccessLevel.ADMIN}
-
-
-def is_collection_owner(user, collection_id: str) -> bool:
-    level = collection_permission(user, collection_id)
-    return level in {AccessLevel.OWNER, AccessLevel.ADMIN}
+def can_write_note(user, note) -> bool:
+    """Write access is limited to the owner or admins."""
+    return _is_admin_user(user) or getattr(note, "owner_id", None) == getattr(user, "id", None)

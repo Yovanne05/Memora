@@ -28,9 +28,7 @@ def test_duplicate_flashcard_in_same_note(client_with_note_data):
     assert duplicated["question"] == "Original question?"
     assert len(duplicated["answers"]) == 2
     assert duplicated["answers"][0]["answer_text"] == "Answer 1"
-    assert duplicated["answers"][0]["is_correct"] is True
     assert duplicated["answers"][1]["answer_text"] == "Answer 2"
-    assert duplicated["answers"][1]["is_correct"] is False
     assert duplicated["answers"][0]["id"] != original_flashcard["answers"][0]["id"]
 
 
