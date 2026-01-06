@@ -18,17 +18,24 @@ class NoteLinkSearchParams:
     offset: int = 0
 
 
+
 def _normalize_ids(note_id_1: str, note_id_2: str) -> Tuple[str, str]:
     return tuple(sorted((note_id_1, note_id_2)))
 
 
-def find_many(params: Optional[NoteLinkSearchParams] = None) -> Tuple[List[NoteLink], int]:
+def find_many(
+    params: Optional[NoteLinkSearchParams] = None,
+) -> Tuple[List[NoteLink], int]:
     param = params or NoteLinkSearchParams()
 
     filters = []
     if param.note_id:
-        filters.append(or_(NoteLink.note_id_1 == param.note_id,
-                       NoteLink.note_id_2 == param.note_id))
+        filters.append(
+            or_(
+                NoteLink.note_id_1 == param.note_id,
+                NoteLink.note_id_2 == param.note_id,
+            )
+        )
 
     stmt = select(NoteLink).where(*filters)
 
@@ -36,11 +43,14 @@ def find_many(params: Optional[NoteLinkSearchParams] = None) -> Tuple[List[NoteL
         "created_at": NoteLink.created_at,
     }
     order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    order_expr = (
+        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    )
 
     with get_db_session() as session:
         total = session.scalar(
-            select(func.count()).select_from(stmt.subquery()))
+            select(func.count()).select_from(stmt.subquery())
+        )
         items = session.scalars(
             stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
         ).all()

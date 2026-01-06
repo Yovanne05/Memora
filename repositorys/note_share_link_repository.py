@@ -12,18 +12,26 @@ class NoteShareLinkSearchParams:
     note_id: Optional[str] = None
 
 
-def find_many(params: Optional[NoteShareLinkSearchParams] = None) -> Tuple[List[NoteShareLink], int]:
+
+def find_many(
+    params: Optional[NoteShareLinkSearchParams] = None,
+) -> Tuple[List[NoteShareLink], int]:
     param = params or NoteShareLinkSearchParams()
 
     filters = []
     if param.note_id:
         filters.append(NoteShareLink.note_id == param.note_id)
 
-    stmt = select(NoteShareLink).where(*filters).order_by(NoteShareLink.created_at.desc())
+    stmt = (
+        select(NoteShareLink)
+        .where(*filters)
+        .order_by(NoteShareLink.created_at.desc())
+    )
 
     with get_db_session() as session:
         total = session.scalar(
-            select(func.count()).select_from(stmt.subquery()))
+            select(func.count()).select_from(stmt.subquery())
+        )
         items = session.scalars(stmt).all()
 
     return items, total or 0

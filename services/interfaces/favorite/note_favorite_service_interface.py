@@ -9,7 +9,9 @@ from repositorys.note_favorite_repository import NoteFavoriteSearchParams
 
 class NoteFavoriteServiceInterface(ABC):
     @abstractmethod
-    def find_many(self, params: NoteFavoriteSearchParams) -> Tuple[List[NoteFavoriteDTO], int]:
+    def find_many(
+        self, params: NoteFavoriteSearchParams
+    ) -> Tuple[List[NoteFavoriteDTO], int]:
         raise NotImplementedError
 
     @abstractmethod

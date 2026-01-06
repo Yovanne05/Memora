@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 from domain_services.flashcard_domain_service import apply_flashcard_update
+from domain_services.permission_domain_service import permission_domain_service
 from dtos.flashcard_dto import (
     FlashcardCreateDTO,
     FlashcardDTO,
@@ -19,12 +20,13 @@ from repositorys.flashcard_repository import FlashcardSearchParams
 from services.interfaces.note.flashcard_service_interface import (
     FlashcardServiceInterface,
 )
-from domain_services.permission_domain_service import permission_domain_service
 from utils.auth import get_current_user
 
 
 class FlashcardService(FlashcardServiceInterface):
-    def find_many(self, params: FlashcardSearchParams) -> Tuple[List[FlashcardDTO], int]:
+    def find_many(
+        self, params: FlashcardSearchParams
+    ) -> Tuple[List[FlashcardDTO], int]:
         user = get_current_user()
         flashcards, total = flashcard_repository.list_for_user(user, params)
         return [flashcard_to_dto(fc) for fc in flashcards], total
@@ -43,15 +45,8 @@ class FlashcardService(FlashcardServiceInterface):
         if not note:
             raise NoteNotFound()
 
-        if not permission_domain_service.can_write_note(note_id, user.id, user.role):
-            raise NoteNotFound()
-
-        if not payload.answers or len(payload.answers) == 0:
-            raise FlashcardMustHaveAnswers()
-
-        correct_answers_count = sum(1 for a in payload.answers if a.is_correct)
-        if correct_answers_count < 1:
-            raise FlashcardMustHaveAtLeastOneCorrectAnswer()
+        self._ensure_can_write_note(note_id, user)
+        self._validate_answers(payload.answers)
 
         flashcard_entity = dto_to_flashcard(payload, note_id)
         saved = flashcard_repository.add(flashcard_entity)
@@ -61,22 +56,15 @@ class FlashcardService(FlashcardServiceInterface):
         self, flashcard_id: str, payload: FlashcardUpdateDTO
     ) -> FlashcardDTO:
         user = get_current_user()
-        
+
         flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:
             raise FlashcardNotFound()
-        
-        if not permission_domain_service.can_write_note(flashcard.note_id, user.id, user.role):
-            raise FlashcardNotFound()
+
+        self._ensure_can_write_note(flashcard.note_id, user, FlashcardNotFound)
 
         if payload.answers is not None:
-            if len(payload.answers) == 0:
-                raise FlashcardMustHaveAnswers()
-
-            correct_answers_count = sum(
-                1 for a in payload.answers if a.is_correct)
-            if correct_answers_count < 1:
-                raise FlashcardMustHaveAtLeastOneCorrectAnswer()
+            self._validate_answers(payload.answers)
 
         updated_flashcard = apply_flashcard_update(flashcard, payload)
         saved = flashcard_repository.update(updated_flashcard)
@@ -84,25 +72,23 @@ class FlashcardService(FlashcardServiceInterface):
 
     def delete(self, flashcard_id: str) -> None:
         user = get_current_user()
-        
+
         flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:
             raise FlashcardNotFound()
-        
-        if not permission_domain_service.can_manage_note(flashcard.note_id, user.id, user.role):
-            raise FlashcardNotFound()
-        
+
+        self._ensure_can_manage_note(flashcard.note_id, user)
+
         flashcard_repository.delete(flashcard_id)
 
     def duplicate(self, flashcard_id: str) -> FlashcardDTO:
         user = get_current_user()
-        
+
         source_flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not source_flashcard:
             raise FlashcardNotFound()
-        
-        if not permission_domain_service.can_write_note(source_flashcard.note_id, user.id, user.role):
-            raise FlashcardNotFound()
+
+        self._ensure_can_write_note(source_flashcard.note_id, user)
 
         create_dto = FlashcardCreateDTO(
             question=source_flashcard.question,
@@ -115,6 +101,27 @@ class FlashcardService(FlashcardServiceInterface):
         )
 
         return self.create(source_flashcard.note_id, create_dto)
+
+    def _ensure_can_write_note(self, note_id: str, user, exc=NoteNotFound) -> None:
+        if not permission_domain_service.can_write_note(
+            note_id, user.id, user.role
+        ):
+            raise exc()
+
+    def _ensure_can_manage_note(self, note_id: str, user) -> None:
+        if not permission_domain_service.can_manage_note(
+            note_id, user.id, user.role
+        ):
+            raise FlashcardNotFound()
+
+    @staticmethod
+    def _validate_answers(answers: list[FlashcardAnswerCreateDTO]) -> None:
+        if not answers:
+            raise FlashcardMustHaveAnswers()
+
+        correct_answers_count = sum(1 for answer in answers if answer.is_correct)
+        if correct_answers_count < 1:
+            raise FlashcardMustHaveAtLeastOneCorrectAnswer()
 
 
 flashcard_service = FlashcardService()

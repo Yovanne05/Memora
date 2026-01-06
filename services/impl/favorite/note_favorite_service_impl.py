@@ -21,7 +21,6 @@ class NoteFavoriteService(NoteFavoriteServiceInterface):
         user = get_current_user()
         favorites, total = note_favorite_repository.find_many(user.id, params)
 
-        # Filter favorites based on accessible notes
         allowed = permission_domain_service.get_accessible_note_ids(
             user.id, user.role
         )
