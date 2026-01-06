@@ -26,7 +26,6 @@ export default function CollectionNotesView({
   const { state, actions } = useWorkspaceContext()
   const updateCollectionMutation = useUpdateCollectionMutation()
 
-  // Update selected collection in context
   useEffect(() => {
     actions.selectCollection(collectionId)
   }, [collectionId, actions])
@@ -107,12 +106,10 @@ export default function CollectionNotesView({
         </div>
       </div>
 
-      {/* Notes Grid */}
       {notes && notes.length > 0 ? (
         <>
-          <NotesGrid items={notes} showQuickActions />
+          <NotesGrid items={notes} showQuickActions showFavoriteButton />
 
-          {/* Pagination */}
           {total > limit && (
             <NotesPagination
               page={state.page}
@@ -138,7 +135,6 @@ export default function CollectionNotesView({
         </div>
       )}
 
-      {/* Edit Collection Dialog */}
       {collection && (
         <CollectionFormDialog
           mode="edit"
