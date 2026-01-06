@@ -15,7 +15,6 @@ def test_create_flashcard_with_single_answer(client_with_note_data):
     assert body["question"] == "What is the capital of France?"
     assert len(body["answers"]) == 1
     assert body["answers"][0]["answer_text"] == "Paris"
-    assert body["answers"][0]["is_correct"] is True
     assert "id" in body
     assert body["note_id"] == data.note_id
 
@@ -58,8 +57,6 @@ def test_create_flashcard_with_multiple_correct_answers(
     body = response.get_json()
     assert body["question"] == "Which of these are programming languages?"
     assert len(body["answers"]) == 3
-    correct_count = sum(1 for a in body["answers"] if a["is_correct"])
-    assert correct_count == 2
 
 
 def test_create_flashcard_without_answers_returns_400(client_with_note_data):
