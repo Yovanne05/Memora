@@ -139,7 +139,9 @@ export function NoteQuickActions({
 
           {/* Partager */}
           <DropdownMenuItem
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
               setIsDropdownOpen(false)
               setShareDialogOpen(true)
             }}

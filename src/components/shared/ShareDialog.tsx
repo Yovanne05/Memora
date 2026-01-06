@@ -96,43 +96,82 @@ export function ShareDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {trigger !== null && (
-        <DialogTrigger asChild>
-          {trigger || (
-            <Button variant="outline" size="sm">
-              <Users className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          )}
-        </DialogTrigger>
+    <>
+      {trigger !== undefined && (
+        <Dialog>
+          <DialogTrigger asChild>
+            {trigger || (
+              <Button variant="outline" size="sm">
+                <Users className="mr-2 h-4 w-4" />
+                Share
+              </Button>
+            )}
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <ShareForm
+                selectedUser={selectedUser}
+                permission={permission}
+                excludedUserIds={excludedUserIds}
+                isLoading={isLoading || isSubmitting}
+                onUserChange={setSelectedUser}
+                onPermissionChange={setPermission}
+                onSubmit={handleAddShare}
+              />
+
+              <Separator />
+
+              <ShareList
+                shares={shares}
+                onUpdatePermission={handleUpdatePermission}
+                onRemove={handleRemoveShare}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
 
-        <div className="space-y-4">
-          <ShareForm
-            selectedUser={selectedUser}
-            permission={permission}
-            excludedUserIds={excludedUserIds}
-            isLoading={isLoading || isSubmitting}
-            onUserChange={setSelectedUser}
-            onPermissionChange={setPermission}
-            onSubmit={handleAddShare}
-          />
+      {trigger === undefined && (
+        <Dialog open={open} onOpenChange={onOpenChange} modal>
+          <DialogContent
+            className="max-w-md"
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
 
-          <Separator />
+            <div className="space-y-4">
+              <ShareForm
+                selectedUser={selectedUser}
+                permission={permission}
+                excludedUserIds={excludedUserIds}
+                isLoading={isLoading || isSubmitting}
+                onUserChange={setSelectedUser}
+                onPermissionChange={setPermission}
+                onSubmit={handleAddShare}
+              />
 
-          <ShareList
-            shares={shares}
-            onUpdatePermission={handleUpdatePermission}
-            onRemove={handleRemoveShare}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
+              <Separator />
+
+              <ShareList
+                shares={shares}
+                onUpdatePermission={handleUpdatePermission}
+                onRemove={handleRemoveShare}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
