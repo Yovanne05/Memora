@@ -1,8 +1,10 @@
 tags:
   - flashcards
-summary: Récupérer une flashcard
+summary: Obtenir une flashcard
 description: >
-  Retourne les détails d'une flashcard spécifique par son identifiant.
+  Récupère les détails d'une flashcard spécifique.
+  
+  **Permissions requises:** READ, WRITE ou OWNER sur la note parente.
 parameters:
   - in: path
     name: flashcard_id
@@ -12,8 +14,8 @@ parameters:
     description: Identifiant unique de la flashcard.
 responses:
   200:
-    description: Flashcard trouvée.
+    description: Flashcard récupérée avec succès.
     schema:
       $ref: "#/definitions/Flashcard"
   404:
-    description: Flashcard introuvable.
+    description: Flashcard introuvable ou permission insuffisante.
