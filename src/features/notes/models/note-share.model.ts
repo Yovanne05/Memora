@@ -1,4 +1,4 @@
-import { SharePermission } from "../dtos/note-share.dto";
+import type { SharePermission } from "../dtos/note-share.dto";
 
 export interface NoteShare {
   noteId: string;

@@ -4,16 +4,16 @@ export const SharePermissionSchema = z.enum(["read", "write", "owner"]);
 export type SharePermission = z.infer<typeof SharePermissionSchema>;
 
 export const NoteShareDtoSchema = z.object({
-  note_id: z.string().uuid(),
-  user_id: z.string().uuid(),
+  note_id: z.uuid(),
+  user_id: z.uuid(),
   permission: SharePermissionSchema,
-  created_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
 });
 
 export type NoteShareDto = z.infer<typeof NoteShareDtoSchema>;
 
 export const NoteShareCreateDtoSchema = z.object({
-  user_id: z.string().uuid(),
+  user_id: z.uuid(),
   permission: SharePermissionSchema.default("read"),
 });
 

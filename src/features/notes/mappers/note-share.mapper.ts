@@ -1,9 +1,9 @@
-import {
+import type {
   NoteShareDto,
   NoteShareCreateDto,
   NoteShareUpdateDto,
 } from "../dtos/note-share.dto";
-import {
+import type {
   NoteShare,
   NoteShareCreate,
   NoteShareUpdate,
