@@ -1,7 +1,8 @@
 tags:
   - reports
-summary: Mettre à jour le statut d'un signalement (admin)
-description: Permet de passer un signalement en cours de traitement, résolu ou rejeté.
+summary: Mettre à jour un signalement (déprécié, utiliser /reports/{id})
+description: |
+  Ancienne référence pour mise à jour de signalement. Utiliser `PATCH /reports/{id}`.
 parameters:
   - name: report_id
     in: path
@@ -12,10 +13,10 @@ parameters:
     name: payload
     required: true
     schema:
-      $ref: "#/definitions/ReportStatusPayload"
+      $ref: "#/definitions/ReportUpdatePayload"
 responses:
   200:
-    description: Statut mis à jour.
+    description: Signalement mis à jour.
     schema:
       $ref: "#/definitions/Report"
   401:

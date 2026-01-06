@@ -1,6 +1,6 @@
 from typing import Protocol, Tuple
 
-from dtos.report_dto import ReportCreateDTO, ReportDTO, ReportStatusUpdateDTO
+from dtos.report_dto import ReportCreateDTO, ReportDTO, ReportUpdateDTO
 from repositorys.report_repository import ReportSearchParams
 
 
@@ -17,8 +17,5 @@ class ReportServiceInterface(Protocol):
     def find_one(self, report_id: str) -> ReportDTO:
         ...
 
-    def update_status(self, report_id: str, status_dto: ReportStatusUpdateDTO) -> ReportDTO:
-        ...
-
-    def delete_target(self, report_id: str) -> ReportDTO:
+    def update(self, report_id: str, update_dto: ReportUpdateDTO) -> ReportDTO:
         ...

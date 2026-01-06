@@ -5,14 +5,14 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
-from dtos.report_dto import ReportCreateDTO, ReportStatusUpdateDTO
+from dtos.report_dto import ReportCreateDTO, ReportUpdateDTO
 from querys.report_query import ReportFindQuery
 from services.impl.report_service_impl import report_service
 
-bp_reports = Blueprint("reports", __name__, url_prefix="/reports")
+bp_reports = Blueprint("reports", __name__)
 
 
-@bp_reports.post("/notes/<uuid:note_id>")
+@bp_reports.post("/notes/<uuid:note_id>/reports")
 @jwt_required()
 @swag_from("../docs/reports/report_note.yaml")
 def report_note(note_id: UUID):
@@ -21,7 +21,7 @@ def report_note(note_id: UUID):
     return jsonify(report.model_dump(by_alias=True)), HTTPStatus.CREATED
 
 
-@bp_reports.post("/collections/<uuid:collection_id>")
+@bp_reports.post("/collections/<uuid:collection_id>/reports")
 @jwt_required()
 @swag_from("../docs/reports/report_collection.yaml")
 def report_collection(collection_id: UUID):
@@ -30,7 +30,7 @@ def report_collection(collection_id: UUID):
     return jsonify(report.model_dump(by_alias=True)), HTTPStatus.CREATED
 
 
-@bp_reports.get("")
+@bp_reports.get("/reports")
 @jwt_required()
 @swag_from("../docs/reports/list.yaml")
 def list_reports():
@@ -50,7 +50,7 @@ def list_reports():
     )
 
 
-@bp_reports.get("/<uuid:report_id>")
+@bp_reports.get("/reports/<uuid:report_id>")
 @jwt_required()
 @swag_from("../docs/reports/find_one.yaml")
 def get_report(report_id: UUID):
@@ -58,18 +58,10 @@ def get_report(report_id: UUID):
     return jsonify(report.model_dump(by_alias=True)), HTTPStatus.OK
 
 
-@bp_reports.patch("/<uuid:report_id>/status")
+@bp_reports.patch("/reports/<uuid:report_id>")
 @jwt_required()
-@swag_from("../docs/reports/update_status.yaml")
-def update_status(report_id: UUID):
-    payload = ReportStatusUpdateDTO.model_validate_json(request.data)
-    report = report_service.update_status(str(report_id), payload)
-    return jsonify(report.model_dump(by_alias=True)), HTTPStatus.OK
-
-
-@bp_reports.delete("/<uuid:report_id>/target")
-@jwt_required()
-@swag_from("../docs/reports/delete_target.yaml")
-def delete_report_target(report_id: UUID):
-    report = report_service.delete_target(str(report_id))
+@swag_from("../docs/reports/update.yaml")
+def update_report(report_id: UUID):
+    payload = ReportUpdateDTO.model_validate_json(request.data)
+    report = report_service.update(str(report_id), payload)
     return jsonify(report.model_dump(by_alias=True)), HTTPStatus.OK

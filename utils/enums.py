@@ -44,3 +44,7 @@ class ReportStatusEnum(str, Enum):
     IN_PROGRESS = "in_progress"
     RESOLVED = "resolved"
     REJECTED = "rejected"
+
+
+class ReportActionEnum(str, Enum):
+    DELETE_TARGET = "delete_target"

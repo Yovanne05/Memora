@@ -64,7 +64,7 @@ def _create_note(client, owner_id: str, collection_id: str) -> str:
 
 def _create_report(client, note_id: str, reason: ReportReasonEnum):
     response = client.post(
-        f"/reports/notes/{note_id}",
+        f"/notes/{note_id}/reports",
         json={
             "reason": reason.value,
             "description": "Suspicious content",
@@ -118,7 +118,7 @@ def test_admin_updates_status(app_client):
     admin = _create_user(app_client, role=RoleEnum.ADMIN)
     _login(app_client, admin["email"], admin["password"])
     response = app_client.patch(
-        f"/reports/{report['id']}/status",
+        f"/reports/{report['id']}",
         json={"status": ReportStatusEnum.IN_PROGRESS.value},
     )
 
@@ -126,3 +126,27 @@ def test_admin_updates_status(app_client):
     body = response.get_json()
     assert body["status"] == ReportStatusEnum.IN_PROGRESS.value
 
+
+def test_admin_deletes_target_via_action(app_client):
+    owner = _create_user(app_client, role=RoleEnum.CLIENT)
+    _login(app_client, owner["email"], owner["password"])
+    collection_id = _create_collection(app_client, owner["id"])
+    note_id = _create_note(app_client, owner["id"], collection_id)
+    report = _create_report(app_client, note_id, ReportReasonEnum.SPAM_OR_ABUSE)
+
+    admin = _create_user(app_client, role=RoleEnum.ADMIN)
+    _login(app_client, admin["email"], admin["password"])
+    response = app_client.patch(
+        f"/reports/{report['id']}",
+        json={
+            "status": ReportStatusEnum.IN_PROGRESS.value,
+            "action": "delete_target",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["status"] == ReportStatusEnum.RESOLVED.value
+
+    note_response = app_client.get(f"/notes/{note_id}")
+    assert note_response.status_code == 404

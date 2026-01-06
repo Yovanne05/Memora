@@ -32,6 +32,7 @@ from daos.note_dao import Note, NoteLink, NoteShare
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
+from daos.review_dao import Review
 from daos.report_dao import Report
 
 

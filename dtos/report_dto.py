@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from utils.enums import (
     ReportReasonEnum,
     ReportStatusEnum,
+    ReportActionEnum,
     ReportTargetEnum,
 )
 
@@ -14,8 +15,9 @@ class ReportCreateDTO(BaseModel):
     description: str | None = Field(default=None, max_length=2000)
 
 
-class ReportStatusUpdateDTO(BaseModel):
+class ReportUpdateDTO(BaseModel):
     status: ReportStatusEnum
+    action: ReportActionEnum | None = None
 
 
 class ReportDTO(BaseModel):

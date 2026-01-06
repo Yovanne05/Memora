@@ -9,7 +9,7 @@ from domain_services.report_domain_service import (
     ensure_can_report_note,
     ensure_report_has_target,
 )
-from dtos.report_dto import ReportCreateDTO, ReportDTO, ReportStatusUpdateDTO
+from dtos.report_dto import ReportCreateDTO, ReportDTO, ReportUpdateDTO
 from exceptions.report_exception import ReportNotFound
 from mappers.report_mapper import report_to_dto
 from repositorys import collection_repository, note_repository
@@ -19,7 +19,7 @@ from services.impl.collection.collection_service_impl import collection_service
 from services.impl.note.note_crud_service_impl import note_crud_service
 from services.interfaces.report_service_interface import ReportServiceInterface
 from utils.auth import get_current_user
-from utils.enums import ReportStatusEnum
+from utils.enums import ReportStatusEnum, ReportActionEnum
 
 
 class ReportService(ReportServiceInterface):
@@ -73,9 +73,7 @@ class ReportService(ReportServiceInterface):
             raise ReportNotFound()
         return report_to_dto(report_entity)
 
-    def update_status(
-        self, report_id: str, status_dto: ReportStatusUpdateDTO
-    ) -> ReportDTO:
+    def update(self, report_id: str, update_dto: ReportUpdateDTO) -> ReportDTO:
         user = get_current_user()
         ensure_admin_user(user)
 
@@ -83,26 +81,17 @@ class ReportService(ReportServiceInterface):
         if not report_entity:
             raise ReportNotFound()
 
-        report_entity.status = status_dto.status
-        saved = report_repository.update(report_entity)
-        return report_to_dto(saved)
+        if update_dto.action == ReportActionEnum.DELETE_TARGET:
+            ensure_report_has_target(report_entity)
+            if report_entity.note_id:
+                note_crud_service.delete(report_entity.note_id)
+            elif report_entity.collection_id:
+                collection_service.delete(report_entity.collection_id)
 
-    def delete_target(self, report_id: str) -> ReportDTO:
-        user = get_current_user()
-        ensure_admin_user(user)
-
-        report_entity = report_repository.find_one(report_id)
-        if not report_entity:
-            raise ReportNotFound()
-
-        ensure_report_has_target(report_entity)
-
-        if report_entity.note_id:
-            note_crud_service.delete(report_entity.note_id)
-        elif report_entity.collection_id:
-            collection_service.delete(report_entity.collection_id)
-
-        report_entity.status = ReportStatusEnum.RESOLVED
+            # Delete action implies the report is resolved once the target is removed
+            report_entity.status = ReportStatusEnum.RESOLVED
+        else:
+            report_entity.status = update_dto.status
         saved = report_repository.update(report_entity)
         return report_to_dto(saved)
 

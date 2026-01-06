@@ -103,10 +103,20 @@ definitions:
         maxLength: 2000
         description: Détails supplémentaires optionnels.
 
-  ReportStatusPayload:
+  ReportUpdatePayload:
     type: object
     required: ["status"]
     properties:
       status:
         type: string
         enum: ["pending", "in_progress", "resolved", "rejected"]
+      action:
+        type: string
+        enum: ["delete_target"]
+        description: |
+          Action de modération à appliquer en plus du changement de statut.
+          Si `delete_target` est envoyé, la ressource ciblée est supprimée et le report
+          est automatiquement marqué `resolved` (le statut fourni est ignoré).
+    description: |
+      Payload de mise à jour d'un signalement. L'action `delete_target` supprime la ressource
+      signalée (note ou collection) et marque le report comme résolu.
