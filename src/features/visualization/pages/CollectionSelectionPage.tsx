@@ -3,8 +3,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { usePublicCollectionsQuery } from "../hooks/usePublicCollectionsQuery";
-import { CollectionCard } from "@/features/collections/components/list/CollectionCard";
-import { CollectionsListSkeleton } from "@/features/collections/components/list/CollectionsListSkeleton";
+import { CollectionCard } from "@/features/collections/components/CollectionCard";
+import { CollectionsListSkeleton } from "@/features/collections/components/CollectionsListSkeleton";
 import { ErrorState } from "@/components/ui/error-state";
 import type { Collection } from "@/features/collections/models/collection.model";
 

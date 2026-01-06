@@ -15,16 +15,16 @@ import { NODE_COLORS } from "@/features/visualization/lib/visualization.constant
 import type { Collection } from "@/features/collections/models/collection.model"
 import { Position, type NodeProps } from "reactflow"
 
-vi.mock("@/features/collections/components/list/CollectionCard", () => ({
+vi.mock("@/features/collections/components/CollectionCard", () => ({
   CollectionCard: ({
     collection,
     onCardClick,
   }: {
     collection: Collection
-    onCardClick: (c: Collection) => void
+    onCardClick?: (c: Collection) => void
   }) => (
     <button
-      onClick={() => onCardClick(collection)}
+      onClick={() => onCardClick?.(collection)}
       aria-label={`card-${collection.id}`}
     >
       {collection.name}
