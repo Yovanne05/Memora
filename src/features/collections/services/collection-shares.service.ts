@@ -29,6 +29,13 @@ export function createCollectionSharesService(
       );
       return data.items.map(dtoToCollectionShare);
     },
+    async listByUser(userId: string): Promise<CollectionShare[]> {
+      const data = await client.get<CollectionShareListDto>(
+        "/collection-shares",
+        { params: { userId } }
+      );
+      return data.items.map(dtoToCollectionShare);
+    },
 
     async create(
       collectionId: string,

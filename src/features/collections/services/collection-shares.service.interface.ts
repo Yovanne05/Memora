@@ -6,6 +6,7 @@ import type {
 
 export interface ICollectionSharesService {
   list(collectionId: string): Promise<CollectionShare[]>;
+  listByUser(userId: string): Promise<CollectionShare[]>;
   create(
     collectionId: string,
     payload: CollectionShareCreate

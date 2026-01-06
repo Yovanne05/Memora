@@ -6,6 +6,7 @@ import type {
 
 export interface INoteSharesService {
   list(noteId: string): Promise<NoteShare[]>;
+  listByUser(userId: string): Promise<NoteShare[]>;
   create(noteId: string, payload: NoteShareCreate): Promise<NoteShare>;
   update(
     noteId: string,

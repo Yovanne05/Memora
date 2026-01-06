@@ -28,6 +28,12 @@ export function createNoteSharesService(
       });
       return data.items.map(dtoToNoteShare);
     },
+    async listByUser(userId: string): Promise<NoteShare[]> {
+      const data = await client.get<NoteShareListDto>("/note-shares", {
+        params: { userId },
+      });
+      return data.items.map(dtoToNoteShare);
+    },
 
     async create(
       noteId: string,

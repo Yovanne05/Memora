@@ -1,4 +1,4 @@
-import { SharePermission } from "../dtos/collection-share.dto";
+import type { SharePermission } from "../dtos/collection-share.dto";
 
 export interface CollectionShare {
   collectionId: string;

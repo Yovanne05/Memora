@@ -1,9 +1,9 @@
-import {
+import type {
   CollectionShareDto,
   CollectionShareCreateDto,
   CollectionShareUpdateDto,
 } from "../dtos/collection-share.dto";
-import {
+import type {
   CollectionShare,
   CollectionShareCreate,
   CollectionShareUpdate,
