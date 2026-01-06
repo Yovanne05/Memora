@@ -3,13 +3,14 @@ import { NoteCard } from "./NoteCard"
 
 interface NotesGridProps {
   items: Note[]
+  showQuickActions?: boolean
 }
 
-export function NotesGrid({ items }: Readonly<NotesGridProps>) {
+export function NotesGrid({ items, showQuickActions = false }: Readonly<NotesGridProps>) {
   return (
     <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {items.map((note) => (
-        <NoteCard key={note.id} note={note} />
+        <NoteCard key={note.id} note={note} showQuickActions={showQuickActions} />
       ))}
     </section>
   )

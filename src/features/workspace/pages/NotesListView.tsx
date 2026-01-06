@@ -48,7 +48,7 @@ export default function NotesListView() {
   return (
     <div className="space-y-6">
       {/* Notes Grid */}
-      <NotesGrid items={notes} />
+      <NotesGrid items={notes} showQuickActions />
 
       {/* Pagination */}
       {total > limit && (

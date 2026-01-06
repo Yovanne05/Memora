@@ -2,11 +2,13 @@ import { Link } from "@tanstack/react-router"
 import type { Note } from "../models/note.model"
 import { ResourceCard, type ResourceCardAction } from "@/components/shared/ResourceCard"
 import { CalendarClock, Eye, FileText, Lock, User2 } from "lucide-react"
+import { NoteQuickActions } from "./NoteQuickActions"
 
 interface NoteCardProps {
   note: Note
   onEdit?: (note: Note) => void
   onDelete?: (note: Note) => void
+  showQuickActions?: boolean
 }
 
 const formatDate = (date: string) =>
@@ -16,28 +18,32 @@ const formatDate = (date: string) =>
     day: "numeric",
   }).format(new Date(date))
 
-export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
+export function NoteCard({ note, onEdit, onDelete, showQuickActions = false }: Readonly<NoteCardProps>) {
   const isPublic = note.visibility === "public"
 
   const actions: ResourceCardAction[] = []
-  if (onEdit) {
-    actions.push({
-      label: "Modifier",
-      onClick: (e) => {
-        e.preventDefault()
-        onEdit(note)
-      },
-    })
-  }
-  if (onDelete) {
-    actions.push({
-      label: "Supprimer",
-      variant: "destructive",
-      onClick: (e) => {
-        e.preventDefault()
-        onDelete(note)
-      },
-    })
+
+  // Si showQuickActions est true, on ne génère pas d'actions car on utilise NoteQuickActions
+  if (!showQuickActions) {
+    if (onEdit) {
+      actions.push({
+        label: "Modifier",
+        onClick: (e) => {
+          e.preventDefault()
+          onEdit(note)
+        },
+      })
+    }
+    if (onDelete) {
+      actions.push({
+        label: "Supprimer",
+        variant: "destructive",
+        onClick: (e) => {
+          e.preventDefault()
+          onDelete(note)
+        },
+      })
+    }
   }
 
   const metadata = (
@@ -65,6 +71,10 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
     </>
   )
 
+  const headerActions = showQuickActions ? (
+    <NoteQuickActions note={note} triggerVariant="ghost" />
+  ) : undefined
+
   return (
     <Link
       to="/app/workspace/notes/$noteId"
@@ -78,6 +88,7 @@ export function NoteCard({ note, onEdit, onDelete }: Readonly<NoteCardProps>) {
         description={note.content || "Aucun contenu"}
         icon={FileText}
         actions={actions}
+        headerActions={headerActions}
         metadata={metadata}
       />
     </Link>

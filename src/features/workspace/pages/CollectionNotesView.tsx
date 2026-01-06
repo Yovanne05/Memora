@@ -110,7 +110,7 @@ export default function CollectionNotesView({
       {/* Notes Grid */}
       {notes && notes.length > 0 ? (
         <>
-          <NotesGrid items={notes} />
+          <NotesGrid items={notes} showQuickActions />
 
           {/* Pagination */}
           {total > limit && (
