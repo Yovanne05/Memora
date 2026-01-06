@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { Loader2 } from "lucide-react"
 import { useWorkspaceContext } from "../context/WorkspaceContext"
-import { NotesGrid } from "@/features/notes/components/list/NotesGrid"
+import { NotesGrid } from "@/features/notes/components/NotesGrid"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import type { NotesFilters } from "@/features/notes/types/note-query"
 

@@ -10,8 +10,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Search, Filter, X } from "lucide-react"
-import type { CollectionsSort, CollectionsTab } from "../../lib/collections-query"
-import type { CollectionVisibility } from "../../models/collection.model"
+import type { CollectionsSort, CollectionsTab } from "../lib/collections-query"
+import type { CollectionVisibility } from "../models/collection.model"
 import { forwardRef } from "react"
 
 interface CollectionsToolbarProps {
