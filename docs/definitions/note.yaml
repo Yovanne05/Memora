@@ -283,3 +283,50 @@ definitions:
         items:
           $ref: "#/definitions/NoteShareLink"
     required: ["total", "items"]
+
+  NoteLink:
+    type: object
+    description: Lien entre deux notes dans une même collection.
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Identifiant de la note source.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      linkedNoteId:
+        type: string
+        format: uuid
+        description: Identifiant de la note liée.
+        example: "3eeaa924-c2e4-49a2-8123-4613ef7f27b9"
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du lien.
+        example: "2025-05-12T09:23:41Z"
+    required: ["note_id", "linkedNoteId", "created_at"]
+
+  NoteLinkCreatePayload:
+    type: object
+    description: Données nécessaires pour créer un lien entre deux notes.
+    required: ["linkedNoteId"]
+    properties:
+      linkedNoteId:
+        type: string
+        format: uuid
+        description: Identifiant de la note à lier.
+        example: "3eeaa924-c2e4-49a2-8123-4613ef7f27b9"
+
+  NoteLinkListResponse:
+    type: object
+    description: Liste paginée des liens d'une note.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de liens.
+        example: 5
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/NoteLink"
+    required: ["total", "items"]
