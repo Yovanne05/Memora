@@ -1,13 +1,17 @@
 import { Loader2 } from "lucide-react"
-import { useWorkspaceCollections } from "../../hooks/useWorkspaceCollections"
+import { useWorkspaceCollections, type WorkspaceMode } from "../../hooks/useWorkspaceCollections"
 import { useWorkspaceContext } from "../../context/WorkspaceContext"
 import { useWorkspaceNavigation } from "../../hooks/useWorkspaceNavigation"
 import { CollectionTreeItem } from "./CollectionTreeItem"
 
-export function CollectionsTree() {
-  const { collections, isLoading, isError } = useWorkspaceCollections()
+interface CollectionsTreeProps {
+  mode?: WorkspaceMode
+}
+
+export function CollectionsTree({ mode = "default" }: Readonly<CollectionsTreeProps>) {
+  const { collections, isLoading, isError } = useWorkspaceCollections({ mode })
   const { state, actions } = useWorkspaceContext()
-  const { navigateToCollection } = useWorkspaceNavigation()
+  const { navigateToCollection } = useWorkspaceNavigation(mode)
 
   if (isLoading) {
     return (
@@ -44,6 +48,7 @@ export function CollectionsTree() {
           selectedNoteId={state.selectedNoteId}
           onToggle={() => actions.toggleCollection(collection.id)}
           onSelect={() => navigateToCollection(collection.id)}
+          mode={mode}
         />
       ))}
     </div>

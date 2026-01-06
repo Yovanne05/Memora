@@ -12,10 +12,11 @@ const SORT_MAP = {
 
 interface UseWorkspaceNotesOptions {
   collectionId?: string
+  favorites?: boolean
 }
 
 export function useWorkspaceNotes(options: UseWorkspaceNotesOptions = {}) {
-  const { collectionId } = options
+  const { collectionId, favorites } = options
   const { state } = useWorkspaceContext()
 
   const filters = useMemo<NotesFilters>(() => {
@@ -28,8 +29,12 @@ export function useWorkspaceNotes(options: UseWorkspaceNotesOptions = {}) {
       baseFilters.collectionId = collectionId
     }
 
+    if (favorites) {
+      baseFilters.isFavorite = true
+    }
+
     return baseFilters
-  }, [state.search, state.sort, collectionId])
+  }, [state.search, state.sort, collectionId, favorites])
 
   const notesQuery = useNotesQuery(state.page, state.limit, filters)
 

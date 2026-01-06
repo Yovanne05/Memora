@@ -2,32 +2,42 @@ import { useCallback } from "react"
 import { useRouter } from "@tanstack/react-router"
 import { useWorkspaceContext } from "../context/WorkspaceContext"
 
-export function useWorkspaceNavigation() {
+type WorkspaceMode = "default" | "favorites"
+
+export function useWorkspaceNavigation(mode: WorkspaceMode = "default") {
   const router = useRouter()
   const { actions } = useWorkspaceContext()
 
+  const navigateToFavorites = useCallback(() => {
+    router.navigate({ to: "/app/workspace/favorites" })
+    actions.selectCollection(null)
+    actions.selectNote(null)
+  }, [router, actions])
+
   const navigateToNote = useCallback(
     (noteId: string, collectionId?: string) => {
+      const base = mode === "favorites" ? "/app/workspace/favorites" : "/app/workspace"
+
       const path = collectionId
-        ? `/app/workspace/collections/${collectionId}/notes/${noteId}`
-        : `/app/workspace/notes/${noteId}`
+        ? `${base}/collections/${collectionId}/notes/${noteId}`
+        : `${base}/notes/${noteId}`
 
       router.navigate({ to: path })
       actions.selectNote(noteId)
-      if (collectionId) {
-        actions.selectCollection(collectionId)
-      }
+      if (collectionId) actions.selectCollection(collectionId)
     },
-    [router, actions]
+    [router, actions, mode]
   )
 
   const navigateToCollection = useCallback(
     (collectionId: string) => {
-      router.navigate({ to: `/app/workspace/collections/${collectionId}` })
+      const base = mode === "favorites" ? "/app/workspace/favorites" : "/app/workspace"
+
+      router.navigate({ to: `${base}/collections/${collectionId}` })
       actions.selectCollection(collectionId)
       actions.selectNote(null)
     },
-    [router, actions]
+    [router, actions, mode]
   )
 
   const navigateToAllNotes = useCallback(() => {
@@ -37,6 +47,7 @@ export function useWorkspaceNavigation() {
   }, [router, actions])
 
   return {
+    navigateToFavorites,
     navigateToNote,
     navigateToCollection,
     navigateToAllNotes,

@@ -3,6 +3,10 @@ import type { Collection } from "@/features/collections/models/collection.model"
 import { cn } from "@/lib/utils"
 import { NoteTreeItem } from "./NoteTreeItem"
 import { useWorkspaceNavigation } from "../../hooks/useWorkspaceNavigation"
+import { useToggleCollectionFavoriteMutation } from "@/features/collections/hooks/useToggleCollectionFavorite"
+import { FavoriteButton } from "@/components/favorite-button"
+
+type WorkspaceMode = "default" | "favorites"
 
 interface CollectionTreeItemProps {
   collection: Collection
@@ -11,6 +15,7 @@ interface CollectionTreeItemProps {
   selectedNoteId: string | null
   onToggle: () => void
   onSelect: () => void
+  mode?: WorkspaceMode
 }
 
 export function CollectionTreeItem({
@@ -20,14 +25,24 @@ export function CollectionTreeItem({
   selectedNoteId,
   onToggle,
   onSelect,
+  mode = "default",
 }: CollectionTreeItemProps) {
-  const { navigateToNote } = useWorkspaceNavigation()
+  const { navigateToNote } = useWorkspaceNavigation(mode)
+  const toggleFavorite = useToggleCollectionFavoriteMutation()
+
   const notesCount = collection.notes?.length || 0
+  const favorite = collection.isFavorite === true
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleFavorite.mutate({ collectionId: collection.id, next: !favorite })
+  }
 
   return (
     <div>
       {/* Collection header */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 group">
         <button
           type="button"
           onClick={onToggle}
@@ -54,12 +69,28 @@ export function CollectionTreeItem({
         >
           <FolderClosed className="h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="flex-1 truncate text-left">{collection.name}</span>
+
           {notesCount > 0 && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Files className="h-3 w-3" />
               {notesCount}
             </span>
           )}
+
+          <span className="ml-1">
+            <FavoriteButton
+              pressed={favorite}
+              label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+              disabled={toggleFavorite.isPending}
+              onClick={handleFavoriteClick}
+              size="sm"
+              className={cn(
+                "h-7 w-7",
+                !favorite && "opacity-0 group-hover:opacity-100",
+                "text-muted-foreground hover:text-foreground"
+              )}
+            />
+          </span>
         </button>
       </div>
 
