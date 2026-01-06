@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask_jwt_extended import get_current_user, jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 import config
 from flask import Blueprint, jsonify, request
@@ -26,6 +26,6 @@ def create_session():
 @jwt_required()
 @swag_from("../docs/auth/me.yaml")
 def me():
-    user = get_current_user()
-    user_dto = auth_service.get_me(user.id)
+    user_id = get_jwt_identity()
+    user_dto = auth_service.get_me(user_id)
     return jsonify({"user": user_dto.model_dump()}), HTTPStatus.OK
