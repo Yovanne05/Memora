@@ -32,7 +32,7 @@ export function UserSearchCombobox({
   excludeUserIds = [],
   placeholder = "Search users...",
   disabled,
-}: UserSearchComboboxProps) {
+}: Readonly<UserSearchComboboxProps>) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 

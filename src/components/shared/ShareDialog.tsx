@@ -48,7 +48,7 @@ export function ShareDialog({
   open,
   onOpenChange,
   trigger,
-}: ShareDialogProps) {
+}: Readonly<ShareDialogProps>) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [permission, setPermission] = useState<SharePermission>("read");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,7 +67,7 @@ export function ShareDialog({
       setSelectedUser(null);
       setPermission("read");
       toast.success("User added successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to add user");
     } finally {
       setIsSubmitting(false);
@@ -81,7 +81,7 @@ export function ShareDialog({
     try {
       await onUpdateShare(userId, newPermission);
       toast.success("Permission updated");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update permission");
     }
   };
@@ -90,7 +90,7 @@ export function ShareDialog({
     try {
       await onRemoveShare(userId);
       toast.success("User removed");
-    } catch (error) {
+    } catch {
       toast.error("Failed to remove user");
     }
   };

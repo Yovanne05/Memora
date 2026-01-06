@@ -30,7 +30,7 @@ export function SharePermissionSelect({
   value,
   onChange,
   disabled,
-}: SharePermissionSelectProps) {
+}: Readonly<SharePermissionSelectProps>) {
   const selected = PERMISSIONS.find((p) => p.value === value);
 
   return (
