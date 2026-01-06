@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from flask_jwt_extended import get_current_user, jwt_required
+
 import config
 from flask import Blueprint, jsonify, request
 from flasgger import swag_from
@@ -18,3 +20,12 @@ def create_session():
     payload = LoginDTO.model_validate_json(request.data)
     user, token = auth_service.login(payload)
     return jsonify({"user": user.model_dump(), "access_token": token}), HTTPStatus.OK
+
+
+@bp_sessions.get("/me")
+@jwt_required()
+@swag_from("../docs/auth/me.yaml")
+def me():
+    user = get_current_user()
+    user_dto = auth_service.get_me(user.id)
+    return jsonify({"user": user_dto.model_dump()}), HTTPStatus.OK

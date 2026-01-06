@@ -10,7 +10,6 @@ from dtos.user_dto import UserCreateDTO, UserUpdateDTO
 from querys.user_query import UserFindQuery
 from services.impl.auth_service_impl import auth_service
 from services.impl.user_service_impl import user_service
-from utils.auth import get_current_user
 from utils.enums import RoleEnum
 
 bp_users = Blueprint("users", __name__, url_prefix="/users")
@@ -52,15 +51,6 @@ def create():
     )
     user = user_service.create(user_create)
     return jsonify(user.model_dump()), HTTPStatus.CREATED
-
-
-@bp_users.get("/me")
-@jwt_required()
-@swag_from("../docs/auth/me.yaml")
-def me():
-    user = get_current_user()
-    user_dto = auth_service.get_me(user.id)
-    return jsonify({"user": user_dto.model_dump()}), HTTPStatus.OK
 
 
 @bp_users.patch("/<uuid:user_id>")
