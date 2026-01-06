@@ -1,16 +1,36 @@
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import inspect
 from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
 from utils.permission_models import AccessLevel
 from domain_services.permission_domain_service import permission_domain_service
+from dtos.owner_dto import OwnerDTO
+from utils.enums import SharePermissionEnum
 
 
-def _safe_owner_username(note: Note) -> Optional[str]:
+def _get_all_owners(note: Note) -> List[OwnerDTO]:
+    """
+    Récupère tous les propriétaires (owners) de la note :
+    - Le créateur original (owner_id)
+    - Tous les utilisateurs ayant reçu permission OWNER via NoteShare
+    """
+    owners = []
+
+    # Ajouter le créateur original
     insp = inspect(note)
-    if "owner" in insp.unloaded:
-        return None
-    return note.owner.username if note.owner else None
+    if "owner" not in insp.unloaded and note.owner:
+        owners.append(OwnerDTO(user_id=note.owner_id, username=note.owner.username))
+
+    # Ajouter tous ceux qui ont permission OWNER via NoteShare
+    if "shares" not in insp.unloaded:
+        for share in note.shares:
+            if share.permission == SharePermissionEnum.OWNER:
+                # Charger l'utilisateur si nécessaire
+                share_insp = inspect(share)
+                if "user" not in share_insp.unloaded and share.user:
+                    owners.append(OwnerDTO(user_id=share.user_id, username=share.user.username))
+
+    return owners
 
 
 def _safe_collection_name(note: Note) -> Optional[str]:
@@ -48,12 +68,11 @@ def note_to_dto(note: Note, favorite_note_ids: set[str] | None = None, current_u
         "title": note.title,
         "content": note.content,
         "visibility": note.visibility,
-        "owner_id": note.owner_id,
+        "owners": _get_all_owners(note),
         "collection_id": note.collection_id,
         "tags": note.tags,
         "created_at": note.created_at,
         "updated_at": note.updated_at,
-        "owner_username": _safe_owner_username(note),
         "collection_name": _safe_collection_name(note),
         "is_favorite": is_favorite,
         "user_permission": user_permission_str,

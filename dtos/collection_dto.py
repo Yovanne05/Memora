@@ -1,4 +1,5 @@
 from dtos.note_dto import NoteDTO
+from dtos.owner_dto import OwnerDTO
 from utils.enums import VisibilityEnum
 from datetime import datetime
 from typing import List
@@ -27,7 +28,7 @@ class CollectionDTO(BaseModel) :
     name : str
     description : str | None = None
     visibility : VisibilityEnum
-    owner_id : str
+    owners : List[OwnerDTO] = Field(default_factory = list)
     tags : List[str] = Field(default_factory = list)
     is_favorite: bool = False
     created_at : datetime

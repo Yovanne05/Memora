@@ -48,7 +48,8 @@ class Collection(
     owner: Mapped["User"] = relationship(back_populates="collections")
     notes: Mapped[list["Note"]] = relationship(back_populates="collection", lazy="selectin")
     shares: Mapped[list["CollectionShare"]] = relationship(
-        back_populates="collection"
+        back_populates="collection",
+        lazy="selectin",
     )
     share_links: Mapped[list["CollectionShareLink"]] = relationship(
         back_populates="collection",
@@ -73,4 +74,4 @@ class CollectionShare(SharePermissionMixin, CreatedAtMixin, Base):
     )
 
     collection: Mapped["Collection"] = relationship(back_populates="shares")
-    user: Mapped["User"] = relationship(back_populates="collection_shares")
+    user: Mapped["User"] = relationship(back_populates="collection_shares", lazy="selectin")

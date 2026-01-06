@@ -61,6 +61,7 @@ class Note(
         back_populates="note",
         cascade="all, delete-orphan",
         passive_deletes=True,
+        lazy="selectin",
     )
     share_links: Mapped[list["NoteShareLink"]] = relationship(
         back_populates="note",
@@ -100,7 +101,7 @@ class NoteShare(SharePermissionMixin, CreatedAtMixin, Base):
     )
 
     note: Mapped["Note"] = relationship(back_populates="shares")
-    user: Mapped["User"] = relationship(back_populates="note_shares")
+    user: Mapped["User"] = relationship(back_populates="note_shares", lazy="selectin")
 
 
 class NoteLink(CreatedAtMixin, Base):
