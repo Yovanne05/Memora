@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { useNoteLinksQuery } from "../hooks/useNoteLinksQuery"
 import { useLinkNotes } from "../hooks/useLinkNotes"
 import type { Note } from "../models/note.model"
+import { getContentPreview } from "@/lib/html-utils"
 
 interface QuickLinkNoteProps {
   readonly note: Note
@@ -132,7 +133,7 @@ export const QuickLinkNote = memo(function QuickLinkNote({
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm truncate">{availableNote.title}</h4>
                     <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                      {availableNote.content || "Sans contenu"}
+                      {getContentPreview(availableNote.content || "", 100)}
                     </p>
                   </div>
                   {availableNote.tags.length > 0 && (

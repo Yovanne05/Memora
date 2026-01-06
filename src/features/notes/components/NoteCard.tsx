@@ -3,6 +3,7 @@ import type { Note } from "../models/note.model"
 import { ResourceCard, type ResourceCardAction } from "@/components/shared/ResourceCard"
 import { CalendarClock, Eye, FileText, Lock, User2 } from "lucide-react"
 import { NoteQuickActions } from "./NoteQuickActions"
+import { getContentPreview } from "@/lib/html-utils"
 
 interface NoteCardProps {
   note: Note
@@ -75,6 +76,10 @@ export function NoteCard({ note, onEdit, onDelete, showQuickActions = false }: R
     <NoteQuickActions note={note} triggerVariant="ghost" />
   ) : undefined
 
+  const contentPreview = note.content
+    ? getContentPreview(note.content, 150)
+    : "Aucun contenu"
+
   return (
     <Link
       to="/app/workspace/notes/$noteId"
@@ -85,7 +90,7 @@ export function NoteCard({ note, onEdit, onDelete, showQuickActions = false }: R
       <ResourceCard
         id={note.id}
         title={note.title}
-        description={note.content || "Aucun contenu"}
+        description={contentPreview}
         icon={FileText}
         actions={actions}
         headerActions={headerActions}

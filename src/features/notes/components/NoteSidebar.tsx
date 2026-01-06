@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useResizable } from "@/hooks/useResizable";
 import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection";
 import { RichTextDisplay } from "@/components/editor/RichTextDisplay";
+import { getContentPreview } from "@/lib/html-utils";
 
 interface NoteSidebarProps {
   readonly note: Note | null;
@@ -107,7 +108,7 @@ export function NoteSidebar({
                       {relatedNote.title}
                     </p>
                     <p className="text-xs text-muted-foreground line-clamp-1">
-                      {relatedNote.content}
+                      {getContentPreview(relatedNote.content || "", 100)}
                     </p>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground shrink-0" />
