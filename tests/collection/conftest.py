@@ -18,7 +18,7 @@ from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 # Test constants
 TEST_PASSWORD_HASH = "test-password-hash" # NOSONAR
-TEST_PASSWORD = "ValidPass1!" # NOSONAR
+TEST_PASSWORD = "ValidPass12!" # NOSONAR
 
 
 

@@ -1,10 +1,13 @@
 import re
 import bcrypt
 
-PASSWORD_REGEX = re.compile(r"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$")
+PASSWORD_MIN_LENGTH = 12
+PASSWORD_REGEX = re.compile(
+    rf"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{{{PASSWORD_MIN_LENGTH},}}$"
+)
 PASSWORD_VALIDATION_ERROR = (
-    "Password must be at least 8 characters and include one uppercase letter, "
-    "one digit, and one special character."
+    f"Password must be at least {PASSWORD_MIN_LENGTH} characters and include one "
+    "uppercase letter, one digit, and one special character."
 )
 
 

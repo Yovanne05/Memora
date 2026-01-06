@@ -4,9 +4,9 @@ import config
 import pytest
 
 # Test constants
-TEST_PASSWORD = "StrongPwd1!" # NOSONAR
+TEST_PASSWORD = "StrongPass1!" # NOSONAR
 WEAK_PASSWORD = "weakpass" # NOSONAR
-WRONG_PASSWORD = "WrongPwd1!" # NOSONAR
+WRONG_PASSWORD = "WrongPass12!" # NOSONAR
 
 
 @pytest.fixture(autouse=True)

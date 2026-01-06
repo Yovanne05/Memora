@@ -12,7 +12,7 @@ definitions:
         type: string
         format: password
         description: >
-          Minimum 8 characters with at least one uppercase letter,
+          Minimum 12 characters with at least one uppercase letter,
           one digit, and one special character.
         example: "StrongPass1!"
       username:
@@ -45,7 +45,7 @@ definitions:
       password:
         type: string
         format: password
-        description: Raw password matching the complexity policy.
+        description: Mot de passe du compte.
         example: "StrongPass1!"
     example:
       identifier: "user@example.com"

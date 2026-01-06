@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 
-TEST_PASSWORD = "StrongPwd1!"  # NOSONAR
+TEST_PASSWORD = "StrongPass1!"  # NOSONAR
 
 
 @pytest.fixture
