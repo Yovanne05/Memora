@@ -93,7 +93,7 @@ def test_get_shared_collection_includes_all_collection_fields(client_with_note_d
         "id",
         "name",
         "description",
-        "owner_id",
+        "owners",
         "visibility",
         "created_at",
         "updated_at",
@@ -172,7 +172,7 @@ def test_get_shared_collection_returns_same_data_as_authenticated_request(
     assert auth_data["id"] == public_data["id"]
     assert auth_data["name"] == public_data["name"]
     assert auth_data["description"] == public_data["description"]
-    assert auth_data["owner_id"] == public_data["owner_id"]
+    assert auth_data["owners"] == public_data["owners"]
 
 
 def test_get_shared_collection_after_link_deletion_fails(client_with_note_data):

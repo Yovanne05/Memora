@@ -1,7 +1,14 @@
 definitions:
   Note:
     type: object
-    description: ReprÇ¸sentation complÇùte d'une note dans MEMORA.
+    description: >
+      Représentation complète d'une note dans MEMORA.
+
+      **Propriétaires multiples:** Une note peut avoir plusieurs propriétaires :
+      - Le créateur original de la note
+      - Tous les utilisateurs ayant reçu la permission OWNER via NoteShare
+
+      Tous les propriétaires ont exactement les mêmes droits et sont indistinguables.
     properties:
       id:
         type: string
@@ -16,15 +23,18 @@ definitions:
         type: string
         description: Contenu riche de la note (Markdown acceptÇ¸).
         example: "Rappel sur les jointures INNER/LEFT..."
-      owner_id:
-        type: string
-        format: uuid
-        description: Identifiant du propriÇ¸taire de la note.
-        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
-      owner_username:
-        type: string
-        description: Nom d'utilisateur du propriÇ¸taire (chargÇ¸ automatiquement).
-        example: "jean.dupont"
+      owners:
+        type: array
+        description: >
+          Liste de tous les propriétaires de la note.
+          Inclut le créateur original ET tous les utilisateurs avec permission OWNER.
+        items:
+          $ref: "#/definitions/Owner"
+        example:
+          - user_id: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+            username: "jean.dupont"
+          - user_id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            username: "marie.martin"
       collection_id:
         type: string
         format: uuid
@@ -61,7 +71,22 @@ definitions:
         format: date-time
         description: DerniÇùre mise Çÿ jour.
         example: "2025-05-15T16:02:07Z"
-    required: ["id", "title", "content", "owner_id", "owner_username", "visibility", "created_at", "updated_at"]
+    required: ["id", "title", "content", "owners", "visibility", "created_at", "updated_at"]
+
+  Owner:
+    type: object
+    description: Représente un propriétaire (owner) d'une note ou collection.
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant unique de l'utilisateur.
+        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      username:
+        type: string
+        description: Nom d'utilisateur.
+        example: "jean.dupont"
+    required: ["user_id", "username"]
 
   NoteCreatePayload:
     type: object

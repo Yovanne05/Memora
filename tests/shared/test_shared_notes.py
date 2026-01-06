@@ -131,7 +131,7 @@ def test_get_shared_note_returns_same_data_as_authenticated_request(
     assert auth_data["id"] == public_data["id"]
     assert auth_data["title"] == public_data["title"]
     assert auth_data["content"] == public_data["content"]
-    assert auth_data["owner_id"] == public_data["owner_id"]
+    assert auth_data["owners"] == public_data["owners"]
 
 
 def test_get_shared_note_after_link_deletion_fails(client_with_note_data):

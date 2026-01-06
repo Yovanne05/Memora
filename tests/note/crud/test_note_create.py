@@ -20,7 +20,8 @@ def test_create_note_returns_created_note(client_with_note_data):
     assert response.status_code == 201
     body = response.get_json()
     assert body["title"] == title
-    assert body["owner_id"] == data.owner_id
+    assert len(body["owners"]) == 1
+    assert body["owners"][0]["user_id"] == data.owner_id
     data.track_created_note(body["id"])
 
 
