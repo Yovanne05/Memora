@@ -1,11 +1,11 @@
-"""Tests for GET /note-share-links endpoint"""
+"""Tests for GET /notes/{note_id}/public-links endpoint"""
 from utils.enums import SharePermissionEnum
 
 
 def test_list_note_share_links_returns_empty_list(client_with_note_data):
     client, data = client_with_note_data
 
-    response = client.get(f"/note-share-links?noteId={data.note_id}")
+    response = client.get(f"/notes/{data.note_id}/public-links")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -21,15 +21,19 @@ def test_list_note_share_links_returns_created_links(client_with_note_data):
 
     # Create two share links
     payload1 = {"permission": SharePermissionEnum.READ.value}
-    response1 = client.post(f"/note-share-links/{data.note_id}", json=payload1)
+    response1 = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload1
+    )
     assert response1.status_code == 201
 
     payload2 = {"permission": SharePermissionEnum.WRITE.value}
-    response2 = client.post(f"/note-share-links/{data.note_id}", json=payload2)
+    response2 = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload2
+    )
     assert response2.status_code == 201
 
     # List share links
-    response = client.get(f"/note-share-links?noteId={data.note_id}")
+    response = client.get(f"/notes/{data.note_id}/public-links")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -54,16 +58,20 @@ def test_list_note_share_links_filters_by_note_id(client_with_note_data):
 
     # Create share link for first note
     payload1 = {"permission": SharePermissionEnum.READ.value}
-    response1 = client.post(f"/note-share-links/{data.note_id}", json=payload1)
+    response1 = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload1
+    )
     assert response1.status_code == 201
 
     # Create share link for second note
     payload2 = {"permission": SharePermissionEnum.WRITE.value}
-    response2 = client.post(f"/note-share-links/{other_note_id}", json=payload2)
+    response2 = client.post(
+        f"/notes/{other_note_id}/public-links", json=payload2
+    )
     assert response2.status_code == 201
 
     # List share links for first note only
-    response = client.get(f"/note-share-links?noteId={data.note_id}")
+    response = client.get(f"/notes/{data.note_id}/public-links")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -78,7 +86,7 @@ def test_list_note_share_links_requires_authentication(app_client):
     from uuid import uuid4
     note_id = str(uuid4())
 
-    response = app_client.get(f"/note-share-links?noteId={note_id}")
+    response = app_client.get(f"/notes/{note_id}/public-links")
 
     assert response.status_code == 401
 
@@ -88,7 +96,9 @@ def test_list_note_share_links_requires_ownership(client_with_note_data):
 
     # Create share link
     payload = {"permission": SharePermissionEnum.READ.value}
-    response = client.post(f"/note-share-links/{data.note_id}", json=payload)
+    response = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload
+    )
     assert response.status_code == 201
 
     # Create another user and authenticate as them
@@ -96,7 +106,7 @@ def test_list_note_share_links_requires_ownership(client_with_note_data):
     data._authenticate_client(other_user_id)
 
     # Try to list share links for note owned by first user
-    response = client.get(f"/note-share-links?noteId={data.note_id}")
+    response = client.get(f"/notes/{data.note_id}/public-links")
 
     assert response.status_code == 200
     body = response.get_json()

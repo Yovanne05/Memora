@@ -10,16 +10,18 @@ from sqlalchemy.orm import selectinload, Session
 from daos.collection_dao import Collection
 from daos.note_dao import Note
 from domain_services.permission_domain_service import permission_domain_service
+from repositorys.collection_favorite_repository import (
+    favorite_collection_ids_for_user,
+)
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
-from repositorys.collection_favorite_repository import favorite_collection_ids_for_user
 
 
 def _apply_eager_loading(stmt: Select) -> Select:
     return stmt.options(
         selectinload(Collection.notes).selectinload(Note.owner),
         selectinload(Collection.notes).selectinload(Note.outgoing_links),
-        selectinload(Collection.notes).selectinload(Note.incoming_links)
+        selectinload(Collection.notes).selectinload(Note.incoming_links),
     )
 
 
@@ -39,25 +41,27 @@ def _scope_to_user(stmt: Select, user) -> Select:
         return stmt.where(Collection.id.is_(None))
     return stmt.where(Collection.id.in_(accessible_ids))
 
-@dataclass
-class CollectionSearchParams :
 
-    owner_id : Optional[str] = None
-    visibility : VisibilityEnum | None = None
-    title_contains : Optional[str] = None
-    ids : Optional[list[str]] = None
+@dataclass
+class CollectionSearchParams:
+    owner_id: Optional[str] = None
+    visibility: VisibilityEnum | None = None
+    title_contains: Optional[str] = None
+    ids: Optional[list[str]] = None
     tags: Optional[list[str]] = None
     shared_with_user_id: Optional[str] = None
     is_favorite: Optional[bool] = False
 
     only_with_notes: bool = False
 
-    sort_by : Literal["title", "created_at", "updated_at"] = "created_at"
-    sort_dir : Literal["asc", "desc"] = "desc"
+    sort_by: Literal["title", "created_at", "updated_at"] = "created_at"
+    sort_dir: Literal["asc", "desc"] = "desc"
 
-    limit : int = 50
-    offset : int = 0
-    
+    limit: int = 50
+    offset: int = 0
+
+
+
 def get_for_user(user, collection_id: str) -> Optional[Collection]:
     with get_db_session() as session:
         stmt = select(Collection).where(Collection.id == collection_id)
@@ -108,7 +112,9 @@ def delete(collection_id: str) -> bool:
         return True
 
 
-def list_for_user(user, params: Optional[CollectionSearchParams] = None) -> Tuple[List[Collection], int]:
+def list_for_user(
+    user, params: Optional[CollectionSearchParams] = None
+) -> Tuple[List[Collection], int]:
     param = params or CollectionSearchParams()
 
     filters = []
@@ -131,9 +137,7 @@ def list_for_user(user, params: Optional[CollectionSearchParams] = None) -> Tupl
 
     if param.only_with_notes:
         note_exists = (
-            select(1)
-            .where(Note.collection_id == Collection.id)
-            .exists()
+            select(1).where(Note.collection_id == Collection.id).exists()
         )
         filters.append(note_exists)
 
@@ -152,7 +156,9 @@ def list_for_user(user, params: Optional[CollectionSearchParams] = None) -> Tupl
         "updated_at": Collection.updated_at,
     }
     order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    order_expr = (
+        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    )
 
     stmt = _apply_eager_loading(stmt)
 

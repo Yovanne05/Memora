@@ -1,4 +1,4 @@
-"""Tests for POST /flashcards/{flashcard_id}/duplicate endpoint"""
+"""Tests for POST /flashcards/{flashcard_id}/duplicates endpoint"""
 
 
 def test_duplicate_flashcard_in_same_note(client_with_note_data):
@@ -12,13 +12,13 @@ def test_duplicate_flashcard_in_same_note(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     original_flashcard = create_response.get_json()
     original_id = original_flashcard["id"]
 
     duplicate_response = client.post(
-        f"/flashcards/{original_id}/duplicate"
+        f"/flashcards/{original_id}/duplicates"
     )
 
     assert duplicate_response.status_code == 201
@@ -40,12 +40,12 @@ def test_duplicate_flashcard_without_body(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
     duplicate_response = client.post(
-        f"/flashcards/{flashcard_id}/duplicate"
+        f"/flashcards/{flashcard_id}/duplicates"
     )
 
     assert duplicate_response.status_code == 201
@@ -57,7 +57,7 @@ def test_duplicate_nonexistent_flashcard_returns_404(client_with_note_data):
     client, _ = client_with_note_data
 
     response = client.post(
-        "/flashcards/00000000-0000-0000-0000-000000000000/duplicate"
+        "/flashcards/00000000-0000-0000-0000-000000000000/duplicates"
     )
 
     assert response.status_code == 404

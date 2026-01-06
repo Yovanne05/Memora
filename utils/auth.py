@@ -25,7 +25,6 @@ def _load_user_from_token():
 
 
 def get_current_user():
-    """Return the authenticated user entity, caching per request."""
     if hasattr(g, "current_user") and g.current_user:
         return g.current_user
 

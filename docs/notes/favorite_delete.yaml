@@ -1,5 +1,5 @@
 tags:
-  - notes
+  - note-favorites
 summary: Retirer une note des favoris
 description: Supprime la note des favoris de l'utilisateur authentifie.
 parameters:

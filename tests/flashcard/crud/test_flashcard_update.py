@@ -9,7 +9,7 @@ def test_update_flashcard_question(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
@@ -32,7 +32,7 @@ def test_update_flashcard_answers(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
@@ -61,7 +61,7 @@ def test_update_flashcard_with_empty_answers_returns_400(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 

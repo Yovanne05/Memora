@@ -1,9 +1,14 @@
-from dtos.note_dto import NoteDTO
 from dtos.collection_dto import CollectionDTO
+from dtos.note_dto import NoteDTO
 from exceptions.shared_exception import SharedResourceNotFound
 from mappers.note_mapper import note_to_dto
 from mappers.collection_mapper import collection_to_dto
-from repositorys import note_share_link_repository, collection_share_link_repository, note_repository, collection_repository
+from repositorys import (
+    collection_repository,
+    collection_share_link_repository,
+    note_repository,
+    note_share_link_repository,
+)
 
 
 class SharedService:

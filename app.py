@@ -2,19 +2,25 @@ import config
 from flask import Flask
 from flask_cors import CORS
 
-from controllers.auth_controller import bp_auth
+from controllers.auth_controller import bp_sessions
 from controllers.collection_controller import bp_collections
 from controllers.note_controller import bp_notes
-from controllers.note_link_controller import bp_note_links
+from controllers.note_link_controller import bp_note_relations
 from controllers.user_controller import bp_users
-from controllers.collection_controller import bp_collections
 from controllers.share_note_controller import bp_note_shares
 from controllers.share_collection_controller import bp_collection_shares
-from controllers.note_share_link_controller import bp_note_share_links
-from controllers.collection_share_link_controller import bp_collection_share_links
-from controllers.shared_controller import bp_shared
+from controllers.note_public_link_controller import bp_note_public_links
+from controllers.collection_public_link_controller import bp_collection_public_links
+from controllers.note_public_link_access_controller import (
+    bp_note_public_links_access,
+)
+from controllers.collection_public_link_access_controller import (
+    bp_collection_public_links_access,
+)
+from controllers.note_favorite_controller import bp_note_favorites
+from controllers.collection_favorite_controller import bp_collection_favorites
 from controllers.image_note_controller import bp_note_images
-from controllers.flashcard_controller import bp_flashcards
+from controllers.flashcard_controller import bp_flashcards, bp_note_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
 from controllers.review_controller import bp_reviews
 from utils import db
@@ -43,20 +49,24 @@ def create_app() -> Flask:
 
     register_global_filter(app)
 
-    app.register_blueprint(bp_auth)
+    app.register_blueprint(bp_sessions)
     app.register_blueprint(bp_users)
     app.register_blueprint(bp_notes)
-    app.register_blueprint(bp_note_links)
+    app.register_blueprint(bp_note_relations)
     app.register_blueprint(bp_collections)
     app.register_blueprint(bp_note_shares)
     app.register_blueprint(bp_collection_shares)
-    app.register_blueprint(bp_note_share_links)
-    app.register_blueprint(bp_collection_share_links)
-    app.register_blueprint(bp_shared)
+    app.register_blueprint(bp_note_public_links)
+    app.register_blueprint(bp_collection_public_links)
+    app.register_blueprint(bp_note_public_links_access)
+    app.register_blueprint(bp_collection_public_links_access)
     app.register_blueprint(bp_note_images)
     app.register_blueprint(bp_flashcards)
+    app.register_blueprint(bp_note_flashcards)
     app.register_blueprint(bp_user_statistics)
     app.register_blueprint(bp_reviews)
+    app.register_blueprint(bp_note_favorites)
+    app.register_blueprint(bp_collection_favorites)
 
     return app
 

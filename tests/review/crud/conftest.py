@@ -30,7 +30,7 @@ class ReviewTestData:
         target_note_id = note_id or self.note_data.note_id
         payload = {"question": question, "answers": answers}
 
-        response = self.client.post(f"/flashcards/{target_note_id}", json=payload)
+        response = self.client.post(f"/notes/{target_note_id}/flashcards", json=payload)
         assert response.status_code == 201, response.get_data(as_text=True)
         body = response.get_json()
 

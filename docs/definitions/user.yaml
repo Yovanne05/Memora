@@ -52,7 +52,7 @@ definitions:
       password:
         type: string
         format: password
-        minLength: 8
+        minLength: 12
         description: Mot de passe en clair (sera hash avant stockage).
       username:
         type: string
@@ -82,7 +82,7 @@ definitions:
       password:
         type: string
         format: password
-        minLength: 8
+        minLength: 12
         description: Nouveau mot de passe (si fourni).
       username:
         type: string

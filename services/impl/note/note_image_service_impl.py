@@ -1,23 +1,25 @@
-import os
-from uuid import uuid4
 from datetime import datetime, timezone
+import os
 from typing import List
+from uuid import uuid4
+
 from werkzeug.datastructures import FileStorage
 
-from services.interfaces.note.note_image_service_interface import NoteImageServiceInterface
-from repositorys import note_repository
-from repositorys import note_image_repository
 from daos.note_image_dao import NoteImage
+from domain_services.permission_domain_service import permission_domain_service
 from dtos.note_image_dto import NoteImageDTO
-from mappers.note_image_mapper import note_image_to_dto
-from exceptions.note_exception import NoteNotFound
 from exceptions.note_image_exception import (
     FileTooLarge,
     InvalidFileType,
     NoFileProvided,
     NoteImageNotFound,
 )
-from domain_services.permission_domain_service import permission_domain_service
+from exceptions.note_exception import NoteNotFound
+from mappers.note_image_mapper import note_image_to_dto
+from repositorys import note_image_repository, note_repository
+from services.interfaces.note.note_image_service_interface import (
+    NoteImageServiceInterface,
+)
 from utils.auth import get_current_user
 
 
@@ -25,7 +27,7 @@ class NoteImageService(NoteImageServiceInterface):
     UPLOAD_FOLDER = "uploads/notes"
     ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
     MAX_FILE_SIZE = 5 * 1024 * 1024
-    
+
     def __init__(self):
         os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
 
@@ -35,11 +37,11 @@ class NoteImageService(NoteImageServiceInterface):
             and filename.rsplit(".", 1)[1].lower() in self.ALLOWED_EXTENSIONS
         )
 
-    def _validate_file_size(self, file: FileStorage) -> bool:
+    def _get_file_size(self, file: FileStorage) -> int:
         file.seek(0, os.SEEK_END)
         size = file.tell()
         file.seek(0)
-        return size <= self.MAX_FILE_SIZE
+        return size
 
     def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
         note = note_repository.find_one_unscoped(note_id)
@@ -52,7 +54,8 @@ class NoteImageService(NoteImageServiceInterface):
         if not self._allowed_file(file.filename):
             raise InvalidFileType()
 
-        if not self._validate_file_size(file):
+        file_size = self._get_file_size(file)
+        if file_size > self.MAX_FILE_SIZE:
             raise FileTooLarge()
 
         ext = file.filename.rsplit(".", 1)[1].lower()
@@ -63,10 +66,6 @@ class NoteImageService(NoteImageServiceInterface):
 
         filepath = os.path.join(note_folder, filename)
 
-        file.seek(0, os.SEEK_END)
-        file_size = file.tell()
-        file.seek(0)
-
         file.save(filepath)
 
         image_entity = NoteImage(
@@ -76,7 +75,7 @@ class NoteImageService(NoteImageServiceInterface):
             file_path=filepath,
             file_size=file_size,
             mime_type=file.content_type or f"image/{ext}",
-            uploaded_at=datetime.now(timezone.utc)
+            uploaded_at=datetime.now(timezone.utc),
         )
 
         saved_entity = note_image_repository.add(image_entity)

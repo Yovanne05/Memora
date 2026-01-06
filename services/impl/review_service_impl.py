@@ -8,7 +8,10 @@ from dtos.review_dto import (
     UpcomingReviewsGroupDTO,
     FlashcardWithReviewDTO,
 )
-from exceptions.review_exception import FlashcardNotFoundForReview, InvalidAnswerForFlashcard
+from exceptions.review_exception import (
+    FlashcardNotFoundForReview,
+    InvalidAnswerForFlashcard,
+)
 from repositorys import flashcard_repository, review_repository
 from services.interfaces.review_service_interface import ReviewServiceInterface
 from utils.enums import ReviewDifficultyEnum
@@ -16,7 +19,11 @@ from utils.enums import ReviewDifficultyEnum
 
 class ReviewService(ReviewServiceInterface):
     def submit_review(
-        self, user_id: str, flashcard_id: str, selected_answer_id: str, difficulty: str
+        self,
+        user_id: str,
+        flashcard_id: str,
+        selected_answer_id: str,
+        difficulty: str,
     ) -> ReviewDTO:
         flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:

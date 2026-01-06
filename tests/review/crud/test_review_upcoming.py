@@ -1,4 +1,4 @@
-"""Tests for GET /reviews/upcoming endpoint"""
+"""Tests for GET /reviews?status=upcoming endpoint"""
 from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 
@@ -6,7 +6,7 @@ from email.utils import parsedate_to_datetime
 def test_get_upcoming_reviews_empty_when_no_reviews(client_with_review_data):
     client, _ = client_with_review_data
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -27,7 +27,7 @@ def test_get_upcoming_reviews_after_single_review(client_with_review_data):
     }
     client.post("/reviews", json=payload)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -59,7 +59,7 @@ def test_get_upcoming_reviews_multiple_flashcards_same_date(client_with_review_d
         }
         client.post("/reviews", json=payload)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -92,7 +92,7 @@ def test_get_upcoming_reviews_sorted_by_date(client_with_review_data):
     client.post("/reviews", json=payload2)
     client.post("/reviews", json=payload2)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -115,7 +115,7 @@ def test_get_upcoming_reviews_contains_question_text(client_with_review_data):
     }
     client.post("/reviews", json=payload)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -137,7 +137,7 @@ def test_get_upcoming_reviews_date_format(client_with_review_data):
     }
     client.post("/reviews", json=payload)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -166,7 +166,7 @@ def test_get_upcoming_reviews_only_for_current_user(client_with_review_data):
 
     data.note_data._authenticate_client(other_user_id)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -186,7 +186,7 @@ def test_get_upcoming_reviews_includes_past_due(client_with_review_data):
     }
     client.post("/reviews", json=payload)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -208,7 +208,7 @@ def test_get_upcoming_reviews_response_structure(client_with_review_data):
     }
     client.post("/reviews", json=payload)
 
-    response = client.get("/reviews/upcoming")
+    response = client.get("/reviews?status=upcoming")
 
     assert response.status_code == 200
     body = response.get_json()

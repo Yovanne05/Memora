@@ -1,4 +1,4 @@
-"""Tests for PATCH /note-shares/{note_id}/shares/{user_id} endpoint"""
+"""Tests for PATCH /notes/{note_id}/shares/{user_id} endpoint"""
 from uuid import uuid4
 
 from utils.enums import SharePermissionEnum
@@ -10,7 +10,7 @@ def test_update_share_returns_updated_share(client_with_note_data):
     payload = {"permission": SharePermissionEnum.WRITE.value}
 
     response = client.patch(
-        f"/note-shares/{data.note_id}/shares/{data.share_user_id}",
+        f"/notes/{data.note_id}/shares/{data.share_user_id}",
         json=payload,
     )
 
@@ -24,7 +24,7 @@ def test_update_share_returns_404_when_missing(client_with_note_data):
     payload = {"permission": SharePermissionEnum.WRITE.value}
 
     response = client.patch(
-        f"/note-shares/{data.note_id}/shares/{uuid4()}",
+        f"/notes/{data.note_id}/shares/{uuid4()}",
         json=payload,
     )
 

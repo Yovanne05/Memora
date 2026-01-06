@@ -9,7 +9,7 @@ def test_delete_flashcard(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
@@ -32,15 +32,13 @@ def test_delete_flashcard_removes_answers(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 
     client.delete(f"/flashcards/{flashcard_id}")
 
-    response = client.get(
-        "/flashcards", query_string={"noteId": data.note_id}
-    )
+    response = client.get(f"/notes/{data.note_id}/flashcards")
     assert response.status_code == 200
     body = response.get_json()
     assert body["total"] == 0

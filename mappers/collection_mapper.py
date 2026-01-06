@@ -1,5 +1,6 @@
 from typing import List, Set
 from sqlalchemy import inspect
+
 from daos.collection_dao import Collection
 from daos.note_dao import Note
 
@@ -35,7 +36,9 @@ def _get_all_owners(collection: Collection) -> List[OwnerDTO]:
     return owners
 
 
-def _build_note_dtos(notes: List[Note], note_favorite_ids: set[str] | None) -> List[NoteDTO]:
+def _build_note_dtos(
+    notes: List[Note], note_favorite_ids: set[str] | None
+) -> List[NoteDTO]:
     return [
         note_to_dto(note, favorite_note_ids=note_favorite_ids)
         for note in notes
@@ -61,15 +64,17 @@ def _add_edge_if_new(
     edges: List[dict],
     seen: Set[tuple],
     source_id: str,
-    target_id: str
+    target_id: str,
 ) -> None:
     edge_key = (source_id, target_id)
     if edge_key not in seen:
-        edges.append({
-            "id": f"{source_id}-{target_id}",
-            "source": source_id,
-            "target": target_id,
-        })
+        edges.append(
+            {
+                "id": f"{source_id}-{target_id}",
+                "source": source_id,
+                "target": target_id,
+            }
+        )
         seen.add(edge_key)
 
 
@@ -116,6 +121,7 @@ def collection_to_dto(
             "edges": _build_graph_edges(notes, note_ids),
         }
     )
+
 
 def dto_to_collection(collection_create_dto: CollectionCreateDTO) -> Collection:
     return Collection(

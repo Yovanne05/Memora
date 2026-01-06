@@ -12,25 +12,35 @@ class CollectionShareLinkSearchParams:
     collection_id: Optional[str] = None
 
 
-def find_many(params: Optional[CollectionShareLinkSearchParams] = None) -> Tuple[List[CollectionShareLink], int]:
+
+def find_many(
+    params: Optional[CollectionShareLinkSearchParams] = None,
+) -> Tuple[List[CollectionShareLink], int]:
     param = params or CollectionShareLinkSearchParams()
 
     filters = []
     if param.collection_id:
         filters.append(CollectionShareLink.collection_id == param.collection_id)
 
-    stmt = select(CollectionShareLink).where(*filters).order_by(CollectionShareLink.created_at.desc())
+    stmt = (
+        select(CollectionShareLink)
+        .where(*filters)
+        .order_by(CollectionShareLink.created_at.desc())
+    )
 
     with get_db_session() as session:
         total = session.scalar(
-            select(func.count()).select_from(stmt.subquery()))
+            select(func.count()).select_from(stmt.subquery())
+        )
         items = session.scalars(stmt).all()
 
     return items, total or 0
 
 
 def find_by_collection(collection_id: str) -> List[CollectionShareLink]:
-    stmt = select(CollectionShareLink).where(CollectionShareLink.collection_id == collection_id)
+    stmt = select(CollectionShareLink).where(
+        CollectionShareLink.collection_id == collection_id
+    )
     with get_db_session() as session:
         return session.scalars(stmt).all()
 

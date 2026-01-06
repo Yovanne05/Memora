@@ -1,4 +1,4 @@
-"""Tests for POST /note-share-links/{note_id} endpoint"""
+"""Tests for POST /notes/{note_id}/public-links endpoint"""
 from utils.enums import SharePermissionEnum
 
 
@@ -8,7 +8,9 @@ def test_create_note_share_link_returns_created_link(client_with_note_data):
         "permission": SharePermissionEnum.READ.value,
     }
 
-    response = client.post(f"/note-share-links/{data.note_id}", json=payload)
+    response = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload
+    )
 
     assert response.status_code == 201
     body = response.get_json()
@@ -24,7 +26,9 @@ def test_create_note_share_link_with_write_permission(client_with_note_data):
         "permission": SharePermissionEnum.WRITE.value,
     }
 
-    response = client.post(f"/note-share-links/{data.note_id}", json=payload)
+    response = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload
+    )
 
     assert response.status_code == 201
     body = response.get_json()
@@ -38,7 +42,9 @@ def test_create_note_share_link_with_owner_permission(client_with_note_data):
         "permission": SharePermissionEnum.OWNER.value,
     }
 
-    response = client.post(f"/note-share-links/{data.note_id}", json=payload)
+    response = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload
+    )
 
     assert response.status_code == 201
     body = response.get_json()
@@ -53,7 +59,9 @@ def test_create_note_share_link_requires_authentication(app_client):
         "permission": SharePermissionEnum.READ.value,
     }
 
-    response = app_client.post(f"/note-share-links/{note_id}", json=payload)
+    response = app_client.post(
+        f"/notes/{note_id}/public-links", json=payload
+    )
 
     assert response.status_code == 401
 
@@ -67,7 +75,9 @@ def test_create_note_share_link_with_nonexistent_note(client_with_note_data):
         "permission": SharePermissionEnum.READ.value,
     }
 
-    response = client.post(f"/note-share-links/{fake_note_id}", json=payload)
+    response = client.post(
+        f"/notes/{fake_note_id}/public-links", json=payload
+    )
 
     assert response.status_code == 404
 
@@ -78,7 +88,9 @@ def test_create_note_share_link_with_invalid_permission(client_with_note_data):
         "permission": "invalid_permission",
     }
 
-    response = client.post(f"/note-share-links/{data.note_id}", json=payload)
+    response = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload
+    )
 
     assert response.status_code == 422
 
@@ -88,13 +100,17 @@ def test_create_multiple_share_links_for_same_note(client_with_note_data):
 
     # Create first link
     payload1 = {"permission": SharePermissionEnum.READ.value}
-    response1 = client.post(f"/note-share-links/{data.note_id}", json=payload1)
+    response1 = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload1
+    )
     assert response1.status_code == 201
     link1_id = response1.get_json()["id"]
 
     # Create second link
     payload2 = {"permission": SharePermissionEnum.WRITE.value}
-    response2 = client.post(f"/note-share-links/{data.note_id}", json=payload2)
+    response2 = client.post(
+        f"/notes/{data.note_id}/public-links", json=payload2
+    )
     assert response2.status_code == 201
     link2_id = response2.get_json()["id"]
 

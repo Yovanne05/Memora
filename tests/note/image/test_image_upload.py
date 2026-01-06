@@ -1,4 +1,4 @@
-"""Tests for POST /notes/{note_id} endpoint (image upload)"""
+"""Tests for POST /notes/{note_id}/images endpoint (image upload)"""
 from io import BytesIO
 from uuid import uuid4
 
@@ -9,7 +9,7 @@ def test_upload_image_returns_created(client_with_note_data):
     image_data = b"fake image content for testing"
 
     response = client.post(
-        f"/notes/{data.note_id}",
+        f"/notes/{data.note_id}/images",
         data={"image": (BytesIO(image_data), "test.png")},
         content_type="multipart/form-data",
     )
@@ -30,7 +30,7 @@ def test_upload_image_without_file_returns_400(client_with_note_data):
     client, data = client_with_note_data
 
     response = client.post(
-        f"/notes/{data.note_id}",
+        f"/notes/{data.note_id}/images",
         data={},
         content_type="multipart/form-data",
     )
@@ -44,7 +44,7 @@ def test_upload_image_with_invalid_extension_returns_400(client_with_note_data):
     image_data = b"fake image"
 
     response = client.post(
-        f"/notes/{data.note_id}",
+        f"/notes/{data.note_id}/images",
         data={"image": (BytesIO(image_data), "test.exe")},
         content_type="multipart/form-data",
     )
@@ -59,7 +59,7 @@ def test_upload_image_for_nonexistent_note_returns_404(client_with_note_data):
     image_data = b"fake image"
 
     response = client.post(
-        f"/notes/{fake_note_id}",
+        f"/notes/{fake_note_id}/images",
         data={"image": (BytesIO(image_data), "test.png")},
         content_type="multipart/form-data",
     )

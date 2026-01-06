@@ -1,5 +1,5 @@
 tags:
-  - users
+  - user-statistics
 summary: Statistiques utilisateur
 description: >
   Retourne les statistiques de l'utilisateur connecte : nombre de notes,

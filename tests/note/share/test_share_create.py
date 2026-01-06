@@ -1,4 +1,4 @@
-"""Tests for POST /note-shares/{note_id} endpoint"""
+"""Tests for POST /notes/{note_id}/shares endpoint"""
 from uuid import uuid4
 
 from utils.enums import SharePermissionEnum
@@ -11,7 +11,7 @@ def test_share_note_returns_created_share(client_with_note_data):
         "permission": SharePermissionEnum.WRITE.value,
     }
 
-    response = client.post(f"/note-shares/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/shares", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -28,7 +28,7 @@ def test_share_note_rejects_owner_target(client_with_note_data):
         "permission": SharePermissionEnum.READ.value,
     }
 
-    response = client.post(f"/note-shares/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/shares", json=payload)
     assert response.status_code == 422
 
 
@@ -39,7 +39,7 @@ def test_share_note_requires_existing_user(client_with_note_data):
         "permission": SharePermissionEnum.READ.value,
     }
 
-    response = client.post(f"/note-shares/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/shares", json=payload)
 
     assert response.status_code == 422
 
@@ -52,7 +52,7 @@ def test_share_note_prevents_duplicates(client_with_note_data):
         "permission": SharePermissionEnum.READ.value,
     }
 
-    response = client.post(f"/note-shares/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/shares", json=payload)
 
     assert response.status_code == 409
 
@@ -64,7 +64,7 @@ def test_share_note_with_owner_permission(client_with_note_data):
         "permission": SharePermissionEnum.OWNER.value,
     }
 
-    response = client.post(f"/note-shares/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/shares", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
