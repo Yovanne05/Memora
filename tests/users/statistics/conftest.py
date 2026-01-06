@@ -23,10 +23,14 @@ def _register_user(client):
         "username": f"user-{uuid4().hex[:6]}",
         "display_name": "Test User",
     }
-    response = client.post("/auth/register", json=payload)
+    response = client.post("/users", json=payload)
     assert response.status_code == 201
-    body = response.get_json()
-    return email, password, body["user"]["id"], body["access_token"]
+    user_id = response.get_json()["id"]
+    login_payload = {"identifier": email, "password": password}  # NOSONAR
+    login_response = client.post("/sessions", json=login_payload)
+    assert login_response.status_code == 200
+    token = login_response.get_json()["access_token"]
+    return email, password, user_id, token
 
 
 def _create_collection(client, token, owner_id):
@@ -68,7 +72,7 @@ def _create_flashcard(client, token, note_id):
         ],
     }
     response = client.post(
-        f"/flashcards/{note_id}",
+        f"/notes/{note_id}/flashcards",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -79,7 +83,7 @@ def _create_flashcard(client, token, note_id):
 def _share_note(client, token, note_id, target_user_id):
     payload = {"user_id": target_user_id, "permission": "read"}
     response = client.post(
-        f"/note-shares/{note_id}",
+        f"/notes/{note_id}/shares",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -89,7 +93,7 @@ def _share_note(client, token, note_id, target_user_id):
 def _share_collection(client, token, collection_id, target_user_id):
     payload = {"user_id": target_user_id, "permission": "read"}
     response = client.post(
-        f"/collection-shares/{collection_id}",
+        f"/collections/{collection_id}/shares",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )

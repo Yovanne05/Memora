@@ -2,7 +2,6 @@ from http import HTTPStatus
 from uuid import UUID
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
@@ -62,14 +61,14 @@ def delete(note_id: UUID):
     return "", HTTPStatus.NO_CONTENT
 
 
-@bp_notes.post("/<uuid:note_id>/favorite")
+@bp_notes.post("/<uuid:note_id>/favorites")
 @swag_from("../docs/notes/favorite_add.yaml")
 def add_favorite(note_id: UUID):
     favorite = note_favorite_service.add_favorite(str(note_id))
     return jsonify(favorite.model_dump()), HTTPStatus.CREATED
 
 
-@bp_notes.delete("/<uuid:note_id>/favorite")
+@bp_notes.delete("/<uuid:note_id>/favorites")
 @swag_from("../docs/notes/favorite_delete.yaml")
 def remove_favorite(note_id: UUID):
     note_favorite_service.remove_favorite(str(note_id))

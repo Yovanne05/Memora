@@ -1,4 +1,3 @@
-"""Common mixins for SQLAlchemy DAO models"""
 from datetime import datetime
 
 from sqlalchemy import (
@@ -16,16 +15,12 @@ from utils.utils import generate_uuid
 
 
 class UUIDMixin:
-    """Mixin for models with UUID primary key"""
-
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, default=generate_uuid
     )
 
 
 class TimestampMixin:
-    """Mixin for models with created_at and updated_at timestamps"""
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )
@@ -38,16 +33,12 @@ class TimestampMixin:
 
 
 class CreatedAtMixin:
-    """Mixin for models with only created_at timestamp"""
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )
 
 
 class VisibilityMixin:
-    """Mixin for models with visibility field"""
-
     visibility: Mapped[VisibilityEnum] = mapped_column(
         SAEnum(
             VisibilityEnum,
@@ -61,8 +52,6 @@ class VisibilityMixin:
 
 
 class TagsMixin:
-    """Mixin for models with tags array field"""
-
     tags: Mapped[list[str]] = mapped_column(
         StringArray,
         nullable=False,
@@ -71,8 +60,6 @@ class TagsMixin:
 
 
 class OwnerMixin:
-    """Mixin for models with owner_id foreign key"""
-
     owner_id: Mapped[str] = mapped_column(
         String(36),
         ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
@@ -81,8 +68,6 @@ class OwnerMixin:
 
 
 class SharePermissionMixin:
-    """Mixin for share models with permission field"""
-
     permission: Mapped[SharePermissionEnum] = mapped_column(
         SAEnum(
             SharePermissionEnum,

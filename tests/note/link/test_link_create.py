@@ -1,4 +1,4 @@
-"""Tests for POST /note-links/{note_id} endpoint"""
+"""Tests for POST /notes/{note_id}/links endpoint"""
 from uuid import uuid4
 
 
@@ -7,7 +7,7 @@ def test_create_link_returns_created_link(client_with_note_data):
     payload = {"linked_note_id": data.linked_note_id}
 
     response = client.post(
-        f"/note-links/{data.note_id}",
+        f"/notes/{data.note_id}/links",
         json=payload,
     )
 
@@ -22,7 +22,7 @@ def test_create_link_rejects_self_reference(client_with_note_data):
     client, data = client_with_note_data
     payload = {"linked_note_id": data.note_id}
 
-    response = client.post(f"/note-links/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/links", json=payload)
 
     assert response.status_code == 422
 
@@ -31,7 +31,7 @@ def test_create_link_requires_existing_target(client_with_note_data):
     client, data = client_with_note_data
     payload = {"linked_note_id": str(uuid4())}
 
-    response = client.post(f"/note-links/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/links", json=payload)
 
     assert response.status_code == 404
 
@@ -48,6 +48,6 @@ def test_create_link_requires_same_collection(client_with_note_data):
     )
     payload = {"linked_note_id": other_note_id}
 
-    response = client.post(f"/note-links/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/links", json=payload)
 
     assert response.status_code == 422

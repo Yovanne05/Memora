@@ -1,9 +1,8 @@
+import os
 from http import HTTPStatus
 from uuid import UUID
-import os
 
 from flask import Blueprint, jsonify, request, send_file
-from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from services.impl.note.note_image_service_impl import note_image_service
@@ -14,7 +13,7 @@ from domain_services.permission_domain_service import permission_domain_service
 bp_note_images = Blueprint("note_images", __name__, url_prefix="/notes")
 
 
-@bp_note_images.get("/<uuid:note_id>")
+@bp_note_images.get("/<uuid:note_id>/images")
 @swag_from("../docs/notes_images/list.yaml")
 def find_many(note_id: UUID):
     images = note_image_service.list_images(str(note_id))
@@ -36,7 +35,7 @@ def find_one(note_id: UUID, filename: str):
     return send_file(filepath, mimetype="image/jpeg")
 
 
-@bp_note_images.post("/<uuid:note_id>")
+@bp_note_images.post("/<uuid:note_id>/images")
 @swag_from("../docs/notes_images/upload.yaml")
 def create(note_id: UUID):
     if "image" not in request.files:

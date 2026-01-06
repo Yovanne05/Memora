@@ -9,7 +9,7 @@ def test_find_one_flashcard_returns_flashcard(client_with_note_data):
     }
 
     create_response = client.post(
-        f"/flashcards/{data.note_id}", json=payload
+        f"/notes/{data.note_id}/flashcards", json=payload
     )
     flashcard_id = create_response.get_json()["id"]
 

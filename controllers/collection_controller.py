@@ -2,7 +2,6 @@ from http import HTTPStatus
 from uuid import UUID
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.collection_dto import (
@@ -69,14 +68,14 @@ def delete(collection_id: UUID):
     return "", HTTPStatus.NO_CONTENT
 
 
-@bp_collections.post("/<uuid:collection_id>/favorite")
+@bp_collections.post("/<uuid:collection_id>/favorites")
 @swag_from("../docs/collections/favorite_add.yaml")
 def add_favorite(collection_id: UUID):
     favorite = collection_favorite_service.add_favorite(str(collection_id))
     return jsonify(favorite.model_dump()), HTTPStatus.CREATED
 
 
-@bp_collections.delete("/<uuid:collection_id>/favorite")
+@bp_collections.delete("/<uuid:collection_id>/favorites")
 @swag_from("../docs/collections/favorite_delete.yaml")
 def remove_favorite(collection_id: UUID):
     collection_favorite_service.remove_favorite(str(collection_id))

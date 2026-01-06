@@ -9,7 +9,7 @@ def test_user_with_read_cannot_create_flashcard(client_with_note_data):
     # Share note with READ permission
     share_user_id = data.create_user("reader")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.READ.value,
@@ -24,7 +24,7 @@ def test_user_with_read_cannot_create_flashcard(client_with_note_data):
         "question": "Test question?",
         "answers": [{"answer_text": "Test answer", "is_correct": True}],
     }
-    response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
 
     assert response.status_code == 404  # Note not found (permission denied)
 
@@ -38,13 +38,13 @@ def test_user_with_read_cannot_update_flashcard(client_with_note_data):
         "question": "Original question?",
         "answers": [{"answer_text": "Original answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with READ permission
     share_user_id = data.create_user("reader")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.READ.value,
@@ -70,13 +70,13 @@ def test_user_with_read_cannot_delete_flashcard(client_with_note_data):
         "question": "Test question?",
         "answers": [{"answer_text": "Test answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with READ permission
     share_user_id = data.create_user("reader")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.READ.value,
@@ -99,7 +99,7 @@ def test_user_with_write_can_create_flashcard(client_with_note_data):
     # Share note with WRITE permission
     share_user_id = data.create_user("writer")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.WRITE.value,
@@ -114,7 +114,7 @@ def test_user_with_write_can_create_flashcard(client_with_note_data):
         "question": "Writer's question?",
         "answers": [{"answer_text": "Writer's answer", "is_correct": True}],
     }
-    response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -130,13 +130,13 @@ def test_user_with_write_can_update_flashcard(client_with_note_data):
         "question": "Original question?",
         "answers": [{"answer_text": "Original answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with WRITE permission
     share_user_id = data.create_user("writer")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.WRITE.value,
@@ -164,13 +164,13 @@ def test_user_with_write_cannot_delete_flashcard(client_with_note_data):
         "question": "Test question?",
         "answers": [{"answer_text": "Test answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with WRITE permission
     share_user_id = data.create_user("writer")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.WRITE.value,
@@ -193,7 +193,7 @@ def test_user_with_owner_can_create_flashcard(client_with_note_data):
     # Share note with OWNER permission
     share_user_id = data.create_user("co-owner")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.OWNER.value,
@@ -208,7 +208,7 @@ def test_user_with_owner_can_create_flashcard(client_with_note_data):
         "question": "Owner's question?",
         "answers": [{"answer_text": "Owner's answer", "is_correct": True}],
     }
-    response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
 
     assert response.status_code == 201
     body = response.get_json()
@@ -224,13 +224,13 @@ def test_user_with_owner_can_update_flashcard(client_with_note_data):
         "question": "Original question?",
         "answers": [{"answer_text": "Original answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with OWNER permission
     share_user_id = data.create_user("co-owner")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.OWNER.value,
@@ -258,13 +258,13 @@ def test_user_with_owner_can_delete_flashcard(client_with_note_data):
         "question": "Test question?",
         "answers": [{"answer_text": "Test answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with OWNER permission
     share_user_id = data.create_user("co-owner")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.OWNER.value,
@@ -289,13 +289,13 @@ def test_user_with_write_can_duplicate_flashcard(client_with_note_data):
         "question": "Original question?",
         "answers": [{"answer_text": "Original answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with WRITE permission
     share_user_id = data.create_user("writer")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.WRITE.value,
@@ -306,7 +306,7 @@ def test_user_with_write_can_duplicate_flashcard(client_with_note_data):
     data._authenticate_client(share_user_id)
 
     # Duplicate flashcard
-    response = client.post(f"/flashcards/{flashcard_id}/duplicate")
+    response = client.post(f"/flashcards/{flashcard_id}/duplicates")
 
     assert response.status_code == 201
     body = response.get_json()
@@ -323,13 +323,13 @@ def test_user_with_read_cannot_duplicate_flashcard(client_with_note_data):
         "question": "Original question?",
         "answers": [{"answer_text": "Original answer", "is_correct": True}],
     }
-    create_response = client.post(f"/flashcards/{data.note_id}", json=payload)
+    create_response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
     flashcard_id = create_response.get_json()["id"]
 
     # Share note with READ permission
     share_user_id = data.create_user("reader")
     client.post(
-        f"/note-shares/{data.note_id}",
+        f"/notes/{data.note_id}/shares",
         json={
             "user_id": share_user_id,
             "permission": SharePermissionEnum.READ.value,
@@ -340,6 +340,6 @@ def test_user_with_read_cannot_duplicate_flashcard(client_with_note_data):
     data._authenticate_client(share_user_id)
 
     # Try to duplicate flashcard
-    response = client.post(f"/flashcards/{flashcard_id}/duplicate")
+    response = client.post(f"/flashcards/{flashcard_id}/duplicates")
 
     assert response.status_code == 404  # Flashcard not found (permission denied)

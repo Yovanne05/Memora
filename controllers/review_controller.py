@@ -26,12 +26,18 @@ def create_review():
     return jsonify(review_dto.model_dump(by_alias=True)), HTTPStatus.CREATED
 
 
-@bp_reviews.get("/upcoming")
+@bp_reviews.get("")
 @swag_from("../docs/reviews/upcoming.yaml")
-def get_upcoming():
+def find_many():
+    status = request.args.get("status")
+    if status not in (None, "upcoming"):
+        return (
+            jsonify({"error": "Unsupported status filter"}),
+            HTTPStatus.BAD_REQUEST,
+        )
+
     user = get_current_user()
     upcoming = review_service.get_upcoming_reviews(user.id)
-
     return (
         jsonify([group.model_dump(by_alias=True) for group in upcoming]),
         HTTPStatus.OK,

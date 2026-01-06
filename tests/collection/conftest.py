@@ -114,7 +114,7 @@ def client_with_collection_data(collection_test_data):
         auth_email = f"auth-{uuid4().hex[:8]}@example.com"
         auth_password = TEST_PASSWORD
         auth_resp = client.post(
-            "/auth/register",
+            "/users",
             json={
                 "email": auth_email,
                 "password": auth_password, # NOSONAR
@@ -122,6 +122,11 @@ def client_with_collection_data(collection_test_data):
             },
         )
         assert auth_resp.status_code == 201, auth_resp.get_data(as_text=True)
-        token = auth_resp.get_json()["access_token"]
+        login_resp = client.post(
+            "/sessions",
+            json={"identifier": auth_email, "password": auth_password}, # NOSONAR
+        )
+        assert login_resp.status_code == 200, login_resp.get_data(as_text=True)
+        token = login_resp.get_json()["access_token"]
         client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         yield client, collection_test_data

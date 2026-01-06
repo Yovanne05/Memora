@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 from werkzeug.test import Client
-from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
+from utils.enums import SharePermissionEnum, VisibilityEnum
 
 # Test constants
 TEST_PASSWORD_PREFIX = "TestPwd" # NOSONAR
@@ -62,7 +62,6 @@ class NoteTestData:
             "password": f"{TEST_PASSWORD_PREFIX}-{self.base_slug}-{unique}-1!", # NOSONAR
             "username": f"{label}-{self.base_slug}-{unique}",
             "display_name": f"{label.capitalize()} user {unique}",
-            "role": RoleEnum.CLIENT.value,
         }
         response = self.client.post("/users", json=payload)
         assert response.status_code == 201, response.get_data(as_text=True)
@@ -79,7 +78,7 @@ class NoteTestData:
     def _authenticate_client(self, user_id: str) -> None:
         creds = self._user_credentials[user_id]
         response = self.client.post(
-            "/auth/login",
+            "/sessions",
             json={
                 "identifier": creds["email"],
                 "password": creds["password"], # NOSONAR
@@ -168,7 +167,7 @@ class NoteTestData:
         self, permission: SharePermissionEnum = SharePermissionEnum.READ
     ):
         response = self.client.post(
-            f"/note-shares/{self.note_id}",
+            f"/notes/{self.note_id}/shares",
             json={
                 "note_id": self.note_id,
                 "user_id": self.share_user_id,
@@ -182,7 +181,7 @@ class NoteTestData:
 
     def ensure_link(self):
         response = self.client.post(
-            f"/note-links/{self.note_id}",
+            f"/notes/{self.note_id}/links",
             json={"linked_note_id": self.linked_note_id},
         )
         assert response.status_code == 201, response.get_data(as_text=True)
@@ -201,13 +200,13 @@ class NoteTestData:
 
     def add_note_favorite(self, note_id: str | None = None):
         target = note_id or self.note_id
-        response = self.client.post(f"/notes/{target}/favorite")
+        response = self.client.post(f"/notes/{target}/favorites")
         assert response.status_code in (200, 201), response.get_data(as_text=True)
         self.created_note_favorites.add(target)
         return response.get_json()
 
     def remove_note_favorite(self, note_id: str):
-        response = self.client.delete(f"/notes/{note_id}/favorite")
+        response = self.client.delete(f"/notes/{note_id}/favorites")
         if response.status_code not in (204, 404):
             raise AssertionError(
                 f"Favorite cleanup failed for note {note_id}: {response.status_code} {response.get_data(as_text=True)}"
@@ -215,13 +214,13 @@ class NoteTestData:
 
     def add_collection_favorite(self, collection_id: str | None = None):
         target = collection_id or self.collection_id
-        response = self.client.post(f"/collections/{target}/favorite")
+        response = self.client.post(f"/collections/{target}/favorites")
         assert response.status_code in (200, 201), response.get_data(as_text=True)
         self.created_collection_favorites.add(target)
         return response.get_json()
 
     def remove_collection_favorite(self, collection_id: str):
-        response = self.client.delete(f"/collections/{collection_id}/favorite")
+        response = self.client.delete(f"/collections/{collection_id}/favorites")
         if response.status_code not in (204, 404):
             raise AssertionError(
                 f"Favorite cleanup failed for collection {collection_id}: {response.status_code} {response.get_data(as_text=True)}"

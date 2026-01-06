@@ -1,4 +1,4 @@
-"""Tests for GET /note-links endpoint"""
+"""Tests for GET /notes/{note_id}/links endpoint"""
 from uuid import uuid4
 
 
@@ -6,9 +6,7 @@ def test_list_links_returns_items(client_with_note_data):
     client, data = client_with_note_data
     data.ensure_link()
 
-    response = client.get(
-        "/note-links", query_string={"noteId": data.note_id}
-    )
+    response = client.get(f"/notes/{data.note_id}/links")
 
     assert response.status_code == 200
     payload = response.get_json()
@@ -21,7 +19,7 @@ def test_list_links_returns_items(client_with_note_data):
 def test_list_links_returns_empty_for_unknown_note(client_with_note_data):
     client, _ = client_with_note_data
 
-    response = client.get("/note-links", query_string={"noteId": uuid4()})
+    response = client.get(f"/notes/{uuid4()}/links")
 
     assert response.status_code == 200
     payload = response.get_json()
