@@ -14,6 +14,7 @@ export function dtoToNote(dto: NoteDto): Note {
     content: dto.content,
     tags: dto.tags ?? [],
     visibility: dto.visibility ?? "private",
+    userPermission: dto.user_permission ?? null,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
   }

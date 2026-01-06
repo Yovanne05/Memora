@@ -7,6 +7,7 @@ interface FormActionsProps {
   isUpdate: boolean
   loading: boolean
   deleteLoading?: boolean
+  readOnly?: boolean
   onCancel?: () => void
   onDelete?: () => void
 }
@@ -16,6 +17,7 @@ export function FormActions({
   isUpdate,
   loading,
   deleteLoading = false,
+  readOnly = false,
   onCancel,
   onDelete,
 }: Readonly<FormActionsProps>) {
@@ -60,10 +62,12 @@ export function FormActions({
               {deleteLoading ? "Suppression..." : "Supprimer"}
             </Button>
           )}
-          <Button className="gap-2" type="submit" disabled={loading}>
-            <Save className="h-4 w-4" />
-            {loading ? "Enregistrement..." : "Enregistrer"}
-          </Button>
+          {!readOnly && (
+            <Button className="gap-2" type="submit" disabled={loading}>
+              <Save className="h-4 w-4" />
+              {loading ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
