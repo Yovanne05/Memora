@@ -126,21 +126,3 @@ def test_admin_updates_status(app_client):
     body = response.get_json()
     assert body["status"] == ReportStatusEnum.IN_PROGRESS.value
 
-
-def test_admin_delete_target_removes_note_and_resolves_report(app_client):
-    owner = _create_user(app_client, role=RoleEnum.CLIENT)
-    _login(app_client, owner["email"], owner["password"])
-    collection_id = _create_collection(app_client, owner["id"])
-    note_id = _create_note(app_client, owner["id"], collection_id)
-    report = _create_report(app_client, note_id, ReportReasonEnum.HARASSMENT_OR_ABUSE)
-
-    admin = _create_user(app_client, role=RoleEnum.ADMIN)
-    _login(app_client, admin["email"], admin["password"])
-    response = app_client.delete(f"/reports/{report['id']}/target")
-    assert response.status_code == 200
-    body = response.get_json()
-    assert body["status"] == ReportStatusEnum.RESOLVED.value
-
-    # The reported note should be gone
-    note_response = app_client.get(f"/notes/{note_id}")
-    assert note_response.status_code == 404

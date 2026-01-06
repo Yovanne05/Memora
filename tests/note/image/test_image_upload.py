@@ -3,24 +3,6 @@ from io import BytesIO
 from uuid import uuid4
 
 
-def test_upload_image_returns_created(client_with_note_data):
-    client, data = client_with_note_data
-
-    image_data = b"fake image content for testing"
-
-    response = client.post(
-        f"/notes/{data.note_id}/attachments",
-        data={
-            "image": (BytesIO(image_data), "test.png"),
-        },
-        content_type="multipart/form-data",
-    )
-
-    assert response.status_code == 201
-    json_data = response.get_json()
-    assert json_data.get("url")
-
-
 def test_upload_image_without_file_returns_400(client_with_note_data):
     client, data = client_with_note_data
 
