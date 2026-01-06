@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useLinkNotes } from "../hooks/useLinkNotes"
 import type { Note } from "../models/note.model"
 import type { NoteLink } from "../models/note-link.model"
+import { getContentPreview } from "@/lib/html-utils"
 
 interface NoteLinkDialogProps {
   readonly note: Note
@@ -104,7 +105,7 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
               >
                 <h4 className="font-medium text-sm mb-1">{availableNote.title}</h4>
                 <p className="text-xs text-muted-foreground line-clamp-2">
-                  {availableNote.content}
+                  {getContentPreview(availableNote.content || "", 150)}
                 </p>
               </button>
             ))}

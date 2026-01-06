@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useRouter } from "@tanstack/react-router"
 import { Loader2 } from "lucide-react"
-import { NoteEditForm, type NoteFormValues } from "@/features/notes/components/forms/NoteEditForm"
+import { NoteEditForm, type NoteFormValues } from "@/features/notes/components/NoteEditForm"
 import { NoteLinkManager } from "@/features/notes/components/NoteLinkManager"
 import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"

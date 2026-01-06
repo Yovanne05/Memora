@@ -4,9 +4,9 @@ import { vi } from "vitest"
 import type { ReactNode, ChangeEvent } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-import { CollectionNotesHeader } from "@/features/collections/components/details/CollectionNotesHeader"
-import { CollectionNotesGrid } from "@/features/collections/components/details/CollectionNotesGrid"
-import { CollectionNotesSection } from "@/features/collections/components/details/CollectionNotesSection"
+import { CollectionNotesHeader } from "@/features/collections/components/CollectionNotesHeader"
+import { CollectionNotesGrid } from "@/features/collections/components/CollectionNotesGrid"
+import { CollectionNotesSection } from "@/features/collections/components/CollectionNotesSection"
 import type { Note } from "@/features/notes/models/note.model"
 
 type NotesFilters = {

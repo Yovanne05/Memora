@@ -1,6 +1,6 @@
 import { DeleteCollectionDialog } from "./DeleteCollectionDialog"
-import type { Collection } from "../../models/collection.model"
-import type { CollectionFormValues } from "../forms/CollectionEditForm"
+import type { Collection } from "../models/collection.model"
+import type { CollectionFormValues } from "./CollectionEditForm"
 import { CollectionFormDialog } from "./CollectionFormDialog"
 
 interface CollectionDialogsProps {

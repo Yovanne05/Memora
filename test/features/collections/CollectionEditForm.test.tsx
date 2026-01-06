@@ -1,4 +1,4 @@
-import { CollectionEditForm } from '@/features/collections/components/forms/CollectionEditForm'
+import { CollectionEditForm } from '@/features/collections/components/CollectionEditForm'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'

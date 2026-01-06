@@ -76,22 +76,20 @@ export function CollectionTreeItem({
               {notesCount}
             </span>
           )}
-
-          <span className="ml-1">
-            <FavoriteButton
-              pressed={favorite}
-              label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
-              disabled={toggleFavorite.isPending}
-              onClick={handleFavoriteClick}
-              size="sm"
-              className={cn(
-                "h-7 w-7",
-                !favorite && "opacity-0 group-hover:opacity-100",
-                "text-muted-foreground hover:text-foreground"
-              )}
-            />
-          </span>
         </button>
+
+        <FavoriteButton
+          pressed={favorite}
+          label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+          disabled={toggleFavorite.isPending}
+          onClick={handleFavoriteClick}
+          size="sm"
+          className={cn(
+            "h-7 w-7 shrink-0",
+            !favorite && "opacity-0 group-hover:opacity-100",
+            "text-muted-foreground hover:text-foreground"
+          )}
+        />
       </div>
 
       {/* Notes list (if expanded) */}

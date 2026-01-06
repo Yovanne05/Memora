@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { Loader2 } from "lucide-react"
 import { useWorkspaceContext } from "../context/WorkspaceContext"
-import { NotesGrid } from "@/features/notes/components/list/NotesGrid"
+import { NotesGrid } from "@/features/notes/components/NotesGrid"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import type { NotesFilters } from "@/features/notes/types/note-query"
 
@@ -59,7 +59,7 @@ export default function FavoritesView() {
       </div>
 
       {notes.length > 0 ? (
-      <NotesGrid items={notes} mode="favorites" />
+      <NotesGrid items={notes}/>
       ) : (
         <div className="flex h-64 flex-col items-center justify-center gap-2">
           <p className="text-lg font-medium">Aucune note en favoris</p>

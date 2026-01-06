@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { NoteCard } from "@/features/notes/components/list/NoteCard"
+import { NoteCard } from "@/features/notes/components/NoteCard"
 import type { Note } from "@/features/notes/models/note.model"
 import { X, Link2 } from "lucide-react"
 import { GridLoadingState, GridEmptyState } from "./GridStates"
@@ -15,6 +15,7 @@ import {
 import { useCreateNoteLinkMutation } from "@/features/notes/hooks/useCreateNoteLinkMutation"
 import { useDeleteNoteLinkMutation } from "@/features/notes/hooks/useDeleteNoteLinkMutation"
 import { useNoteLinksQuery } from "@/features/notes/hooks/useNoteLinksQuery"
+import { getContentPreview } from "@/lib/html-utils"
 
 type CollectionNotesGridWithLinksProps = {
   readonly notes: Note[]
@@ -107,7 +108,7 @@ function NoteLinkButton({ note, availableNotes }: { readonly note: Note; readonl
                       {targetNote.title}
                     </p>
                     <p className="text-xs text-muted-foreground line-clamp-1">
-                      {targetNote.content}
+                      {getContentPreview(targetNote.content || "", 100)}
                     </p>
                   </div>
                 </div>

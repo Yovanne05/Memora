@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { CollectionCard } from "./CollectionCard"
 import { CollectionsListSkeleton } from "./CollectionsListSkeleton"
-import type { Collection } from "../../models/collection.model"
+import type { Collection } from "../models/collection.model"
 
 interface CollectionsContentProps {
   loading: boolean
