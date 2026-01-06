@@ -58,11 +58,18 @@ class CollectionTestData:
         user_repository.add(user)
         self.created_users.add(user_id)
 
-    def _create_collection(self) -> str:
+    def create_collection(
+        self, owner_id: str | None = None, name: str | None = None
+    ) -> str:
+        return self._create_collection(owner_id=owner_id, name=name)
+
+    def _create_collection(
+        self, owner_id: str | None = None, name: str | None = None
+    ) -> str:
         dto = CollectionCreateDTO(
-            name=self.collection_name,
+            name=name or self.collection_name,
             description="Collection created for collection share tests.",
-            owner_id=self.owner_id,
+            owner_id=self.owner_id if owner_id is None else owner_id,
             visibility=VisibilityEnum.PRIVATE,
         )
         created = collection_service.create(dto)
@@ -104,7 +111,7 @@ def collection_test_data():
 
 
 @pytest.fixture
-def client_with_collection_data(collection_test_data):
+def client_with_collection_data():
     from app import create_app
     app = create_app()
     with app.test_client() as client:
@@ -122,6 +129,10 @@ def client_with_collection_data(collection_test_data):
             },
         )
         assert auth_resp.status_code == 201, auth_resp.get_data(as_text=True)
+        auth_body = auth_resp.get_json()
+        user_id = auth_body["id"]
+        data = CollectionTestData(owner_id=user_id)
+        data.bootstrap()
         login_resp = client.post(
             "/sessions",
             json={"identifier": auth_email, "password": auth_password}, # NOSONAR
@@ -129,4 +140,4 @@ def client_with_collection_data(collection_test_data):
         assert login_resp.status_code == 200, login_resp.get_data(as_text=True)
         token = login_resp.get_json()["access_token"]
         client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
-        yield client, collection_test_data
+        yield client, data

@@ -2,8 +2,10 @@
 from utils.enums import SharePermissionEnum
 
 
-def test_list_collection_share_links_returns_empty_list(client_with_note_data):
-    client, data = client_with_note_data
+def test_list_collection_share_links_returns_empty_list(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     response = client.get(f"/collections/{data.collection_id}/public-links")
 
@@ -16,8 +18,10 @@ def test_list_collection_share_links_returns_empty_list(client_with_note_data):
     assert body["total"] == 0
 
 
-def test_list_collection_share_links_returns_created_links(client_with_note_data):
-    client, data = client_with_note_data
+def test_list_collection_share_links_returns_created_links(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     # Create two share links
     payload1 = {"permission": SharePermissionEnum.READ.value}
@@ -47,8 +51,10 @@ def test_list_collection_share_links_returns_created_links(client_with_note_data
     assert all("created_at" in link for link in items)
 
 
-def test_list_collection_share_links_filters_by_collection_id(client_with_note_data):
-    client, data = client_with_note_data
+def test_list_collection_share_links_filters_by_collection_id(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     # Create another collection
     other_collection_id = data.create_collection(name="Other collection")
@@ -89,8 +95,10 @@ def test_list_collection_share_links_requires_authentication(app_client):
     assert response.status_code == 401
 
 
-def test_list_collection_share_links_requires_ownership(client_with_note_data):
-    client, data = client_with_note_data
+def test_list_collection_share_links_requires_ownership(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     # Create collection as share_user
     other_collection_id = data.create_collection(owner_id=data.share_user_id)

@@ -4,8 +4,10 @@ from uuid import uuid4
 from utils.enums import SharePermissionEnum
 
 
-def test_delete_collection_share_link_returns_no_content(client_with_note_data):
-    client, data = client_with_note_data
+def test_delete_collection_share_link_returns_no_content(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     # Create share link
     payload = {"permission": SharePermissionEnum.READ.value}
@@ -23,8 +25,10 @@ def test_delete_collection_share_link_returns_no_content(client_with_note_data):
     assert response.status_code == 204
 
 
-def test_delete_collection_share_link_removes_from_list(client_with_note_data):
-    client, data = client_with_note_data
+def test_delete_collection_share_link_removes_from_list(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     # Create share link
     payload = {"permission": SharePermissionEnum.READ.value}
@@ -66,8 +70,10 @@ def test_delete_collection_share_link_requires_authentication(app_client):
     assert response.status_code == 401
 
 
-def test_delete_collection_share_link_with_nonexistent_link(client_with_note_data):
-    client, data = client_with_note_data
+def test_delete_collection_share_link_with_nonexistent_link(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     fake_link_id = str(uuid4())
     response = client.delete(
@@ -78,9 +84,9 @@ def test_delete_collection_share_link_with_nonexistent_link(client_with_note_dat
 
 
 def test_delete_collection_share_link_with_nonexistent_collection(
-    client_with_note_data,
+    client_with_collection_data,
 ):
-    client, data = client_with_note_data
+    client, data = client_with_collection_data
 
     fake_collection_id = str(uuid4())
     fake_link_id = str(uuid4())
@@ -91,8 +97,10 @@ def test_delete_collection_share_link_with_nonexistent_collection(
     assert response.status_code == 404
 
 
-def test_delete_collection_share_link_invalidates_public_access(client_with_note_data):
-    client, data = client_with_note_data
+def test_delete_collection_share_link_invalidates_public_access(
+    client_with_collection_data,
+):
+    client, data = client_with_collection_data
 
     # Create share link
     payload = {"permission": SharePermissionEnum.READ.value}
