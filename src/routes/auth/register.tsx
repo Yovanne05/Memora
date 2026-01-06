@@ -92,7 +92,7 @@ function RegisterPage() {
     try {
       await registerUser(values)
       toast.success("Compte créé avec succès. Vous pouvez maintenant vous connecter.")
-      await router.navigate({ to: "/auth/login" })
+      await router.navigate({ to: "/auth/login", search: { redirect: search.redirect } })
     } catch (error) {
       console.error("Failed to register user", error)
       const message = getFriendlyError(error)
