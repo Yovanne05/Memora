@@ -88,7 +88,6 @@ class ReportService(ReportServiceInterface):
             elif report_entity.collection_id:
                 collection_service.delete(report_entity.collection_id)
 
-            # Delete action implies the report is resolved once the target is removed
             report_entity.status = ReportStatusEnum.RESOLVED
         else:
             report_entity.status = update_dto.status
