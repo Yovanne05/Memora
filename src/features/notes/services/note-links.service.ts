@@ -12,7 +12,21 @@ import type { PaginatedNoteLinks } from "../types/paginated-note-link"
 export function createNoteLinksService(client: HttpClient = httpClient): INoteLinksService {
   return {
     async list(params?: NoteLinksFilters): Promise<PaginatedNoteLinks> {
-      const data = await client.get<PaginatedNoteLinksDto>(`/note-links`, { params })
+      const noteId = params?.noteId
+      if (!noteId) {
+        return {
+          items: [],
+          total: 0,
+          limit: params?.limit ?? 10,
+          offset: params?.offset ?? 0,
+        }
+      }
+      const query = { ...params }
+      delete query.noteId
+      const data = await client.get<PaginatedNoteLinksDto>(
+        `/notes/${noteId}/relations`,
+        { params: query }
+      )
       return {
         items: (data?.items ?? []).map(dtoToNoteLink),
         total: data?.total ?? 0,
@@ -22,13 +36,13 @@ export function createNoteLinksService(client: HttpClient = httpClient): INoteLi
     },
     async create(noteId: string, payload: CreateNoteLink) {
       const dto = await client.post<NoteLinkDto, CreateNoteLinkDto>(
-        `/note-links/${noteId}`,
+        `/notes/${noteId}/relations`,
         toCreateNoteLinkDto(payload)
       )
       return dtoToNoteLink(dto)
     },
     async remove(noteId: string, linkedNoteId: string) {
-      await client.delete<void>(`/note-links/${noteId}/links/${linkedNoteId}`)
+      await client.delete<void>(`/notes/${noteId}/relations/${linkedNoteId}`)
     },
   }
 }

@@ -56,10 +56,6 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
-    onSuccess: ({ accessToken, user }) => {
-      syncToken(accessToken)
-      queryClient.setQueryData(AUTH_USER_QUERY_KEY, user)
-    },
   })
 
   const logout = useCallback(async () => {

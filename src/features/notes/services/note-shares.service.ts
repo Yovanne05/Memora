@@ -17,22 +17,35 @@ import type {
   NoteShareUpdate,
 } from "../models/note-share.model";
 import type { INoteSharesService } from "./note-shares.service.interface";
+import { notesService } from "./notes.service";
 
 export function createNoteSharesService(
   client: HttpClient = httpClient
 ): INoteSharesService {
   return {
     async list(noteId: string): Promise<NoteShare[]> {
-      const data = await client.get<NoteShareListDto>("/note-shares", {
-        params: { note_id: noteId },
-      });
+      const data = await client.get<NoteShareListDto>(
+        `/notes/${noteId}/shares`
+      );
       return data.items.map(dtoToNoteShare);
     },
     async listByUser(userId: string): Promise<NoteShare[]> {
-      const data = await client.get<NoteShareListDto>("/note-shares", {
-        params: { userId },
+      if (!userId) {
+        return []
+      }
+      const data = await notesService.list({
+        limit: 200,
+        offset: 0,
+        sharedWithUserId: userId,
       });
-      return data.items.map(dtoToNoteShare);
+      return data.items
+        .filter((note) => note.ownerId !== userId)
+        .map((note) => ({
+          noteId: note.id,
+          userId,
+          permission: note.userPermission ?? "read",
+          createdAt: new Date(note.createdAt),
+        }));
     },
 
     async create(
@@ -40,7 +53,7 @@ export function createNoteSharesService(
       payload: NoteShareCreate
     ): Promise<NoteShare> {
       const dto = await client.post<NoteShareDto, NoteShareCreateDto>(
-        `/note-shares/${noteId}`,
+        `/notes/${noteId}/shares`,
         noteShareCreateToDto(payload)
       );
       return dtoToNoteShare(dto);
@@ -52,14 +65,14 @@ export function createNoteSharesService(
       payload: NoteShareUpdate
     ): Promise<NoteShare> {
       const dto = await client.patch<NoteShareDto, NoteShareUpdateDto>(
-        `/note-shares/${noteId}/shares/${userId}`,
+        `/notes/${noteId}/shares/${userId}`,
         noteShareUpdateToDto(payload)
       );
       return dtoToNoteShare(dto);
     },
 
     async remove(noteId: string, userId: string): Promise<void> {
-      await client.delete<void>(`/note-shares/${noteId}/shares/${userId}`);
+      await client.delete<void>(`/notes/${noteId}/shares/${userId}`);
     },
   };
 }
