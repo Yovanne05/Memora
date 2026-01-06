@@ -3,7 +3,7 @@
 
 def test_list_shares_returns_items(client_with_collection_data):
     client, data = client_with_collection_data
-    data.ensure_share()
+    data.ensure_share(client)
 
     response = client.get(f"/collections/{data.collection_id}/shares")
 

@@ -2,6 +2,7 @@ from http import HTTPStatus
 from uuid import UUID
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.collection_share_dto import (
@@ -21,6 +22,7 @@ bp_collection_shares = Blueprint(
 
 
 @bp_collection_shares.get("")
+@jwt_required()
 @swag_from("../docs/shares_collections/share_list.yaml")
 def find_many(collection_id: UUID):
     raw_query = request.args.to_dict(flat=True)
@@ -36,6 +38,7 @@ def find_many(collection_id: UUID):
 
 
 @bp_collection_shares.post("")
+@jwt_required()
 @swag_from("../docs/shares_collections/share_create.yaml")
 def create(collection_id: UUID):
     payload = CollectionShareCreateDTO.model_validate_json(request.data)
@@ -46,6 +49,7 @@ def create(collection_id: UUID):
 
 
 @bp_collection_shares.patch("/<uuid:user_id>")
+@jwt_required()
 @swag_from("../docs/shares_collections/share_update.yaml")
 def update(collection_id: UUID, user_id: UUID):
     payload = CollectionShareUpdateDTO.model_validate_json(request.data)
@@ -56,6 +60,7 @@ def update(collection_id: UUID, user_id: UUID):
 
 
 @bp_collection_shares.delete("/<uuid:user_id>")
+@jwt_required()
 @swag_from("../docs/shares_collections/share_delete.yaml")
 def delete(collection_id: UUID, user_id: UUID):
     collection_share_service.revoke_share(str(collection_id), str(user_id))

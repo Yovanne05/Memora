@@ -77,18 +77,17 @@ class CollectionTestData:
         return created.id
 
     def ensure_share(
-        self, permission: SharePermissionEnum = SharePermissionEnum.READ
+        self, client, permission: SharePermissionEnum = SharePermissionEnum.READ
     ):
-        share = collection_share_service.share_collection(
-            self.collection_id,
-            CollectionShareCreateDTO(
-                collection_id=self.collection_id,
-                user_id=self.share_user_id,
-                permission=permission,
-            ),
+        response = client.post(
+            f"/collections/{self.collection_id}/shares",
+            json={
+                "user_id": self.share_user_id,
+                "permission": permission.value,
+            },
         )
         self.created_shares.add((self.collection_id, self.share_user_id))
-        return share
+        return response.get_json()
 
     def track_created_share(self, collection_id: str, user_id: str) -> None:
         self.created_shares.add((collection_id, user_id))

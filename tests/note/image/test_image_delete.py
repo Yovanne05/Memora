@@ -8,7 +8,7 @@ def test_delete_image_returns_no_content(client_with_note_data):
 
     image_data = b"fake image"
     upload_response = client.post(
-        f"/notes/{data.note_id}",
+        f"/notes/{data.note_id}/images",
         data={"image": (BytesIO(image_data), "test.png")},
         content_type="multipart/form-data",
     )
