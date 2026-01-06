@@ -15,6 +15,7 @@ from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
 from controllers.review_controller import bp_reviews
+from controllers.report_controller import bp_reports
 from utils import db
 from utils.jwt import init_jwt
 from utils.filter import register_global_filter
@@ -51,6 +52,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_flashcards)
     app.register_blueprint(bp_user_statistics)
     app.register_blueprint(bp_reviews)
+    app.register_blueprint(bp_reports)
 
     return app
 

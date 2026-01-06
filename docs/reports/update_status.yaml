@@ -1,0 +1,26 @@
+tags:
+  - reports
+summary: Mettre à jour le statut d'un signalement (admin)
+description: Permet de passer un signalement en cours de traitement, résolu ou rejeté.
+parameters:
+  - name: report_id
+    in: path
+    required: true
+    type: string
+    format: uuid
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/ReportStatusPayload"
+responses:
+  200:
+    description: Statut mis à jour.
+    schema:
+      $ref: "#/definitions/Report"
+  401:
+    description: Non authentifié.
+  403:
+    description: Réservé aux admins.
+  404:
+    description: Signalement introuvable.

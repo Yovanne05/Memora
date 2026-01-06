@@ -1,0 +1,112 @@
+definitions:
+  Report:
+    type: object
+    description: Signalement sur une note ou une collection.
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "3b96fa56-6e1d-4d1e-88f5-38c0475a2c9c"
+      targetType:
+        type: string
+        enum: ["note", "collection"]
+        example: "note"
+      noteId:
+        type: string
+        format: uuid
+        nullable: true
+      collectionId:
+        type: string
+        format: uuid
+        nullable: true
+      reason:
+        type: string
+        enum:
+          [
+            "illegal_content",
+            "shocking_or_inappropriate",
+            "harassment_or_abuse",
+            "rights_violation",
+            "spam_or_abuse",
+            "technical_issue",
+            "other",
+          ]
+        example: "illegal_content"
+      status:
+        type: string
+        enum: ["pending", "in_progress", "resolved", "rejected"]
+        example: "pending"
+      description:
+        type: string
+        nullable: true
+        example: "Le contenu semble enfreindre nos règles."
+      reporterId:
+        type: string
+        format: uuid
+      reporterEmail:
+        type: string
+        format: email
+        nullable: true
+      noteTitle:
+        type: string
+        nullable: true
+      collectionName:
+        type: string
+        nullable: true
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+    required:
+      [
+        "id",
+        "targetType",
+        "reason",
+        "status",
+        "reporterId",
+        "createdAt",
+        "updatedAt",
+      ]
+
+  ReportList:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Report"
+    required: ["total", "items"]
+
+  ReportCreatePayload:
+    type: object
+    required: ["reason"]
+    properties:
+      reason:
+        type: string
+        enum:
+          [
+            "illegal_content",
+            "shocking_or_inappropriate",
+            "harassment_or_abuse",
+            "rights_violation",
+            "spam_or_abuse",
+            "technical_issue",
+            "other",
+          ]
+      description:
+        type: string
+        maxLength: 2000
+        description: Détails supplémentaires optionnels.
+
+  ReportStatusPayload:
+    type: object
+    required: ["status"]
+    properties:
+      status:
+        type: string
+        enum: ["pending", "in_progress", "resolved", "rejected"]
