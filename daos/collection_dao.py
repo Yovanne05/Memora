@@ -23,6 +23,7 @@ from daos.base_models import (
 if TYPE_CHECKING:
     from daos.note_dao import Note
     from daos.user_dao import User
+    from daos.report_dao import Report
 
 
 class Collection(
@@ -49,6 +50,11 @@ class Collection(
     notes: Mapped[list["Note"]] = relationship(back_populates="collection", lazy="selectin")
     shares: Mapped[list["CollectionShare"]] = relationship(
         back_populates="collection"
+    )
+    reports: Mapped[list["Report"]] = relationship(
+        back_populates="collection",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
 

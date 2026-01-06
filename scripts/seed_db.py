@@ -16,7 +16,13 @@ if str(BASE_DIR) not in sys.path:
 
 import config
 from utils.db import drop_all, create_all, get_db_session
-from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
+from utils.enums import (
+    ReportReasonEnum,
+    ReportStatusEnum,
+    RoleEnum,
+    SharePermissionEnum,
+    VisibilityEnum,
+)
 from utils.utils import generate_uuid
 
 # Import all DAO models so metadata is registered before create_all
@@ -26,6 +32,8 @@ from daos.note_dao import Note, NoteLink, NoteShare
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
+from daos.review_dao import Review
+from daos.report_dao import Report
 
 
 def _hash_password(raw_password: str) -> str:
@@ -200,6 +208,27 @@ def seed() -> None:
             ]
         )
         print("Flashcards inserted.")
+
+        # Reports
+        session.add_all(
+            [
+                Report(
+                    note_id=note_api.id,
+                    reporter_id=bob.id,
+                    reason=ReportReasonEnum.SPAM_OR_ABUSE,
+                    status=ReportStatusEnum.PENDING,
+                    description="La note semble contenir trop de pub.",
+                ),
+                Report(
+                    collection_id=coll_templates.id,
+                    reporter_id=alice.id,
+                    reason=ReportReasonEnum.TECHNICAL_ISSUE,
+                    status=ReportStatusEnum.IN_PROGRESS,
+                    description="Impossible de charger certains templates.",
+                ),
+            ]
+        )
+        print("Reports inserted.")
 
         session.flush()
         print("Seed completed successfully.")
