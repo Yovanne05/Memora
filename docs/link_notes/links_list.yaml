@@ -1,5 +1,5 @@
 tags:
-  - notes
+  - note-links
 summary: Lister les liens d'une note
 description: >
   Retourne toutes les notes reliées à la note demandée. Les liens sont limités aux

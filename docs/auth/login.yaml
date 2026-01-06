@@ -1,7 +1,7 @@
 tags:
-  - auth
-summary: Connexion
-description: Authentifie un utilisateur via son email ou username et renvoie un JWT.
+  - sessions
+summary: Creation de session
+description: Authentifie un utilisateur via son email ou username et cree une session JWT.
 security: []
 parameters:
   - in: body

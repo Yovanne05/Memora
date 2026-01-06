@@ -1,8 +1,8 @@
 tags:
-  - shared
-summary: Accéder à une collection via un lien de partage public
+  - collection-share-links-public
+summary: Acceder a une collection via un lien de partage public
 description: >
-  Récupère une collection en utilisant l'ID du lien de partage.
+  Recupere une collection en utilisant l'ID du lien de partage.
   Aucune authentification n'est requise.
 parameters:
   - in: path
@@ -10,14 +10,14 @@ parameters:
     type: string
     format: uuid
     required: true
-    description: ID du lien de partage (clé primaire).
+    description: ID du lien de partage (cle primaire).
     example: "b2c3d4e5-6789-01bc-def0-234567890abc"
 responses:
   200:
-    description: Collection récupérée avec succès.
+    description: Collection recuperee avec succes.
     schema:
       $ref: "#/definitions/Collection"
   404:
-    description: Lien de partage non trouvé ou invalide.
+    description: Lien de partage non trouve ou invalide.
   422:
-    description: ID malformé.
+    description: ID malforme.
