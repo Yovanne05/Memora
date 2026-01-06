@@ -1,25 +1,25 @@
 tags:
-  - note-links
-summary: Supprimer un lien entre notes
+  - note-relations
+summary: Supprimer une relation entre notes
 description: >
-  Supprime le lien entre la note ciblée et une autre note de la même collection.
+  Supprime la relation entre la note ciblee et une autre note de la meme collection.
 parameters:
   - in: path
     name: note_id
     type: string
     format: uuid
     required: true
-    description: Note de référence.
+    description: Note de reference.
   - in: path
     name: linked_note_id
     type: string
     format: uuid
     required: true
-    description: Note liée à dissocier.
+    description: Note reliee a dissocier.
 responses:
   204:
-    description: Lien supprimé.
+    description: Relation supprimee.
   404:
-    description: Note ou lien introuvable.
+    description: Note ou relation introuvable.
   422:
-    description: Suppression invalide (même note).
+    description: Suppression invalide (meme note).

@@ -181,7 +181,7 @@ class NoteTestData:
 
     def ensure_link(self):
         response = self.client.post(
-            f"/notes/{self.note_id}/links",
+            f"/notes/{self.note_id}/relations",
             json={"linked_note_id": self.linked_note_id},
         )
         assert response.status_code == 201, response.get_data(as_text=True)

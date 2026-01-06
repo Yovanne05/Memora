@@ -9,12 +9,12 @@ from querys.note_link_query import NoteLinkFindQuery
 from services.impl.note.note_link_service_impl import note_link_service
 
 
-bp_note_links = Blueprint(
-    "note_links", __name__, url_prefix="/notes/<uuid:note_id>/links"
+bp_note_relations = Blueprint(
+    "note_relations", __name__, url_prefix="/notes/<uuid:note_id>/relations"
 )
 
 
-@bp_note_links.get("")
+@bp_note_relations.get("")
 @swag_from("../docs/link_notes/links_list.yaml")
 def find_many(note_id: UUID):
     raw_query = request.args.to_dict(flat=True)
@@ -29,7 +29,7 @@ def find_many(note_id: UUID):
     )
 
 
-@bp_note_links.post("")
+@bp_note_relations.post("")
 @swag_from("../docs/link_notes/links_create.yaml")
 def create(note_id: UUID):
     payload = NoteLinkCreateDTO.model_validate_json(request.data)
@@ -37,7 +37,7 @@ def create(note_id: UUID):
     return jsonify(link_dto.model_dump()), HTTPStatus.CREATED
 
 
-@bp_note_links.delete("/<uuid:linked_note_id>")
+@bp_note_relations.delete("/<uuid:linked_note_id>")
 @swag_from("../docs/link_notes/links_delete.yaml")
 def delete(note_id: UUID, linked_note_id: UUID):
     note_link_service.delete_link(str(note_id), str(linked_note_id))

@@ -1,8 +1,3 @@
-"""
-Permission Decorators
-Declarative authorization for Flask routes.
-Follows separation of concerns: controllers shouldn't contain permission logic.
-"""
 from functools import wraps
 from typing import Callable, Literal
 
@@ -86,38 +81,28 @@ def require_permission(
 
 
 def require_note_read(resource_id_param: str = "note_id"):
-    """Shorthand for requiring note read permission."""
     return require_permission("note", "read", resource_id_param)
 
 
 def require_note_write(resource_id_param: str = "note_id"):
-    """Shorthand for requiring note write permission."""
     return require_permission("note", "write", resource_id_param)
 
 
 def require_note_manage(resource_id_param: str = "note_id"):
-    """Shorthand for requiring note manage permission."""
     return require_permission("note", "manage", resource_id_param)
 
 
 def require_collection_read(resource_id_param: str = "collection_id"):
-    """Shorthand for requiring collection read permission."""
     return require_permission("collection", "read", resource_id_param)
 
 
 def require_collection_write(resource_id_param: str = "collection_id"):
-    """Shorthand for requiring collection write permission."""
     return require_permission("collection", "write", resource_id_param)
 
 
 def require_collection_manage(resource_id_param: str = "collection_id"):
-    """Shorthand for requiring collection manage permission."""
     return require_permission("collection", "manage", resource_id_param)
 
 
 def require_owner(resource_type: ResourceType, resource_id_param: str = "id"):
-    """
-    Decorator to require ownership (equivalent to 'manage' permission).
-    Alias for clarity when ownership is specifically required.
-    """
     return require_permission(resource_type, "manage", resource_id_param)

@@ -1,9 +1,9 @@
 tags:
-  - note-links
-summary: Lister les liens d'une note
+  - note-relations
+summary: Lister les relations d'une note
 description: >
-  Retourne toutes les notes reliées à la note demandée. Les liens sont limités aux
-  notes d'une même collection.
+  Retourne toutes les notes associees a la note demandee.
+  Les relations sont limitees aux notes d'une meme collection.
 parameters:
   - in: path
     name: note_id
@@ -13,7 +13,7 @@ parameters:
     description: Identifiant unique de la note.
 responses:
   200:
-    description: Liste des liens.
+    description: Liste des relations.
     schema:
       $ref: "#/definitions/NoteLinkListResponse"
   404:

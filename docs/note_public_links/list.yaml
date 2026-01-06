@@ -1,0 +1,18 @@
+tags:
+  - note-public-links
+summary: Lister les liens publics
+description: >
+  Retourne la liste des liens publics crees pour les notes de l'utilisateur,
+  triee par date de creation decroissante.
+parameters:
+  - in: query
+    name: noteId
+    type: string
+    format: uuid
+    required: false
+    description: Filtre sur une note specifique.
+responses:
+  200:
+    description: Liste des liens publics.
+    schema:
+      $ref: "#/definitions/NoteShareLinkListResponse"

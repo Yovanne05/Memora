@@ -11,16 +11,16 @@ from services.impl.note.note_share_link_service_impl import (
     note_share_link_service,
 )
 
-bp_note_share_links = Blueprint(
-    "note_share_links",
+bp_note_public_links = Blueprint(
+    "note_public_links",
     __name__,
-    url_prefix="/notes/<uuid:note_id>/share-links",
+    url_prefix="/notes/<uuid:note_id>/public-links",
 )
 
 
-@bp_note_share_links.get("")
+@bp_note_public_links.get("")
 @jwt_required()
-@swag_from("../docs/note_share_links/list.yaml")
+@swag_from("../docs/note_public_links/list.yaml")
 def find_many(note_id: UUID):
     raw_query = request.args.to_dict(flat=True)
     raw_query["noteId"] = str(note_id)
@@ -36,9 +36,9 @@ def find_many(note_id: UUID):
     )
 
 
-@bp_note_share_links.post("")
+@bp_note_public_links.post("")
 @jwt_required()
-@swag_from("../docs/note_share_links/create.yaml")
+@swag_from("../docs/note_public_links/create.yaml")
 def create(note_id: UUID):
     payload = NoteShareLinkCreateDTO.model_validate_json(request.data)
     share_link_dto = note_share_link_service.create_share_link(
@@ -47,9 +47,9 @@ def create(note_id: UUID):
     return jsonify(share_link_dto.model_dump()), HTTPStatus.CREATED
 
 
-@bp_note_share_links.delete("/<uuid:link_id>")
+@bp_note_public_links.delete("/<uuid:link_id>")
 @jwt_required()
-@swag_from("../docs/note_share_links/delete.yaml")
+@swag_from("../docs/note_public_links/delete.yaml")
 def delete(note_id: UUID, link_id: UUID):
     note_share_link_service.delete_share_link(str(note_id), str(link_id))
     return "", HTTPStatus.NO_CONTENT

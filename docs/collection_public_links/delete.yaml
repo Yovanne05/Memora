@@ -1,8 +1,8 @@
 tags:
-  - collection-share-links
-summary: Supprimer un lien de partage
+  - collection-public-links
+summary: Supprimer un lien public
 description: >
-  Révoque un lien de partage. L'accès via ce lien sera immédiatement invalidé.
+  Revoque un lien public. L'acces via ce lien est immediatement invalide.
 parameters:
   - in: path
     name: collection_id
@@ -15,9 +15,9 @@ parameters:
     type: string
     format: uuid
     required: true
-    description: Identifiant du lien de partage à supprimer.
+    description: Identifiant du lien public a supprimer.
 responses:
   204:
-    description: Lien supprimé avec succès.
+    description: Lien public supprime avec succes.
   404:
     description: Lien ou collection introuvable.

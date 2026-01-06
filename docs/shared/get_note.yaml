@@ -1,8 +1,8 @@
 tags:
-  - note-share-links-public
-summary: Acceder a une note via un lien de partage public
+  - note-public-links-access
+summary: Acceder a une note via un lien public
 description: >
-  Recupere une note en utilisant l'ID du lien de partage.
+  Recupere une note en utilisant l'ID du lien public.
   Aucune authentification n'est requise.
 parameters:
   - in: path
@@ -10,7 +10,7 @@ parameters:
     type: string
     format: uuid
     required: true
-    description: ID du lien de partage (cle primaire).
+    description: ID du lien public (cle primaire).
     example: "a1b2c3d4-5678-90ab-cdef-1234567890ab"
 responses:
   200:
@@ -18,6 +18,6 @@ responses:
     schema:
       $ref: "#/definitions/Note"
   404:
-    description: Lien de partage non trouve ou invalide.
+    description: Lien public non trouve ou invalide.
   422:
     description: ID malforme.
