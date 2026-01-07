@@ -83,7 +83,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
     return (await response.json()) as T;
   } catch (error) {
-    normalizeError(error);
+    throw normalizeError(error);
   }
 }
 
