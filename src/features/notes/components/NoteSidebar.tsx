@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator"
 import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection"
 import { RichTextDisplay } from "@/components/editor/RichTextDisplay"
 import { cn } from "@/lib/utils"
+import { formatLongDateTime } from "@/lib/format.utils"
 import { useResizable } from "@/hooks/useResizable"
 import type { Note } from "../models/note.model"
 import { NoteSidebarHeader } from "./note-sidebar/NoteSidebarHeader"
@@ -36,21 +37,8 @@ export function NoteSidebar({
 
   if (!note) return null
 
-  const formattedCreatedAt = new Date(note.createdAt).toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-
-  const formattedUpdatedAt = new Date(note.updatedAt).toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  const formattedCreatedAt = formatLongDateTime(note.createdAt)
+  const formattedUpdatedAt = formatLongDateTime(note.updatedAt)
 
   return (
     <aside

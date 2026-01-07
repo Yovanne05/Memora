@@ -40,11 +40,3 @@ export const VISIBILITY_BADGE_CLASSES: Record<Visibility, string> = {
   public: "border-emerald-400/50 bg-emerald-50 text-emerald-700",
   private: "border-border bg-muted text-foreground",
 }
-
-export function getVisibilityLabel(visibility: Visibility): string {
-  return VISIBILITY_LABELS[visibility]
-}
-
-export function getVisibilityBadgeClasses(visibility: Visibility): string {
-  return VISIBILITY_BADGE_CLASSES[visibility]
-}

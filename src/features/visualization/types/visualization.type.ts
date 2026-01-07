@@ -1,5 +1,4 @@
 import type { Node, Edge } from "reactflow"
-
 export interface CustomNodeData {
   title: string
   connections: number

@@ -1,9 +1,9 @@
-import type { CollectionVisualization } from "../../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 import { OrphanNotesZone } from "../OrphanNotesZone"
 import { VisualizationLegend } from "../VisualizationLegend"
 
 type CollectionVisualizationExtrasProps = {
-  collection: CollectionVisualization
+  collection: Collection
   orphanNodeIds: Set<string>
   onSelectOrphan: (noteId: string) => void
 }

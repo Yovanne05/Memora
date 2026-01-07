@@ -2,7 +2,7 @@ import { EditorContent } from "@tiptap/react"
 
 import { cn } from "@/lib/utils"
 import { MenuBar } from "./MenuBar"
-import { useRichTextEditor } from "./hooks/useRichTextEditor"
+import { useRichTextEditor } from "../../hooks/useRichTextEditor"
 import "./editor.css"
 
 interface RichTextEditorProps {
@@ -17,7 +17,7 @@ interface RichTextEditorProps {
 export function RichTextEditor({
   content,
   onChange,
-  placeholder = "Commencez à écrire...",
+  placeholder = "Commencez ï¿½ ï¿½crire...",
   editable = true,
   className,
   noteId,

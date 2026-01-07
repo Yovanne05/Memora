@@ -1,7 +1,7 @@
 import { Plus, FileText, FolderPlus, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { useWorkspaceContext } from "../../context/WorkspaceContext"
+import { useWorkspaceContext } from "../../context"
 import { useWorkspaceNavigation } from "../../hooks/useWorkspaceNavigation"
 import { CollectionsTree } from "./CollectionsTree"
 import { cn } from "@/lib/utils"

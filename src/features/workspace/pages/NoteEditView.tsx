@@ -1,8 +1,8 @@
 import { NoteEditForm } from "@/features/notes/components/NoteEditForm"
 import { NoteLinkManager } from "@/features/notes/components/NoteLinkManager"
-import { NoteEditError } from "./note-edit-view/NoteEditError"
-import { NoteEditLoading } from "./note-edit-view/NoteEditLoading"
-import { NoteEditReadOnlyBanner } from "./note-edit-view/NoteEditReadOnlyBanner"
+import { NoteEditError } from "../components/note-edit/NoteEditError"
+import { NoteEditLoading } from "../components/note-edit/NoteEditLoading"
+import { NoteEditReadOnlyBanner } from "../components/note-edit/NoteEditReadOnlyBanner"
 import { useNoteEditView } from "../hooks/useNoteEditView"
 
 interface NoteEditViewProps {

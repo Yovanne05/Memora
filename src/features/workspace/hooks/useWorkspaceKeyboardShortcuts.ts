@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useWorkspaceContext } from "../context/WorkspaceContext"
+import { useWorkspaceContext } from "../context"
 
 export function useWorkspaceKeyboardShortcuts() {
   const { actions } = useWorkspaceContext()

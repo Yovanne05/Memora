@@ -1,7 +1,7 @@
 import { EditorContent } from "@tiptap/react"
 
 import { cn } from "@/lib/utils"
-import { useRichTextDisplay } from "./hooks/useRichTextDisplay"
+import { useRichTextDisplay } from "../../hooks/useRichTextDisplay"
 import "./editor.css"
 
 interface RichTextDisplayProps {

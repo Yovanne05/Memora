@@ -1,21 +1,32 @@
-import { useMemo } from "react"
+import { useEffect } from "react"
 import { useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Underline from "@tiptap/extension-underline"
 import Link from "@tiptap/extension-link"
+import Placeholder from "@tiptap/extension-placeholder"
 import TextAlign from "@tiptap/extension-text-align"
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight"
 import { common, createLowlight } from "lowlight"
 
 import { cn } from "@/lib/utils"
-import { ResizableImage } from "../extensions/ResizableImage"
-import { parseContent } from "../utils/content"
+import { ResizableImage } from "../lib/ResizableImage"
+import { parseContent } from "../lib/content"
+
+type UseRichTextEditorArgs = {
+  content: string
+  onChange: (content: string) => void
+  placeholder: string
+  editable: boolean
+}
 
 const lowlight = createLowlight(common)
 
-export function useRichTextDisplay(content: string) {
-  const parsedContent = useMemo(() => parseContent(content), [content])
-
+export function useRichTextEditor({
+  content,
+  onChange,
+  placeholder,
+  editable,
+}: UseRichTextEditorArgs) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -23,12 +34,13 @@ export function useRichTextDisplay(content: string) {
       }),
       Underline,
       Link.configure({
-        openOnClick: true,
+        openOnClick: false,
         HTMLAttributes: {
-          class: "text-primary underline cursor-pointer hover:text-primary/80",
-          target: "_blank",
-          rel: "noopener noreferrer",
+          class: "text-primary underline cursor-pointer",
         },
+      }),
+      Placeholder.configure({
+        placeholder,
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -47,30 +59,47 @@ export function useRichTextDisplay(content: string) {
         },
       }),
     ],
-    content: parsedContent,
-    editable: false,
+    content: parseContent(content),
+    editable,
+    onUpdate: ({ editor: activeEditor }) => {
+      const json = activeEditor.getJSON()
+      onChange(JSON.stringify(json))
+    },
     editorProps: {
       attributes: {
         class: cn(
-          "prose prose-sm max-w-none",
+          "prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4",
           "prose-headings:font-semibold prose-headings:tracking-tight",
           "prose-p:leading-relaxed prose-p:text-muted-foreground",
           "prose-a:text-primary prose-a:underline prose-a:cursor-pointer",
-          "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm",
+          "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded",
           "prose-pre:bg-muted prose-pre:p-4",
           "prose-ul:list-disc prose-ol:list-decimal",
           "prose-li:text-muted-foreground",
           "prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground",
-          "prose-strong:font-semibold prose-strong:text-foreground",
-          "prose-em:italic",
           "prose-img:rounded-lg prose-img:shadow-md prose-img:my-4"
         ),
       },
     },
   })
 
-  return {
-    editor,
-    isEmpty: !content || content.trim().length === 0,
-  }
+  useEffect(() => {
+    if (!editor) return
+
+    const currentContent = JSON.stringify(editor.getJSON())
+    const newContent = parseContent(content)
+
+    if (typeof newContent === "string") {
+      if (currentContent !== newContent) {
+        editor.commands.setContent(newContent)
+      }
+    } else {
+      const newContentStr = JSON.stringify(newContent)
+      if (currentContent !== newContentStr) {
+        editor.commands.setContent(newContent)
+      }
+    }
+  }, [content, editor])
+
+  return editor
 }

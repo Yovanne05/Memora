@@ -1,9 +1,9 @@
-import { CollectionNotesEditDialog } from "./collection-notes-view/CollectionNotesEditDialog"
-import { CollectionNotesEmpty } from "./collection-notes-view/CollectionNotesEmpty"
-import { CollectionNotesError } from "./collection-notes-view/CollectionNotesError"
-import { CollectionNotesHeader } from "./collection-notes-view/CollectionNotesHeader"
-import { CollectionNotesList } from "./collection-notes-view/CollectionNotesList"
-import { CollectionNotesLoading } from "./collection-notes-view/CollectionNotesLoading"
+import { CollectionNotesEditDialog } from "../components/collection-notes/CollectionNotesEditDialog"
+import { CollectionNotesEmpty } from "../components/collection-notes/CollectionNotesEmpty"
+import { CollectionNotesError } from "../components/collection-notes/CollectionNotesError"
+import { CollectionNotesHeader } from "../components/collection-notes/CollectionNotesHeader"
+import { CollectionNotesList } from "../components/collection-notes/CollectionNotesList"
+import { CollectionNotesLoading } from "../components/collection-notes/CollectionNotesLoading"
 import { useCollectionNotesView } from "../hooks/useCollectionNotesView"
 
 interface CollectionNotesViewProps {

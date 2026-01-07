@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { useRouter } from "@tanstack/react-router"
-import { useWorkspaceContext } from "../context/WorkspaceContext"
+import { useWorkspaceContext } from "../context"
 
 type WorkspaceMode = "default" | "favorites"
 

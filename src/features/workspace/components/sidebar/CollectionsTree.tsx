@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react"
 import { useWorkspaceCollections, type WorkspaceMode } from "../../hooks/useWorkspaceCollections"
-import { useWorkspaceContext } from "../../context/WorkspaceContext"
+import { useWorkspaceContext } from "../../context"
 import { useWorkspaceNavigation } from "../../hooks/useWorkspaceNavigation"
 import { CollectionTreeItem } from "./CollectionTreeItem"
 

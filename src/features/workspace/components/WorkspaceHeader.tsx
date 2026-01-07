@@ -1,4 +1,4 @@
-import { useWorkspaceContext } from "../context/WorkspaceContext"
+import { useWorkspaceContext } from "../context"
 import { WorkspaceBreadcrumb } from "./workspace-header/WorkspaceBreadcrumb"
 import { WorkspaceGraphButton } from "./workspace-header/WorkspaceGraphButton"
 import { WorkspaceSearch } from "./workspace-header/WorkspaceSearch"

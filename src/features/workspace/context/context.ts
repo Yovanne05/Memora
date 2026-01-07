@@ -15,3 +15,5 @@ export function useWorkspaceContext() {
   }
   return context
 }
+
+export type { WorkspaceActions, WorkspaceState } from "../types/workspace.types"

@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { CollectionVisualizationView } from "@/features/visualization/components/CollectionVisualizationView"
-import { useWorkspaceContext } from "../context/WorkspaceContext"
+import { useWorkspaceContext } from "../context"
 
 export function GraphViewDialog() {
   const { state, actions } = useWorkspaceContext()

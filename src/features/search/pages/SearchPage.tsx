@@ -4,8 +4,8 @@ import { SearchFilters } from "../components/SearchFilters"
 import { SearchInput } from "../components/SearchInput"
 import { SearchResults } from "../components/SearchResults"
 import { useSearchManager } from "../hooks/useSearchManager"
-import { SearchHeader } from "./SearchHeader"
-import { SearchSummary } from "./SearchSummary"
+import { SearchHeader } from "../components/SearchHeader"
+import { SearchSummary } from "../components/SearchSummary"
 
 export default function SearchPage() {
   const manager = useSearchManager()

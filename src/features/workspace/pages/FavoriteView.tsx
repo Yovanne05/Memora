@@ -1,8 +1,8 @@
-import { FavoritesContent } from "./favorites-view/FavoritesContent"
-import { FavoritesEmpty } from "./favorites-view/FavoritesEmpty"
-import { FavoritesError } from "./favorites-view/FavoritesError"
-import { FavoritesHeader } from "./favorites-view/FavoritesHeader"
-import { FavoritesLoading } from "./favorites-view/FavoritesLoading"
+import { FavoritesContent } from "../components/favorites/FavoritesContent"
+import { FavoritesEmpty } from "../components/favorites/FavoritesEmpty"
+import { FavoritesError } from "../components/favorites/FavoritesError"
+import { FavoritesHeader } from "../components/favorites/FavoritesHeader"
+import { FavoritesLoading } from "../components/favorites/FavoritesLoading"
 import { useFavoritesView } from "../hooks/useFavoritesView"
 
 export default function FavoritesView() {

@@ -1,7 +1,7 @@
 import { CalendarClock, Eye, Lock, User2 } from "lucide-react"
 
 import type { Note } from "../../models/note.model"
-import { formatNoteDate } from "./formatDate"
+import { formatShortDate } from "@/lib/format.utils"
 
 type NoteCardMetaProps = {
   note: Note
@@ -30,7 +30,7 @@ export function NoteCardMeta({ note }: Readonly<NoteCardMetaProps>) {
       </span>
       <span className="flex items-center gap-1 text-xs text-muted-foreground">
         <CalendarClock className="h-3.5 w-3.5" />
-        Mis à jour le {formatNoteDate(note.updatedAt)}
+        Mis à jour le {formatShortDate(note.updatedAt)}
       </span>
     </>
   )

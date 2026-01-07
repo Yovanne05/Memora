@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import type { NotesFilters } from "@/features/notes/types/note-query"
-import { useWorkspaceContext } from "../context/WorkspaceContext"
+import { useWorkspaceContext } from "../context"
 import { useWorkspaceAccessScope } from "./useWorkspaceAccessScope"
 
 const SORT_MAP = {
