@@ -13,6 +13,8 @@ export const ResizableImage = Image.extend({
           }
           return {
             src: attributes.src,
+            loading: 'lazy',
+            decoding: 'async',
           }
         },
       },
@@ -44,7 +46,7 @@ export const ResizableImage = Image.extend({
         default: null,
         parseHTML: (element) => {
           const width = element.getAttribute('width') || element.style.width
-          return width ? parseInt(width) : null
+          return width ? Number.parseInt(width) : null
         },
         renderHTML: (attributes) => {
           if (!attributes.width) {
@@ -60,7 +62,7 @@ export const ResizableImage = Image.extend({
         default: null,
         parseHTML: (element) => {
           const height = element.getAttribute('height') || element.style.height
-          return height === 'auto' ? 'auto' : height ? parseInt(height) : null
+          return height === 'auto' ? 'auto' : height ? Number.parseInt(height) : null
         },
         renderHTML: (attributes) => {
           if (!attributes.height || attributes.height === 'auto') {
@@ -95,6 +97,10 @@ export const ResizableImage = Image.extend({
       if (node.attrs.title) {
         img.title = node.attrs.title
       }
+
+      // Optimize image loading
+      img.loading = 'lazy'
+      img.decoding = 'async'
 
       // Set dimensions
       if (node.attrs.width) {
