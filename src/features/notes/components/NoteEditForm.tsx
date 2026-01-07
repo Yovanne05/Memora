@@ -21,6 +21,7 @@ export interface NoteFormValues {
 interface NoteEditFormProps {
   note?: Note
   loading?: boolean
+  readOnly?: boolean
   onSubmit: (values: NoteFormValues) => void | Promise<void>
   onCancel?: () => void
   onDelete?: () => void
@@ -34,6 +35,7 @@ interface NoteEditFormProps {
 export function NoteEditForm({
   note,
   loading = false,
+  readOnly = false,
   onSubmit,
   onCancel,
   onDelete,
@@ -68,11 +70,11 @@ export function NoteEditForm({
     })
   })
 
-  const isFormDisabled = loading || form.formState.isSubmitting
+  const isFormDisabled = loading || form.formState.isSubmitting || readOnly
 
   return (
     <Form {...form} key={note?.id}>
-      <form className="space-y-6" onSubmit={handleFormSubmit}>
+      <form className="space-y-6" onSubmit={readOnly ? (e) => e.preventDefault() : handleFormSubmit}>
         <FormActions
           savedTime={savedTime}
           isUpdate={!!note}
@@ -80,6 +82,7 @@ export function NoteEditForm({
           deleteLoading={deleteLoading}
           onCancel={onCancel}
           onDelete={onDelete}
+          readOnly={readOnly}
         />
 
         <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">

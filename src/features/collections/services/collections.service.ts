@@ -59,11 +59,11 @@ export function createCollectionsService(
       await client.delete<void>(`/collections/${id}`);
     },
     async addFavorite(id: string) {
-      await client.post<void, never>(`/collections/${id}/favorite`, undefined as never)
+      await client.post<void, never>(`/collections/${id}/favorites`, undefined as never)
     },
 
     async removeFavorite(id: string) {
-      await client.delete<void>(`/collections/${id}/favorite`)
+      await client.delete<void>(`/collections/${id}/favorites`)
     },
   };
 }

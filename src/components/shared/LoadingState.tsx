@@ -8,10 +8,6 @@ export interface LoadingStateProps {
   className?: string
 }
 
-/**
- * Composant générique pour afficher un état de chargement
- * Remplace NotesListSkeleton, CollectionsListSkeleton, etc.
- */
 export function LoadingState({
   count = 6,
   lines = 3,

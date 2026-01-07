@@ -3,7 +3,7 @@ import type { AuthSession, LoginPayload, RegisterPayload } from "../models/auth.
 
 export interface IAuthService {
   login(payload: LoginPayload): Promise<AuthSession>
-  register(payload: RegisterPayload): Promise<AuthSession>
+  register(payload: RegisterPayload): Promise<User>
   getProfile(): Promise<User>
   logout(): Promise<void>
 }

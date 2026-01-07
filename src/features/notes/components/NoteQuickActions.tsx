@@ -7,9 +7,11 @@ import {
   Trash2,
   MoreVertical,
   Folder,
-  FolderMinus
+  FolderMinus,
+  Users
 } from "lucide-react"
 import { toast } from "sonner"
+import { NoteShareDialog } from "./NoteShareDialog"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -53,6 +55,7 @@ export function NoteQuickActions({
   showLabel = false
 }: Readonly<NoteQuickActionsProps>) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const updateMutation = useUpdateNoteMutation({ onSuccess: onActionComplete })
@@ -134,6 +137,22 @@ export function NoteQuickActions({
 
           <DropdownMenuSeparator />
 
+          {/* Partager */}
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsDropdownOpen(false)
+              setShareDialogOpen(true)
+            }}
+            disabled={isPending}
+          >
+            <Users className="h-4 w-4" />
+            Partager
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
           {/* Déplacer vers collection */}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger disabled={isPending}>
@@ -197,6 +216,14 @@ export function NoteQuickActions({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Dialogue de partage */}
+      <NoteShareDialog
+        noteId={note.id}
+        noteTitle={note.title}
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+      />
 
       {/* Dialogue de confirmation de suppression */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

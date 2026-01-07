@@ -90,15 +90,25 @@ export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps
     )
   }
 
+  const note = noteQuery.data
+  const isReadOnly = note.userPermission === "read"
+  const canDelete = note.userPermission === "owner"
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
+      {isReadOnly && (
+        <div className="rounded-md bg-muted px-4 py-2 text-sm text-muted-foreground">
+          Cette note est en lecture seule. Vous ne pouvez pas la modifier.
+        </div>
+      )}
       <NoteEditForm
-        note={noteQuery.data}
+        note={note}
         loading={updateMutation.isPending}
         deleteLoading={deleteMutation.isPending}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
-        onDelete={handleDelete}
+        onDelete={canDelete ? handleDelete : undefined}
+        readOnly={isReadOnly}
       />
 
       {/* Section de liaison de notes - visible uniquement si la note est dans une collection */}

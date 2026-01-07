@@ -41,11 +41,11 @@ export function createNotesService(client: HttpClient = httpClient): INotesServi
     },
     
     async addFavorite(id: string) {
-      await client.post<void, never>(`/notes/${id}/favorite`, undefined as never)
+      await client.post<void, never>(`/notes/${id}/favorites`, undefined as never)
     },
 
     async removeFavorite(id: string) {
-      await client.delete<void>(`/notes/${id}/favorite`)
+      await client.delete<void>(`/notes/${id}/favorites`)
     },
   }
 }

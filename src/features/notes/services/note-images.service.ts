@@ -44,7 +44,7 @@ export function createNoteImagesService(): INoteImagesService {
         })
 
         const response = await uploadWithTimeout(
-          fetch(`${config.apiUrl}/notes/${payload.noteId}/attachments`, requestConfig),
+          fetch(`${config.apiUrl}/notes/${payload.noteId}/images`, requestConfig),
           DEFAULT_TIMEOUT
         )
 

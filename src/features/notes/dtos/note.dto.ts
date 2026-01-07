@@ -13,6 +13,7 @@ export const noteDtoSchema = z.object({
   tags: z.array(z.string()).default([]),
   is_favorite: z.boolean().optional().default(false),
   visibility: noteVisibilitySchema.default("private"),
+  user_permission: z.enum(["read", "write", "owner"]).nullable().optional(),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
 })
