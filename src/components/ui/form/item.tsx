@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { FormItemContext } from "./context"
+import { FormItemContext } from "./contexts"
 
 export const FormItem = React.forwardRef<
   HTMLDivElement,

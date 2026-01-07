@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 
 type TagInputFieldProps = {
   id?: string
-  inputRef: React.RefObject<HTMLInputElement>
+  inputRef: React.RefObject<HTMLInputElement | null>
   value: string
   placeholder?: string
   disabled: boolean

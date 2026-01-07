@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Controller, type ControllerProps, type FieldPath, type FieldValues } from "react-hook-form"
 
-import { FormFieldContext } from "./context"
+import { FormFieldContext } from "./contexts"
 
 export function FormField<
   TFieldValues extends FieldValues = FieldValues,

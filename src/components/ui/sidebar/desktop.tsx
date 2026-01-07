@@ -1,7 +1,5 @@
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
-import { SIDEBAR_WIDTH, SIDEBAR_WIDTH_ICON } from "./constants"
 
 type SidebarDesktopProps = React.ComponentProps<"div"> & {
   side: "left" | "right"

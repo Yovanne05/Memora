@@ -54,7 +54,7 @@ export function ShareDialogBody({
           selectedUser={selectedUser}
           permission={permission}
           excludedUserIds={excludedUserIds}
-          isLoading={isLoading}
+          isLoading={isLoading ?? false}
           onUserChange={onUserChange}
           onPermissionChange={onPermissionChange}
           onSubmit={onSubmit}

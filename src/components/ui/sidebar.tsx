@@ -1,7 +1,4 @@
-"use client"
-
 export { SidebarProvider } from "./sidebar/provider"
-export { useSidebar } from "./sidebar/context"
 export { Sidebar } from "./sidebar/sidebar"
 export { SidebarTrigger } from "./sidebar/trigger"
 export { SidebarRail } from "./sidebar/rail"
