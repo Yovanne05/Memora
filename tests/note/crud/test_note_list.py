@@ -3,7 +3,7 @@
 
 def test_find_many_returns_notes(client_with_note_data):
     client, data = client_with_note_data
-    query = {"ownerId": data.owner_id, "titleContains": data.search_term}
+    query = {"owner_id": data.owner_id, "title_contains": data.search_term}
 
     response = client.get("/notes", query_string=query)
 

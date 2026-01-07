@@ -8,6 +8,7 @@ from dtos.flashcard_dto import (
     FlashcardCreateDTO,
     FlashcardUpdateDTO,
 )
+from dtos.common_dto import ListResponseDTO
 from querys.flashcard_query import FlashcardFindQuery
 from services.impl.note.flashcard_service_impl import flashcard_service
 
@@ -27,12 +28,11 @@ def find_many():
     params = query.to_params()
 
     flashcard_dtos, total = flashcard_service.find_many(params)
-    return (
-        jsonify(
-            {"items": [dto.model_dump() for dto in flashcard_dtos], "total": total}
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in flashcard_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_flashcards.get("/<uuid:flashcard_id>")

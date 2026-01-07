@@ -7,24 +7,24 @@ description: >
   **Permissions requises:** READ, WRITE ou OWNER sur la note pour voir ses flashcards.
 parameters:
   - in: query
-    name: noteId
+    name: note_id
     type: string
     format: uuid
     required: false
     description: Filtre sur une note spécifique.
   - in: query
-    name: questionContains
+    name: question_contains
     type: string
     required: false
     description: Recherche par texte dans les questions.
   - in: query
-    name: sortBy
+    name: sort_by
     type: string
     enum: ["question", "created_at", "updated_at"]
     default: "created_at"
     description: Champ de tri.
   - in: query
-    name: sortDir
+    name: sort_dir
     type: string
     enum: ["asc", "desc"]
     default: "desc"

@@ -101,9 +101,9 @@ def test_report_note_and_list_as_admin(app_client):
     body = response.get_json()
     assert body["total"] == 1
     assert body["items"][0]["id"] == report["id"]
-    assert body["items"][0]["targetType"] == "note"
-    assert body["items"][0]["noteId"] == note_id
-    assert body["items"][0]["reporterId"] == owner["id"]
+    assert body["items"][0]["target_type"] == "note"
+    assert body["items"][0]["note_id"] == note_id
+    assert body["items"][0]["reporter_id"] == owner["id"]
 
 
 def test_report_list_forbidden_for_non_admin(app_client):

@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.note_share_link_dto import NoteShareLinkCreateDTO
+from dtos.common_dto import ListResponseDTO
 from querys.note_share_link_query import NoteShareLinkFindQuery
 from services.impl.note.note_share_link_service_impl import (
     note_share_link_service,
@@ -23,17 +24,16 @@ bp_note_share_links = Blueprint(
 @swag_from("../docs/note_share_links/list.yaml")
 def find_many(note_id: UUID):
     raw_query = request.args.to_dict(flat=True)
-    raw_query["noteId"] = str(note_id)
+    raw_query["note_id"] = str(note_id)
     query = NoteShareLinkFindQuery.model_validate(raw_query)
     params = query.to_params()
 
     share_link_dtos, total = note_share_link_service.find_many(params)
-    return (
-        jsonify(
-            {"items": [dto.model_dump() for dto in share_link_dtos], "total": total}
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in share_link_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_note_share_links.post("")

@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from repositorys.report_repository import ReportSearchParams
 from utils.enums import ReportReasonEnum, ReportStatusEnum, ReportTargetEnum
@@ -10,18 +10,16 @@ from utils.enums import ReportReasonEnum, ReportStatusEnum, ReportTargetEnum
 class ReportFindQuery(BaseModel):
     status: ReportStatusEnum | None = None
     reason: ReportReasonEnum | None = None
-    target_type: ReportTargetEnum | None = Field(default=None, alias="targetType")
-    reporter_id: Optional[UUID] = Field(default=None, alias="reporterId")
-    note_id: Optional[UUID] = Field(default=None, alias="noteId")
-    collection_id: Optional[UUID] = Field(default=None, alias="collectionId")
+    target_type: ReportTargetEnum | None = Field(default=None)
+    reporter_id: Optional[UUID] = Field(default=None)
+    note_id: Optional[UUID] = Field(default=None)
+    collection_id: Optional[UUID] = Field(default=None)
 
-    sort_by: Literal["created_at", "status"] = Field(default="created_at", alias="sortBy")
-    sort_dir: Literal["asc", "desc"] = Field(default="desc", alias="sortDir")
+    sort_by: Literal["created_at", "status"] = Field(default="created_at")
+    sort_dir: Literal["asc", "desc"] = Field(default="desc")
 
     limit: int = Field(default=50, ge=1, le=200)
     offset: int = Field(default=0, ge=0, le=10_000)
-
-    model_config = ConfigDict(populate_by_name=True)
 
     def to_params(self) -> ReportSearchParams:
         return ReportSearchParams(

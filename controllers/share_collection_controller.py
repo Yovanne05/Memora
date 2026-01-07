@@ -9,6 +9,7 @@ from dtos.collection_share_dto import (
     CollectionShareCreateDTO,
     CollectionShareUpdateDTO,
 )
+from dtos.common_dto import ListResponseDTO
 from querys.collection_share_query import CollectionShareFindQuery
 from services.impl.collection.collection_share_service_impl import (
     collection_share_service,
@@ -26,15 +27,16 @@ bp_collection_shares = Blueprint(
 @swag_from("../docs/shares_collections/share_list.yaml")
 def find_many(collection_id: UUID):
     raw_query = request.args.to_dict(flat=True)
-    raw_query["collectionId"] = str(collection_id)
+    raw_query["collection_id"] = str(collection_id)
     query = CollectionShareFindQuery.model_validate(raw_query)
     params = query.to_params()
 
     share_dtos, total = collection_share_service.find_many(params)
-    return (
-        jsonify({"items": [dto.model_dump() for dto in share_dtos], "total": total}),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in share_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_collection_shares.post("")

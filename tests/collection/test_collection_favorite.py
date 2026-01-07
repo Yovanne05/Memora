@@ -16,7 +16,7 @@ def test_collection_favorite_flag_and_filter(client_with_note_data):
     assert detail.status_code == 200
     assert detail.get_json()["is_favorite"] is True
 
-    list_resp = client.get("/collections", query_string={"isFavorite": True})
+    list_resp = client.get("/collections", query_string={"is_favorite": True})
     assert list_resp.status_code == 200
     payload = list_resp.get_json()
     assert payload["total"] >= 1
@@ -26,7 +26,7 @@ def test_collection_favorite_flag_and_filter(client_with_note_data):
     del_resp = client.delete(f"/collections/{data.collection_id}/favorites")
     assert del_resp.status_code == 204
 
-    filtered_after = client.get("/collections", query_string={"isFavorite": True})
+    filtered_after = client.get("/collections", query_string={"is_favorite": True})
     assert filtered_after.status_code == 200
     assert data.collection_id not in [item["id"] for item in filtered_after.get_json()["items"]]
 

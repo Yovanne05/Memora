@@ -8,6 +8,7 @@ from dtos.collection_dto import (
     CollectionCreateDTO,
     CollectionUpdateDTO,
 )
+from dtos.common_dto import ListResponseDTO
 from querys.collection_query import CollectionFindQuery
 from services.impl.collection.collection_service_impl import collection_service
 
@@ -24,15 +25,11 @@ def find_many():
     params = query.to_params()
 
     collection_dtos, total = collection_service.find_many(params)
-    return (
-        jsonify(
-            {
-                "items": [dto.model_dump() for dto in collection_dtos],
-                "total": total,
-            }
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in collection_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_collections.get("/<uuid:collection_id>")

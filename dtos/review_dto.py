@@ -7,11 +7,9 @@ from utils.enums import ReviewDifficultyEnum
 
 
 class ReviewCreateDTO(BaseModel):
-    flashcard_id: str = Field(alias="flashcardId")
-    selected_answer_id: str = Field(alias="selectedAnswerId")
+    flashcard_id: str
+    selected_answer_id: str
     difficulty: ReviewDifficultyEnum
-
-    model_config = ConfigDict(populate_by_name=True)
 
 
 class ReviewDTO(BaseModel):
@@ -30,15 +28,13 @@ class ReviewDTO(BaseModel):
 
 
 class FlashcardWithReviewDTO(BaseModel):
-    flashcard_id: str = Field(alias="flashcardId")
+    flashcard_id: str
     question: str
-    next_review_at: datetime = Field(alias="nextReviewAt")
+    next_review_at: datetime
 
-    model_config = ConfigDict(populate_by_name=True, ser_json_timedelta='iso8601')
+    model_config = ConfigDict(ser_json_timedelta='iso8601')
 
 
 class UpcomingReviewsGroupDTO(BaseModel):
     date: str
     flashcards: list[FlashcardWithReviewDTO]
-
-    model_config = ConfigDict(populate_by_name=True)

@@ -14,7 +14,7 @@ def test_get_statistics_counts_shared_notes(
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["contentStatistics"]["notesSharedByUser"] == 2
+    assert body["content_statistics"]["notes_shared_by_user"] == 2
 
 
 def test_get_statistics_counts_shared_collections(
@@ -31,4 +31,4 @@ def test_get_statistics_counts_shared_collections(
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["contentStatistics"]["collectionsSharedByUser"] == 1
+    assert body["content_statistics"]["collections_shared_by_user"] == 1

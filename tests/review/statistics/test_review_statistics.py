@@ -9,14 +9,14 @@ def test_statistics_review_stats_empty_initially(client_with_review_data):
     assert response.status_code == 200
     body = response.get_json()
 
-    assert "reviewStatistics" in body
-    review_stats = body["reviewStatistics"]
+    assert "review_statistics" in body
+    review_stats = body["review_statistics"]
 
-    assert review_stats["totalReviews"] == 0
-    assert review_stats["reviewsLast7Days"] == 0
-    assert review_stats["reviewsLast30Days"] == 0
-    assert review_stats["averageQuality"] == 0.0
-    assert "qualityDistribution" in review_stats
+    assert review_stats["total_reviews"] == 0
+    assert review_stats["reviews_last_7_days"] == 0
+    assert review_stats["reviews_last_30_days"] == 0
+    assert review_stats["average_quality"] == 0.0
+    assert "quality_distribution" in review_stats
 
 
 def test_statistics_review_stats_after_single_review(client_with_review_data):
@@ -26,8 +26,8 @@ def test_statistics_review_stats_after_single_review(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -37,11 +37,11 @@ def test_statistics_review_stats_after_single_review(client_with_review_data):
     assert response.status_code == 200
     body = response.get_json()
 
-    review_stats = body["reviewStatistics"]
-    assert review_stats["totalReviews"] == 1
-    assert review_stats["reviewsLast7Days"] == 1
-    assert review_stats["reviewsLast30Days"] == 1
-    assert review_stats["averageQuality"] == 2.0
+    review_stats = body["review_statistics"]
+    assert review_stats["total_reviews"] == 1
+    assert review_stats["reviews_last_7_days"] == 1
+    assert review_stats["reviews_last_30_days"] == 1
+    assert review_stats["average_quality"] == 2.0
 
 
 def test_statistics_review_stats_multiple_reviews(client_with_review_data):
@@ -49,16 +49,16 @@ def test_statistics_review_stats_multiple_reviews(client_with_review_data):
 
     flashcard1_id = data.flashcard_ids[0]
     payload1 = {
-        "flashcardId": flashcard1_id,
-        "selectedAnswerId": data.correct_answer_ids[flashcard1_id],
+        "flashcard_id": flashcard1_id,
+        "selected_answer_id": data.correct_answer_ids[flashcard1_id],
         "difficulty": "good",
     }
     client.post("/reviews", json=payload1)
 
     flashcard2_id = data.flashcard_ids[1]
     payload2 = {
-        "flashcardId": flashcard2_id,
-        "selectedAnswerId": data.correct_answer_ids[flashcard2_id],
+        "flashcard_id": flashcard2_id,
+        "selected_answer_id": data.correct_answer_ids[flashcard2_id],
         "difficulty": "easy",
     }
     client.post("/reviews", json=payload2)
@@ -68,9 +68,9 @@ def test_statistics_review_stats_multiple_reviews(client_with_review_data):
     assert response.status_code == 200
     body = response.get_json()
 
-    review_stats = body["reviewStatistics"]
-    assert review_stats["totalReviews"] == 2
-    assert review_stats["averageQuality"] == 2.5
+    review_stats = body["review_statistics"]
+    assert review_stats["total_reviews"] == 2
+    assert review_stats["average_quality"] == 2.5
 
 
 def test_statistics_quality_distribution(client_with_review_data):
@@ -83,8 +83,8 @@ def test_statistics_quality_distribution(client_with_review_data):
 
     for difficulty in difficulties:
         payload = {
-            "flashcardId": flashcard_id,
-            "selectedAnswerId": correct_answer_id,
+            "flashcard_id": flashcard_id,
+            "selected_answer_id": correct_answer_id,
             "difficulty": difficulty,
         }
         client.post("/reviews", json=payload)
@@ -94,7 +94,7 @@ def test_statistics_quality_distribution(client_with_review_data):
     assert response.status_code == 200
     body = response.get_json()
 
-    distribution = body["reviewStatistics"]["qualityDistribution"]
+    distribution = body["review_statistics"]["quality_distribution"]
 
 
 def test_statistics_quality_distribution_all_difficulties(client_with_review_data):
@@ -121,8 +121,8 @@ def test_statistics_quality_distribution_all_difficulties(client_with_review_dat
         flashcard_id = data.flashcard_ids[i]
         correct_answer_id = data.correct_answer_ids[flashcard_id]
         payload = {
-            "flashcardId": flashcard_id,
-            "selectedAnswerId": correct_answer_id,
+            "flashcard_id": flashcard_id,
+            "selected_answer_id": correct_answer_id,
             "difficulty": difficulty,
         }
         client.post("/reviews", json=payload)
@@ -132,7 +132,7 @@ def test_statistics_quality_distribution_all_difficulties(client_with_review_dat
     assert response.status_code == 200
     body = response.get_json()
 
-    distribution = body["reviewStatistics"]["qualityDistribution"]
+    distribution = body["review_statistics"]["quality_distribution"]
 
     assert "again" in distribution
     assert "hard" in distribution
@@ -152,8 +152,8 @@ def test_statistics_updates_on_review_update(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload1 = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload1)
@@ -161,12 +161,12 @@ def test_statistics_updates_on_review_update(client_with_review_data):
     response1 = client.get("/users/me/statistics")
     assert response1.status_code == 200
     body1 = response1.get_json()
-    assert body1["reviewStatistics"]["totalReviews"] == 1
-    assert body1["reviewStatistics"]["averageQuality"] == 2.0
+    assert body1["review_statistics"]["total_reviews"] == 1
+    assert body1["review_statistics"]["average_quality"] == 2.0
 
     payload2 = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "easy",
     }
     client.post("/reviews", json=payload2)
@@ -174,8 +174,8 @@ def test_statistics_updates_on_review_update(client_with_review_data):
     response2 = client.get("/users/me/statistics")
     assert response2.status_code == 200
     body2 = response2.get_json()
-    assert body2["reviewStatistics"]["totalReviews"] == 1
-    assert body2["reviewStatistics"]["averageQuality"] == 3.0
+    assert body2["review_statistics"]["total_reviews"] == 1
+    assert body2["review_statistics"]["average_quality"] == 3.0
 
 
 def test_statistics_only_shows_current_user_reviews(client_with_review_data):
@@ -185,8 +185,8 @@ def test_statistics_only_shows_current_user_reviews(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -200,10 +200,10 @@ def test_statistics_only_shows_current_user_reviews(client_with_review_data):
     assert response.status_code == 200
     body = response.get_json()
 
-    review_stats = body["reviewStatistics"]
-    assert review_stats["totalReviews"] == 0
-    assert review_stats["reviewsLast7Days"] == 0
-    assert review_stats["reviewsLast30Days"] == 0
+    review_stats = body["review_statistics"]
+    assert review_stats["total_reviews"] == 0
+    assert review_stats["reviews_last_7_days"] == 0
+    assert review_stats["reviews_last_30_days"] == 0
 
 
 def test_statistics_content_stats_unaffected(client_with_review_data):
@@ -214,10 +214,10 @@ def test_statistics_content_stats_unaffected(client_with_review_data):
     assert response.status_code == 200
     body = response.get_json()
 
-    assert "contentStatistics" in body
-    content_stats = body["contentStatistics"]
-    assert "notesCreated" in content_stats
-    assert "collectionsCreated" in content_stats
-    assert "flashcardsCreated" in content_stats
+    assert "content_statistics" in body
+    content_stats = body["content_statistics"]
+    assert "notes_created" in content_stats
+    assert "collections_created" in content_stats
+    assert "flashcards_created" in content_stats
 
-    assert "reviewStatistics" in body
+    assert "review_statistics" in body

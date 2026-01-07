@@ -1,34 +1,28 @@
 from typing import Literal, Optional
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, Field, field_validator
 from repositorys.note_repository import NoteSearchParams
 from utils.enums import VisibilityEnum
 
 
 class NoteFindQuery(BaseModel):
-    owner_id: Optional[UUID] = Field(default=None, alias="ownerId")
-    collection_id: Optional[UUID] = Field(default=None, alias="collectionId")
-    shared_with_user_id: Optional[UUID] = Field(
-        default=None, alias="sharedWithUserId"
-    )
+    owner_id: Optional[UUID] = Field(default=None)
+    collection_id: Optional[UUID] = Field(default=None)
+    shared_with_user_id: Optional[UUID] = Field(default=None)
     visibility: VisibilityEnum | None = None
-    title_contains: Optional[str] = Field(default=None, alias="titleContains")
-    content_contains: Optional[str] = Field(
-        default=None, alias="contentContains"
-    )
+    title_contains: Optional[str] = Field(default=None)
+    content_contains: Optional[str] = Field(default=None)
     ids: Optional[list[UUID]] = None
     tags: Optional[list[str]] = None
-    is_favorite: Optional[bool] = Field(default=None, alias="isFavorite")
+    is_favorite: Optional[bool] = Field(default=None)
 
     sort_by: Literal["title", "created_at", "updated_at"] = Field(
-        default="created_at", alias="sortBy"
+        default="created_at"
     )
-    sort_dir: Literal["asc", "desc"] = Field(default="desc", alias="sortDir")
+    sort_dir: Literal["asc", "desc"] = Field(default="desc")
 
     limit: int = Field(default=50, ge=1, le=200)
     offset: int = Field(default=0, ge=0, le=10_000)
-
-    model_config = ConfigDict(populate_by_name=True)
 
     @field_validator("ids", "tags", mode="before")
     @classmethod

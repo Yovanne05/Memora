@@ -23,7 +23,7 @@ def create_review():
         difficulty=payload.difficulty.value,
     )
 
-    return jsonify(review_dto.model_dump(by_alias=True)), HTTPStatus.CREATED
+    return jsonify(review_dto.model_dump()), HTTPStatus.CREATED
 
 
 @bp_reviews.get("")
@@ -39,6 +39,6 @@ def find_many():
     user = get_current_user()
     upcoming = review_service.get_upcoming_reviews(user.id)
     return (
-        jsonify([group.model_dump(by_alias=True) for group in upcoming]),
+        jsonify([group.model_dump() for group in upcoming]),
         HTTPStatus.OK,
     )

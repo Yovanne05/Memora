@@ -12,7 +12,7 @@ def test_get_statistics_counts_created_notes(
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["contentStatistics"]["notesCreated"] == 3
+    assert body["content_statistics"]["notes_created"] == 3
 
 
 def test_get_statistics_counts_created_collections(
@@ -28,7 +28,7 @@ def test_get_statistics_counts_created_collections(
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["contentStatistics"]["collectionsCreated"] == 2
+    assert body["content_statistics"]["collections_created"] == 2
 
 
 def test_get_statistics_counts_created_flashcards(
@@ -46,4 +46,4 @@ def test_get_statistics_counts_created_flashcards(
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["contentStatistics"]["flashcardsCreated"] == 3
+    assert body["content_statistics"]["flashcards_created"] == 3

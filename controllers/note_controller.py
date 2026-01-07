@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request
 from flasgger import swag_from
 
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
+from dtos.common_dto import ListResponseDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
 
@@ -20,12 +21,11 @@ def find_many():
     params = query.to_params()
 
     note_dtos, total = note_crud_service.find_many(params)
-    return (
-        jsonify(
-            {"items": [dto.model_dump() for dto in note_dtos], "total": total}
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in note_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_notes.get("/<uuid:note_id>")

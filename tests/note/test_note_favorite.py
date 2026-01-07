@@ -11,7 +11,7 @@ def test_favorite_flag_and_filter(client_with_note_data):
     assert detail.status_code == 200
     assert detail.get_json()["is_favorite"] is True
 
-    list_resp = client.get("/notes", query_string={"isFavorite": True})
+    list_resp = client.get("/notes", query_string={"is_favorite": True})
     assert list_resp.status_code == 200
     payload = list_resp.get_json()
     assert payload["total"] == 1
@@ -21,7 +21,7 @@ def test_favorite_flag_and_filter(client_with_note_data):
     del_resp = client.delete(f"/notes/{data.note_id}/favorites")
     assert del_resp.status_code == 204
 
-    filtered_after = client.get("/notes", query_string={"isFavorite": True})
+    filtered_after = client.get("/notes", query_string={"is_favorite": True})
     assert filtered_after.status_code == 200
     assert filtered_after.get_json()["total"] == 0
 

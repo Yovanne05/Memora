@@ -7,6 +7,7 @@ from flasgger import swag_from
 
 from dtos.auth_dto import RegisterDTO
 from dtos.user_dto import UserCreateDTO, UserUpdateDTO
+from dtos.common_dto import ListResponseDTO
 from querys.user_query import UserFindQuery
 from services.impl.auth_service_impl import auth_service
 from services.impl.user_service_impl import user_service
@@ -23,12 +24,11 @@ def find_many():
     params = query.to_params()
 
     user_dtos, total = user_service.find_many(params)
-    return (
-        jsonify(
-            {"items": [dto.model_dump() for dto in user_dtos], "total": total}
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in user_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_users.get("/<uuid:user_id>")

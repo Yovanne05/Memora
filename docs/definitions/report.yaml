@@ -7,15 +7,15 @@ definitions:
         type: string
         format: uuid
         example: "3b96fa56-6e1d-4d1e-88f5-38c0475a2c9c"
-      targetType:
+      target_type:
         type: string
         enum: ["note", "collection"]
         example: "note"
-      noteId:
+      note_id:
         type: string
         format: uuid
         nullable: true
-      collectionId:
+      collection_id:
         type: string
         format: uuid
         nullable: true
@@ -40,34 +40,34 @@ definitions:
         type: string
         nullable: true
         example: "Le contenu semble enfreindre nos règles."
-      reporterId:
+      reporter_id:
         type: string
         format: uuid
-      reporterEmail:
+      reporter_email:
         type: string
         format: email
         nullable: true
-      noteTitle:
+      note_title:
         type: string
         nullable: true
-      collectionName:
+      collection_name:
         type: string
         nullable: true
-      createdAt:
+      created_at:
         type: string
         format: date-time
-      updatedAt:
+      updated_at:
         type: string
         format: date-time
     required:
       [
         "id",
-        "targetType",
+        "target_type",
         "reason",
         "status",
-        "reporterId",
-        "createdAt",
-        "updatedAt",
+        "reporter_id",
+        "created_at",
+        "updated_at",
       ]
 
   ReportList:
