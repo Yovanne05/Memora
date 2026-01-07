@@ -5,12 +5,12 @@ from flasgger import swag_from
 
 from services.impl.shared_service_impl import shared_service
 
-bp_note_public_links_access = Blueprint(
-    "note_public_links_access", __name__, url_prefix="/note-public-links"
+bp_shared_notes = Blueprint(
+    "shared_notes", __name__, url_prefix="/shared/notes"
 )
 
 
-@bp_note_public_links_access.get("/<link_id>")
+@bp_shared_notes.get("/<link_id>")
 @swag_from("../docs/shared/get_note.yaml")
 def get_note(link_id: str):
     note_dto = shared_service.get_note_by_token(link_id)

@@ -12,12 +12,8 @@ from controllers.share_collection_controller import bp_collection_shares
 from controllers.uploads_controller import bp_uploads
 from controllers.note_public_link_controller import bp_note_public_links
 from controllers.collection_public_link_controller import bp_collection_public_links
-from controllers.note_public_link_access_controller import (
-    bp_note_public_links_access,
-)
-from controllers.collection_public_link_access_controller import (
-    bp_collection_public_links_access,
-)
+from controllers.shared_note_controller import bp_shared_notes
+from controllers.shared_collection_controller import bp_shared_collections
 from controllers.note_favorite_controller import bp_note_favorites
 from controllers.collection_favorite_controller import bp_collection_favorites
 from controllers.image_note_controller import bp_note_images
@@ -59,8 +55,8 @@ def create_app() -> Flask:
     app.register_blueprint(bp_uploads)
     app.register_blueprint(bp_note_public_links)
     app.register_blueprint(bp_collection_public_links)
-    app.register_blueprint(bp_note_public_links_access)
-    app.register_blueprint(bp_collection_public_links_access)
+    app.register_blueprint(bp_shared_notes)
+    app.register_blueprint(bp_shared_collections)
     app.register_blueprint(bp_note_images)
     app.register_blueprint(bp_flashcards)
     app.register_blueprint(bp_note_flashcards)

@@ -2,7 +2,6 @@ import os
 import mimetypes
 from uuid import uuid4
 from datetime import datetime, timezone
-from typing import List
 from werkzeug.datastructures import FileStorage
 
 import config
@@ -17,7 +16,6 @@ from exceptions.note_image_exception import (
     FileTooLarge,
     InvalidFileType,
     NoFileProvided,
-    NoteImageNotFound,
 )
 from utils.auth import get_current_user
 from domain_services.permission_domain_service import permission_domain_service
@@ -46,15 +44,6 @@ class NoteImageService(NoteImageServiceInterface):
             raise NoteNotFound()
         user = get_current_user()
         if not permission_domain_service.can_write_note(note_id, user.id, user.role):
-            raise NoteNotFound()
-        return note
-
-    def _ensure_note_read_access(self, note_id: str):
-        note = note_repository.find_one_unscoped(note_id)
-        if not note:
-            raise NoteNotFound()
-        user = get_current_user()
-        if not permission_domain_service.can_read_note(note_id, user.id, user.role):
             raise NoteNotFound()
         return note
 
@@ -98,28 +87,6 @@ class NoteImageService(NoteImageServiceInterface):
 
         saved_entity = note_image_repository.add(image_entity)
         return note_image_to_dto(saved_entity)
-
-    def list_images(self, note_id: str) -> List[NoteImageDTO]:
-        self._ensure_note_read_access(note_id)
-        images = note_image_repository.find_by_note(note_id)
-        return [note_image_to_dto(img) for img in images]
-
-    def delete_image(self, note_id: str, filename: str) -> None:
-        self._ensure_note_write_access(note_id)
-
-        image = note_image_repository.find_by_note_and_filename(note_id, filename)
-        if not image:
-            raise NoteImageNotFound()
-
-        filepath = image.file_path
-        if os.path.exists(filepath):
-            os.remove(filepath)
-
-        note_image_repository.delete(image.id)
-
-        note_folder = os.path.join(self.upload_folder, note_id)
-        if os.path.exists(note_folder) and not os.listdir(note_folder):
-            os.rmdir(note_folder)
 
 
 note_image_service = NoteImageService()
