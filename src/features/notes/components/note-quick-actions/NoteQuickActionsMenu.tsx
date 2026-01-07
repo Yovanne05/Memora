@@ -1,8 +1,9 @@
+import { MoreVertical } from "lucide-react"
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 import type { Note } from "../../models/note.model"
 import type { Collection } from "@/features/collections/models/collection.model"
 import { NoteQuickActionsMenuContent } from "./NoteQuickActionsMenuContent"
-import { NoteQuickActionsTrigger } from "./NoteQuickActionsTrigger"
 
 type NoteQuickActionsMenuProps = {
   note: Note
@@ -36,11 +37,15 @@ export function NoteQuickActionsMenu({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <NoteQuickActionsTrigger
-          isPending={isPending}
-          triggerVariant={triggerVariant}
-          showLabel={showLabel}
-        />
+        <Button
+          variant={triggerVariant}
+          size={showLabel ? "sm" : "icon"}
+          className={showLabel ? "gap-2" : ""}
+          disabled={isPending}
+        >
+          <MoreVertical className="h-4 w-4" />
+          {showLabel && "Actions"}
+        </Button>
       </DropdownMenuTrigger>
       <NoteQuickActionsMenuContent
         note={note}

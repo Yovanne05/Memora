@@ -1,5 +1,6 @@
+import { Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { QuickAddNoteDialog } from "./quick-add-note/QuickAddNoteDialog"
-import { QuickAddNoteTrigger } from "./quick-add-note/QuickAddNoteTrigger"
 import { useQuickAddNote } from "../hooks/useQuickAddNote"
 
 interface QuickAddNoteProps {
@@ -31,12 +32,15 @@ export function QuickAddNote({
 
   return (
     <>
-      <QuickAddNoteTrigger
+      <Button
         variant={triggerVariant}
         size={triggerSize}
-        showLabel={showLabel}
         onClick={() => setOpen(true)}
-      />
+        className={showLabel ? "gap-2" : ""}
+      >
+        <Plus className="h-4 w-4" />
+        {showLabel && "Nouvelle note"}
+      </Button>
       <QuickAddNoteDialog
         open={open}
         onOpenChange={setOpen}

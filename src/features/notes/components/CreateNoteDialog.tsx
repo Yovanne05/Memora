@@ -2,13 +2,14 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Form } from "@/components/ui/form"
+import { Button } from "@/components/ui/button"
 import type { NoteVisibility } from "../models/note.model"
 import { CollectionField } from "./create-note-dialog/CollectionField"
-import { CreateNoteDialogFooter } from "./create-note-dialog/CreateNoteDialogFooter"
 import { TagsField } from "./create-note-dialog/TagsField"
 import { TitleField } from "./create-note-dialog/TitleField"
 import { VisibilityField } from "./create-note-dialog/VisibilityField"
@@ -55,7 +56,7 @@ export function CreateNoteDialog({
         <DialogHeader>
           <DialogTitle>Nouvelle note</DialogTitle>
           <DialogDescription>
-            Renseigne le nom, la collection et la visibilit� de la note.
+            Renseigne le nom, la collection et la visibilit� de la note.
           </DialogDescription>
         </DialogHeader>
 
@@ -74,12 +75,14 @@ export function CreateNoteDialog({
               isFormDisabled={isFormDisabled}
               errorMessage={form.formState.errors.tags?.message}
             />
-            <CreateNoteDialogFooter
-              titleValue={titleValue}
-              submitting={submitting}
-              isFormDisabled={isFormDisabled}
-              onCancel={() => onOpenChange(false)}
-            />
+            <DialogFooter className="gap-2">
+              <Button variant="ghost" type="button" onClick={() => onOpenChange(false)} disabled={isFormDisabled}>
+                Annuler
+              </Button>
+              <Button type="submit" disabled={isFormDisabled || !titleValue.trim()}>
+                {submitting ? "Création..." : "Créer"}
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
