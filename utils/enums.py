@@ -49,3 +49,9 @@ class ReportStatusEnum(str, Enum):
 
 class ReportActionEnum(str, Enum):
     DELETE_TARGET = "delete_target"
+
+
+class MetricEnum(str, Enum):
+    NOTES = "notes"
+    COLLECTIONS = "collections"
+    REVIEWS = "reviews"

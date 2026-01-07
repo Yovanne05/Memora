@@ -1,0 +1,49 @@
+tags:
+  - user-statistics
+summary: Obtenir les statistiques en série temporelle
+description: >
+  Retourne les données de statistiques en série temporelle pour une métrique spécifique sur une période donnée.
+
+  **Métriques disponibles** : notes, collections, reviews
+
+  **Périodes disponibles** : 7, 30, 90 jours
+parameters:
+  - in: query
+    name: metric
+    type: string
+    enum: [notes, collections, reviews]
+    default: notes
+    description: Type de métrique à récupérer
+  - in: query
+    name: days
+    type: integer
+    enum: [7, 30, 90]
+    default: 30
+    description: Nombre de jours pour la série temporelle
+responses:
+  200:
+    description: Série temporelle des statistiques
+    schema:
+      type: object
+      properties:
+        metric:
+          type: string
+          enum: [notes, collections, reviews]
+          description: Type de métrique
+        days:
+          type: integer
+          description: Nombre de jours de la période
+        points:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+                description: Date du point de données
+              value:
+                type: integer
+                description: Valeur pour cette date
+  422:
+    description: 'Paramètres invalides (metric ou days incorrect)'

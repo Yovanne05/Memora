@@ -2,11 +2,13 @@ from dtos.user_statistics_dto import (
     ContentStatisticsDTO,
     ReviewStatisticsDTO,
     UserStatisticsDTO,
+    UserStatisticsTimeSeriesDTO,
 )
 from repositorys import user_statistics_repository, review_repository
 from services.interfaces.user_statistics_service_interface import (
     UserStatisticsServiceInterface,
 )
+from utils.enums import MetricEnum
 
 
 class UserStatisticsService(UserStatisticsServiceInterface):
@@ -46,6 +48,25 @@ class UserStatisticsService(UserStatisticsServiceInterface):
         return UserStatisticsDTO(
             content_statistics=content_stats, review_statistics=review_stats
         )
+
+    def get_timeseries(
+        self, user_id: str, metric: MetricEnum, days: int
+    ) -> UserStatisticsTimeSeriesDTO:
+        """Get timeseries data for a specific metric."""
+        if metric == MetricEnum.NOTES:
+            points = user_statistics_repository.get_notes_created_timeseries(
+                user_id, days
+            )
+        elif metric == MetricEnum.COLLECTIONS:
+            points = user_statistics_repository.get_collections_created_timeseries(
+                user_id, days
+            )
+        elif metric == MetricEnum.REVIEWS:
+            points = user_statistics_repository.get_reviews_timeseries(user_id, days)
+        else:
+            points = []
+
+        return UserStatisticsTimeSeriesDTO(metric=metric, days=days, points=points)
 
 
 user_statistics_service = UserStatisticsService()
