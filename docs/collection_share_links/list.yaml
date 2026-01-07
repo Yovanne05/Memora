@@ -1,0 +1,18 @@
+tags:
+  - collection-share-links
+summary: Lister les liens publics
+description: >
+  Retourne la liste des liens publics crees pour les collections de l'utilisateur,
+  triee par date de creation decroissante.
+parameters:
+  - in: query
+    name: collectionId
+    type: string
+    format: uuid
+    required: false
+    description: Filtre sur une collection specifique.
+responses:
+  200:
+    description: Liste des liens publics.
+    schema:
+      $ref: "#/definitions/CollectionShareLinkListResponse"

@@ -4,7 +4,7 @@ Algorithme SM-2 (SuperMemo 2) pour la répétition espacée.
 L'algorithme calcule le prochain intervalle de révision basé sur la performance de l'utilisateur.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import NamedTuple
 
@@ -70,7 +70,7 @@ def calculate_next_review(
         else:
             new_interval = int(current_interval_days * float(new_e_factor))
 
-    next_review_at = datetime.utcnow() + timedelta(days=new_interval)
+    next_review_at = datetime.now(timezone.utc) + timedelta(days=new_interval)
 
     return SM2Result(
         e_factor=new_e_factor,

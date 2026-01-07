@@ -1,6 +1,8 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from utils.enums import MetricEnum
+
 
 class ContentStatisticsDTO(BaseModel):
     notes_created: int = Field(alias="notesCreated")
@@ -29,3 +31,18 @@ class UserStatisticsDTO(BaseModel):
     )
 
     model_config = ConfigDict(populate_by_name=True)
+
+
+class TimeSeriesPointDTO(BaseModel):
+    date: str
+    value: int
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class UserStatisticsTimeSeriesDTO(BaseModel):
+    metric: MetricEnum
+    days: int
+    points: list[TimeSeriesPointDTO] = Field(default_factory=list)
+
+    model_config = ConfigDict(populate_by_name=True, use_enum_values=True)

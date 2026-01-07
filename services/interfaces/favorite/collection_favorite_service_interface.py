@@ -11,7 +11,9 @@ from repositorys.collection_favorite_repository import (
 
 class CollectionFavoriteServiceInterface(ABC):
     @abstractmethod
-    def find_many(self, params: CollectionFavoriteSearchParams) -> Tuple[List[CollectionFavoriteDTO], int]:
+    def find_many(
+        self, params: CollectionFavoriteSearchParams
+    ) -> Tuple[List[CollectionFavoriteDTO], int]:
         raise NotImplementedError
 
     @abstractmethod

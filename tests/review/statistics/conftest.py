@@ -30,7 +30,7 @@ class ReviewTestData:
         target_note_id = note_id or self.note_data.note_id
         payload = {"question": question, "answers": answers}
 
-        response = self.client.post(f"/flashcards/{target_note_id}", json=payload)
+        response = self.client.post(f"/notes/{target_note_id}/flashcards", json=payload)
         assert response.status_code == 201, response.get_data(as_text=True)
         body = response.get_json()
 
@@ -41,9 +41,11 @@ class ReviewTestData:
         answer_ids = [answer["id"] for answer in body["answers"]]
         self.flashcard_answer_ids[flashcard_id] = answer_ids
 
-        # Stocker la réponse correcte
-        correct_answer = next(answer for answer in body["answers"] if answer["is_correct"])
-        self.correct_answer_ids[flashcard_id] = correct_answer["id"]
+        # Stocker la réponse correcte en matchant avec le payload original qui contient is_correct
+        for i, input_answer in enumerate(answers):
+            if input_answer.get("is_correct", False):
+                self.correct_answer_ids[flashcard_id] = body["answers"][i]["id"]
+                break
 
         return body
 

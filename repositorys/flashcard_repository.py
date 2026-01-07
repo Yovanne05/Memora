@@ -5,7 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
 from daos.flashcard_dao import Flashcard
-from utils.access_scope import accessible_note_ids
+from domain_services.permission_domain_service import permission_domain_service
 from utils.db import get_db_session
 
 
@@ -22,7 +22,9 @@ class FlashcardSearchParams:
 
 
 def _scope_to_user(stmt, user):
-    allowed_note_ids = accessible_note_ids(user)
+    allowed_note_ids = permission_domain_service.get_accessible_note_ids(
+        user.id, user.role
+    )
     if allowed_note_ids is None:
         return stmt
     if not allowed_note_ids:
@@ -30,7 +32,9 @@ def _scope_to_user(stmt, user):
     return stmt.where(Flashcard.note_id.in_(allowed_note_ids))
 
 
-def list_for_user(user, params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flashcard], int]:
+def list_for_user(
+    user, params: Optional[FlashcardSearchParams] = None
+) -> Tuple[List[Flashcard], int]:
     param = params or FlashcardSearchParams()
 
     filters = []
@@ -38,11 +42,13 @@ def list_for_user(user, params: Optional[FlashcardSearchParams] = None) -> Tuple
         filters.append(Flashcard.note_id == param.note_id)
 
     if param.question_contains:
-        filters.append(Flashcard.question.ilike(
-            f"%{param.question_contains}%"))
+        filters.append(
+            Flashcard.question.ilike(f"%{param.question_contains}%")
+        )
 
-    stmt = select(Flashcard).where(
-        *filters).options(selectinload(Flashcard.answers))
+    stmt = select(Flashcard).where(*filters).options(
+        selectinload(Flashcard.answers)
+    )
 
     stmt = _scope_to_user(stmt, user)
 
@@ -52,11 +58,14 @@ def list_for_user(user, params: Optional[FlashcardSearchParams] = None) -> Tuple
         "updated_at": Flashcard.updated_at,
     }
     order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    order_expr = (
+        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    )
 
     with get_db_session() as session:
         total = session.scalar(
-            select(func.count()).select_from(stmt.subquery()))
+            select(func.count()).select_from(stmt.subquery())
+        )
         items = session.scalars(
             stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
         ).all()
@@ -81,10 +90,6 @@ def find_one_unscoped(flashcard_id: str) -> Optional[Flashcard]:
         return session.execute(stmt).scalar_one_or_none()
 
 
-def find_many(params: Optional[FlashcardSearchParams] = None) -> Tuple[List[Flashcard], int]:
-    raise NotImplementedError("Use list_for_user with an authenticated user context.")
-
-
 def find_by_note(note_id: str) -> List[Flashcard]:
     stmt = (
         select(Flashcard)
@@ -93,10 +98,6 @@ def find_by_note(note_id: str) -> List[Flashcard]:
     )
     with get_db_session() as session:
         return list(session.scalars(stmt).all())
-
-
-def find_one(flashcard_id: str) -> Optional[Flashcard]:
-    raise NotImplementedError("Use get_for_user or find_one_unscoped explicitly.")
 
 
 def add(flashcard: Flashcard) -> Flashcard:

@@ -6,6 +6,8 @@ from utils.enums import (
     RoleEnum,
     VisibilityEnum,
 )
+from utils.db import get_db_session
+from daos.user_dao import User
 
 
 def _create_user(client, role: RoleEnum = RoleEnum.CLIENT):
@@ -16,17 +18,25 @@ def _create_user(client, role: RoleEnum = RoleEnum.CLIENT):
         "password": password,
         "username": f"user-{slug}",
         "display_name": f"User {slug}",
-        "role": role.value,
     }
     response = client.post("/users", json=payload)
     assert response.status_code == 201, response.get_data(as_text=True)
     body = response.get_json()
-    return {"id": body["id"], "email": payload["email"], "password": password}
+    user_id = body["id"]
+
+    # Update role directly in database if not CLIENT
+    if role != RoleEnum.CLIENT:
+        with get_db_session() as session:
+            user = session.query(User).filter(User.id == user_id).one()
+            user.role = role
+            session.commit()
+
+    return {"id": user_id, "email": payload["email"], "password": password}
 
 
 def _login(client, email: str, password: str) -> str:
     response = client.post(
-        "/auth/login",
+        "/sessions",
         json={"identifier": email, "password": password},  # NOSONAR
     )
     assert response.status_code == 200, response.get_data(as_text=True)

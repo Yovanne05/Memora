@@ -17,3 +17,8 @@ class InvalidFileType(BadRequest):
 class FileTooLarge(BadRequest):
     def __init__(self, description: str = "File too large."):
         super().__init__(description=description)
+
+
+class NoteImageNotFound(BadRequest):
+    def __init__(self, description: str = "Image not found."):
+        super().__init__(description=description)

@@ -1,14 +1,14 @@
-"""Tests for PATCH /collection-shares/{collection_id}/shares/{user_id} endpoint"""
+"""Tests for PATCH /collections/{collection_id}/shares/{user_id} endpoint"""
 from utils.enums import SharePermissionEnum
 
 
 def test_update_share_returns_updated_share(client_with_collection_data):
     client, data = client_with_collection_data
-    data.ensure_share()
+    data.ensure_share(client)
     payload = {"permission": SharePermissionEnum.WRITE.value}
 
     response = client.patch(
-        f"/collection-shares/{data.collection_id}/shares/{data.share_user_id}",
+        f"/collections/{data.collection_id}/shares/{data.share_user_id}",
         json=payload,
     )
 

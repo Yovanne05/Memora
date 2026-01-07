@@ -1,4 +1,4 @@
-from werkzeug.exceptions import Conflict, NotFound, UnprocessableEntity
+from werkzeug.exceptions import Conflict, Forbidden, NotFound, UnprocessableEntity
 
 
 class CollectionShareTargetDoesNotExist(UnprocessableEntity):
@@ -30,5 +30,13 @@ class CollectionShareWithOwnerForbidden(UnprocessableEntity):
     def __init__(
         self,
         description: str = "Sharing a collection with its owner is not allowed.",
+    ):
+        super().__init__(description=description)
+
+
+class CollectionSharePermissionDenied(Forbidden):
+    def __init__(
+        self,
+        description: str = "You do not have permission to manage shares for this collection.",
     ):
         super().__init__(description=description)

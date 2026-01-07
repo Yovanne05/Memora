@@ -19,7 +19,10 @@ class CollectionShareSearchParams:
     offset: int = 0
 
 
-def find_many(params: Optional[CollectionShareSearchParams] = None) -> Tuple[List[CollectionShare], int]:
+
+def find_many(
+    params: Optional[CollectionShareSearchParams] = None,
+) -> Tuple[List[CollectionShare], int]:
     param = params or CollectionShareSearchParams()
 
     filters = []
@@ -34,11 +37,14 @@ def find_many(params: Optional[CollectionShareSearchParams] = None) -> Tuple[Lis
         "created_at": CollectionShare.created_at,
     }
     order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    order_expr = (
+        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    )
 
     with get_db_session() as session:
         total = session.scalar(
-            select(func.count()).select_from(stmt.subquery()))
+            select(func.count()).select_from(stmt.subquery())
+        )
         items = session.scalars(
             stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
         ).all()

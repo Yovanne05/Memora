@@ -1,7 +1,10 @@
 definitions:
   FlashcardAnswer:
     type: object
-    description: Réponse associée à une flashcard.
+    description: >
+      Réponse associée à une flashcard.
+      Note: Le champ `is_correct` n'est pas exposé dans cette réponse pour éviter la triche.
+      L'utilisateur découvre si sa réponse est correcte uniquement après avoir soumis une review (POST /reviews).
     properties:
       id:
         type: string
@@ -17,16 +20,12 @@ definitions:
         type: string
         description: Texte de la réponse.
         example: "Paris"
-      is_correct:
-        type: boolean
-        description: Indique si cette réponse est la bonne.
-        example: true
       created_at:
         type: string
         format: date-time
         description: Date de création.
         example: "2025-05-12T09:23:41Z"
-    required: ["id", "flashcard_id", "answer_text", "is_correct", "created_at"]
+    required: ["id", "flashcard_id", "answer_text", "created_at"]
 
   FlashcardAnswerCreatePayload:
     type: object

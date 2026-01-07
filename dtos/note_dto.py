@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel, ConfigDict, Field
 from utils.enums import VisibilityEnum
+from dtos.owner_dto import OwnerDTO
 
 
 class NoteCreateDTO(BaseModel):
@@ -30,12 +31,12 @@ class NoteDTO(BaseModel):
     title: str
     content: str
     visibility: VisibilityEnum
-    owner_id: str
-    owner_username: str | None = None
+    owners: List[OwnerDTO] = Field(default_factory=list)
     collection_id: str | None = None
     collection_name: str | None = None
     tags: List[str] = Field(default_factory=list)
     is_favorite: bool = False
+    user_permission: str | None = None  # "read", "write", "owner", or None
     created_at: datetime
     updated_at: datetime
 

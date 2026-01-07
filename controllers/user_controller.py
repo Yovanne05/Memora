@@ -2,11 +2,15 @@ from http import HTTPStatus
 from uuid import UUID
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
+from dtos.auth_dto import RegisterDTO
 from dtos.user_dto import UserCreateDTO, UserUpdateDTO
 from querys.user_query import UserFindQuery
+from services.impl.auth_service_impl import auth_service
 from services.impl.user_service_impl import user_service
+from utils.enums import RoleEnum
 
 bp_users = Blueprint("users", __name__, url_prefix="/users")
 
@@ -37,8 +41,15 @@ def find_one(user_id: UUID):
 @bp_users.post("")
 @swag_from("../docs/users/create.yaml")
 def create():
-    payload = UserCreateDTO.model_validate_json(request.data)
-    user = user_service.create(payload)
+    payload = RegisterDTO.model_validate_json(request.data)
+    user_create = UserCreateDTO(
+        email=payload.email,
+        password=payload.password,
+        username=payload.username,
+        display_name=payload.display_name,
+        role=RoleEnum.CLIENT,
+    )
+    user = user_service.create(user_create)
     return jsonify(user.model_dump()), HTTPStatus.CREATED
 
 

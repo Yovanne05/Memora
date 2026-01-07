@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from daos.review_dao import Review
@@ -8,7 +8,10 @@ from dtos.review_dto import (
     UpcomingReviewsGroupDTO,
     FlashcardWithReviewDTO,
 )
-from exceptions.review_exception import FlashcardNotFoundForReview, InvalidAnswerForFlashcard
+from exceptions.review_exception import (
+    FlashcardNotFoundForReview,
+    InvalidAnswerForFlashcard,
+)
 from repositorys import flashcard_repository, review_repository
 from services.interfaces.review_service_interface import ReviewServiceInterface
 from utils.enums import ReviewDifficultyEnum
@@ -16,7 +19,11 @@ from utils.enums import ReviewDifficultyEnum
 
 class ReviewService(ReviewServiceInterface):
     def submit_review(
-        self, user_id: str, flashcard_id: str, selected_answer_id: str, difficulty: str
+        self,
+        user_id: str,
+        flashcard_id: str,
+        selected_answer_id: str,
+        difficulty: str,
     ) -> ReviewDTO:
         flashcard = flashcard_repository.find_one_unscoped(flashcard_id)
         if not flashcard:
@@ -60,7 +67,7 @@ class ReviewService(ReviewServiceInterface):
             repetitions=sm2_result.repetitions,
             interval_days=sm2_result.interval_days,
             next_review_at=sm2_result.next_review_at,
-            reviewed_at=datetime.utcnow(),
+            reviewed_at=datetime.now(timezone.utc),
         )
 
         saved_review = review_repository.upsert_review(review)

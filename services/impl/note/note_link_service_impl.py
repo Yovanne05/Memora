@@ -6,17 +6,15 @@ from domain_services.note_domain_service import (
     ensure_note_link_does_not_exist,
     ensure_same_collection,
 )
+from domain_services.permission_domain_service import permission_domain_service
 from dtos.note_link_dto import NoteLinkCreateDTO, NoteLinkDTO
-from exceptions.note_link_exception import NoteLinkNotFound
 from mappers.note_link_mapper import dto_to_note_link, note_link_to_dto
-from repositorys import note_repository
-from repositorys import note_link_repository
+from repositorys import note_link_repository, note_repository
 from repositorys.note_link_repository import NoteLinkSearchParams
 from services.interfaces.note.note_link_service_interface import (
     NoteLinkServiceInterface,
 )
 from utils.auth import get_current_user
-from utils.access_scope import accessible_note_ids, can_read_note_links
 
 
 class NoteLinkService(NoteLinkServiceInterface):
@@ -26,18 +24,24 @@ class NoteLinkService(NoteLinkServiceInterface):
         user = get_current_user()
         base_note_id = params.note_id
 
-        if base_note_id and not can_read_note_links(user, base_note_id):
+        if base_note_id and not permission_domain_service.can_read_note(
+            base_note_id, user.id, user.role
+        ):
             return [], 0
 
         links, total = note_link_repository.find_many(params)
 
-        accessible_notes = accessible_note_ids(user)
+        accessible_notes = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
         if accessible_notes is not None:
             if not accessible_notes:
                 return [], 0
             links = [
-                link for link in links
-                if link.note_id_1 in accessible_notes or link.note_id_2 in accessible_notes
+                link
+                for link in links
+                if link.note_id_1 in accessible_notes
+                or link.note_id_2 in accessible_notes
             ]
             total = len(links)
 
@@ -56,7 +60,8 @@ class NoteLinkService(NoteLinkServiceInterface):
         ensure_same_collection(source_note, target_note)
 
         existing_link = note_link_repository.find_one(
-            note_id, payload.linked_note_id)
+            note_id, payload.linked_note_id
+        )
         ensure_note_link_does_not_exist(existing_link)
 
         link_entity = dto_to_note_link(note_id, payload.linked_note_id)

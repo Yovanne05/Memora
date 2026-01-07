@@ -9,6 +9,7 @@ class VisibilityEnum(str, Enum):
 class SharePermissionEnum(str, Enum):
     READ = "read"
     WRITE = "write"
+    OWNER = "owner"
 
 
 class RoleEnum(str, Enum):
@@ -48,3 +49,9 @@ class ReportStatusEnum(str, Enum):
 
 class ReportActionEnum(str, Enum):
     DELETE_TARGET = "delete_target"
+
+
+class MetricEnum(str, Enum):
+    NOTES = "notes"
+    COLLECTIONS = "collections"
+    REVIEWS = "reviews"

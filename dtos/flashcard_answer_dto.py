@@ -12,7 +12,6 @@ class FlashcardAnswerDTO(BaseModel):
     id: str
     flashcard_id: str
     answer_text: str
-    is_correct: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

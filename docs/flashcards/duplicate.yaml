@@ -4,6 +4,8 @@ summary: Dupliquer une flashcard
 description: >
   Duplique une flashcard existante avec toutes ses réponses dans la même note.
   La flashcard dupliquée aura un nouvel identifiant unique mais conservera la même question et les mêmes réponses.
+  
+  **Permissions requises:** WRITE ou OWNER sur la note parente.
 parameters:
   - in: path
     name: flashcard_id
@@ -17,4 +19,4 @@ responses:
     schema:
       $ref: "#/definitions/Flashcard"
   404:
-    description: Flashcard source introuvable.
+    description: Flashcard source introuvable ou permission insuffisante.

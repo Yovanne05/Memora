@@ -1,4 +1,4 @@
-from werkzeug.exceptions import Conflict, NotFound, UnprocessableEntity
+from werkzeug.exceptions import Conflict, Forbidden, NotFound, UnprocessableEntity
 
 
 class NoteShareTargetDoesNotExist(UnprocessableEntity):
@@ -28,5 +28,13 @@ class NoteShareWithOwnerForbidden(UnprocessableEntity):
     def __init__(
         self,
         description: str = "Sharing a note with its owner is not allowed.",
+    ):
+        super().__init__(description=description)
+
+
+class NoteSharePermissionDenied(Forbidden):
+    def __init__(
+        self,
+        description: str = "You do not have permission to manage shares for this note.",
     ):
         super().__init__(description=description)

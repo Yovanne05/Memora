@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Literal, Optional, Tuple, Set
+from typing import List, Literal, Optional, Set, Tuple
 
 from sqlalchemy import func, select
 
@@ -16,7 +16,11 @@ class NoteFavoriteSearchParams:
     offset: int = 0
 
 
-def find_many(user_id: str, params: Optional[NoteFavoriteSearchParams] = None) -> Tuple[List[NoteFavorite], int]:
+
+def find_many(
+    user_id: str,
+    params: Optional[NoteFavoriteSearchParams] = None,
+) -> Tuple[List[NoteFavorite], int]:
     param = params or NoteFavoriteSearchParams()
     filters = [NoteFavorite.user_id == user_id]
     if param.note_id:
@@ -26,10 +30,14 @@ def find_many(user_id: str, params: Optional[NoteFavoriteSearchParams] = None) -
 
     sort_map = {"created_at": NoteFavorite.created_at}
     order_column = sort_map[param.sort_by]
-    order_expr = order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    order_expr = (
+        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
+    )
 
     with get_db_session() as session:
-        total = session.scalar(select(func.count()).select_from(stmt.subquery()))
+        total = session.scalar(
+            select(func.count()).select_from(stmt.subquery())
+        )
         items = session.scalars(
             stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
         ).all()
@@ -56,7 +64,9 @@ def add(favorite: NoteFavorite) -> NoteFavorite:
 
 def delete(user_id: str, note_id: str) -> bool:
     with get_db_session() as session:
-        favorite = session.get(NoteFavorite, {"user_id": user_id, "note_id": note_id})
+        favorite = session.get(
+            NoteFavorite, {"user_id": user_id, "note_id": note_id}
+        )
         if not favorite:
             return False
         session.delete(favorite)

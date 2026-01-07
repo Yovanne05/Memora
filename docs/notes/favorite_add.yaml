@@ -1,5 +1,5 @@
 tags:
-  - notes
+  - note-favorites
 summary: Ajouter une note aux favoris
 description: Marque la note comme favorite pour l'utilisateur authentifie.
 parameters:

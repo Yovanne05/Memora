@@ -1,0 +1,27 @@
+tags:
+  - note-share-links
+summary: Creer un lien public pour une note
+description: >
+  Genere un lien public permettant l'acces a une note sans authentification.
+  L'ID du lien sert d'identifiant dans l'URL publique.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note a partager.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteShareLinkCreatePayload"
+responses:
+  201:
+    description: Lien public cree.
+    schema:
+      $ref: "#/definitions/NoteShareLink"
+  404:
+    description: Note introuvable.
+  422:
+    description: Donnees invalides.

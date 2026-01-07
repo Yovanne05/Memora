@@ -3,6 +3,8 @@ tags:
 summary: Supprimer une flashcard
 description: >
   Supprime définitivement une flashcard et toutes ses réponses associées.
+  
+  **Permissions requises:** OWNER sur la note parente.
 parameters:
   - in: path
     name: flashcard_id
@@ -14,4 +16,4 @@ responses:
   204:
     description: Flashcard supprimée avec succès.
   404:
-    description: Flashcard introuvable.
+    description: Flashcard introuvable ou permission insuffisante.

@@ -1,13 +1,11 @@
-"""Tests for GET /collection-shares endpoint"""
+"""Tests for GET /collections/{collection_id}/shares endpoint"""
 
 
 def test_list_shares_returns_items(client_with_collection_data):
     client, data = client_with_collection_data
-    data.ensure_share()
+    data.ensure_share(client)
 
-    response = client.get(
-        "/collection-shares", query_string={"collectionId": data.collection_id}
-    )
+    response = client.get(f"/collections/{data.collection_id}/shares")
 
     assert response.status_code == 200
     payload = response.get_json()

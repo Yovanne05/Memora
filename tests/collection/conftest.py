@@ -18,7 +18,7 @@ from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
 
 # Test constants
 TEST_PASSWORD_HASH = "test-password-hash" # NOSONAR
-TEST_PASSWORD = "ValidPass1!" # NOSONAR
+TEST_PASSWORD = "ValidPass12!" # NOSONAR
 
 
 
@@ -58,11 +58,18 @@ class CollectionTestData:
         user_repository.add(user)
         self.created_users.add(user_id)
 
-    def _create_collection(self) -> str:
+    def create_collection(
+        self, owner_id: str | None = None, name: str | None = None
+    ) -> str:
+        return self._create_collection(owner_id=owner_id, name=name)
+
+    def _create_collection(
+        self, owner_id: str | None = None, name: str | None = None
+    ) -> str:
         dto = CollectionCreateDTO(
-            name=self.collection_name,
+            name=name or self.collection_name,
             description="Collection created for collection share tests.",
-            owner_id=self.owner_id,
+            owner_id=self.owner_id if owner_id is None else owner_id,
             visibility=VisibilityEnum.PRIVATE,
         )
         created = collection_service.create(dto)
@@ -70,18 +77,17 @@ class CollectionTestData:
         return created.id
 
     def ensure_share(
-        self, permission: SharePermissionEnum = SharePermissionEnum.READ
+        self, client, permission: SharePermissionEnum = SharePermissionEnum.READ
     ):
-        share = collection_share_service.share_collection(
-            self.collection_id,
-            CollectionShareCreateDTO(
-                collection_id=self.collection_id,
-                user_id=self.share_user_id,
-                permission=permission,
-            ),
+        response = client.post(
+            f"/collections/{self.collection_id}/shares",
+            json={
+                "user_id": self.share_user_id,
+                "permission": permission.value,
+            },
         )
         self.created_shares.add((self.collection_id, self.share_user_id))
-        return share
+        return response.get_json()
 
     def track_created_share(self, collection_id: str, user_id: str) -> None:
         self.created_shares.add((collection_id, user_id))
@@ -104,7 +110,7 @@ def collection_test_data():
 
 
 @pytest.fixture
-def client_with_collection_data(collection_test_data):
+def client_with_collection_data():
     from app import create_app
     app = create_app()
     with app.test_client() as client:
@@ -114,7 +120,7 @@ def client_with_collection_data(collection_test_data):
         auth_email = f"auth-{uuid4().hex[:8]}@example.com"
         auth_password = TEST_PASSWORD
         auth_resp = client.post(
-            "/auth/register",
+            "/users",
             json={
                 "email": auth_email,
                 "password": auth_password, # NOSONAR
@@ -122,6 +128,15 @@ def client_with_collection_data(collection_test_data):
             },
         )
         assert auth_resp.status_code == 201, auth_resp.get_data(as_text=True)
-        token = auth_resp.get_json()["access_token"]
+        auth_body = auth_resp.get_json()
+        user_id = auth_body["id"]
+        data = CollectionTestData(owner_id=user_id)
+        data.bootstrap()
+        login_resp = client.post(
+            "/sessions",
+            json={"identifier": auth_email, "password": auth_password}, # NOSONAR
+        )
+        assert login_resp.status_code == 200, login_resp.get_data(as_text=True)
+        token = login_resp.get_json()["access_token"]
         client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
-        yield client, collection_test_data
+        yield client, data
