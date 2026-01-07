@@ -21,8 +21,8 @@ def test_get_upcoming_reviews_after_single_review(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -42,9 +42,9 @@ def test_get_upcoming_reviews_after_single_review(client_with_review_data):
     assert len(group["flashcards"]) == 1
 
     flashcard = group["flashcards"][0]
-    assert flashcard["flashcardId"] == flashcard_id
+    assert flashcard["flashcard_id"] == flashcard_id
     assert "question" in flashcard
-    assert "nextReviewAt" in flashcard
+    assert "next_review_at" in flashcard
 
 
 def test_get_upcoming_reviews_multiple_flashcards_same_date(client_with_review_data):
@@ -53,8 +53,8 @@ def test_get_upcoming_reviews_multiple_flashcards_same_date(client_with_review_d
     for flashcard_id in data.flashcard_ids[:2]:
         correct_answer_id = data.correct_answer_ids[flashcard_id]
         payload = {
-            "flashcardId": flashcard_id,
-            "selectedAnswerId": correct_answer_id,
+            "flashcard_id": flashcard_id,
+            "selected_answer_id": correct_answer_id,
             "difficulty": "good",
         }
         client.post("/reviews", json=payload)
@@ -78,15 +78,15 @@ def test_get_upcoming_reviews_sorted_by_date(client_with_review_data):
     flashcard2_id = data.flashcard_ids[1]
 
     payload1 = {
-        "flashcardId": flashcard1_id,
-        "selectedAnswerId": data.correct_answer_ids[flashcard1_id],
+        "flashcard_id": flashcard1_id,
+        "selected_answer_id": data.correct_answer_ids[flashcard1_id],
         "difficulty": "again",
     }
     client.post("/reviews", json=payload1)
 
     payload2 = {
-        "flashcardId": flashcard2_id,
-        "selectedAnswerId": data.correct_answer_ids[flashcard2_id],
+        "flashcard_id": flashcard2_id,
+        "selected_answer_id": data.correct_answer_ids[flashcard2_id],
         "difficulty": "easy",
     }
     client.post("/reviews", json=payload2)
@@ -109,8 +109,8 @@ def test_get_upcoming_reviews_contains_question_text(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -131,8 +131,8 @@ def test_get_upcoming_reviews_date_format(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -156,8 +156,8 @@ def test_get_upcoming_reviews_only_for_current_user(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -180,8 +180,8 @@ def test_get_upcoming_reviews_includes_past_due(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -202,8 +202,8 @@ def test_get_upcoming_reviews_response_structure(client_with_review_data):
     correct_answer_id = data.correct_answer_ids[flashcard_id]
 
     payload = {
-        "flashcardId": flashcard_id,
-        "selectedAnswerId": correct_answer_id,
+        "flashcard_id": flashcard_id,
+        "selected_answer_id": correct_answer_id,
         "difficulty": "good",
     }
     client.post("/reviews", json=payload)
@@ -223,12 +223,12 @@ def test_get_upcoming_reviews_response_structure(client_with_review_data):
             assert isinstance(flashcard, dict)
             assert "flashcardId" in flashcard
             assert "question" in flashcard
-            assert "nextReviewAt" in flashcard
-            next_review_str = flashcard["nextReviewAt"]
+            assert "next_review_at" in flashcard
+            next_review_str = flashcard["next_review_at"]
             try:
                 datetime.fromisoformat(next_review_str.replace("Z", "+00:00"))
             except ValueError:
                 try:
                     parsedate_to_datetime(next_review_str)
                 except (ValueError, TypeError):
-                    assert False, f"nextReviewAt format is invalid: {next_review_str}"
+                    assert False, f"next_review_at format is invalid: {next_review_str}"
