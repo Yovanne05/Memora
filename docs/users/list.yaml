@@ -17,15 +17,15 @@ parameters:
     required: false
     description: Filtre sur un alias exact.
   - in: query
-    name: usernameContains
+    name: username_contains
     type: string
     required: false
     description: Recherche partielle dans les alias.
   - in: query
-    name: displayNameContains
+    name: display_name_contains
     type: string
     required: false
-    description: Recherche partielle dans les noms d’affichage.
+    description: Recherche partielle dans les noms d'affichage.
   - in: query
     name: role
     type: string
@@ -38,13 +38,13 @@ parameters:
     required: false
     description: Liste CSV d’identifiants précis (uuid1,uuid2,...).
   - in: query
-    name: sortBy
+    name: sort_by
     type: string
     enum: ["email", "username", "created_at", "id"]
     default: "created_at"
     description: Champ utilisé pour le tri.
   - in: query
-    name: sortDir
+    name: sort_dir
     type: string
     enum: ["asc", "desc"]
     default: "desc"

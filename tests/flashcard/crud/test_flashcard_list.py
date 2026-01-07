@@ -1,9 +1,9 @@
-"""Tests for GET /flashcards endpoint with noteId filter"""
+"""Tests for GET /flashcards endpoint with note_id filter"""
 
 
 def test_list_flashcards_returns_empty(client_with_note_data):
     client, data = client_with_note_data
-    response = client.get(f"/flashcards?noteId={data.note_id}")
+    response = client.get(f"/flashcards?note_id={data.note_id}")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -27,7 +27,7 @@ def test_list_flashcards_returns_created_flashcards(client_with_note_data):
     client.post(f"/notes/{data.note_id}/flashcards", json=payload1)
     client.post(f"/notes/{data.note_id}/flashcards", json=payload2)
 
-    response = client.get(f"/flashcards?noteId={data.note_id}")
+    response = client.get(f"/flashcards?note_id={data.note_id}")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -41,7 +41,7 @@ def test_list_flashcards_for_nonexistent_note_returns_empty(client_with_note_dat
     client, _ = client_with_note_data
 
     response = client.get(
-        "/flashcards?noteId=00000000-0000-0000-0000-000000000000"
+        "/flashcards?note_id=00000000-0000-0000-0000-000000000000"
     )
 
     assert response.status_code == 200

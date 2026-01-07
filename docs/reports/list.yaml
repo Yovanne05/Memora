@@ -23,28 +23,28 @@ parameters:
         "technical_issue",
         "other",
       ]
-  - name: targetType
+  - name: target_type
     in: query
     type: string
     enum: ["note", "collection"]
-  - name: reporterId
+  - name: reporter_id
     in: query
     type: string
     format: uuid
-  - name: noteId
+  - name: note_id
     in: query
     type: string
     format: uuid
-  - name: collectionId
+  - name: collection_id
     in: query
     type: string
     format: uuid
-  - name: sortBy
+  - name: sort_by
     in: query
     type: string
     enum: ["created_at", "status"]
     default: "created_at"
-  - name: sortDir
+  - name: sort_dir
     in: query
     type: string
     enum: ["asc", "desc"]

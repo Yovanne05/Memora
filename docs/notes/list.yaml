@@ -6,19 +6,19 @@ description: >
   (proprietaire, collection, visibilite, texte).
 parameters:
   - in: query
-    name: ownerId
+    name: owner_id
     type: string
     format: uuid
     required: false
     description: Limite la recherche aux notes appartenant a cet utilisateur.
   - in: query
-    name: collectionId
+    name: collection_id
     type: string
     format: uuid
     required: false
     description: Filtre sur une collection precise.
   - in: query
-    name: sharedWithUserId
+    name: shared_with_user_id
     type: string
     format: uuid
     required: false
@@ -30,12 +30,12 @@ parameters:
     required: false
     description: Filtre les notes selon leur niveau de partage.
   - in: query
-    name: titleContains
+    name: title_contains
     type: string
     required: false
     description: Sous-chaine a rechercher dans les titres.
   - in: query
-    name: contentContains
+    name: content_contains
     type: string
     required: false
     description: Sous-chaine recherchee dans le contenu.
@@ -45,7 +45,7 @@ parameters:
     required: false
     description: Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
   - in: query
-    name: isFavorite
+    name: is_favorite
     type: boolean
     required: false
     description: Si true, ne renvoie que les notes favorites de l'utilisateur courant.
@@ -55,13 +55,13 @@ parameters:
     required: false
     description: Liste CSV d'identifiants de tags; la note doit contenir tous les tags fournis.
   - in: query
-    name: sortBy
+    name: sort_by
     type: string
     enum: ["title", "created_at", "updated_at"]
     default: "created_at"
     description: Champ utilise pour trier les resultats.
   - in: query
-    name: sortDir
+    name: sort_dir
     type: string
     enum: ["asc", "desc"]
     default: "desc"

@@ -30,8 +30,8 @@ def test_get_statistics_with_complete_scenario(
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["contentStatistics"]["notesCreated"] == 3
-    assert body["contentStatistics"]["collectionsCreated"] == 2
-    assert body["contentStatistics"]["flashcardsCreated"] == 3
-    assert body["contentStatistics"]["notesSharedByUser"] == 1
-    assert body["contentStatistics"]["collectionsSharedByUser"] == 1
+    assert body["content_statistics"]["notes_created"] == 3
+    assert body["content_statistics"]["collections_created"] == 2
+    assert body["content_statistics"]["flashcards_created"] == 3
+    assert body["content_statistics"]["notes_shared_by_user"] == 1
+    assert body["content_statistics"]["collections_shared_by_user"] == 1

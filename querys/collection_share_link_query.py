@@ -1,15 +1,13 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from repositorys.collection_share_link_repository import CollectionShareLinkSearchParams
 
 
 class CollectionShareLinkFindQuery(BaseModel):
-    collection_id: Optional[UUID] = Field(default=None, alias="collectionId")
-
-    model_config = ConfigDict(populate_by_name=True)
+    collection_id: Optional[UUID] = Field(default=None)
 
     def to_params(self) -> CollectionShareLinkSearchParams:
         return CollectionShareLinkSearchParams(

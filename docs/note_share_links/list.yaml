@@ -6,7 +6,7 @@ description: >
   triee par date de creation decroissante.
 parameters:
   - in: query
-    name: noteId
+    name: note_id
     type: string
     format: uuid
     required: false
