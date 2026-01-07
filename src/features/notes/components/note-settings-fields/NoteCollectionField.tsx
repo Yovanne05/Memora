@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select"
 import type { Collection } from "@/features/collections/models/collection.model"
 import type { UseFormReturn } from "react-hook-form"
-import type { NoteFormValues } from "../note-edit-form/types"
+import type { NoteFormValues } from "../../types/note-edit-form.types"
 
 type NoteCollectionFieldProps = {
   form: UseFormReturn<NoteFormValues>
@@ -63,3 +63,6 @@ export function NoteCollectionField({
     />
   )
 }
+
+
+

@@ -5,8 +5,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
 import type { Note } from "@/features/notes/models/note.model"
-import type { AvailableNoteOption } from "../../types/note.types"
-import type { NotesSort } from "../CollectionNotesHeader"
+import type { AvailableNoteOption, NotesSort } from "../types/note.types"
 
 export function useCollectionNotesSection() {
   const { collectionId } = useParams({
@@ -105,3 +104,5 @@ export function useCollectionNotesSection() {
     onRemoveFromCollection: handleRemoveFromCollection,
   }
 }
+
+

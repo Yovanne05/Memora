@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react"
-import type { CollectionFormValues } from "../components/CollectionEditForm"
+import type { CollectionFormValues } from "../types/collection-form.types"
 import type { Collection, CollectionUpdate } from "../models/collection.model"
 import { useUpdateCollectionMutation } from "./useUpdateCollectionMutation"
 

@@ -1,12 +1,12 @@
 import { useEffect } from "react"
 
 import type { WorkspaceState } from "../types/workspace.types"
-import type { WorkspaceAction } from "./workspaceReducer"
+import type { WorkspaceAction } from "../context/workspaceReducer"
 import {
   persistExpandedCollections,
   persistView,
   readExpandedCollections,
-} from "./storage"
+} from "../context/storage"
 
 type Dispatch = (action: WorkspaceAction) => void
 
@@ -26,3 +26,4 @@ export function useWorkspaceStorage(state: WorkspaceState, dispatch: Dispatch) {
     persistView(state.view)
   }, [state.view])
 }
+

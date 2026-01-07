@@ -1,7 +1,7 @@
 import { Controller, type Control } from "react-hook-form"
 
 import { FormSelect } from "@/components/ui/form-select"
-import { VISIBILITY_OPTIONS } from "./constants"
+import { VISIBILITY_OPTIONS } from "../../types/collection-form.constants"
 import type { CollectionFormInput } from "../../schemas/collection.schema"
 
 type CollectionVisibilityFieldProps = {
@@ -35,3 +35,6 @@ export function CollectionVisibilityField({
     />
   )
 }
+
+
+

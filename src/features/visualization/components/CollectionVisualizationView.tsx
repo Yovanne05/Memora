@@ -7,7 +7,7 @@ import { NoteSidebar } from "../../notes/components/NoteSidebar"
 import { LoadingState } from "./VisualizationSkeleton"
 import { CollectionVisualizationCanvas } from "./collection-visualization/CollectionVisualizationCanvas"
 import { CollectionVisualizationExtras } from "./collection-visualization/CollectionVisualizationExtras"
-import { useCollectionVisualizationInteractions } from "./collection-visualization/useCollectionVisualizationInteractions"
+import { useCollectionVisualizationInteractions } from "../hooks/useCollectionVisualizationInteractions"
 
 interface CollectionVisualizationViewProps {
   readonly collectionId?: string
@@ -69,3 +69,6 @@ export function CollectionVisualizationView({
     </div>
   )
 }
+
+
+

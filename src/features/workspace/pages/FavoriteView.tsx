@@ -3,7 +3,7 @@ import { FavoritesEmpty } from "./favorites-view/FavoritesEmpty"
 import { FavoritesError } from "./favorites-view/FavoritesError"
 import { FavoritesHeader } from "./favorites-view/FavoritesHeader"
 import { FavoritesLoading } from "./favorites-view/FavoritesLoading"
-import { useFavoritesView } from "./favorites-view/useFavoritesView"
+import { useFavoritesView } from "../hooks/useFavoritesView"
 
 export default function FavoritesView() {
   const { isLoading, isError, errorMessage, notes, collections, hasContent } =
@@ -28,3 +28,6 @@ export default function FavoritesView() {
     </div>
   )
 }
+
+
+

@@ -5,10 +5,10 @@ import { FormTextarea } from "@/components/ui/form-textarea"
 import { CollectionFormActions } from "./collection-edit-form/CollectionFormActions"
 import { CollectionTagsField } from "./collection-edit-form/CollectionTagsField"
 import { CollectionVisibilityField } from "./collection-edit-form/CollectionVisibilityField"
-import { useCollectionEditForm } from "./collection-edit-form/useCollectionEditForm"
-import type { CollectionEditFormProps } from "./collection-edit-form/types"
+import { useCollectionEditForm } from "../hooks/useCollectionEditForm"
+import type { CollectionEditFormProps } from "../types/collection-form.types"
 
-export type { CollectionFormValues } from "./collection-edit-form/types"
+export type { CollectionFormValues } from "../types/collection-form.types"
 
 export const CollectionEditForm = memo(function CollectionEditForm({
   mode,
@@ -70,3 +70,7 @@ export const CollectionEditForm = memo(function CollectionEditForm({
     </form>
   )
 })
+
+
+
+

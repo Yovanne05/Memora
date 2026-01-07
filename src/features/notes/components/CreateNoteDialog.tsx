@@ -12,7 +12,7 @@ import { CreateNoteDialogFooter } from "./create-note-dialog/CreateNoteDialogFoo
 import { TagsField } from "./create-note-dialog/TagsField"
 import { TitleField } from "./create-note-dialog/TitleField"
 import { VisibilityField } from "./create-note-dialog/VisibilityField"
-import { useCreateNoteForm } from "./create-note-dialog/useCreateNoteForm"
+import { useCreateNoteForm } from "../hooks/useCreateNoteForm"
 
 interface CreateNoteDialogProps {
   open: boolean
@@ -86,3 +86,6 @@ export function CreateNoteDialog({
     </Dialog>
   )
 }
+
+
+

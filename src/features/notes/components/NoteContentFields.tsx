@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { RichTextEditor } from "@/components/editor/RichTextEditor"
-import type { NoteFormValues } from "./NoteEditForm"
+import type { NoteFormValues } from "../types/note-edit-form.types"
 
 interface NoteContentFieldsProps {
   form: UseFormReturn<NoteFormValues>

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/form"
 import { TagInput } from "@/components/ui/tag-input"
 import type { UseFormReturn } from "react-hook-form"
-import type { NoteFormValues } from "../note-edit-form/types"
+import type { NoteFormValues } from "../../types/note-edit-form.types"
 
 type NoteTagsFieldProps = {
   form: UseFormReturn<NoteFormValues>
@@ -38,3 +38,6 @@ export function NoteTagsField({ form, disabled }: Readonly<NoteTagsFieldProps>) 
     />
   )
 }
+
+
+

@@ -2,11 +2,11 @@ import { useCallback, useEffect } from "react"
 import type { MouseEvent } from "react"
 import type { Edge, Node } from "reactflow"
 
-import type { CollectionVisualization, CustomNodeData } from "../../types/visualization.type"
-import { useNodeSelection } from "../../hooks/useNodeSelection"
-import { useNoteSidebar } from "../../hooks/useNoteSidebar"
-import { useRelatedNotes } from "../../hooks/useRelatedNotes"
-import { useNoteQuery } from "../../../notes/hooks/useNoteQuery"
+import type { CollectionVisualization, CustomNodeData } from "../types/visualization.type"
+import { useNodeSelection } from "./useNodeSelection"
+import { useNoteSidebar } from "./useNoteSidebar"
+import { useRelatedNotes } from "./useRelatedNotes"
+import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
 
 type UseCollectionVisualizationInteractionsArgs = {
   nodes: Node<CustomNodeData>[]
@@ -91,3 +91,4 @@ export function useCollectionVisualizationInteractions({
     },
   }
 }
+

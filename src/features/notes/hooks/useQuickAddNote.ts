@@ -2,8 +2,8 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import { useCreateNoteMutation } from "../../hooks/useCreateNoteMutation"
-import type { NoteVisibility } from "../../models/note.model"
+import { useCreateNoteMutation } from "./useCreateNoteMutation"
+import type { NoteVisibility } from "../models/note.model"
 
 type UseQuickAddNoteArgs = {
   collectionId?: string | null
@@ -64,3 +64,4 @@ export function useQuickAddNote({ collectionId, onSuccess }: UseQuickAddNoteArgs
     handleClose,
   }
 }
+

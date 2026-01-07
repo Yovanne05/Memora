@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { useNoteLinksQuery } from "../../hooks/useNoteLinksQuery"
-import { useLinkNotes } from "../../hooks/useLinkNotes"
-import type { Note } from "../../models/note.model"
+import { useNoteLinksQuery } from "./useNoteLinksQuery"
+import { useLinkNotes } from "./useLinkNotes"
+import type { Note } from "../models/note.model"
 
 type UseQuickLinkNoteArgs = {
   note: Note
@@ -59,3 +59,4 @@ export function useQuickLinkNote({ note, onSuccess }: UseQuickLinkNoteArgs) {
     handleOpenChange,
   }
 }
+

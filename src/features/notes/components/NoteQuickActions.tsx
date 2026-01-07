@@ -1,7 +1,7 @@
 import type { Note } from "../models/note.model"
 import { NoteQuickActionsDialogs } from "./note-quick-actions/NoteQuickActionsDialogs"
 import { NoteQuickActionsMenu } from "./note-quick-actions/NoteQuickActionsMenu"
-import { useNoteQuickActions } from "./note-quick-actions/useNoteQuickActions"
+import { useNoteQuickActions } from "../hooks/useNoteQuickActions"
 
 interface NoteQuickActionsProps {
   readonly note: Note
@@ -66,3 +66,4 @@ export function NoteQuickActions({
     </>
   )
 }
+

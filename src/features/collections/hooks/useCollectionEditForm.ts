@@ -2,12 +2,12 @@ import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import type { CollectionVisibility } from "../../models/collection.model"
+import type { CollectionVisibility } from "../models/collection.model"
 import {
   collectionFormSchema,
   type CollectionFormInput,
-} from "../../schemas/collection.schema"
-import type { CollectionEditFormProps, CollectionFormValues } from "./types"
+} from "../schemas/collection.schema"
+import type { CollectionEditFormProps, CollectionFormValues } from "../types/collection-form.types"
 
 type UseCollectionEditFormArgs = Pick<
   CollectionEditFormProps,
@@ -72,3 +72,5 @@ export function useCollectionEditForm({
     handleFormSubmit,
   }
 }
+
+

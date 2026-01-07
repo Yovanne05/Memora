@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react"
 
 import { useCollectionQuery } from "@/features/collections/hooks/useCollectionQuery"
 import { useUpdateCollectionMutation } from "@/features/collections/hooks/useUpdateCollectionMutation"
-import { useWorkspaceNotes } from "../../hooks/useWorkspaceNotes"
-import { useWorkspaceContext } from "../../context/WorkspaceContext"
-import type { CollectionFormValues } from "@/features/collections/components/CollectionEditForm"
+import { useWorkspaceNotes } from "./useWorkspaceNotes"
+import { useWorkspaceContext } from "../context/WorkspaceContext"
+import type { CollectionFormValues } from "@/features/collections/types/collection-form.types"
 
 export function useCollectionNotesView(collectionId: string) {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -53,3 +53,4 @@ export function useCollectionNotesView(collectionId: string) {
     handleUpdateCollection,
   }
 }
+

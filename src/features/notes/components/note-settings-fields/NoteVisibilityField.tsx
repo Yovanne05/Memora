@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/form"
 import { Switch } from "@/components/ui/switch"
 import type { UseFormReturn } from "react-hook-form"
-import type { NoteFormValues } from "../note-edit-form/types"
+import type { NoteFormValues } from "../../types/note-edit-form.types"
 
 type NoteVisibilityFieldProps = {
   form: UseFormReturn<NoteFormValues>
@@ -52,3 +52,6 @@ export function NoteVisibilityField({
     />
   )
 }
+
+
+

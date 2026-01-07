@@ -5,11 +5,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  CollectionEditForm,
-  type CollectionFormValues,
-} from "./CollectionEditForm"
+import { CollectionEditForm } from "./CollectionEditForm"
 import type { CollectionVisibility } from "../models/collection.model"
+import type { CollectionFormValues } from "../types/collection-form.types"
 
 type FormMode = "create" | "edit"
 

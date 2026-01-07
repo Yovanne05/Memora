@@ -3,7 +3,7 @@ import { toast } from "sonner"
 import { CollectionFormDialog } from "./CollectionFormDialog"
 import { useCreateCollectionMutation } from "../hooks/useCreateCollectionMutation"
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import type { CollectionFormValues } from "./CollectionEditForm"
+import type { CollectionFormValues } from "../types/collection-form.types"
 
 interface CreateCollectionDialogProps {
   open: boolean

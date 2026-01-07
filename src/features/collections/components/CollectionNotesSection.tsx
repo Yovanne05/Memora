@@ -1,6 +1,6 @@
 import { CollectionNotesGridWithLinks } from "./CollectionNotesGridWithLinks"
 import { CollectionNotesHeader } from "./CollectionNotesHeader"
-import { useCollectionNotesSection } from "./collection-notes/useCollectionNotesSection"
+import { useCollectionNotesSection } from "../hooks/useCollectionNotesSection"
 
 export function CollectionNotesSection() {
   const {
@@ -39,3 +39,6 @@ export function CollectionNotesSection() {
     </div>
   )
 }
+
+
+

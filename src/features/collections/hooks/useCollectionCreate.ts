@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import type { CollectionFormValues } from "../components/CollectionEditForm"
+import type { CollectionFormValues } from "../types/collection-form.types"
 import type { CollectionCreate } from "../models/collection.model"
 import { useCreateCollectionMutation } from "./useCreateCollectionMutation"
 

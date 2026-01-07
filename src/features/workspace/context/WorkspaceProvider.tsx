@@ -5,7 +5,7 @@ import { WorkspaceContext } from "./context"
 import { createWorkspaceActions } from "./actions"
 import { workspaceReducer } from "./workspaceReducer"
 import { getInitialWorkspaceState, workspaceDefaults } from "./storage"
-import { useWorkspaceStorage } from "./useWorkspaceStorage"
+import { useWorkspaceStorage } from "../hooks/useWorkspaceStorage"
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(
@@ -24,3 +24,4 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     </WorkspaceContext.Provider>
   )
 }
+

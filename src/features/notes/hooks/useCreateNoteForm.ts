@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import type { NoteVisibility } from "../../models/note.model"
-import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"
+import type { NoteVisibility } from "../models/note.model"
+import { noteCreateFormSchema, type NoteCreateFormInput } from "../schemas/note.schema"
 
 type UseCreateNoteFormArgs = {
   submitting: boolean
@@ -51,3 +51,4 @@ export function useCreateNoteForm({ submitting, onSubmit }: UseCreateNoteFormArg
     handleFormSubmit,
   }
 }
+

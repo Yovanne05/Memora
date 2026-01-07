@@ -3,7 +3,7 @@ import { Popover, PopoverTrigger } from "@/components/ui/popover"
 import type { Note } from "../models/note.model"
 import { QuickLinkNotePopoverContent } from "./quick-link-note/QuickLinkNotePopoverContent"
 import { QuickLinkNoteTrigger } from "./quick-link-note/QuickLinkNoteTrigger"
-import { useQuickLinkNote } from "./quick-link-note/useQuickLinkNote"
+import { useQuickLinkNote } from "../hooks/useQuickLinkNote"
 
 interface QuickLinkNoteProps {
   readonly note: Note
@@ -63,3 +63,6 @@ export const QuickLinkNote = memo(function QuickLinkNote({
     </Popover>
   )
 })
+
+
+

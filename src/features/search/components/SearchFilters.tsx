@@ -10,7 +10,7 @@ import {
   ORDER_OPTIONS,
   SORT_OPTIONS,
   TYPE_OPTIONS,
-} from "./search-filters/constants"
+} from "../types/search-filters.constants"
 
 interface SearchFiltersProps {
   readonly filters: SearchFiltersType
@@ -88,3 +88,6 @@ export function SearchFilters({
     </div>
   )
 }
+
+
+

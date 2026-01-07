@@ -2,7 +2,7 @@ import type { UseFormReturn } from "react-hook-form"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Collection } from "@/features/collections/models/collection.model"
-import type { NoteFormValues } from "./note-edit-form/types"
+import type { NoteFormValues } from "../types/note-edit-form.types"
 import { NoteCollectionField } from "./note-settings-fields/NoteCollectionField"
 import { NoteTagsField } from "./note-settings-fields/NoteTagsField"
 import { NoteVisibilityField } from "./note-settings-fields/NoteVisibilityField"
@@ -40,3 +40,4 @@ export function NoteSettingsFields({
     </Card>
   )
 }
+

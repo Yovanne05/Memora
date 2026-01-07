@@ -1,6 +1,6 @@
 import { QuickAddNoteDialog } from "./quick-add-note/QuickAddNoteDialog"
 import { QuickAddNoteTrigger } from "./quick-add-note/QuickAddNoteTrigger"
-import { useQuickAddNote } from "./quick-add-note/useQuickAddNote"
+import { useQuickAddNote } from "../hooks/useQuickAddNote"
 
 interface QuickAddNoteProps {
   readonly collectionId?: string | null

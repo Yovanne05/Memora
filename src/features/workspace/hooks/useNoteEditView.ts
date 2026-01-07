@@ -4,9 +4,9 @@ import { useRouter } from "@tanstack/react-router"
 import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
 import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutation"
-import { useWorkspaceContext } from "../../context/WorkspaceContext"
-import { useWorkspaceNavigation } from "../../hooks/useWorkspaceNavigation"
-import type { NoteFormValues } from "@/features/notes/components/NoteEditForm"
+import { useWorkspaceContext } from "../context/WorkspaceContext"
+import { useWorkspaceNavigation } from "./useWorkspaceNavigation"
+import type { NoteFormValues } from "@/features/notes/types/note-edit-form.types"
 
 type UseNoteEditViewArgs = {
   noteId: string
@@ -79,3 +79,4 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
     handleCancel,
   }
 }
+

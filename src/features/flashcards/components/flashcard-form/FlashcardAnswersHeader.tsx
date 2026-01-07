@@ -2,7 +2,7 @@ import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { FormLabel } from "@/components/ui/form"
-import { MAX_ANSWERS } from "./constants"
+import { MAX_ANSWERS } from "../../types/flashcard-form.constants"
 
 type FlashcardAnswersHeaderProps = {
   count: number
@@ -32,3 +32,6 @@ export function FlashcardAnswersHeader({
     </div>
   )
 }
+
+
+

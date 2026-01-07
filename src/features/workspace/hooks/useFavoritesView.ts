@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 
-import { useWorkspaceContext } from "../../context/WorkspaceContext"
+import { useWorkspaceContext } from "../context/WorkspaceContext"
 import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import type { NotesFilters } from "@/features/notes/types/note-query"
@@ -60,3 +60,4 @@ export function useFavoritesView() {
     hasContent,
   }
 }
+

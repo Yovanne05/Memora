@@ -1,6 +1,6 @@
 import { CollectionFormDialog } from "@/features/collections/components/CollectionFormDialog"
 import type { Collection } from "@/features/collections/models/collection.model"
-import type { CollectionFormValues } from "@/features/collections/components/CollectionEditForm"
+import type { CollectionFormValues } from "@/features/collections/types/collection-form.types"
 
 type CollectionNotesEditDialogProps = {
   collection: Collection | null

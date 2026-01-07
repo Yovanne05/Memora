@@ -3,7 +3,7 @@ import { Form } from "@/components/ui/form"
 import { FlashcardAnswersField } from "./flashcard-form/FlashcardAnswersField"
 import { FlashcardFormActions } from "./flashcard-form/FlashcardFormActions"
 import { FlashcardQuestionField } from "./flashcard-form/FlashcardQuestionField"
-import { useFlashcardForm } from "./flashcard-form/useFlashcardForm"
+import { useFlashcardForm } from "../hooks/useFlashcardForm"
 import type { FlashcardEditForm } from "../schemas/flashcard.schema"
 
 interface FlashcardFormProps {
@@ -40,3 +40,6 @@ export function FlashcardForm({
     </Form>
   )
 }
+
+
+

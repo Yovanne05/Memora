@@ -4,7 +4,7 @@ import { CollectionNotesError } from "./collection-notes-view/CollectionNotesErr
 import { CollectionNotesHeader } from "./collection-notes-view/CollectionNotesHeader"
 import { CollectionNotesList } from "./collection-notes-view/CollectionNotesList"
 import { CollectionNotesLoading } from "./collection-notes-view/CollectionNotesLoading"
-import { useCollectionNotesView } from "./collection-notes-view/useCollectionNotesView"
+import { useCollectionNotesView } from "../hooks/useCollectionNotesView"
 
 interface CollectionNotesViewProps {
   readonly collectionId: string
@@ -79,3 +79,6 @@ export default function CollectionNotesView({
     </div>
   )
 }
+
+
+

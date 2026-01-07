@@ -2,10 +2,10 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import { useCreateNoteMutation } from "../../hooks/useCreateNoteMutation"
-import { useDeleteNoteMutation } from "../../hooks/useDeleteNoteMutation"
-import { useUpdateNoteMutation } from "../../hooks/useUpdateNoteMutation"
-import type { Note } from "../../models/note.model"
+import { useCreateNoteMutation } from "./useCreateNoteMutation"
+import { useDeleteNoteMutation } from "./useDeleteNoteMutation"
+import { useUpdateNoteMutation } from "./useUpdateNoteMutation"
+import type { Note } from "../models/note.model"
 
 type UseNoteQuickActionsArgs = {
   note: Note
@@ -81,3 +81,4 @@ export function useNoteQuickActions({
     handleDelete,
   }
 }
+

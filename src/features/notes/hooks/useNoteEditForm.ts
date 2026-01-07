@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
 import { formatTime } from "@/lib/format.utils"
-import { noteEditFormSchema } from "../../schemas/note.schema"
-import type { Note } from "../../models/note.model"
-import type { NoteFormValues } from "./types"
+import { noteEditFormSchema } from "../schemas/note.schema"
+import type { Note } from "../models/note.model"
+import type { NoteFormValues } from "../types/note-edit-form.types"
 
 type UseNoteEditFormArgs = {
   note?: Note
@@ -62,3 +62,5 @@ export function useNoteEditForm({
     handleFormSubmit,
   }
 }
+
+

@@ -1,4 +1,4 @@
-import type { CollectionVisibility } from "../../models/collection.model"
+import type { CollectionVisibility } from "../models/collection.model"
 
 export interface CollectionFormValues {
   name: string

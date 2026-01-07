@@ -3,7 +3,7 @@ import { NoteLinkManager } from "@/features/notes/components/NoteLinkManager"
 import { NoteEditError } from "./note-edit-view/NoteEditError"
 import { NoteEditLoading } from "./note-edit-view/NoteEditLoading"
 import { NoteEditReadOnlyBanner } from "./note-edit-view/NoteEditReadOnlyBanner"
-import { useNoteEditView } from "./note-edit-view/useNoteEditView"
+import { useNoteEditView } from "../hooks/useNoteEditView"
 
 interface NoteEditViewProps {
   readonly noteId: string
@@ -47,3 +47,6 @@ export default function NoteEditView({ noteId, collectionId }: NoteEditViewProps
     </div>
   )
 }
+
+
+

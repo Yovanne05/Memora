@@ -3,7 +3,7 @@ import { WorkspaceBreadcrumb } from "./workspace-header/WorkspaceBreadcrumb"
 import { WorkspaceGraphButton } from "./workspace-header/WorkspaceGraphButton"
 import { WorkspaceSearch } from "./workspace-header/WorkspaceSearch"
 import { WorkspaceViewToggle } from "./workspace-header/WorkspaceViewToggle"
-import { useWorkspaceBreadcrumbs } from "./workspace-header/useWorkspaceBreadcrumbs"
+import { useWorkspaceBreadcrumbs } from "../hooks/useWorkspaceBreadcrumbs"
 
 export function WorkspaceHeader() {
   const { state, actions } = useWorkspaceContext()
@@ -27,3 +27,6 @@ export function WorkspaceHeader() {
     </header>
   )
 }
+
+
+

@@ -5,8 +5,8 @@ import {
   flashcardEditFormSchema,
   type FlashcardEditForm,
   type FlashcardEditFormInput,
-} from "../../schemas/flashcard.schema"
-import { MAX_ANSWERS } from "./constants"
+} from "../schemas/flashcard.schema"
+import { MAX_ANSWERS } from "../types/flashcard-form.constants"
 
 type UseFlashcardFormArgs = {
   noteId: string
