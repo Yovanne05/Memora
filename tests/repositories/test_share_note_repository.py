@@ -1,15 +1,127 @@
 """
-Tests pour le repository share_note.
-Utilise la vraie BD via test_factory.
+Tests pour le repository share_note (accès base de données).
+
+Ces tests vérifient :
+- Ajouter/supprimer un partage de note
+- Récupérer partages par note/user
+- Contraintes uniques et permissions
+
+La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from uuid import uuid4
 
-# TODO: Migrer les tests de base de données
-# Voir les exemples dans test_collection_repository.py
+from daos.note_share_dao import NoteShare
+from repositorys import note_share_repository
+from utils.enums import PermissionEnum
 
-class TestShare_noteRepository:
-    """Tests pour les requêtes SQL share_note"""
-    
-    def test_placeholder(self, test_factory):
-        # TODO: Implémenter les tests
-        pass
+
+class TestNoteShareRepositoryAdd:
+    """Tests pour ajouter un partage"""
+
+    def test_add_share_success(self, test_factory):
+        """Ajouter un partage de note."""
+        # Arrange
+        owner_id = test_factory.create_user(label="owner")
+        user_id = test_factory.create_user(label="target")
+        collection_id = test_factory.create_collection(owner_id=owner_id)
+        note_id = test_factory.create_note(owner_id=owner_id, collection_id=collection_id)
+
+        share = NoteShare(
+            note_id=note_id,
+            user_id=user_id,
+            permission=PermissionEnum.READ
+        )
+
+        # Act
+        result = note_share_repository.add(share)
+
+        # Assert
+        assert result.note_id == note_id
+        assert result.user_id == user_id
+        assert result.permission == PermissionEnum.READ
+
+
+class TestNoteShareRepositoryFind:
+    """Tests pour récupérer un partage"""
+
+    def test_find_one_by_note_and_user(self, test_factory):
+        """Récupérer un partage par note et user."""
+        # Arrange
+        owner_id = test_factory.create_user(label="owner")
+        user_id = test_factory.create_user(label="target")
+        collection_id = test_factory.create_collection(owner_id=owner_id)
+        note_id = test_factory.create_note(owner_id=owner_id, collection_id=collection_id)
+
+        share = NoteShare(
+            note_id=note_id,
+            user_id=user_id,
+            permission=PermissionEnum.WRITE
+        )
+        note_share_repository.add(share)
+
+        # Act
+        result = note_share_repository.find_one(note_id, user_id)
+
+        # Assert
+        assert result is not None
+        assert result.note_id == note_id
+        assert result.user_id == user_id
+        assert result.permission == PermissionEnum.WRITE
+
+
+class TestNoteShareRepositoryUpdate:
+    """Tests pour mettre à jour un partage"""
+
+    def test_update_share_success(self, test_factory):
+        """Mettre à jour les permissions d'un partage."""
+        # Arrange
+        owner_id = test_factory.create_user(label="owner")
+        user_id = test_factory.create_user(label="target")
+        collection_id = test_factory.create_collection(owner_id=owner_id)
+        note_id = test_factory.create_note(owner_id=owner_id, collection_id=collection_id)
+
+        share = NoteShare(
+            note_id=note_id,
+            user_id=user_id,
+            permission=PermissionEnum.READ
+        )
+        added = note_share_repository.add(share)
+
+        # Act
+        added.permission = PermissionEnum.WRITE
+        result = note_share_repository.update(added)
+
+        # Assert
+        assert result.permission == PermissionEnum.WRITE
+
+        # Verify in DB
+        found = note_share_repository.find_one(note_id, user_id)
+        assert found.permission == PermissionEnum.WRITE
+
+
+class TestNoteShareRepositoryDelete:
+    """Tests pour supprimer un partage"""
+
+    def test_delete_share_success(self, test_factory):
+        """Supprimer un partage de note."""
+        # Arrange
+        owner_id = test_factory.create_user(label="owner")
+        user_id = test_factory.create_user(label="target")
+        collection_id = test_factory.create_collection(owner_id=owner_id)
+        note_id = test_factory.create_note(owner_id=owner_id, collection_id=collection_id)
+
+        share = NoteShare(
+            note_id=note_id,
+            user_id=user_id,
+            permission=PermissionEnum.READ
+        )
+        note_share_repository.add(share)
+
+        # Act
+        deleted = note_share_repository.delete(note_id, user_id)
+
+        # Assert
+        assert deleted is True
+        result = note_share_repository.find_one(note_id, user_id)
+        assert result is None
