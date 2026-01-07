@@ -3,6 +3,7 @@ import { toast } from "sonner"
 import { noteLinksService } from "../services/note-links.service"
 import type { CreateNoteLink, NoteLink } from "../models/note-link.model"
 import { NOTE_LINKS_QUERY_KEYS } from "./note-links.keys"
+import { logger } from "@/lib/logger"
 
 interface MutationCallbacks {
   onSuccess?: (data: NoteLink) => void
@@ -38,7 +39,7 @@ export function useCreateNoteLinkMutation(noteId: string, callbacks?: MutationCa
         const message = error instanceof Error ? error.message : "La création du lien a échoué."
         toast.error(message)
       }
-      console.error("Failed to create note link:", error)
+      logger.error("Failed to create note link:", error)
       callbacks?.onError?.(error)
     },
   })

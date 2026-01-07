@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import type { Control, UseFormReturn } from "react-hook-form"
+import type { Control } from "react-hook-form"
 import type { FlashcardEditFormInput } from "../../schemas/flashcard.schema"
 
 type FlashcardAnswerItemProps = {
   control: Control<FlashcardEditFormInput>
-  form: UseFormReturn<FlashcardEditFormInput>
   index: number
   fieldId: string
   isCorrect: boolean
@@ -26,7 +25,6 @@ type FlashcardAnswerItemProps = {
 
 export function FlashcardAnswerItem({
   control,
-  form,
   index,
   fieldId,
   isCorrect,

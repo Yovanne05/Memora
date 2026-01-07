@@ -12,6 +12,7 @@ import {
   groupEdgesByConnection,
   calculateEdgeOffset,
 } from "./layoutEngine"
+import { logger } from "@/lib/logger"
 
 export function transformNodesToReactFlow(
   nodes: GraphNode[],
@@ -49,7 +50,7 @@ export function filterValidEdges(
       validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
 
     if (!isValid) {
-      console.warn(
+      logger.warn(
         `[Visualization] Arête ignorée - nœuds manquants:`,
         edge
       )

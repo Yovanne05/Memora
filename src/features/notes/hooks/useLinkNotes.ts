@@ -3,6 +3,7 @@ import { useNotesQuery } from "./useNotesQuery"
 import { useCreateNoteLinkMutation } from "./useCreateNoteLinkMutation"
 import type { Note } from "../models/note.model"
 import type { NoteLink } from "../models/note-link.model"
+import { logger } from "@/lib/logger"
 
 interface UseLinkNotesOptions {
   note: Note
@@ -45,7 +46,7 @@ export function useLinkNotes({ note, existingLinks = [], onSuccess }: UseLinkNot
       onSuccess?.()
       return true
     } catch (error) {
-      console.error("Failed to create link:", error)
+      logger.error("Failed to create link:", error)
       return false
     }
   }

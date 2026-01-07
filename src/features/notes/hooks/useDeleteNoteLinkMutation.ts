@@ -3,6 +3,7 @@ import { toast } from "sonner"
 import { noteLinksService } from "../services/note-links.service"
 import type { NoteLink } from "../models/note-link.model"
 import { NOTE_LINKS_QUERY_KEYS } from "./note-links.keys"
+import { logger } from "@/lib/logger"
 
 interface MutationCallbacks {
   onSuccess?: () => void
@@ -39,7 +40,7 @@ export function useDeleteNoteLinkMutation(noteId: string, callbacks?: MutationCa
         const message = error instanceof Error ? error.message : "La suppression du lien a échoué."
         toast.error(message)
       }
-      console.error("Failed to delete note link:", error)
+      logger.error("Failed to delete note link:", error)
       callbacks?.onError?.(error)
     },
   })

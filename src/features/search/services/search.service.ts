@@ -7,6 +7,7 @@ import type {
   PaginatedSearchResponse,
 } from '../types/search.types'
 import type { SearchFilters } from '../types/search-query'
+import { logger } from "@/lib/logger"
 
 export interface ISearchService {
   search(params: SearchFilters): Promise<PaginatedSearchResponse>
@@ -45,7 +46,7 @@ export function createSearchService(
           results.push(...collections.items.map(item => ({ type: 'collection' as const, item })))
           totalCount += collections.total
         } catch (error) {
-          console.error('Error fetching collections:', error)
+          logger.error('Error fetching collections:', error)
         }
       }
 
@@ -63,7 +64,7 @@ export function createSearchService(
           results.push(...paginatedNotes.items.map(item => ({ type: 'note' as const, item })))
           totalCount += paginatedNotes.total
         } catch (error) {
-          console.error('Error fetching notes:', error)
+          logger.error('Error fetching notes:', error)
         }
       }
 

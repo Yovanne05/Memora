@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 interface RateLimiterConfig {
   maxRequests: number;
   windowMs: number;
@@ -41,7 +42,7 @@ class RateLimiter {
       const waitTime = this.config.windowMs - (Date.now() - oldestRequest.timestamp);
 
       if (waitTime > 0) {
-        console.debug(`Rate limit reached. Waiting ${waitTime}ms before next request.`);
+        logger.debug(`Rate limit reached. Waiting ${waitTime}ms before next request.`);
         await this.sleep(waitTime);
         this.requests = this.requests.filter(
           (record) => Date.now() - record.timestamp < this.config.windowMs

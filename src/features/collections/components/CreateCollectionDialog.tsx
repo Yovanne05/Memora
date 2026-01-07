@@ -4,6 +4,7 @@ import { CollectionFormDialog } from "./CollectionFormDialog"
 import { useCreateCollectionMutation } from "../hooks/useCreateCollectionMutation"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import type { CollectionFormValues } from "../types/collection-form.types"
+import { logger } from "@/lib/logger"
 
 interface CreateCollectionDialogProps {
   open: boolean
@@ -43,7 +44,7 @@ export function CreateCollectionDialog({
       })
     } catch (error) {
       toast.error("Impossible de créer la collection")
-      console.error("Error creating collection:", error)
+      logger.error("Error creating collection:", error)
     }
   }
 

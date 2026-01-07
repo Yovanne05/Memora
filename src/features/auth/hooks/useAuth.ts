@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/errors"
 import { clearAccessToken, getAccessToken, setAccessToken } from "../lib/token-storage"
 import type { LoginPayload, RegisterPayload } from "../models/auth.model"
 import { authService } from "../services/auth.service"
+import { logger } from "@/lib/logger"
 
 const AUTH_USER_QUERY_KEY = ["auth", "user"] as const
 
@@ -64,7 +65,7 @@ export function useAuth() {
         await authService.logout()
       }
     } catch (error) {
-      console.warn("Logout request failed, cleaning up client-side token only.", error)
+      logger.warn("Logout request failed, cleaning up client-side token only.", error)
     } finally {
       syncToken(null)
       queryClient.removeQueries({ queryKey: AUTH_USER_QUERY_KEY })

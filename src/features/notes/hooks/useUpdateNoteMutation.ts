@@ -5,6 +5,7 @@ import type { MutationCallbacks } from "@/lib/mutation-callbacks"
 import { notesService } from "../services/notes.service"
 import type { Note, NoteUpdate } from "../models/note.model"
 import { NOTES_QUERY_KEYS } from "./notes.keys"
+import { logger } from "@/lib/logger"
 
 export function useUpdateNoteMutation(callbacks?: MutationCallbacks<Note>) {
   const queryClient = useQueryClient()
@@ -25,7 +26,7 @@ export function useUpdateNoteMutation(callbacks?: MutationCallbacks<Note>) {
         const message = error instanceof Error ? error.message : "La mise à jour de la note a échoué."
         toast.error(message)
       }
-      console.error("Failed to update note:", error)
+      logger.error("Failed to update note:", error)
       callbacks?.onError?.(error)
     },
   })

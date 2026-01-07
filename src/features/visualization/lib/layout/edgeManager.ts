@@ -1,5 +1,6 @@
 import type { NodePosition, EdgeGroup } from "../../types/visualization.type"
 import type { GraphEdge } from "@/features/collections/models/collection.model"
+import { logger } from "@/lib/logger"
 
 type ConnectionSides = {
   sourceSide: "top" | "bottom" | "left" | "right"
@@ -93,7 +94,7 @@ export function groupEdgesByConnection(
     const targetPos = positions[edge.target]
 
     if (!sourcePos || !targetPos) {
-      console.warn(
+      logger.warn(
         `Impossible de positionner l'arete ${edge.source} -> ${edge.target} car une position est manquante`
       )
       return

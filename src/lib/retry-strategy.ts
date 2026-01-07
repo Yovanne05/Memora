@@ -1,4 +1,5 @@
 import { ApiError, TimeoutError, NetworkError } from "./errors";
+import { logger } from "./logger"
 
 const DEFAULT_RETRY_DELAY = 1000; // 1 second
 const DEFAULT_RETRY_DELAY_MULTIPLIER = 2; // Exponential backoff
@@ -24,7 +25,7 @@ export function isRetryable(
 ): boolean {
   if (!isIdempotent(method)) {
     if (retriesRemaining > 0) {
-      console.warn(
+      logger.warn(
         `Non-idempotent method ${method.toUpperCase()} failed, not retrying. ` +
           `Retry mechanism is disabled for non-idempotent requests to prevent duplicate operations.`
       );

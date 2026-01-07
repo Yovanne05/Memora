@@ -4,6 +4,7 @@ import type { MutationCallbacks } from "@/lib/mutation-callbacks"
 
 import { notesService } from "../services/notes.service"
 import { NOTES_QUERY_KEYS } from "./notes.keys"
+import { logger } from "@/lib/logger"
 
 export function useDeleteNoteMutation(callbacks?: MutationCallbacks<void>) {
   const queryClient = useQueryClient()
@@ -23,7 +24,7 @@ export function useDeleteNoteMutation(callbacks?: MutationCallbacks<void>) {
         const message = error instanceof Error ? error.message : "La suppression de la note a échoué."
         toast.error(message)
       }
-      console.error("Failed to delete note:", error)
+      logger.error("Failed to delete note:", error)
       callbacks?.onError?.(error)
     },
   })

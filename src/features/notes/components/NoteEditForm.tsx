@@ -3,7 +3,7 @@ import { Form } from "@/components/ui/form"
 import { FormActions } from "./FormActions"
 import { NoteContentFields } from "./NoteContentFields"
 import { NoteSettingsFields } from "./NoteSettingsFields"
-import type { NoteEditFormProps, NoteFormValues } from "../types/note-edit-form.types"
+import type { NoteEditFormProps } from "../types/note-edit-form.types"
 import { useNoteEditForm } from "../hooks/useNoteEditForm"
 
 export type { NoteFormValues } from "../types/note-edit-form.types"

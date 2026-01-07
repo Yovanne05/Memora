@@ -4,6 +4,7 @@ import type {
   AdjacencyList,
 } from "../../types/visualization.type"
 import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
+import { logger } from "@/lib/logger"
 
 export function validateEdges(
   edges: GraphEdge[],
@@ -13,7 +14,7 @@ export function validateEdges(
     const isValid = nodeIds.has(edge.source) && nodeIds.has(edge.target)
 
     if (!isValid) {
-      console.warn(
+      logger.warn(
         `Arete ignorée car elle reference un noeud inconnu: ${edge.source} -> ${edge.target}`
       )
     }

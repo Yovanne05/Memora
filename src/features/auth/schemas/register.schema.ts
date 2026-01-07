@@ -8,7 +8,7 @@ export const registerSchema = z.object({
     .string()
     .min(12, "12 caractères minimum")
     .regex(/[A-Z]/, "Au moins 1 majuscule")
-    .regex(/[0-9]/, "Au moins 1 chiffre")
+    .regex(/\d/, "Au moins 1 chiffre")
     .regex(/[^A-Za-z0-9]/, "Au moins 1 caractère spécial"),
 })
 

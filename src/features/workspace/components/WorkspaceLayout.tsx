@@ -11,6 +11,7 @@ import { useWorkspaceKeyboardShortcuts } from "../hooks/useWorkspaceKeyboardShor
 import { useCreateNoteMutation } from "@/features/notes/hooks/useCreateNoteMutation"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import type { NoteVisibility } from "@/features/notes/models/note.model"
+import { logger } from "@/lib/logger"
 
 interface WorkspaceLayoutProps {
   readonly children: ReactNode
@@ -56,7 +57,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       router.navigate({ to: path })
     } catch (error) {
       toast.error("Impossible de créer la note")
-      console.error("Error creating note:", error)
+      logger.error("Error creating note:", error)
     }
   }
 

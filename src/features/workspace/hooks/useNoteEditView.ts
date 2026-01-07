@@ -7,6 +7,7 @@ import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutat
 import { useWorkspaceContext } from "../context"
 import { useWorkspaceNavigation } from "./useWorkspaceNavigation"
 import type { NoteFormValues } from "@/features/notes/types/note-edit-form.types"
+import { logger } from "@/lib/logger"
 
 type UseNoteEditViewArgs = {
   noteId: string
@@ -42,7 +43,7 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
         },
       })
     } catch (error) {
-      console.error("Failed to update note:", error)
+      logger.error("Failed to update note:", error)
     }
   }
 
@@ -55,7 +56,7 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
         navigateToAllNotes()
       }
     } catch (error) {
-      console.error("Failed to delete note:", error)
+      logger.error("Failed to delete note:", error)
     }
   }
 

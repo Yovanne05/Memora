@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import type { MutationCallbacks } from "@/lib/mutation-callbacks"
+import { logger } from "@/lib/logger"
 
 export interface ResourceMutationConfig<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>
@@ -57,7 +58,7 @@ export function useResourceMutation<TData = unknown, TVariables = unknown>(
         toast.error(message)
       }
 
-      console.error("Mutation error:", error)
+      logger.error("Mutation error:", error)
 
       callbacks?.onError?.(error)
     },

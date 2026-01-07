@@ -5,6 +5,7 @@ import { collectionsService } from '@/features/collections/services/collections.
 import type { Collection, CollectionUpdate } from '@/features/collections/models/collection.model'
 import type { PaginatedCollections } from '../types/paginated-collection'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
+import { logger } from "@/lib/logger"
 
 export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collection>) {
   const queryClient = useQueryClient()
@@ -47,7 +48,7 @@ export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collec
         const message = error instanceof Error ? error.message : 'La mise à jour de la collection a échoué.'
         toast.error(message)
       }
-      console.error('Failed to update collection:', error)
+      logger.error('Failed to update collection:', error)
       callbacks?.onError?.(error)
     },
   })

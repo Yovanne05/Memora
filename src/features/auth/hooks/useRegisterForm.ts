@@ -8,6 +8,7 @@ import { useRouter } from "@tanstack/react-router"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { registerSchema } from "@/features/auth/schemas/register.schema"
 import { getRegisterErrorMessage } from "@/features/auth/lib/register-errors"
+import { logger } from "@/lib/logger"
 
 export function useRegisterForm(redirectTo: string) {
   const router = useRouter()
@@ -39,7 +40,7 @@ export function useRegisterForm(redirectTo: string) {
       toast.success("Compte créé avec succès. Vous pouvez maintenant vous connecter.")
       await router.navigate({ to: "/auth/login", search: { redirect: redirectTo } })
     } catch (error) {
-      console.error("Failed to register user", error)
+      logger.error("Failed to register user", error)
       const message = getRegisterErrorMessage(error)
       toast.error(message)
       setFormError(message)
