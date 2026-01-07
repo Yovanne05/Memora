@@ -1,15 +1,310 @@
 """
-Tests pour le service note.
-Mock le repository note_repository.
+Tests pour le service note (logique métier).
+
+Ces tests vérifient la logique métier du service note :
+- Création de notes
+- Mise à jour de notes
+- Suppression de notes
+- Validation des contraintes (titre unique, collection valide)
+- Gestion des favoris
+
+Les repositories sont MOCKÉS pour isoler la logique du service.
 """
 import pytest
+from uuid import uuid4
+from unittest.mock import Mock
 
-# TODO: Migrer la logique métier
-# Voir les exemples dans test_collection_service.py
+from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO, NoteDTO
+from daos.note_dao import Note
+from daos.user_dao import User
+from daos.collection_dao import Collection
+from exceptions.note_exception import NoteNotFound, NoteTitleConflict
+from exceptions.collection_exception import CollectionNotFound
+from exceptions.user_exception import UserNotFound
+from utils.enums import VisibilityEnum, RoleEnum
 
-class TestNoteService:
-    """Tests pour la logique métier note"""
-    
-    def test_placeholder(self):
-        # TODO: Implémenter les tests
-        pass
+
+class TestNoteServiceCreate:
+    """Tests pour la création de note"""
+
+    def test_create_note_success(self, mock_note_repository, mock_user_repository, mock_collection_repository):
+        """Créer une note avec des données valides."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        user_id = str(uuid4())
+        collection_id = str(uuid4())
+
+        mock_user_repository.find_one.return_value = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT
+        )
+
+        mock_collection_repository.find_for_owner.return_value = Collection(
+            id=collection_id,
+            name="Test Collection",
+            owner_id=user_id,
+            visibility=VisibilityEnum.PRIVATE
+        )
+
+        mock_note_repository.find_one_by_title.return_value = None
+
+        created_note = Note(
+            id=str(uuid4()),
+            title="Test Note",
+            content="Test content",
+            owner_id=user_id,
+            collection_id=collection_id,
+            visibility=VisibilityEnum.PRIVATE
+        )
+        mock_note_repository.add.return_value = created_note
+
+        dto = NoteCreateDTO(
+            title="Test Note",
+            content="Test content",
+            owner_id=user_id,
+            collection_id=collection_id,
+            visibility=VisibilityEnum.PRIVATE
+        )
+
+        # Act
+        result = note_crud_service.create(dto)
+
+        # Assert
+        assert isinstance(result, NoteDTO)
+        assert result.title == "Test Note"
+        assert result.owner_id == user_id
+        mock_user_repository.find_one.assert_called_once_with(user_id)
+        mock_collection_repository.find_for_owner.assert_called_once_with(collection_id, user_id)
+        mock_note_repository.add.assert_called_once()
+
+    def test_create_note_raises_user_not_found(self, mock_note_repository, mock_user_repository):
+        """Créer une note avec un owner inexistant lève UserNotFound."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+        from exceptions.user_exception import UserNotFound
+
+        # Arrange
+        user_id = str(uuid4())
+        mock_user_repository.find_one.return_value = None
+
+        dto = NoteCreateDTO(
+            title="Test Note",
+            content="Test content",
+            owner_id=user_id,
+            visibility=VisibilityEnum.PRIVATE
+        )
+
+        # Act & Assert
+        with pytest.raises(UserNotFound):
+            note_crud_service.create(dto)
+
+        mock_user_repository.find_one.assert_called_once_with(user_id)
+        mock_note_repository.add.assert_not_called()
+
+    def test_create_note_raises_title_conflict(self, mock_note_repository, mock_user_repository, mock_collection_repository):
+        """Créer une note avec un titre existant lève NoteTitleConflict."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        user_id = str(uuid4())
+        collection_id = str(uuid4())
+
+        mock_user_repository.find_one.return_value = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT
+        )
+
+        mock_collection_repository.find_for_owner.return_value = Collection(
+            id=collection_id,
+            name="Test Collection",
+            owner_id=user_id
+        )
+
+        existing_note = Note(
+            id=str(uuid4()),
+            title="Duplicate Title",
+            owner_id=user_id,
+            collection_id=collection_id
+        )
+        mock_note_repository.find_one_by_title.return_value = existing_note
+
+        dto = NoteCreateDTO(
+            title="Duplicate Title",
+            content="Test",
+            owner_id=user_id,
+            collection_id=collection_id
+        )
+
+        # Act & Assert
+        with pytest.raises(NoteTitleConflict):
+            note_crud_service.create(dto)
+
+        mock_note_repository.add.assert_not_called()
+
+
+class TestNoteServiceFindOne:
+    """Tests pour la récupération d'une note"""
+
+    def test_find_one_success(self, mock_note_repository, mock_note_favorite_repository, monkeypatch):
+        """Récupérer une note existante."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        note_id = str(uuid4())
+        user_id = str(uuid4())
+
+        # Mock get_current_user
+        current_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT
+        )
+        monkeypatch.setattr("services.impl.note.note_crud_service_impl.get_current_user", lambda: current_user)
+
+        note_entity = Note(
+            id=note_id,
+            title="Test Note",
+            content="Test content",
+            owner_id=user_id,
+            visibility=VisibilityEnum.PRIVATE
+        )
+        mock_note_repository.get_for_user.return_value = note_entity
+        mock_note_favorite_repository.favorite_note_ids_for_user.return_value = []
+
+        # Act
+        result = note_crud_service.find_one(note_id)
+
+        # Assert
+        assert isinstance(result, NoteDTO)
+        assert result.id == note_id
+        assert result.title == "Test Note"
+        mock_note_repository.get_for_user.assert_called_once()
+
+    def test_find_one_not_found(self, mock_note_repository, monkeypatch):
+        """Récupérer une note inexistante lève NoteNotFound."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        note_id = str(uuid4())
+        user_id = str(uuid4())
+
+        current_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT
+        )
+        monkeypatch.setattr("services.impl.note.note_crud_service_impl.get_current_user", lambda: current_user)
+
+        mock_note_repository.get_for_user.return_value = None
+
+        # Act & Assert
+        with pytest.raises(NoteNotFound):
+            note_crud_service.find_one(note_id)
+
+
+class TestNoteServiceUpdate:
+    """Tests pour la mise à jour de note"""
+
+    def test_update_note_success(self, mock_note_repository):
+        """Mettre à jour une note existante."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        note_id = str(uuid4())
+        existing_note = Note(
+            id=note_id,
+            title="Old Title",
+            content="Old content",
+            owner_id=str(uuid4()),
+            visibility=VisibilityEnum.PRIVATE
+        )
+        updated_note = Note(
+            id=note_id,
+            title="New Title",
+            content="New content",
+            owner_id=existing_note.owner_id,
+            visibility=VisibilityEnum.PUBLIC
+        )
+
+        mock_note_repository.find_one_unscoped.return_value = existing_note
+        mock_note_repository.update.return_value = updated_note
+
+        dto = NoteUpdateDTO(
+            title="New Title",
+            content="New content",
+            visibility=VisibilityEnum.PUBLIC
+        )
+
+        # Act
+        result = note_crud_service.update(note_id, dto)
+
+        # Assert
+        assert result.title == "New Title"
+        assert result.content == "New content"
+        mock_note_repository.find_one_unscoped.assert_called_once_with(note_id)
+        mock_note_repository.update.assert_called_once()
+
+    def test_update_note_not_found(self, mock_note_repository):
+        """Mettre à jour une note inexistante lève NoteNotFound."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        note_id = str(uuid4())
+        mock_note_repository.find_one_unscoped.return_value = None
+
+        dto = NoteUpdateDTO(title="New Title")
+
+        # Act & Assert
+        with pytest.raises(NoteNotFound):
+            note_crud_service.update(note_id, dto)
+
+        mock_note_repository.update.assert_not_called()
+
+
+class TestNoteServiceDelete:
+    """Tests pour la suppression de note"""
+
+    def test_delete_note_success(self, mock_note_repository):
+        """Supprimer une note existante."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        note_id = str(uuid4())
+        note_entity = Note(
+            id=note_id,
+            title="To Delete",
+            owner_id=str(uuid4())
+        )
+        mock_note_repository.find_one_unscoped.return_value = note_entity
+        mock_note_repository.delete.return_value = None
+
+        # Act
+        note_crud_service.delete(note_id)
+
+        # Assert
+        mock_note_repository.find_one_unscoped.assert_called_once_with(note_id)
+        mock_note_repository.delete.assert_called_once_with(note_id)
+
+    def test_delete_note_not_found(self, mock_note_repository):
+        """Supprimer une note inexistante lève NoteNotFound."""
+        from services.impl.note.note_crud_service_impl import note_crud_service
+
+        # Arrange
+        note_id = str(uuid4())
+        mock_note_repository.find_one_unscoped.return_value = None
+
+        # Act & Assert
+        with pytest.raises(NoteNotFound):
+            note_crud_service.delete(note_id)
+
+        mock_note_repository.delete.assert_not_called()
