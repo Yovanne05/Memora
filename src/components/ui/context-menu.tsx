@@ -1,6 +1,0 @@
-export { ContextMenu, ContextMenuSub, ContextMenuTrigger } from "./context-menu/root"
-export { ContextMenuContent, ContextMenuSubContent } from "./context-menu/content"
-export { ContextMenuItem } from "./context-menu/item"
-export { ContextMenuLabel } from "./context-menu/label"
-export { ContextMenuSeparator } from "./context-menu/separator"
-export { ContextMenuSubTrigger } from "./context-menu/sub-trigger"
