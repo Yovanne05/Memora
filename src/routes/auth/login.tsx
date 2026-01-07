@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 
 import { getAccessToken } from "@/features/auth/lib/token-storage"
-import { LoginPage } from "./login/LoginPage"
+import { LoginPage } from "@/features/auth/pages/login/LoginPage"
 
 export const Route = createFileRoute("/auth/login")({
   validateSearch: (search) => ({

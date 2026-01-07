@@ -1,7 +1,7 @@
-import { AuthPageLayout } from "../components/AuthPageLayout"
+import { AuthPageLayout } from "@/features/auth/components/AuthPageLayout"
 import { LoginForm } from "./LoginForm"
 import { LoginIntro } from "./LoginIntro"
-import { useLoginForm } from "./useLoginForm"
+import { useLoginForm } from "@/features/auth/hooks/useLoginForm"
 
 type LoginPageProps = {
   redirectTo: string
@@ -28,3 +28,4 @@ export function LoginPage({ redirectTo }: Readonly<LoginPageProps>) {
     </AuthPageLayout>
   )
 }
+

@@ -8,7 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import type { RegisterValues } from "./registerSchema"
+import type { RegisterValues } from "@/features/auth/schemas/register.schema"
 
 type RegisterIdentityFieldsProps = {
   control: Control<RegisterValues>
@@ -65,3 +65,4 @@ export function RegisterIdentityFields({
     </>
   )
 }
+

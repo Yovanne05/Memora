@@ -7,8 +7,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { AuthPasswordField } from "../components/AuthPasswordField"
-import type { RegisterValues } from "./registerSchema"
+import { AuthPasswordField } from "@/features/auth/components/AuthPasswordField"
+import type { RegisterValues } from "@/features/auth/schemas/register.schema"
 
 type RegisterPasswordFieldProps = {
   control: Control<RegisterValues>
@@ -56,3 +56,4 @@ export function RegisterPasswordField({
     />
   )
 }
+

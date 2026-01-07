@@ -3,9 +3,9 @@ import type { UseFormReturn } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
-import { AuthFormCard } from "../components/AuthFormCard"
-import { AuthFormError } from "../components/AuthFormError"
-import type { RegisterValues } from "./registerSchema"
+import { AuthFormCard } from "@/features/auth/components/AuthFormCard"
+import { AuthFormError } from "@/features/auth/components/AuthFormError"
+import type { RegisterValues } from "@/features/auth/schemas/register.schema"
 import { RegisterIdentityFields } from "./RegisterIdentityFields"
 import { RegisterPasswordField } from "./RegisterPasswordField"
 
@@ -63,3 +63,4 @@ export function RegisterForm({
     </AuthFormCard>
   )
 }
+

@@ -1,7 +1,7 @@
-import { AuthPageLayout } from "../components/AuthPageLayout"
+import { AuthPageLayout } from "@/features/auth/components/AuthPageLayout"
 import { RegisterForm } from "./RegisterForm"
 import { RegisterIntro } from "./RegisterIntro"
-import { useRegisterForm } from "./useRegisterForm"
+import { useRegisterForm } from "@/features/auth/hooks/useRegisterForm"
 
 type RegisterPageProps = {
   redirectTo: string
@@ -28,3 +28,4 @@ export function RegisterPage({ redirectTo }: Readonly<RegisterPageProps>) {
     </AuthPageLayout>
   )
 }
+

@@ -6,8 +6,8 @@ import type { z } from "zod"
 import { useRouter } from "@tanstack/react-router"
 
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import { loginSchema } from "./loginSchema"
-import { getLoginErrorMessage } from "./getLoginErrorMessage"
+import { loginSchema } from "@/features/auth/schemas/login.schema"
+import { getLoginErrorMessage } from "@/features/auth/lib/login-errors"
 
 export function useLoginForm(redirectTo: string) {
   const router = useRouter()
@@ -51,3 +51,4 @@ export function useLoginForm(redirectTo: string) {
     isLoggingIn,
   }
 }
+

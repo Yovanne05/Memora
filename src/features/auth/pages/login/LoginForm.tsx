@@ -11,10 +11,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { AuthFormCard } from "../components/AuthFormCard"
-import { AuthFormError } from "../components/AuthFormError"
-import { AuthPasswordField } from "../components/AuthPasswordField"
-import type { LoginValues } from "./loginSchema"
+import { AuthFormCard } from "@/features/auth/components/AuthFormCard"
+import { AuthFormError } from "@/features/auth/components/AuthFormError"
+import { AuthPasswordField } from "@/features/auth/components/AuthPasswordField"
+import type { LoginValues } from "@/features/auth/schemas/login.schema"
 
 type LoginFormProps = {
   form: UseFormReturn<LoginValues>
@@ -87,3 +87,4 @@ export function LoginForm({
     </AuthFormCard>
   )
 }
+

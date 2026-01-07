@@ -6,8 +6,8 @@ import type { z } from "zod"
 import { useRouter } from "@tanstack/react-router"
 
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import { registerSchema } from "./registerSchema"
-import { getRegisterErrorMessage } from "./getRegisterErrorMessage"
+import { registerSchema } from "@/features/auth/schemas/register.schema"
+import { getRegisterErrorMessage } from "@/features/auth/lib/register-errors"
 
 export function useRegisterForm(redirectTo: string) {
   const router = useRouter()
@@ -55,3 +55,4 @@ export function useRegisterForm(redirectTo: string) {
     isRegistering,
   }
 }
+

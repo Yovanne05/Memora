@@ -1,4 +1,4 @@
-import { AuthIntroPanel } from "../components/AuthIntroPanel"
+import { AuthIntroPanel } from "@/features/auth/components/AuthIntroPanel"
 
 const HIGHLIGHTS = [
   {
@@ -29,3 +29,4 @@ export function RegisterIntro() {
     />
   )
 }
+
