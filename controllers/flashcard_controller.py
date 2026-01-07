@@ -35,23 +35,6 @@ def find_many():
     )
 
 
-@bp_note_flashcards.get("")
-@swag_from("../docs/flashcards/list.yaml")
-def find_many_for_note(note_id: UUID):
-    raw_query = request.args.to_dict(flat=True)
-    raw_query["noteId"] = str(note_id)
-    query = FlashcardFindQuery.model_validate(raw_query)
-    params = query.to_params()
-
-    flashcard_dtos, total = flashcard_service.find_many(params)
-    return (
-        jsonify(
-            {"items": [dto.model_dump() for dto in flashcard_dtos], "total": total}
-        ),
-        HTTPStatus.OK,
-    )
-
-
 @bp_flashcards.get("/<uuid:flashcard_id>")
 @swag_from("../docs/flashcards/find_one.yaml")
 def find_one(flashcard_id: UUID):

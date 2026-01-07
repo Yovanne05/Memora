@@ -1,5 +1,5 @@
 tags:
-  - note-public-links
+  - note-share-links
 summary: Creer un lien public pour une note
 description: >
   Genere un lien public permettant l'acces a une note sans authentification.

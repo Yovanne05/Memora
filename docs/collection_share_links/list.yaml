@@ -1,5 +1,5 @@
 tags:
-  - collection-public-links
+  - collection-share-links
 summary: Lister les liens publics
 description: >
   Retourne la liste des liens publics crees pour les collections de l'utilisateur,

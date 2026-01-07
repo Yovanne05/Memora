@@ -1,5 +1,5 @@
 tags:
-  - note-public-links-access
+  - shared-notes
 summary: Acceder a une note via un lien public
 description: >
   Recupere une note en utilisant l'ID du lien public.
