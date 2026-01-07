@@ -22,17 +22,17 @@ class ReportUpdateDTO(BaseModel):
 
 class ReportDTO(BaseModel):
     id: str
-    target_type: ReportTargetEnum = Field(alias="targetType")
-    note_id: str | None = Field(default=None, alias="noteId")
-    collection_id: str | None = Field(default=None, alias="collectionId")
+    target_type: ReportTargetEnum
+    note_id: str | None = None
+    collection_id: str | None = None
     reason: ReportReasonEnum
     status: ReportStatusEnum
     description: str | None = None
-    reporter_id: str = Field(alias="reporterId")
-    reporter_email: str | None = Field(default=None, alias="reporterEmail")
-    note_title: str | None = Field(default=None, alias="noteTitle")
-    collection_name: str | None = Field(default=None, alias="collectionName")
-    created_at: datetime = Field(alias="createdAt")
-    updated_at: datetime = Field(alias="updatedAt")
+    reporter_id: str
+    reporter_email: str | None = None
+    note_title: str | None = None
+    collection_name: str | None = None
+    created_at: datetime
+    updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(from_attributes=True)

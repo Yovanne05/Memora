@@ -17,7 +17,7 @@ bp_user_statistics = Blueprint(
 def get_statistics():
     user = get_current_user()
     stats = user_statistics_service.get_statistics(user.id)
-    return jsonify(stats.model_dump(by_alias=True)), HTTPStatus.OK
+    return jsonify(stats.model_dump()), HTTPStatus.OK
 
 
 @bp_user_statistics.get("/statistics/timeseries")
@@ -32,4 +32,4 @@ def get_statistics_timeseries():
     timeseries = user_statistics_service.get_timeseries(
         user.id, query.metric, query.days
     )
-    return jsonify(timeseries.model_dump(by_alias=True, mode='json')), HTTPStatus.OK
+    return jsonify(timeseries.model_dump(mode='json')), HTTPStatus.OK

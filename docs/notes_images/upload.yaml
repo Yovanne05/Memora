@@ -22,7 +22,7 @@ responses:
   201:
     description: Image uploadee avec succes.
     schema:
-      $ref: "#/definitions/NoteImageUploadResponse"
+      $ref: "#/definitions/NoteImage"
   400:
     description: Requete invalide (pas de fichier, type non autorise, taille trop grande).
   404:

@@ -293,7 +293,7 @@ definitions:
         format: uuid
         description: Identifiant de la note source.
         example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
-      linkedNoteId:
+      linked_note_id:
         type: string
         format: uuid
         description: Identifiant de la note liée.
@@ -303,14 +303,14 @@ definitions:
         format: date-time
         description: Date de création du lien.
         example: "2025-05-12T09:23:41Z"
-    required: ["note_id", "linkedNoteId", "created_at"]
+    required: ["note_id", "linked_note_id", "created_at"]
 
   NoteLinkCreatePayload:
     type: object
     description: Données nécessaires pour créer un lien entre deux notes.
-    required: ["linkedNoteId"]
+    required: ["linked_note_id"]
     properties:
-      linkedNoteId:
+      linked_note_id:
         type: string
         format: uuid
         description: Identifiant de la note à lier.

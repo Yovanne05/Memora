@@ -1,5 +1,5 @@
 definitions:
-  NoteImageUploadResponse:
+  NoteImage:
     type: object
     properties:
       url:

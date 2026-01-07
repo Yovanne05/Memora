@@ -1,14 +1,14 @@
 definitions:
   ReviewCreatePayload:
     type: object
-    required: ["flashcardId", "selectedAnswerId", "difficulty"]
+    required: ["flashcard_id", "selected_answer_id", "difficulty"]
     properties:
-      flashcardId:
+      flashcard_id:
         type: string
         format: uuid
         description: Identifiant de la flashcard révisée.
         example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
-      selectedAnswerId:
+      selected_answer_id:
         type: string
         format: uuid
         description: Identifiant de la réponse sélectionnée par l'utilisateur.
@@ -94,7 +94,7 @@ definitions:
     type: object
     description: Flashcard avec sa prochaine date de révision.
     properties:
-      flashcardId:
+      flashcard_id:
         type: string
         format: uuid
         description: Identifiant de la flashcard.
@@ -103,12 +103,12 @@ definitions:
         type: string
         description: Question de la flashcard.
         example: "Quelle est la capitale de la France ?"
-      nextReviewAt:
+      next_review_at:
         type: string
         format: date-time
         description: Date et heure de la prochaine révision.
         example: "2025-05-20T09:00:00Z"
-    required: ["flashcardId", "question", "nextReviewAt"]
+    required: ["flashcard_id", "question", "next_review_at"]
 
   UpcomingReviewsGroup:
     type: object

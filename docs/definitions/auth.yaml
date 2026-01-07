@@ -1,5 +1,5 @@
 definitions:
-  AuthRegisterPayload:
+  Register:
     type: object
     required: ["email", "password"] # NOSONAR
     properties:
@@ -34,7 +34,7 @@ definitions:
       username: "janedoe"
       display_name: "Jane Doe"
 
-  AuthLoginPayload:
+  Login:
     type: object
     required: ["identifier", "password"] # NOSONAR
     properties:

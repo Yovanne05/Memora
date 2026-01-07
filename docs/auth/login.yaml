@@ -8,7 +8,7 @@ parameters:
     name: body
     required: true
     schema:
-      $ref: "#/definitions/AuthLoginPayload"
+      $ref: "#/definitions/Login"
 responses:
   200:
     description: Authentification reussie.
