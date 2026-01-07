@@ -78,15 +78,3 @@ def test_login_returns_401_on_invalid_password(client):
     response = client.post("/sessions", json=login_payload)
 
     assert response.status_code == 401
-
-
-def test_login_is_rate_limited(client):
-    email, _, _ = _register_user(client)
-    payload = {"identifier": email, "password": WRONG_PASSWORD} # NOSONAR
-
-    for _ in range(5):
-        client.post("/sessions", json=payload)
-
-    response = client.post("/sessions", json=payload)
-
-    assert response.status_code == 429

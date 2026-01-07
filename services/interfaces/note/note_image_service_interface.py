@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 from werkzeug.datastructures import FileStorage
 from dtos.note_image_dto import NoteImageDTO
 
