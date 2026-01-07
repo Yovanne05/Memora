@@ -40,7 +40,7 @@ export function AppSidebar() {
     { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
     { title: "Recherche", icon: Search, url: "/app/search" },
     { title: "Révision", icon: GraduationCap, url: "/app/revision" },
-    { title: "Journal et stats", icon: History, url: undefined }, // désactivé
+    { title: "Statistiques", icon: History, url: "/app/statistics" },
   ]
 
   const accountItems = [
