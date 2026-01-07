@@ -9,9 +9,10 @@ from repositorys import (
     note_repository,
     note_share_link_repository,
 )
+from services.interfaces.shared_service_interface import SharedServiceInterface
 
 
-class SharedService:
+class SharedService(SharedServiceInterface):
     def get_note_by_token(self, token: str) -> NoteDTO:
         share_link = note_share_link_repository.find_one(token)
         if not share_link:

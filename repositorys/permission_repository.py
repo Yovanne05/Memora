@@ -142,55 +142,5 @@ class PermissionRepository:
         stmt = select(Note.id).where(Note.collection_id.in_(collection_ids))
         return set(session.scalars(stmt).all())
 
-    @staticmethod
-    def check_note_share_exists(
-        session: Session, note_id: str, user_id: str
-    ) -> bool:
-        share = (
-            session.query(NoteShare)
-            .filter(NoteShare.note_id == note_id, NoteShare.user_id == user_id)
-            .first()
-        )
-        return share is not None
-
-    @staticmethod
-    def check_collection_share_exists(
-        session: Session, collection_id: str, user_id: str
-    ) -> bool:
-        share = (
-            session.query(CollectionShare)
-            .filter(
-                CollectionShare.collection_id == collection_id,
-                CollectionShare.user_id == user_id,
-            )
-            .first()
-        )
-        return share is not None
-
-    @staticmethod
-    def get_note_share_permission(
-        session: Session, note_id: str, user_id: str
-    ) -> Optional[SharePermissionEnum]:
-        share = (
-            session.query(NoteShare)
-            .filter(NoteShare.note_id == note_id, NoteShare.user_id == user_id)
-            .first()
-        )
-        return share.permission if share else None
-
-    @staticmethod
-    def get_collection_share_permission(
-        session: Session, collection_id: str, user_id: str
-    ) -> Optional[SharePermissionEnum]:
-        share = (
-            session.query(CollectionShare)
-            .filter(
-                CollectionShare.collection_id == collection_id,
-                CollectionShare.user_id == user_id,
-            )
-            .first()
-        )
-        return share.permission if share else None
-
 
 permission_repository = PermissionRepository()

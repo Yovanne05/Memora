@@ -1,0 +1,26 @@
+tags:
+  - uploads
+summary: Récupérer un fichier uploadé
+description: >
+  Sert un fichier statique uploadé depuis le stockage local.
+
+  **Note:** Cet endpoint est uniquement disponible lorsque le driver de stockage est configuré en mode "local".
+
+  **Pas d'authentification requise** - endpoint public pour servir les fichiers (images, etc.).
+parameters:
+  - in: path
+    name: key
+    type: string
+    required: true
+    description: Chemin du fichier dans le stockage (ex: "note_id/filename.png")
+responses:
+  200:
+    description: Fichier retourné avec succès
+    schema:
+      type: file
+  400:
+    description: Clé de fichier invalide
+  404:
+    description: Fichier non trouvé
+  503:
+    description: Service d'uploads non disponible (driver non-local)

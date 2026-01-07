@@ -1,5 +1,6 @@
 import os
 from flask import Blueprint, send_file
+from flasgger import swag_from
 
 from exceptions.upload_exception import (
     UploadsNotAvailable,
@@ -12,6 +13,7 @@ bp_uploads = Blueprint("uploads", __name__, url_prefix="/uploads")
 
 
 @bp_uploads.get("/<path:key>")
+@swag_from("../docs/uploads/serve_upload.yaml")
 def serve_upload(key: str):
     """Serve files stored on the local driver."""
     storage = get_storage_client()
