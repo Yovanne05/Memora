@@ -11,14 +11,14 @@ from services.impl.collection.collection_share_link_service_impl import (
     collection_share_link_service,
 )
 
-bp_collection_public_links = Blueprint(
-    "collection_public_links",
+bp_collection_share_links = Blueprint(
+    "collection_share_links",
     __name__,
     url_prefix="/collections/<uuid:collection_id>/public-links",
 )
 
 
-@bp_collection_public_links.get("")
+@bp_collection_share_links.get("")
 @jwt_required()
 @swag_from("../docs/collection_public_links/list.yaml")
 def find_many(collection_id: UUID):
@@ -36,7 +36,7 @@ def find_many(collection_id: UUID):
     )
 
 
-@bp_collection_public_links.post("")
+@bp_collection_share_links.post("")
 @jwt_required()
 @swag_from("../docs/collection_public_links/create.yaml")
 def create(collection_id: UUID):
@@ -47,7 +47,7 @@ def create(collection_id: UUID):
     return jsonify(share_link_dto.model_dump()), HTTPStatus.CREATED
 
 
-@bp_collection_public_links.delete("/<uuid:link_id>")
+@bp_collection_share_links.delete("/<uuid:link_id>")
 @jwt_required()
 @swag_from("../docs/collection_public_links/delete.yaml")
 def delete(collection_id: UUID, link_id: UUID):

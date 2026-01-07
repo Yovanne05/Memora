@@ -1,5 +1,5 @@
 tags:
-  - notes
+  - note-images
 summary: Upload une image pour une note
 description: >
   Permet d'uploader une image (JPEG, PNG, GIF, WebP) pour une note.

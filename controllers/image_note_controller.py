@@ -1,14 +1,6 @@
-import os
 from http import HTTPStatus
 from uuid import UUID
 
-from flask import Blueprint, jsonify, request, send_file
-from flasgger import swag_from
-
-from services.impl.note.note_image_service_impl import note_image_service
-from exceptions.note_image_exception import NoFileProvided, NoteImageNotFound
-from utils.auth import get_current_user
-from domain_services.permission_domain_service import permission_domain_service
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from flasgger import swag_from

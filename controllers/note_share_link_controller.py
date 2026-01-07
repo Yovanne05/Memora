@@ -11,14 +11,14 @@ from services.impl.note.note_share_link_service_impl import (
     note_share_link_service,
 )
 
-bp_note_public_links = Blueprint(
-    "note_public_links",
+bp_note_share_links = Blueprint(
+    "note_share_links",
     __name__,
     url_prefix="/notes/<uuid:note_id>/public-links",
 )
 
 
-@bp_note_public_links.get("")
+@bp_note_share_links.get("")
 @jwt_required()
 @swag_from("../docs/note_public_links/list.yaml")
 def find_many(note_id: UUID):
@@ -36,7 +36,7 @@ def find_many(note_id: UUID):
     )
 
 
-@bp_note_public_links.post("")
+@bp_note_share_links.post("")
 @jwt_required()
 @swag_from("../docs/note_public_links/create.yaml")
 def create(note_id: UUID):
@@ -47,7 +47,7 @@ def create(note_id: UUID):
     return jsonify(share_link_dto.model_dump()), HTTPStatus.CREATED
 
 
-@bp_note_public_links.delete("/<uuid:link_id>")
+@bp_note_share_links.delete("/<uuid:link_id>")
 @jwt_required()
 @swag_from("../docs/note_public_links/delete.yaml")
 def delete(note_id: UUID, link_id: UUID):
