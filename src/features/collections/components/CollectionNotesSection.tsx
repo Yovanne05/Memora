@@ -6,7 +6,7 @@ import { CollectionNotesHeader, type NotesSort } from "./CollectionNotesHeader";
 import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation";
 import type { Note } from "@/features/notes/models/note.model";
 import { CollectionNotesGridWithLinks } from "./CollectionNotesGridWithLinks";
-import type { AvailableNoteOption } from "../../types/note.types";
+import type { AvailableNoteOption } from "../types/note.types";
 
 export function CollectionNotesSection() {
   const { collectionId } = useParams({

@@ -20,6 +20,7 @@ import { useLinkedNotesQuery } from "../hooks/useLinkedNotesQuery"
 import { useDeleteNoteLinkMutation } from "../hooks/useDeleteNoteLinkMutation"
 import { NoteLinkDialog } from "./NoteLinkDialog"
 import type { Note } from "../models/note.model"
+import { getContentPreview } from "@/lib/html-utils"
 
 interface NoteLinkManagerProps {
   readonly note: Note
@@ -88,7 +89,7 @@ export function NoteLinkManager({ note }: Readonly<NoteLinkManagerProps>) {
             <div className="flex-1 min-w-0">
               <h4 className="font-medium text-sm truncate">{linkedNote.title}</h4>
               <p className="text-xs text-muted-foreground line-clamp-1">
-                {linkedNote.content}
+                {getContentPreview(linkedNote.content || "", 100)}
               </p>
             </div>
             <div className="flex items-center gap-1">

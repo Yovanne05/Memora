@@ -1,9 +1,9 @@
 import { useRouter } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { CollectionFormDialog } from "./CollectionFormDialog"
-import { useCreateCollectionMutation } from "../../hooks/useCreateCollectionMutation"
+import { useCreateCollectionMutation } from "../hooks/useCreateCollectionMutation"
 import { useAuth } from "@/features/auth/hooks/useAuth"
-import type { CollectionFormValues } from "../forms/CollectionEditForm"
+import type { CollectionFormValues } from "./CollectionEditForm"
 
 interface CreateCollectionDialogProps {
   open: boolean

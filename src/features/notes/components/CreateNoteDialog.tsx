@@ -27,8 +27,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import type { NoteVisibility } from "../../models/note.model"
-import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"
+import type { NoteVisibility } from "../models/note.model"
+import { noteCreateFormSchema, type NoteCreateFormInput } from "../schemas/note.schema"
 
 interface CreateNoteDialogProps {
   open: boolean

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { NoteCard } from "@/features/notes/components/list/NoteCard"
+import { NoteCard } from "@/features/notes/components/NoteCard"
 import type { Note } from "@/features/notes/models/note.model"
 import { X } from "lucide-react"
 import { GridLoadingState, GridEmptyState } from "./GridStates"
@@ -32,7 +32,7 @@ export function CollectionNotesGrid({
           key={note.id}
           className="group relative space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:border-border/80"
         >
-          <NoteCard note={note} />
+          <NoteCard note={note} showFavoriteButton />
           <div className="flex justify-end border-t border-border/50 pt-3 mt-3">
             <Button
               type="button"

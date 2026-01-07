@@ -1,12 +1,8 @@
-/* Styles pour l'éditeur TipTap */
-
-/* Style de base de l'éditeur */
 .ProseMirror {
   outline: none;
   min-height: 200px;
 }
 
-/* Placeholder */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -15,13 +11,11 @@
   height: 0;
 }
 
-/* Styles pour la sélection */
 .ProseMirror-selectednode {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
 }
 
-/* Styles pour les blocs de code */
 .ProseMirror pre {
   background: hsl(var(--muted));
   border-radius: 0.375rem;
@@ -57,7 +51,6 @@
   text-decoration: none;
 }
 
-/* Styles pour les listes */
 .ProseMirror ul,
 .ProseMirror ol {
   padding-left: 1.5rem;
@@ -68,7 +61,6 @@
   margin: 0.25rem 0;
 }
 
-/* Styles pour les blockquotes */
 .ProseMirror blockquote {
   border-left: 3px solid hsl(var(--primary));
   padding-left: 1rem;
@@ -77,7 +69,6 @@
   font-style: italic;
 }
 
-/* Styles pour les titres */
 .ProseMirror h1,
 .ProseMirror h2,
 .ProseMirror h3,
@@ -102,13 +93,11 @@
   font-size: 1.25rem;
 }
 
-/* Styles pour les paragraphes */
 .ProseMirror p {
   margin: 0.5rem 0;
   line-height: 1.6;
 }
 
-/* Alignement du texte */
 .ProseMirror[style*="text-align: left"] {
   text-align: left;
 }
@@ -121,12 +110,82 @@
   text-align: right;
 }
 
-/* Animation pour le focus */
 .ProseMirror:focus {
   outline: none;
 }
 
-/* Styles pour le mode lecture seule */
 .ProseMirror[contenteditable="false"] {
   cursor: default;
+}
+
+.ProseMirror[contenteditable="false"] .image-resizer-handle {
+  display: none;
+}
+
+.image-resizer-container {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  margin: 1rem 0;
+}
+
+.image-resizer-container img {
+  display: block;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  max-width: 100%;
+  height: auto;
+}
+
+.image-resizer-container.resizing img {
+  user-select: none;
+  pointer-events: none;
+}
+
+.image-resizer-handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 60px;
+  background-color: hsl(var(--primary));
+  border-radius: 6px;
+  cursor: ew-resize;
+  opacity: 0.3;
+  transition: opacity 0.2s, background-color 0.2s;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.image-resizer-handle:hover {
+  opacity: 0.8;
+  background-color: hsl(var(--primary) / 0.9);
+}
+
+.image-resizer-container:hover .image-resizer-handle,
+.image-resizer-container.resizing .image-resizer-handle {
+  opacity: 1;
+}
+
+.image-resizer-container.is-selected .image-resizer-handle,
+.ProseMirror-selectednode.image-resizer-container .image-resizer-handle {
+  opacity: 1;
+}
+
+.image-resizer-container.resizing .image-resizer-handle {
+  background-color: hsl(var(--primary) / 1);
+}
+
+.image-resizer-handle-right {
+  right: -4px;
+}
+
+.image-resizer-handle-left {
+  left: -4px;
+}
+
+.image-resizer-container.is-selected img,
+.ProseMirror-selectednode.image-resizer-container img {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
 }

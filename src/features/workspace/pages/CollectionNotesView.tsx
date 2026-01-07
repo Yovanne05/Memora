@@ -1,14 +1,14 @@
 import { Loader2, Edit } from "lucide-react"
-import { NotesGrid } from "@/features/notes/components/list/NotesGrid"
-import { NotesPagination } from "@/features/notes/components/list/NotesPagination"
+import { NotesGrid } from "@/features/notes/components/NotesGrid"
+import { NotesPagination } from "@/features/notes/components/NotesPagination"
 import { useCollectionQuery } from "@/features/collections/hooks/useCollectionQuery"
 import { useWorkspaceNotes } from "../hooks/useWorkspaceNotes"
 import { useWorkspaceContext } from "../context/WorkspaceContext"
 import { QuickAddNote } from "@/features/notes/components/QuickAddNote"
 import { Button } from "@/components/ui/button"
-import { CollectionFormDialog } from "@/features/collections/components/dialogs/CollectionFormDialog"
+import { CollectionFormDialog } from "@/features/collections/components/CollectionFormDialog"
 import { useUpdateCollectionMutation } from "@/features/collections/hooks/useUpdateCollectionMutation"
-import type { CollectionFormValues } from "@/features/collections/components/forms/CollectionEditForm"
+import type { CollectionFormValues } from "@/features/collections/components/CollectionEditForm"
 import { useMemo, useEffect, useState } from "react"
 
 interface CollectionNotesViewProps {
@@ -26,7 +26,6 @@ export default function CollectionNotesView({
   const { state, actions } = useWorkspaceContext()
   const updateCollectionMutation = useUpdateCollectionMutation()
 
-  // Update selected collection in context
   useEffect(() => {
     actions.selectCollection(collectionId)
   }, [collectionId, actions])
@@ -107,12 +106,10 @@ export default function CollectionNotesView({
         </div>
       </div>
 
-      {/* Notes Grid */}
       {notes && notes.length > 0 ? (
         <>
-          <NotesGrid items={notes} />
+          <NotesGrid items={notes} showQuickActions showFavoriteButton />
 
-          {/* Pagination */}
           {total > limit && (
             <NotesPagination
               page={state.page}
@@ -138,7 +135,6 @@ export default function CollectionNotesView({
         </div>
       )}
 
-      {/* Edit Collection Dialog */}
       {collection && (
         <CollectionFormDialog
           mode="edit"

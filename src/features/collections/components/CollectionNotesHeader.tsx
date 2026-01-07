@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { SortAsc, FileText, Plus } from "lucide-react"
-import type { AvailableNoteOption } from "../../types/note.types"
+import type { AvailableNoteOption } from "../types/note.types"
 
 export type NotesSort = "recent" | "alphabetical" | "oldest"
 

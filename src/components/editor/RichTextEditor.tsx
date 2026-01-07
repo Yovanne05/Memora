@@ -5,6 +5,7 @@ import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import TextAlign from '@tiptap/extension-text-align'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { ResizableImage } from './extensions/ResizableImage'
 import { common, createLowlight } from 'lowlight'
 import { MenuBar } from './MenuBar'
 import { cn } from '@/lib/utils'
@@ -19,6 +20,7 @@ interface RichTextEditorProps {
   placeholder?: string
   editable?: boolean
   className?: string
+  noteId?: string
 }
 
 
@@ -53,7 +55,8 @@ export function RichTextEditor({
   onChange,
   placeholder = "Commencez à écrire...",
   editable = true,
-  className
+  className,
+  noteId
 }: Readonly<RichTextEditorProps>) {
   const editor = useEditor({
     extensions: [
@@ -79,6 +82,13 @@ export function RichTextEditor({
           class: 'bg-muted rounded-md p-4 font-mono text-sm',
         },
       }),
+      ResizableImage.configure({
+        inline: true,
+        allowBase64: false,
+        HTMLAttributes: {
+          class: 'rounded-lg max-w-full h-auto',
+        },
+      }),
     ],
     content: parseContent(content),
     editable,
@@ -98,6 +108,7 @@ export function RichTextEditor({
           'prose-ul:list-disc prose-ol:list-decimal',
           'prose-li:text-muted-foreground',
           'prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground',
+          'prose-img:rounded-lg prose-img:shadow-md prose-img:my-4',
         ),
       },
     },
@@ -127,7 +138,7 @@ export function RichTextEditor({
 
   return (
     <div className={cn('border border-border rounded-lg overflow-hidden', className)}>
-      {editable && <MenuBar editor={editor} />}
+      {editable && <MenuBar editor={editor} noteId={noteId} />}
       <EditorContent editor={editor} />
     </div>
   )

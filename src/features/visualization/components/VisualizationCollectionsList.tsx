@@ -1,5 +1,5 @@
 import type { Collection } from "@/features/collections/models/collection.model"
-import { CollectionCard } from "@/features/collections/components/list/CollectionCard"
+import { CollectionCard } from "@/features/collections/components/CollectionCard"
 import { cn } from "@/lib/utils"
 
 interface VisualizationCollectionsListProps {
