@@ -16,7 +16,13 @@ if str(BASE_DIR) not in sys.path:
 
 import config
 from utils.db import drop_all, create_all, get_db_session
-from utils.enums import RoleEnum, SharePermissionEnum, VisibilityEnum
+from utils.enums import (
+    ReportReasonEnum,
+    ReportStatusEnum,
+    RoleEnum,
+    SharePermissionEnum,
+    VisibilityEnum,
+)
 from utils.utils import generate_uuid
 
 # Import all DAO models so metadata is registered before create_all
@@ -24,9 +30,10 @@ from daos.user_dao import User
 from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note, NoteLink, NoteShare
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
-from daos.note_image_dao import NoteImage
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
+from daos.review_dao import Review
+from daos.report_dao import Report
 
 
 def _hash_password(raw_password: str) -> str:
@@ -202,21 +209,26 @@ def seed() -> None:
         )
         print("Flashcards inserted.")
 
-        # Note images
-        uploads_dir = pathlib.Path("uploads")
-        uploads_dir.mkdir(exist_ok=True)
-        session.add(
-            NoteImage(
-                id=generate_uuid(),
-                note_id=note_archi.id,
-                file_name="schema-architecture.png",
-                file_path=str(uploads_dir / "schema-architecture.png"),
-                file_size=204800,
-                mime_type="image/png",
-                uploaded_at=datetime.now(timezone.utc),
-            )
+        # Reports
+        session.add_all(
+            [
+                Report(
+                    note_id=note_api.id,
+                    reporter_id=bob.id,
+                    reason=ReportReasonEnum.SPAM_OR_ABUSE,
+                    status=ReportStatusEnum.PENDING,
+                    description="La note semble contenir trop de pub.",
+                ),
+                Report(
+                    collection_id=coll_templates.id,
+                    reporter_id=alice.id,
+                    reason=ReportReasonEnum.TECHNICAL_ISSUE,
+                    status=ReportStatusEnum.IN_PROGRESS,
+                    description="Impossible de charger certains templates.",
+                ),
+            ]
         )
-        print("Note images inserted.")
+        print("Reports inserted.")
 
         session.flush()
         print("Seed completed successfully.")

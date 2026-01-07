@@ -1,0 +1,21 @@
+tags:
+  - reports
+summary: Récupérer un signalement (admin)
+description: Détail d'un signalement. Réservé aux admins.
+parameters:
+  - name: report_id
+    in: path
+    required: true
+    type: string
+    format: uuid
+responses:
+  200:
+    description: Signalement trouvé.
+    schema:
+      $ref: "#/definitions/Report"
+  401:
+    description: Non authentifié.
+  403:
+    description: Réservé aux admins.
+  404:
+    description: Signalement introuvable.

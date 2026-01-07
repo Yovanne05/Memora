@@ -9,6 +9,7 @@ from controllers.note_link_controller import bp_note_relations
 from controllers.user_controller import bp_users
 from controllers.share_note_controller import bp_note_shares
 from controllers.share_collection_controller import bp_collection_shares
+from controllers.uploads_controller import bp_uploads
 from controllers.note_public_link_controller import bp_note_public_links
 from controllers.collection_public_link_controller import bp_collection_public_links
 from controllers.note_public_link_access_controller import (
@@ -23,9 +24,9 @@ from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards, bp_note_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
 from controllers.review_controller import bp_reviews
+from controllers.report_controller import bp_reports
 from utils import db
 from utils.jwt import init_jwt
-from utils.limiter import init_limiter
 from utils.filter import register_global_filter
 from utils.logger import init_logger
 from utils.swagger import init_swagger
@@ -36,9 +37,8 @@ def create_app() -> Flask:
 
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
-    app.config["RATELIMIT_STORAGE_URI"] = config.RATELIMIT_STORAGE_URI
+    app.config["MAX_CONTENT_LENGTH"] = config.IMAGE_MAX_CONTENT_LENGTH
 
-    init_limiter(app)
     init_jwt(app)
     init_swagger(app)
     init_logger(app)
@@ -56,6 +56,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_collections)
     app.register_blueprint(bp_note_shares)
     app.register_blueprint(bp_collection_shares)
+    app.register_blueprint(bp_uploads)
     app.register_blueprint(bp_note_public_links)
     app.register_blueprint(bp_collection_public_links)
     app.register_blueprint(bp_note_public_links_access)
@@ -67,6 +68,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_reviews)
     app.register_blueprint(bp_note_favorites)
     app.register_blueprint(bp_collection_favorites)
+    app.register_blueprint(bp_reports)
 
     return app
 

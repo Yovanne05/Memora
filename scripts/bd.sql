@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS flashcards CASCADE;
 DROP TABLE IF EXISTS note_images CASCADE;
 DROP TABLE IF EXISTS note_links CASCADE;
 DROP TABLE IF EXISTS note_shares CASCADE;
+DROP TABLE IF EXISTS reports CASCADE;
 DROP TABLE IF EXISTS collection_shares CASCADE;
 DROP TABLE IF EXISTS note_favorites CASCADE;
 DROP TABLE IF EXISTS collection_favorites CASCADE;
@@ -18,12 +19,24 @@ DROP TYPE IF EXISTS review_difficulty_enum;
 DROP TYPE IF EXISTS roleenum;
 DROP TYPE IF EXISTS visibility_enum;
 DROP TYPE IF EXISTS permission_enum;
+DROP TYPE IF EXISTS report_reason_enum;
+DROP TYPE IF EXISTS report_status_enum;
 
 
 CREATE TYPE visibilityenum AS ENUM ('private', 'public');
 CREATE TYPE sharepermissionenum AS ENUM ('read', 'write');
 CREATE TYPE review_difficulty_enum AS ENUM ('again', 'hard', 'good', 'easy');
 CREATE TYPE roleenum AS ENUM ('client', 'admin', 'super_admin');
+CREATE TYPE report_reason_enum AS ENUM (
+    'illegal_content',
+    'shocking_or_inappropriate',
+    'harassment_or_abuse',
+    'rights_violation',
+    'spam_or_abuse',
+    'technical_issue',
+    'other'
+);
+CREATE TYPE report_status_enum AS ENUM ('pending', 'in_progress', 'resolved', 'rejected');
 
 -- ===== TABLES =====
 
@@ -84,6 +97,40 @@ CREATE INDEX idx_notes_collection
 
 CREATE INDEX idx_notes_owner
     ON notes (owner_id);
+
+CREATE TABLE reports (
+    id             CHAR(36) PRIMARY KEY,
+    note_id        CHAR(36),
+    collection_id  CHAR(36),
+    reporter_id    CHAR(36) NOT NULL,
+    reason         report_reason_enum NOT NULL,
+    status         report_status_enum NOT NULL DEFAULT 'pending',
+    description    TEXT,
+    created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_reports_single_target
+        CHECK (
+            (note_id IS NOT NULL AND collection_id IS NULL) OR
+            (note_id IS NULL AND collection_id IS NOT NULL)
+        ),
+    CONSTRAINT fk_reports_note
+        FOREIGN KEY (note_id) REFERENCES notes(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_reports_collection
+        FOREIGN KEY (collection_id) REFERENCES collections(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_reports_reporter
+        FOREIGN KEY (reporter_id) REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE INDEX idx_reports_note ON reports (note_id);
+CREATE INDEX idx_reports_collection ON reports (collection_id);
+CREATE INDEX idx_reports_status ON reports (status);
+CREATE INDEX idx_reports_reporter ON reports (reporter_id);
 
 CREATE TABLE note_images (
     id          CHAR(36) PRIMARY KEY,

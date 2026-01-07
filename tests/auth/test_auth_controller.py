@@ -20,9 +20,6 @@ def client():
     app = create_app()
     app.testing = False
     app.config["TESTING"] = False
-    from utils.limiter import limiter
-    limiter.enabled = True
-    limiter.reset()
     with app.test_client() as client:
         client.environ_base["REMOTE_ADDR"] = (
             f"10.0.0.{int(uuid4().int % 200) + 1}"

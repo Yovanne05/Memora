@@ -1,0 +1,30 @@
+tags:
+  - reports
+summary: Mettre à jour un signalement (statut et action de modération)
+description: |
+  Permet aux admins de changer le statut d'un signalement et d'exécuter une action
+  de modération optionnelle. L'action `delete_target` supprime la ressource signalée
+  (note ou collection) et marque automatiquement le signalement comme `resolved`
+  une fois la suppression effectuée.
+parameters:
+  - name: report_id
+    in: path
+    required: true
+    type: string
+    format: uuid
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/ReportUpdatePayload"
+responses:
+  200:
+    description: Signalement mis à jour.
+    schema:
+      $ref: "#/definitions/Report"
+  401:
+    description: Non authentifié.
+  403:
+    description: Réservé aux admins.
+  404:
+    description: Signalement introuvable.

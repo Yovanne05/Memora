@@ -24,6 +24,7 @@ from daos.base_models import (
 if TYPE_CHECKING:
     from daos.collection_dao import Collection
     from daos.user_dao import User
+    from daos.report_dao import Report
 
 
 class Note(
@@ -80,6 +81,11 @@ class Note(
     incoming_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_2],
         back_populates="target_note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    reports: Mapped[list["Report"]] = relationship(
+        back_populates="note",
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
