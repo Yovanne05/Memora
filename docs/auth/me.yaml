@@ -1,7 +1,7 @@
 tags:
-  - users
+  - sessions
 summary: Profil courant
-description: Retourne les informations du compte associe au token.
+description: Retourne les informations du compte associé au token.
 responses:
   200:
     description: Profil en cours.

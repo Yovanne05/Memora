@@ -78,3 +78,26 @@ def test_login_returns_401_on_invalid_password(client):
     response = client.post("/sessions", json=login_payload)
 
     assert response.status_code == 401
+
+
+def test_get_me_returns_current_user(client):
+    email, password, registered_user = _register_user(client)
+    login_payload = {"identifier": email, "password": password} # NOSONAR
+    login_response = client.post("/sessions", json=login_payload)
+    token = login_response.get_json()["access_token"]
+
+    response = client.get(
+        "/sessions/me",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["user"]["email"] == email
+    assert body["user"]["id"] == registered_user["id"]
+
+
+def test_get_me_returns_401_without_token(client):
+    response = client.get("/sessions/me")
+
+    assert response.status_code == 401
