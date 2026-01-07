@@ -1,4 +1,4 @@
-"""Tests for GET /note-public-links/{token} endpoint"""
+"""Tests for GET /shared/notes/{token} endpoint"""
 from uuid import uuid4
 
 from utils.enums import SharePermissionEnum
@@ -20,7 +20,7 @@ def test_get_shared_note_returns_note_data(client_with_note_data):
     if "HTTP_AUTHORIZATION" in client.environ_base:
         del client.environ_base["HTTP_AUTHORIZATION"]
 
-    response = client.get(f"/note-public-links/{token}")
+    response = client.get(f"/shared/notes/{token}")
 
     assert response.status_code == 200
     body = response.get_json()
@@ -46,7 +46,7 @@ def test_get_shared_note_does_not_require_authentication(client_with_note_data):
     if "HTTP_AUTHORIZATION" in client.environ_base:
         del client.environ_base["HTTP_AUTHORIZATION"]
 
-    response = client.get(f"/note-public-links/{token}")
+    response = client.get(f"/shared/notes/{token}")
 
     # Should work without auth
     assert response.status_code == 200
@@ -55,7 +55,7 @@ def test_get_shared_note_does_not_require_authentication(client_with_note_data):
 def test_get_shared_note_with_invalid_token(app_client):
     fake_token = str(uuid4())
 
-    response = app_client.get(f"/note-public-links/{fake_token}")
+    response = app_client.get(f"/shared/notes/{fake_token}")
 
     assert response.status_code == 404
 
@@ -63,7 +63,7 @@ def test_get_shared_note_with_invalid_token(app_client):
 def test_get_shared_note_with_malformed_token(app_client):
     malformed_token = "not-a-uuid"
 
-    response = app_client.get(f"/note-public-links/{malformed_token}")
+    response = app_client.get(f"/shared/notes/{malformed_token}")
 
     assert response.status_code == 404
 
@@ -98,7 +98,7 @@ def test_get_shared_note_works_with_any_permission_level(client_with_note_data):
             del client.environ_base["HTTP_AUTHORIZATION"]
 
         # Access via public link
-        response = client.get(f"/note-public-links/{token}")
+        response = client.get(f"/shared/notes/{token}")
 
         assert response.status_code == 200
         body = response.get_json()
@@ -131,7 +131,7 @@ def test_get_shared_note_returns_same_data_as_authenticated_request(
         del client.environ_base["HTTP_AUTHORIZATION"]
 
     # Get note via public link
-    public_response = client.get(f"/note-public-links/{token}")
+    public_response = client.get(f"/shared/notes/{token}")
     assert public_response.status_code == 200
     public_data = public_response.get_json()
 
@@ -156,7 +156,7 @@ def test_get_shared_note_after_link_deletion_fails(client_with_note_data):
     # Verify it works
     if "HTTP_AUTHORIZATION" in client.environ_base:
         del client.environ_base["HTTP_AUTHORIZATION"]
-    response = client.get(f"/note-public-links/{token}")
+    response = client.get(f"/shared/notes/{token}")
     assert response.status_code == 200
 
     # Re-authenticate and delete link
@@ -169,7 +169,7 @@ def test_get_shared_note_after_link_deletion_fails(client_with_note_data):
     # Try to access again
     if "HTTP_AUTHORIZATION" in client.environ_base:
         del client.environ_base["HTTP_AUTHORIZATION"]
-    response = client.get(f"/note-public-links/{token}")
+    response = client.get(f"/shared/notes/{token}")
     assert response.status_code == 404
 
 
@@ -200,7 +200,7 @@ def test_get_shared_note_works_for_different_notes(client_with_note_data):
 
     # Verify each token returns the correct note
     for i, token in enumerate(tokens):
-        response = client.get(f"/note-public-links/{token}")
+        response = client.get(f"/shared/notes/{token}")
         assert response.status_code == 200
         body = response.get_json()
         assert body["id"] == note_ids[i]

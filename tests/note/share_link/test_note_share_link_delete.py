@@ -95,7 +95,7 @@ def test_delete_note_share_link_invalidates_public_access(client_with_note_data)
     link_id = create_response.get_json()["id"]
 
     # Verify public access works
-    public_response = client.get(f"/note-public-links/{link_id}")
+    public_response = client.get(f"/shared/notes/{link_id}")
     assert public_response.status_code == 200
 
     # Delete share link
@@ -105,5 +105,5 @@ def test_delete_note_share_link_invalidates_public_access(client_with_note_data)
     assert delete_response.status_code == 204
 
     # Verify public access no longer works
-    public_response = client.get(f"/note-public-links/{link_id}")
+    public_response = client.get(f"/shared/notes/{link_id}")
     assert public_response.status_code == 404

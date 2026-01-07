@@ -111,7 +111,7 @@ def test_delete_collection_share_link_invalidates_public_access(
     link_id = create_response.get_json()["id"]
 
     # Verify public access works
-    public_response = client.get(f"/collection-public-links/{link_id}")
+    public_response = client.get(f"/shared/collections/{link_id}")
     assert public_response.status_code == 200
 
     # Delete share link
@@ -121,5 +121,5 @@ def test_delete_collection_share_link_invalidates_public_access(
     assert delete_response.status_code == 204
 
     # Verify public access no longer works
-    public_response = client.get(f"/collection-public-links/{link_id}")
+    public_response = client.get(f"/shared/collections/{link_id}")
     assert public_response.status_code == 404
