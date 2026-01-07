@@ -9,7 +9,6 @@ from controllers.note_link_controller import bp_note_relations
 from controllers.user_controller import bp_users
 from controllers.share_note_controller import bp_note_shares
 from controllers.share_collection_controller import bp_collection_shares
-from controllers.uploads_controller import bp_uploads
 from controllers.note_share_link_controller import bp_note_share_links
 from controllers.collection_share_link_controller import bp_collection_share_links
 from controllers.shared_note_controller import bp_shared_notes
@@ -52,7 +51,6 @@ def create_app() -> Flask:
     app.register_blueprint(bp_collections)
     app.register_blueprint(bp_note_shares)
     app.register_blueprint(bp_collection_shares)
-    app.register_blueprint(bp_uploads)
     app.register_blueprint(bp_note_share_links)
     app.register_blueprint(bp_collection_share_links)
     app.register_blueprint(bp_shared_notes)

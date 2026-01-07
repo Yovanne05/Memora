@@ -38,7 +38,7 @@ def test_delete_flashcard_removes_answers(client_with_note_data):
 
     client.delete(f"/flashcards/{flashcard_id}")
 
-    response = client.get(f"/notes/{data.note_id}/flashcards")
+    response = client.get(f"/flashcards?noteId={data.note_id}")
     assert response.status_code == 200
     body = response.get_json()
     assert body["total"] == 0
