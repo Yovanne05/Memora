@@ -4,6 +4,7 @@ import { isRetryable, getRetryDelay, delay } from "./retry-strategy";
 import { parseError, normalizeError } from "./error-handler";
 import { requestWithTimeout } from "./timeout";
 import { config } from "./config";
+import { getRateLimiter } from "./rate-limiter";
 
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
 const DEFAULT_RETRIES = 3;
@@ -63,6 +64,9 @@ function buildPathWithParams(path: string, params?: HttpRequestOptions["params"]
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
+    const rateLimiter = getRateLimiter();
+    await rateLimiter.waitForSlot();
+
     const requestConfig = await applyInterceptors(init || {});
     const response = await requestWithTimeout(
       fetch(`${config.apiUrl}${path}`, requestConfig),
@@ -139,3 +143,5 @@ export function createHttpClient(): HttpClient {
 export const httpClient = createHttpClient();
 
 export { addInterceptor } from "./interceptors";
+export { configureRateLimiter, resetRateLimiter } from "./rate-limiter";
+export type { RateLimiterConfig } from "./rate-limiter";
