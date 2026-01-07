@@ -11,7 +11,7 @@ type NoteLinkListProps = {
   items: NoteLinkListItem[]
   isLoading: boolean
   searchQuery: string
-  selectedId: string
+  selectedId: string | null
   onSelect: (id: string) => void
 }
 

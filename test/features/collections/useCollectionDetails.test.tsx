@@ -1,22 +1,12 @@
-import { act, renderHook, waitFor } from "@testing-library/react"
+import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import type { ReactNode } from "react"
 import { vi } from "vitest"
-import { useCollectionDetails } from "@/features/collections/hooks/useCollectionDetails"
+import { useCollectionQuery } from "@/features/collections/hooks/useCollectionQuery"
 import type { Collection } from "@/features/collections/models/collection.model"
-import React from "react"
-
-const mockRouter = {
-  navigate: vi.fn(),
-}
-
-vi.mock("@tanstack/react-router", () => ({
-  useRouter: () => mockRouter,
-}))
 
 const mockCollectionsService = vi.hoisted(() => ({
   get: vi.fn(),
-  update: vi.fn(),
-  remove: vi.fn(),
 }))
 
 vi.mock("@/features/collections/services/collections.service", () => ({
@@ -24,175 +14,53 @@ vi.mock("@/features/collections/services/collections.service", () => ({
 }))
 
 const createWrapper = (client: QueryClient) => {
-  return ({ children }: { children: React.ReactNode }) => (
+  return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
 }
 
-describe("useCollectionDetails", () => {
-  let queryClient: QueryClient
-
-  const collection: Collection = {
-    id: "col-1",
-    ownerId: "owner",
-    name: "Test Collection",
-    description: "Description",
-    visibility: "private",
-    tags: [],
-    notes: [],
-    nodes: [],
-    edges: [],
-    createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-02T00:00:00.000Z",
-  }
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-    queryClient = new QueryClient({
+describe("useCollectionQuery", () => {
+  test("fetches a collection by id", async () => {
+    const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     })
-  })
 
-  test("charge la collection et retourne les données", async () => {
+    const collection: Collection = {
+      id: "col-1",
+      ownerId: "owner",
+      name: "Collection",
+      description: "Desc",
+      visibility: "private",
+      tags: [],
+      notes: [],
+      nodes: [],
+      edges: [],
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-02T00:00:00.000Z",
+    }
+
     mockCollectionsService.get.mockResolvedValue(collection)
 
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
+    const { result } = renderHook(() => useCollectionQuery("col-1"), {
       wrapper: createWrapper(queryClient),
     })
 
-    await waitFor(() => expect(result.current.loading).toBe(false))
-
-    expect(result.current.collection).toEqual(collection)
-    expect(result.current.error).toBeNull()
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data).toEqual(collection)
     expect(mockCollectionsService.get).toHaveBeenCalledWith("col-1")
   })
 
-  test("initialValues contient les valeurs de la collection", async () => {
-    mockCollectionsService.get.mockResolvedValue(collection)
-
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
-      wrapper: createWrapper(queryClient),
+  test("does not fetch when disabled", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
     })
 
-    await waitFor(() => expect(result.current.collection).toEqual(collection))
+    const { result } = renderHook(
+      () => useCollectionQuery("", { enabled: true }),
+      { wrapper: createWrapper(queryClient) }
+    )
 
-    expect(result.current.initialValues).toEqual({
-      name: "Test Collection",
-      description: "Description",
-      visibility: "private",
-    })
-  })
-
-  test("handleEdit met à jour la collection", async () => {
-    mockCollectionsService.get.mockResolvedValue(collection)
-    const updated = { ...collection, name: "Updated" }
-    mockCollectionsService.update.mockResolvedValue(updated)
-
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    await waitFor(() => expect(result.current.collection).toEqual(collection))
-
-    await act(async () => {
-      await result.current.handlers.onEdit({
-        name: "Updated",
-        description: "Description",
-        visibility: "private",
-      })
-    })
-
-    await waitFor(() => {
-      expect(mockCollectionsService.update).toHaveBeenCalledWith("col-1", {
-        name: "Updated",
-        description: "Description",
-        visibility: "private",
-      })
-    })
-  })
-
-  test("handleBack navigue vers la liste des collections", async () => {
-    mockCollectionsService.get.mockResolvedValue(collection)
-
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    await waitFor(() => expect(result.current.collection).toEqual(collection))
-
-    act(() => {
-      result.current.handlers.onBack()
-    })
-
-    expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/workspace" })
-  })
-
-  test("handleDelete définit deleteTarget", async () => {
-    mockCollectionsService.get.mockResolvedValue(collection)
-
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    await waitFor(() => expect(result.current.collection).toEqual(collection))
-
-    act(() => {
-      result.current.handlers.onDelete()
-    })
-
-    await waitFor(() => {
-      expect(result.current.deletion.target).toEqual(collection)
-    })
-  })
-
-  test("confirmDelete supprime la collection et navigue", async () => {
-    mockCollectionsService.get.mockResolvedValue(collection)
-    mockCollectionsService.remove.mockResolvedValue(undefined)
-
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    await waitFor(() => expect(result.current.collection).toEqual(collection))
-
-    act(() => {
-      result.current.handlers.onDelete()
-    })
-
-    await waitFor(() => {
-      expect(result.current.deletion.target).toEqual(collection)
-    })
-
-    await act(async () => {
-      await result.current.deletion.confirmDelete()
-    })
-
-    await waitFor(() => {
-      expect(mockCollectionsService.remove).toHaveBeenCalledWith("col-1")
-    })
-
-    await waitFor(() => {
-      expect(mockRouter.navigate).toHaveBeenCalledWith({ to: "/app/workspace" })
-    })
-  })
-
-  test("isEditing peut être basculé", async () => {
-    mockCollectionsService.get.mockResolvedValue(collection)
-
-    const { result } = renderHook(() => useCollectionDetails("col-1"), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    await waitFor(() => expect(result.current.collection).toEqual(collection))
-
-    expect(result.current.isEditing).toBe(false)
-
-    act(() => {
-      result.current.setIsEditing(true)
-    })
-
-    await waitFor(() => {
-      expect(result.current.isEditing).toBe(true)
-    })
+    expect(result.current.isFetching).toBe(false)
+    expect(mockCollectionsService.get).not.toHaveBeenCalled()
   })
 })

@@ -1,174 +1,95 @@
-import { renderHook, waitFor, act } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { vi } from "vitest";
-import { useCollectionCreate } from "@/features/collections/hooks/useCollectionCreate";
-import type { Collection } from "@/features/collections/models/collection.model";
-import React from "react";
-
-const mockUserId = "user-123";
-
-vi.mock("@/features/auth/hooks/useAuth", () => ({
-  useAuth: () => ({ user: { id: mockUserId } }),
-}));
+import { renderHook, act } from "@testing-library/react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import type { ReactNode } from "react"
+import { vi } from "vitest"
+import { useCreateCollectionMutation } from "@/features/collections/hooks/useCreateCollectionMutation"
+import { COLLECTIONS_QUERY_KEYS } from "@/features/collections/hooks/collections.keys"
+import type { Collection } from "@/features/collections/models/collection.model"
+import type { PaginatedCollections } from "@/features/collections/types/paginated-collection"
 
 const mockCollectionsService = vi.hoisted(() => ({
   create: vi.fn(),
-}));
+}))
 
 vi.mock("@/features/collections/services/collections.service", () => ({
   collectionsService: mockCollectionsService,
-}));
+}))
+
+vi.mock("@/lib/logger", () => ({
+  logger: { error: vi.fn() },
+}))
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
 
 const createWrapper = (client: QueryClient) => {
-  return ({ children }: { children: React.ReactNode }) => (
+  return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
-  );
-};
+  )
+}
 
-describe("useCollectionCreate", () => {
-  let queryClient: QueryClient;
+describe("useCreateCollectionMutation", () => {
+  test("creates a collection and updates cache", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    })
 
-  const newCollection: Collection = {
-    id: "col-new",
-    ownerId: mockUserId,
-    name: "New Collection",
-    description: "New Description",
-    visibility: "private",
-    tags: [],
-    notes: [],
-    nodes: [],
-    edges: [],
-    createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-01T00:00:00.000Z",
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
-  });
-
-  test("l'état initial est fermé", () => {
-    const { result } = renderHook(() => useCollectionCreate(), {
-      wrapper: createWrapper(queryClient),
-    });
-
-    expect(result.current.isOpen).toBe(false);
-    expect(result.current.loading).toBe(false);
-  });
-
-  test("open et close basculent isOpen", () => {
-    const { result } = renderHook(() => useCollectionCreate(), {
-      wrapper: createWrapper(queryClient),
-    });
-
-    act(() => {
-      result.current.open();
-    });
-
-    expect(result.current.isOpen).toBe(true);
-
-    act(() => {
-      result.current.close();
-    });
-
-    expect(result.current.isOpen).toBe(false);
-  });
-
-  test("submit crée une collection avec userId", async () => {
-    mockCollectionsService.create.mockResolvedValue(newCollection);
-
-    const { result } = renderHook(() => useCollectionCreate(), {
-      wrapper: createWrapper(queryClient),
-    });
-
-    act(() => {
-      result.current.open();
-    });
-
-    expect(result.current.isOpen).toBe(true);
-
-    await act(async () => {
-      await result.current.submit({
-        name: "New Collection",
-        description: "New Description",
-        visibility: "private",
-      });
-    });
-
-    expect(mockCollectionsService.create).toHaveBeenCalledWith({
-      ownerId: mockUserId,
+    const newCollection: Collection = {
+      id: "col-new",
+      ownerId: "owner-1",
       name: "New Collection",
       description: "New Description",
       visibility: "private",
-    });
+      tags: [],
+      notes: [],
+      nodes: [],
+      edges: [],
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z",
+    }
 
-    await waitFor(() => {
-      expect(result.current.isOpen).toBe(false);
-    });
-  });
+    const existingCollection = { ...newCollection, id: "col-1", name: "Existing" }
 
-  test("loading est vrai pendant la création", async () => {
-    let resolveCreate: (value: Collection) => void = () => {};
-    mockCollectionsService.create.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveCreate = resolve;
-        })
-    );
+    mockCollectionsService.create.mockResolvedValue(newCollection)
 
-    const { result } = renderHook(() => useCollectionCreate(), {
-      wrapper: createWrapper(queryClient),
-    });
+    const listKey = COLLECTIONS_QUERY_KEYS.lists()
+    const initialList: PaginatedCollections = {
+      items: [existingCollection],
+      total: 1,
+      limit: 10,
+      offset: 0,
+    }
+    queryClient.setQueryData(listKey, initialList)
 
-    let submitPromise!: Promise<void>;
+    const { result } = renderHook(
+      () => useCreateCollectionMutation({ silent: true }),
+      { wrapper: createWrapper(queryClient) }
+    )
 
     await act(async () => {
-      submitPromise = result.current.submit({
+      await result.current.mutateAsync({
+        ownerId: "owner-1",
         name: "New Collection",
         description: "New Description",
         visibility: "private",
-      });
-    });
+      })
+    })
 
-    await waitFor(() => {
-      expect(result.current.loading).toBe(true);
-    });
+    expect(mockCollectionsService.create).toHaveBeenCalledWith({
+      ownerId: "owner-1",
+      name: "New Collection",
+      description: "New Description",
+      visibility: "private",
+    })
 
-    await act(async () => {
-      resolveCreate(newCollection);
-      await submitPromise;
-    });
-
-    expect(result.current.loading).toBe(false);
-  });
-
-  test("error est défini en cas d'échec", async () => {
-    const error = new Error("Creation failed");
-    mockCollectionsService.create.mockRejectedValue(error);
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-    try {
-      const { result } = renderHook(() => useCollectionCreate(), {
-        wrapper: createWrapper(queryClient),
-      });
-
-      await act(async () => {
-        await result.current
-          .submit({
-            name: "New Collection",
-            description: "New Description",
-            visibility: "private",
-          })
-          .catch(() => {});
-      });
-
-      await waitFor(() => {
-        expect(result.current.error).toBeTruthy();
-      });
-    } finally {
-      consoleErrorSpy.mockRestore();
-    }
-  });
-});
+    const listData = queryClient.getQueryData(listKey)
+    expect(listData).toEqual(newCollection)
+    expect(
+      queryClient.getQueryData(COLLECTIONS_QUERY_KEYS.detail(newCollection.id))
+    ).toEqual(newCollection)
+  })
+})

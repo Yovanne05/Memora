@@ -1,68 +1,99 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { vi } from 'vitest'
-import { useAsyncMutation } from '@/hooks/useAsyncMutation'
+import { renderHook, act } from "@testing-library/react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import type { ReactNode } from "react"
+import { vi } from "vitest"
+import { useResourceMutation } from "@/hooks/useResourceMutation"
 
-type TestComponentProps = {
-  action: () => Promise<string>
-  errorMessage: string
-  onSuccess?: (result: string, args: unknown[]) => void
+const mockToast = vi.hoisted(() => ({
+  success: vi.fn(),
+  error: vi.fn(),
+}))
+
+vi.mock("sonner", () => ({
+  toast: mockToast,
+}))
+
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    error: vi.fn(),
+  },
+}))
+
+const createWrapper = (client: QueryClient) => {
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  )
 }
 
-function TestComponent({ action, errorMessage, onSuccess }: TestComponentProps) {
-  const { execute, loading, error, resetError } = useAsyncMutation(
-    action,
-    errorMessage,
-    onSuccess
-  )
-
-  return (
-    <div>
-      <button onClick={() => execute().catch(() => {})}>run</button>
-      <button onClick={resetError}>reset</button>
-      <div>loading:{loading ? 'yes' : 'no'}</div>
-      <div>error:{error ?? 'none'}</div>
-    </div>
-  )
-}
-
-describe('useAsyncMutation', () => {
-  test('handles success and onSuccess callback', async () => {
-    const action = vi.fn().mockResolvedValue('OK')
+describe("useResourceMutation", () => {
+  test("sets cache data and calls onSuccess", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    })
+    const mutationFn = vi.fn().mockResolvedValue("OK")
     const onSuccess = vi.fn()
-    const user = userEvent.setup()
 
-    render(
-      <TestComponent action={action} errorMessage="Erreur" onSuccess={onSuccess} />
+    const { result } = renderHook(
+      () =>
+        useResourceMutation<string, { value: string }>(
+          {
+            mutationFn,
+            queryKey: ["resource"],
+            successMessage: "done",
+          },
+          { onSuccess, silent: true }
+        ),
+      { wrapper: createWrapper(queryClient) }
     )
 
-    await user.click(screen.getByText('run'))
-
-    await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith('OK', expect.any(Array))
+    await act(async () => {
+      await result.current.mutateAsync({ value: "payload" })
     })
 
-    expect(screen.getByText('loading:no')).toBeTruthy()
-    expect(screen.getByText('error:none')).toBeTruthy()
+    expect(mutationFn).toHaveBeenCalledWith(
+      { value: "payload" },
+      expect.objectContaining({ client: expect.any(Object) })
+    )
+    expect(queryClient.getQueryData(["resource"])).toBe("OK")
+    expect(onSuccess).toHaveBeenCalledWith("OK")
   })
 
-  test('handles error and sets error message', async () => {
-    const action = vi.fn().mockRejectedValue(new Error('boom'))
-    const user = userEvent.setup()
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  test("calls onError when mutation fails", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    })
+    const error = new Error("boom")
+    const mutationFn = vi.fn().mockRejectedValue(error)
+    const onError = vi.fn()
 
-    try {
-      render(<TestComponent action={action} errorMessage="Erreur" />)
+    const { result } = renderHook(
+      () =>
+        useResourceMutation<string, void>(
+          {
+            mutationFn,
+            queryKey: ["resource"],
+            errorMessage: "failed",
+          },
+          { onError, silent: true }
+        ),
+      { wrapper: createWrapper(queryClient) }
+    )
 
-      await user.click(screen.getByText('run'))
+    await act(async () => {
+      try {
+        await result.current.mutateAsync(undefined as void)
+      } catch {
+        // swallow to allow assertions below
+      }
+    })
 
-      await waitFor(() => {
-        expect(screen.getByText(/error:boom/)).toBeTruthy()
-      })
-
-      expect(screen.getByText('loading:no')).toBeTruthy()
-    } finally {
-      consoleErrorSpy.mockRestore()
-    }
+    expect(onError).toHaveBeenCalledWith(error)
+    expect(queryClient.getQueryData(["resource"])).toBeUndefined()
   })
 })

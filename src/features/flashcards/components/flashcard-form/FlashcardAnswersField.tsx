@@ -49,9 +49,8 @@ export function FlashcardAnswersField({
             key={field.id}
             fieldId={field.id}
             control={control}
-            form={form}
             index={index}
-            isCorrect={form.watch(`answers.${index}.isCorrect`)}
+            isCorrect={form.watch(`answers.${index}.isCorrect`) ?? false}
             canRemove={fields.length > 2}
             isSubmitting={isSubmitting}
             onToggleCorrect={onToggleCorrect}

@@ -1,4 +1,4 @@
-import { Controller, type Control } from "react-hook-form"
+import { Controller, type Control, type FieldError } from "react-hook-form"
 
 import { FormSelect } from "@/components/ui/form-select"
 import { VISIBILITY_OPTIONS } from "../../types/collection-form.constants"
@@ -7,7 +7,7 @@ import type { CollectionFormInput } from "../../schemas/collection.schema"
 type CollectionVisibilityFieldProps = {
   control: Control<CollectionFormInput>
   disabled: boolean
-  error?: { message?: string }
+  error?: FieldError
 }
 
 export function CollectionVisibilityField({

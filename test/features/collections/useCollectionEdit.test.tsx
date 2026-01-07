@@ -1,9 +1,11 @@
-import { renderHook, waitFor, act } from "@testing-library/react"
+import { renderHook, act } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import type { ReactNode } from "react"
 import { vi } from "vitest"
-import { useCollectionEdit } from "@/features/collections/hooks/useCollectionEdit"
+import { useUpdateCollectionMutation } from "@/features/collections/hooks/useUpdateCollectionMutation"
+import { COLLECTIONS_QUERY_KEYS } from "@/features/collections/hooks/collections.keys"
 import type { Collection } from "@/features/collections/models/collection.model"
-import React from "react"
+import type { PaginatedCollections } from "@/features/collections/types/paginated-collection"
 
 const mockCollectionsService = vi.hoisted(() => ({
   update: vi.fn(),
@@ -13,137 +15,76 @@ vi.mock("@/features/collections/services/collections.service", () => ({
   collectionsService: mockCollectionsService,
 }))
 
+vi.mock("@/lib/logger", () => ({
+  logger: { error: vi.fn() },
+}))
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}))
+
 const createWrapper = (client: QueryClient) => {
-  return ({ children }: { children: React.ReactNode }) => (
+  return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
 }
 
-describe("useCollectionEdit", () => {
-  let queryClient: QueryClient
-
-  const collection: Collection = {
-    id: "col-1",
-    ownerId: "owner",
-    name: "Original",
-    description: "Original Desc",
-    visibility: "private",
-    tags: [],
-    notes: [],
-    nodes: [],
-    edges: [],
-    createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-02T00:00:00.000Z",
-  }
-
-  beforeEach(() => {
-    vi.clearAllMocks()
-    queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    })
-  })
-
-  test("l'état initial est vide", () => {
-    const { result } = renderHook(() => useCollectionEdit(), {
-      wrapper: createWrapper(queryClient),
+describe("useUpdateCollectionMutation", () => {
+  test("updates collection in cache", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     })
 
-    expect(result.current.target).toBeNull()
-    expect(result.current.loading).toBe(false)
-    expect(result.current.error).toBeNull()
-  })
+    const collection: Collection = {
+      id: "col-1",
+      ownerId: "owner",
+      name: "Original",
+      description: "Desc",
+      visibility: "private",
+      tags: [],
+      notes: [],
+      nodes: [],
+      edges: [],
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-02T00:00:00.000Z",
+    }
 
-  test("open définit la collection cible", () => {
-    const { result } = renderHook(() => useCollectionEdit(), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    act(() => {
-      result.current.open(collection)
-    })
-
-    expect(result.current.target).toEqual(collection)
-  })
-
-  test("submit met à jour la collection", async () => {
     const updated = { ...collection, name: "Updated" }
     mockCollectionsService.update.mockResolvedValue(updated)
 
-    const { result } = renderHook(() => useCollectionEdit(), {
-      wrapper: createWrapper(queryClient),
-    })
+    const listKey = COLLECTIONS_QUERY_KEYS.list()
+    const detailKey = COLLECTIONS_QUERY_KEYS.detail(collection.id)
+    const listData: PaginatedCollections = {
+      items: [collection],
+      total: 1,
+      limit: 10,
+      offset: 0,
+    }
 
-    act(() => {
-      result.current.open(collection)
-    })
+    queryClient.setQueryData(listKey, listData)
+    queryClient.setQueryData(detailKey, collection)
+
+    const { result } = renderHook(
+      () => useUpdateCollectionMutation({ silent: true }),
+      { wrapper: createWrapper(queryClient) }
+    )
 
     await act(async () => {
-      await result.current.submit({
-        name: "Updated",
-        description: "Original Desc",
-        visibility: "private",
+      await result.current.mutateAsync({
+        id: collection.id,
+        data: { name: "Updated" },
       })
     })
 
     expect(mockCollectionsService.update).toHaveBeenCalledWith("col-1", {
       name: "Updated",
-      description: "Original Desc",
-      visibility: "private",
     })
 
-    await waitFor(() => {
-      expect(result.current.target).toBeNull()
-    })
-  })
-
-  test("close réinitialise target", () => {
-    const { result } = renderHook(() => useCollectionEdit(), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    act(() => {
-      result.current.open(collection)
-    })
-
-    expect(result.current.target).toEqual(collection)
-
-    act(() => {
-      result.current.close()
-    })
-
-    expect(result.current.target).toBeNull()
-  })
-
-  test("loading est vrai pendant la mise à jour", async () => {
-    mockCollectionsService.update.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({}), 100))
-    )
-
-    const { result } = renderHook(() => useCollectionEdit(), {
-      wrapper: createWrapper(queryClient),
-    })
-
-    act(() => {
-      result.current.open(collection)
-    })
-
-    let submitPromise: Promise<void>
-    act(() => {
-      submitPromise = result.current.submit({
-        name: "Updated",
-        description: "Desc",
-        visibility: "private",
-      })
-    })
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(true)
-    })
-
-    await act(async () => {
-      await submitPromise
-    })
-
-    expect(result.current.loading).toBe(false)
+    const updatedList = queryClient.getQueryData<PaginatedCollections>(listKey)
+    expect(updatedList?.items[0]).toEqual(updated)
+    expect(queryClient.getQueryData(detailKey)).toEqual(updated)
   })
 })

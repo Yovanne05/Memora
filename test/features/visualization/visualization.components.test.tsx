@@ -6,7 +6,6 @@ import type { HTMLAttributes } from "react"
 import { VisualizationHeader } from "@/features/visualization/components/VisualizationHeader"
 import { VisualizationLegend } from "@/features/visualization/components/VisualizationLegend"
 import { LoadingState } from "@/features/visualization/components/VisualizationSkeleton"
-import { VisualizationCollectionsList } from "@/features/visualization/components/VisualizationCollectionsList"
 import { CustomNode } from "@/features/visualization/components/CustomNode"
 import { OrphanNotesZone } from "@/features/visualization/components/OrphanNotesZone"
 import { NodeContent } from "@/features/visualization/components/NodeContent"
@@ -14,23 +13,6 @@ import { NodeHandle } from "@/features/visualization/components/NodeHandle"
 import { NODE_COLORS } from "@/features/visualization/lib/visualization.constants"
 import type { Collection } from "@/features/collections/models/collection.model"
 import { Position, type NodeProps } from "reactflow"
-
-vi.mock("@/features/collections/components/CollectionCard", () => ({
-  CollectionCard: ({
-    collection,
-    onCardClick,
-  }: {
-    collection: Collection
-    onCardClick?: (c: Collection) => void
-  }) => (
-    <button
-      onClick={() => onCardClick?.(collection)}
-      aria-label={`card-${collection.id}`}
-    >
-      {collection.name}
-    </button>
-  ),
-}))
 
 type ReactFlowHandleProps = HTMLAttributes<HTMLDivElement> & {
   id: string
@@ -74,44 +56,6 @@ describe("Visualization components", () => {
     const { container } = render(<LoadingState />)
     expect(screen.getByText("Chargement...")).toBeInTheDocument()
     expect(container.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(20)
-  })
-
-  test("VisualizationCollectionsList affiche vide ou carte selectionnee", async () => {
-    const collections: Collection[] = [
-      {
-        id: "c1",
-        ownerId: "o1",
-        name: "Col 1",
-        description: "",
-        visibility: "public",
-        tags: [],
-        notes: [],
-        nodes: [],
-        edges: [],
-        createdAt: "",
-        updatedAt: "",
-      },
-    ]
-
-    const { rerender } = render(
-      <VisualizationCollectionsList
-        collections={[]}
-        selectedId={undefined}
-        onSelect={vi.fn()}
-      />
-    )
-    expect(screen.getByText(/Aucune collection/)).toBeInTheDocument()
-
-    const onSelect = vi.fn()
-    rerender(
-      <VisualizationCollectionsList
-        collections={collections}
-        selectedId="c1"
-        onSelect={onSelect}
-      />
-    )
-    await userEvent.click(screen.getByLabelText("card-c1"))
-    expect(onSelect).toHaveBeenCalledWith(collections[0])
   })
 
   test("CustomNode affiche le contenu et les handles", () => {

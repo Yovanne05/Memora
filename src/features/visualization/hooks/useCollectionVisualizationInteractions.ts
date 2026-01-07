@@ -2,7 +2,8 @@ import { useCallback, useEffect } from "react"
 import type { MouseEvent } from "react"
 import type { Edge, Node } from "reactflow"
 
-import type { CollectionVisualization, CustomNodeData } from "../types/visualization.type"
+import type { CustomNodeData } from "../types/visualization.type"
+import type { Collection } from "@/features/collections/models/collection.model"
 import { useNodeSelection } from "./useNodeSelection"
 import { useNoteSidebar } from "./useNoteSidebar"
 import { useRelatedNotes } from "./useRelatedNotes"
@@ -12,7 +13,7 @@ type UseCollectionVisualizationInteractionsArgs = {
   nodes: Node<CustomNodeData>[]
   edges: Edge[]
   orphanNodeIds: Set<string>
-  collection?: CollectionVisualization
+  collection?: Collection
 }
 
 export function useCollectionVisualizationInteractions({
