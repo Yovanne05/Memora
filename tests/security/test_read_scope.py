@@ -1,15 +1,9 @@
-import os
 from uuid import uuid4
 
-os.environ.setdefault("APP_ENV", "test")
-os.environ.setdefault("SWAGGER_ENABLED", "0")
-
-import config
+import bcrypt
 import pytest
 from flask import g
-from sqlalchemy import create_engine
 
-from app import create_app
 from daos.user_dao import User
 from dtos.collection_dto import CollectionCreateDTO
 from dtos.note_dto import NoteCreateDTO
@@ -26,64 +20,25 @@ from repositorys.note_repository import (
 )
 from services.impl.collection.collection_service_impl import collection_service
 from services.impl.note.note_crud_service_impl import note_crud_service
-from utils import db as db_utils
 from utils.enums import RoleEnum, VisibilityEnum, SharePermissionEnum
 from daos.note_dao import NoteShare
 from daos.collection_dao import CollectionShare
 
 
 def _clear_scope_cache():
+    """Nettoie le cache des scopes d'accès"""
     g.pop("accessible_collection_ids", None)
     g.pop("accessible_note_ids", None)
 
 
-@pytest.fixture(autouse=True)
-def configure_test_env(monkeypatch):
-    monkeypatch.setattr(config, "APP_ENV", "test")
-    monkeypatch.setattr(config, "SWAGGER_ENABLED", False)
-    test_uri = "sqlite+pysqlite:///:memory:"
-    monkeypatch.setattr(config, "SQLALCHEMY_TEST_DATABASE_URI", test_uri)
-    # Ensure previous scoped sessions are cleared before rebinding.
-    db_utils.SessionLocal.remove()
-
-    test_engine = create_engine(
-        test_uri,
-        echo=False,
-        future=True,
-        pool_pre_ping=True,
-    )
-    monkeypatch.setattr(db_utils, "engine", test_engine)
-    db_utils.SessionLocal.configure(bind=test_engine)
-
-    with test_engine.begin():
-        db_utils.Base.metadata.drop_all(bind=test_engine)
-        db_utils.Base.metadata.create_all(bind=test_engine)
-
-    try:
-        yield
-    finally:
-        db_utils.SessionLocal.remove()
-        test_engine.dispose()
-
-
-@pytest.fixture(autouse=True)
-def app_context(configure_test_env):
-    app = create_app()
-    with app.app_context():
-        db_utils.drop_all()
-        db_utils.create_all()
-        _clear_scope_cache()
-        yield
-        _clear_scope_cache()
-
-
 def _create_user(email_prefix: str) -> User:
     unique = uuid4().hex[:8]
+    password = f"TestPassword-{unique}-1!"  # NOSONAR
     user = User(
         email=f"{email_prefix}-{unique}@example.com",
         username=f"{email_prefix}-{unique}",
         display_name=f"{email_prefix} user",
-        password_hash="test-hash", # NOSONAR
+        password_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),  # NOSONAR
         role=RoleEnum.CLIENT,
     )
     return user_repository.add(user)
