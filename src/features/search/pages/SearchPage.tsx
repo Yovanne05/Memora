@@ -1,32 +1,18 @@
-import { Search } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
-import { SearchInput } from '../components/SearchInput'
-import { SearchFilters } from '../components/SearchFilters'
-import { SearchResults } from '../components/SearchResults'
-import { useSearchManager } from '../hooks/useSearchManager'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PaginationComponent } from "@/components/ui/pagination-component"
+import { SearchFilters } from "../components/SearchFilters"
+import { SearchInput } from "../components/SearchInput"
+import { SearchResults } from "../components/SearchResults"
+import { useSearchManager } from "../hooks/useSearchManager"
+import { SearchHeader } from "./SearchHeader"
+import { SearchSummary } from "./SearchSummary"
 
 export default function SearchPage() {
   const manager = useSearchManager()
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Recherche</h1>
-          <p className="text-muted-foreground">
-            Recherchez parmi vos collections et notes publiques
-          </p>
-        </div>
-        <Search className="h-8 w-8 text-muted-foreground" />
-      </div>
+      <SearchHeader />
 
       <SearchInput
         value={manager.query}
@@ -48,13 +34,12 @@ export default function SearchPage() {
         </CardContent>
       </Card>
 
-      {manager.hasSearched && !manager.isLoading && (
-        <div className="text-sm text-muted-foreground">
-          {manager.total} résultat{manager.total > 1 ? 's' : ''} trouvé{manager.total > 1 ? 's' : ''}
-        </div>
-      )}
+      <SearchSummary
+        total={manager.total}
+        hasSearched={manager.hasSearched}
+        isLoading={manager.isLoading}
+      />
 
-      {/* Results */}
       <SearchResults
         results={manager.results}
         isLoading={manager.isLoading}
@@ -63,66 +48,11 @@ export default function SearchPage() {
       />
 
       {manager.hasSearched && !manager.isLoading && manager.totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => manager.setPage(Math.max(0, manager.page - 1))}
-                aria-disabled={manager.page === 0}
-                className={manager.page === 0 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
-            </PaginationItem>
-
-            {Array.from({ length: manager.totalPages }, (_, i) => i)
-              .filter((i) => {
-                return (
-                  i < 3 ||
-                  i >= manager.totalPages - 3 ||
-                  Math.abs(i - manager.page) <= 1
-                )
-              })
-              .map((i, idx, arr) => {
-                const showEllipsisBefore = idx > 0 && arr[idx - 1] !== i - 1
-                const showEllipsisAfter = idx < arr.length - 1 && arr[idx + 1] !== i + 1
-
-                return (
-                  <div key={i} className="flex items-center">
-                    {showEllipsisBefore && (
-                      <PaginationItem>
-                        <span className="px-2 text-muted-foreground">...</span>
-                      </PaginationItem>
-                    )}
-                    <PaginationItem>
-                      <PaginationLink
-                        onClick={() => manager.setPage(i)}
-                        isActive={manager.page === i}
-                        className="cursor-pointer"
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                    {showEllipsisAfter && (
-                      <PaginationItem>
-                        <span className="px-2 text-muted-foreground">...</span>
-                      </PaginationItem>
-                    )}
-                  </div>
-                )
-              })}
-
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => manager.setPage(Math.min(manager.totalPages - 1, manager.page + 1))}
-                aria-disabled={manager.page >= manager.totalPages - 1}
-                className={
-                  manager.page >= manager.totalPages - 1
-                    ? 'pointer-events-none opacity-50'
-                    : 'cursor-pointer'
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <PaginationComponent
+          page={manager.page}
+          maxPage={manager.totalPages - 1}
+          setPage={manager.setPage}
+        />
       )}
     </div>
   )

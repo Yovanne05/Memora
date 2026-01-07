@@ -1,37 +1,13 @@
-import { useMemo } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
-import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import type { Note, NoteVisibility } from "../models/note.model"
-import { noteEditFormSchema } from "../schemas/note.schema"
-import { formatTime } from "@/lib/format.utils"
+
 import { FormActions } from "./FormActions"
 import { NoteContentFields } from "./NoteContentFields"
 import { NoteSettingsFields } from "./NoteSettingsFields"
+import type { NoteEditFormProps, NoteFormValues } from "./note-edit-form/types"
+import { useNoteEditForm } from "./note-edit-form/useNoteEditForm"
 
-export interface NoteFormValues {
-  title: string
-  content: string
-  visibility: NoteVisibility
-  collectionId?: string | null
-  tags: string[]
-}
+export type { NoteFormValues } from "./note-edit-form/types"
 
-interface NoteEditFormProps {
-  note?: Note
-  loading?: boolean
-  readOnly?: boolean
-  onSubmit: (values: NoteFormValues) => void | Promise<void>
-  onCancel?: () => void
-  onDelete?: () => void
-  deleteLoading?: boolean
-}
-
-/**
- * Formulaire d'édition de note
- * Refactorisé en sous-composants pour une meilleure lisibilité
- */
 export function NoteEditForm({
   note,
   loading = false,
@@ -41,40 +17,21 @@ export function NoteEditForm({
   onDelete,
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
-  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsQuery()
-  const collections = collectionsData?.items ?? []
-
-  const form = useForm({
-    resolver: zodResolver(noteEditFormSchema),
-    defaultValues: {
-      title: note?.title ?? "",
-      content: note?.content ?? "",
-      visibility: note?.visibility ?? "private",
-      collectionId: note?.collectionId ?? null,
-      tags: note?.tags ?? [],
-    },
-  })
-
-  const savedTime = useMemo(() => {
-    if (!note?.updatedAt) return null
-    return formatTime(note.updatedAt)
-  }, [note])
-
-  const handleFormSubmit = form.handleSubmit(async (values) => {
-    await onSubmit({
-      title: values.title,
-      content: values.content,
-      visibility: values.visibility,
-      collectionId: values.collectionId ?? null,
-      tags: values.tags,
-    })
-  })
-
-  const isFormDisabled = loading || form.formState.isSubmitting || readOnly
+  const {
+    form,
+    collections,
+    loadingCollections,
+    savedTime,
+    isFormDisabled,
+    handleFormSubmit,
+  } = useNoteEditForm({ note, loading, readOnly, onSubmit })
 
   return (
     <Form {...form} key={note?.id}>
-      <form className="space-y-6" onSubmit={readOnly ? (e) => e.preventDefault() : handleFormSubmit}>
+      <form
+        className="space-y-6"
+        onSubmit={readOnly ? (event) => event.preventDefault() : handleFormSubmit}
+      >
         <FormActions
           savedTime={savedTime}
           isUpdate={!!note}
@@ -86,12 +43,7 @@ export function NoteEditForm({
         />
 
         <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-          <NoteContentFields
-            form={form}
-            disabled={isFormDisabled}
-            noteId={note?.id}
-          />
-
+          <NoteContentFields form={form} disabled={isFormDisabled} noteId={note?.id} />
           <NoteSettingsFields
             form={form}
             disabled={isFormDisabled}

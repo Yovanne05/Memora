@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router"
+import { FileText } from "lucide-react"
+
 import type { Note } from "../models/note.model"
-import { ResourceCard, type ResourceCardAction } from "@/components/shared/ResourceCard"
-import { CalendarClock, Eye, FileText, Lock, Star, User2 } from "lucide-react"
+import { ResourceCard } from "@/components/shared/ResourceCard"
 import { NoteQuickActions } from "./NoteQuickActions"
 import { getContentPreview } from "@/lib/html-utils"
-import { useToggleNoteFavoriteMutation } from "../hooks/useToggleNoteFavoriteMutation"
-import { Button } from "@/components/ui/button"
-import { useCallback } from "react"
+import { buildNoteCardActions } from "./note-card/buildNoteCardActions"
+import { NoteCardFavoriteButton } from "./note-card/NoteCardFavoriteButton"
+import { NoteCardMeta } from "./note-card/NoteCardMeta"
 
 interface NoteCardProps {
   note: Note
@@ -16,101 +17,18 @@ interface NoteCardProps {
   showFavoriteButton?: boolean
 }
 
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat("fr-FR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(new Date(date))
-
 export function NoteCard({
   note,
   onEdit,
   onDelete,
   showQuickActions = false,
-  showFavoriteButton = false
+  showFavoriteButton = false,
 }: Readonly<NoteCardProps>) {
-  const isPublic = note.visibility === "public"
-  const toggleFavorite = useToggleNoteFavoriteMutation()
   const favorite = note.isFavorite === true
-
-  const handleFavoriteClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-      toggleFavorite.mutate({ noteId: note.id, next: !favorite })
-    },
-    [toggleFavorite, note.id, favorite]
-  )
-
-  const actions: ResourceCardAction[] = []
-
-  // Si showQuickActions est true, on ne génère pas d'actions car on utilise NoteQuickActions
-  if (!showQuickActions) {
-    if (onEdit) {
-      actions.push({
-        label: "Modifier",
-        onClick: (e) => {
-          e.preventDefault()
-          onEdit(note)
-        },
-      })
-    }
-    if (onDelete) {
-      actions.push({
-        label: "Supprimer",
-        variant: "destructive",
-        onClick: (e) => {
-          e.preventDefault()
-          onDelete(note)
-        },
-      })
-    }
-  }
-
-  const metadata = (
-    <>
-      <span className="flex items-center gap-1 text-xs text-foreground">
-        <User2 className="h-3.5 w-3.5" />
-        {note.ownerUsername}
-        <span className="text-muted-foreground">•</span>
-        {isPublic ? (
-          <>
-            <Eye className="h-3.5 w-3.5" />
-            Publique
-          </>
-        ) : (
-          <>
-            <Lock className="h-3.5 w-3.5" />
-            Privée
-          </>
-        )}
-      </span>
-      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-        <CalendarClock className="h-3.5 w-3.5" />
-        Mis à jour le {formatDate(note.updatedAt)}
-      </span>
-    </>
-  )
+  const actions = buildNoteCardActions({ note, onEdit, onDelete, showQuickActions })
 
   const favoriteButton = showFavoriteButton ? (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0"
-      onClick={handleFavoriteClick}
-      aria-pressed={favorite}
-      aria-label={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
-      title={favorite ? "Retirer des favoris" : "Ajouter aux favoris"}
-      disabled={toggleFavorite.isPending}
-    >
-      <Star
-        className={`h-4 w-4 transition ${
-          favorite ? "fill-current text-primary" : "text-muted-foreground"
-        }`}
-        aria-hidden="true"
-      />
-    </Button>
+    <NoteCardFavoriteButton noteId={note.id} favorite={favorite} />
   ) : null
 
   const headerActions = showQuickActions ? (
@@ -118,7 +36,9 @@ export function NoteCard({
       {favoriteButton}
       <NoteQuickActions note={note} triggerVariant="ghost" />
     </div>
-  ) : favoriteButton
+  ) : (
+    favoriteButton
+  )
 
   const contentPreview = note.content
     ? getContentPreview(note.content, 150)
@@ -138,7 +58,7 @@ export function NoteCard({
         icon={FileText}
         actions={actions}
         headerActions={headerActions}
-        metadata={metadata}
+        metadata={<NoteCardMeta note={note} />}
       />
     </Link>
   )

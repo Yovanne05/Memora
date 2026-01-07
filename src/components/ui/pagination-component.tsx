@@ -1,14 +1,14 @@
-import { useMemo, type MouseEvent } from "react"
+import { type MouseEvent } from "react"
 import { cn } from "@/lib/utils"
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { PaginationPageItems } from "./pagination-component/PageItems"
+import { usePaginationPages } from "./pagination-component/usePaginationPages"
 
 export function PaginationComponent({
   page,
@@ -21,40 +21,7 @@ export function PaginationComponent({
 }>) {
   const totalPages = maxPage + 1
   const currentPage = page + 1
-
-  const pages = useMemo(() => {
-    const base = new Set<number>()
-    base.add(1)
-    base.add(totalPages)
-    base.add(currentPage)
-    base.add(currentPage - 1)
-    base.add(currentPage + 1)
-
-    if (currentPage <= 2) {
-      base.add(2)
-      base.add(3)
-    }
-
-    if (currentPage >= totalPages - 1) {
-      base.add(totalPages - 1)
-      base.add(totalPages - 2)
-    }
-
-    const orderedPages = Array.from(base)
-      .filter((p) => p >= 1 && p <= totalPages)
-      .sort((a, b) => a - b)
-
-    const result: Array<number | "ellipsis"> = []
-    for (const value of orderedPages) {
-      const previous = result[result.length - 1]
-      if (typeof previous === "number" && value - previous > 1) {
-        result.push("ellipsis")
-      }
-      result.push(value)
-    }
-
-    return result
-  }, [currentPage, totalPages])
+  const pages = usePaginationPages(currentPage, totalPages)
 
   const goToPage = (target: number) => {
     const next = Math.min(maxPage, Math.max(0, target))
@@ -67,31 +34,6 @@ export function PaginationComponent({
       event.preventDefault()
       goToPage(target)
     }
-
-  const pageElements = (() => {
-    let ellipsisIndex = 0
-
-    return pages.map((value) => {
-      if (value === "ellipsis") {
-        const key = `ellipsis-${ellipsisIndex}`
-        ellipsisIndex += 1
-
-        return (
-          <PaginationItem key={key}>
-            <PaginationEllipsis />
-          </PaginationItem>
-        )
-      }
-
-      return (
-        <PaginationItem key={value}>
-          <PaginationLink href="#" isActive={value === currentPage} onClick={handleNavigate(value - 1)}>
-            {value}
-          </PaginationLink>
-        </PaginationItem>
-      )
-    })
-  })()
 
   return (
     <Pagination className="mt-6">
@@ -106,11 +48,15 @@ export function PaginationComponent({
             )}
             onClick={handleNavigate(page - 1)}
           >
-            PrÃ©cÃ©dent
+            Précédent
           </PaginationPrevious>
         </PaginationItem>
 
-        {pageElements}
+        <PaginationPageItems
+          pages={pages}
+          currentPage={currentPage}
+          onSelect={goToPage}
+        />
 
         <PaginationItem>
           <PaginationNext

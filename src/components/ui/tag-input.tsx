@@ -1,8 +1,9 @@
 import * as React from "react"
-import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Badge } from "./badge"
-import { Input } from "./input"
+import { TagInputField } from "./tag-input/TagInputField"
+import { TagInputMessages } from "./tag-input/TagInputMessages"
+import { TagList } from "./tag-input/TagList"
+import { useTagInput } from "./tag-input/useTagInput"
 
 export interface TagInputProps {
   readonly value: string[]
@@ -25,49 +26,13 @@ export function TagInput({
   error,
   id,
 }: Readonly<TagInputProps>) {
-  const [inputValue, setInputValue] = React.useState("")
   const inputRef = React.useRef<HTMLInputElement>(null)
   const tagInputId = React.useId()
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (disabled) return
+  const { inputValue, setInputValue, handleKeyDown, handleInputBlur, removeTag } =
+    useTagInput({ value, onChange, maxTags, disabled })
 
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault()
-      addTag()
-    } else if (e.key === "Backspace" && !inputValue && value.length > 0) {
-      removeTag(value.length - 1)
-    }
-  }
-
-  const addTag = () => {
-    const trimmedValue = inputValue.trim()
-
-    if (!trimmedValue) return
-
-    if (value.length >= maxTags) {
-      return
-    }
-
-    if (value.includes(trimmedValue)) {
-      setInputValue("")
-      return
-    }
-
-    onChange([...value, trimmedValue])
-    setInputValue("")
-  }
-
-  const removeTag = (index: number) => {
-    if (disabled) return
-    onChange(value.filter((_, i) => i !== index))
-  }
-
-  const handleInputBlur = () => {
-    if (inputValue.trim()) {
-      addTag()
-    }
-  }
+  const maxed = value.length >= maxTags
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -79,46 +44,20 @@ export function TagInput({
           disabled && "cursor-not-allowed opacity-50"
         )}
       >
-        {value.map((tag) => (
-          <Badge
-            key={`${tagInputId}-tag-${tag}`}
-            variant="secondary"
-            className="gap-1 pr-1 text-xs"
-          >
-            {tag}
-            {!disabled && (
-              <button
-                type="button"
-                onClick={() => removeTag(value.indexOf(tag))}
-                className="ml-1 rounded-sm hover:bg-secondary-foreground/20 focus:outline-none focus:ring-1 focus:ring-ring"
-                aria-label={`Supprimer le tag ${tag}`}
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
-          </Badge>
-        ))}
-        <Input
-          ref={inputRef}
+        <TagList tags={value} disabled={disabled} onRemove={removeTag} id={tagInputId} />
+        <TagInputField
           id={id}
-          type="text"
+          inputRef={inputRef}
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={value.length === 0 ? placeholder : ""}
+          disabled={disabled}
+          maxed={maxed}
+          onChange={setInputValue}
           onKeyDown={handleKeyDown}
           onBlur={handleInputBlur}
-          placeholder={value.length === 0 ? placeholder : ""}
-          disabled={disabled || value.length >= maxTags}
-          className="h-7 flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 min-w-[120px]"
         />
       </label>
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
-      {value.length >= maxTags && (
-        <p className="text-sm text-muted-foreground">
-          Limite de {maxTags} tags atteinte
-        </p>
-      )}
+      <TagInputMessages error={error} maxTags={maxTags} count={value.length} />
     </div>
   )
 }

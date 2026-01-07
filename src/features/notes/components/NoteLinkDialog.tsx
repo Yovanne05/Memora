@@ -1,20 +1,18 @@
 import { memo } from "react"
-import { Search } from "lucide-react"
+
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useLinkNotes } from "../hooks/useLinkNotes"
 import type { Note } from "../models/note.model"
 import type { NoteLink } from "../models/note-link.model"
-import { getContentPreview } from "@/lib/html-utils"
+import { NoteLinkDialogFooter } from "./note-link-dialog/NoteLinkDialogFooter"
+import { NoteLinkList } from "./note-link-dialog/NoteLinkList"
+import { NoteLinkSearch } from "./note-link-dialog/NoteLinkSearch"
 
 interface NoteLinkDialogProps {
   readonly note: Note
@@ -27,7 +25,7 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
   note,
   existingLinks,
   open,
-  onOpenChange
+  onOpenChange,
 }: Readonly<NoteLinkDialogProps>) {
   const {
     searchQuery,
@@ -49,7 +47,7 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
     if (!selectedNoteId) return
     const success = await handleCreateLink(selectedNoteId)
     if (!success) {
-      alert("Impossible de crÃ©er le lien")
+      alert("Impossible de créer le lien")
     }
   }
 
@@ -64,65 +62,27 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
         <DialogHeader>
           <DialogTitle>Lier une note</DialogTitle>
           <DialogDescription>
-            SÃ©lectionnez une note de la mÃªme collection Ã  lier
+            Sélectionnez une note de la même collection à lier
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher une note..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-
-          <div className="flex-1 overflow-y-auto border rounded-lg">
-            {isLoading && (
-              <div className="p-4 space-y-2">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            )}
-
-            {!isLoading && availableNotes.length === 0 && (
-              <div className="p-8 text-center text-muted-foreground">
-                {searchQuery ? "Aucune note trouvÃ©e" : "Aucune note disponible"}
-              </div>
-            )}
-
-            {!isLoading && availableNotes.map(availableNote => (
-              <button
-                type="button"
-                key={availableNote.id}
-                onClick={() => setSelectedNoteId(availableNote.id)}
-                className={`w-full text-left p-4 border-b last:border-b-0 hover:bg-accent transition-colors ${
-                  selectedNoteId === availableNote.id ? "bg-accent" : ""
-                }`}
-              >
-                <h4 className="font-medium text-sm mb-1">{availableNote.title}</h4>
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {getContentPreview(availableNote.content || "", 150)}
-                </p>
-              </button>
-            ))}
-          </div>
+          <NoteLinkSearch value={searchQuery} onChange={setSearchQuery} />
+          <NoteLinkList
+            items={availableNotes}
+            isLoading={isLoading}
+            searchQuery={searchQuery}
+            selectedId={selectedNoteId}
+            onSelect={setSelectedNoteId}
+          />
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
-            Annuler
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!selectedNoteId || isPending}
-          >
-            {isPending ? "Liaison..." : "Lier la note"}
-          </Button>
-        </DialogFooter>
+        <NoteLinkDialogFooter
+          onCancel={handleClose}
+          onSubmit={handleSubmit}
+          isPending={isPending}
+          hasSelection={!!selectedNoteId}
+        />
       </DialogContent>
     </Dialog>
   )

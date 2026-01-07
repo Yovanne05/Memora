@@ -1,20 +1,21 @@
-import { X, Calendar, Eye, EyeOff, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import type { Note } from "../models/note.model";
-import { cn } from "@/lib/utils";
-import { useResizable } from "@/hooks/useResizable";
-import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection";
-import { RichTextDisplay } from "@/components/editor/RichTextDisplay";
-import { getContentPreview } from "@/lib/html-utils";
+import { Separator } from "@/components/ui/separator"
+import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection"
+import { RichTextDisplay } from "@/components/editor/RichTextDisplay"
+import { cn } from "@/lib/utils"
+import { useResizable } from "@/hooks/useResizable"
+import type { Note } from "../models/note.model"
+import { NoteSidebarHeader } from "./note-sidebar/NoteSidebarHeader"
+import { NoteSidebarInfo } from "./note-sidebar/NoteSidebarInfo"
+import { NoteSidebarOverview } from "./note-sidebar/NoteSidebarOverview"
+import { NoteSidebarRelatedNotes } from "./note-sidebar/NoteSidebarRelatedNotes"
+import { NoteSidebarResizer } from "./note-sidebar/NoteSidebarResizer"
 
 interface NoteSidebarProps {
-  readonly note: Note | null;
-  readonly open: boolean;
-  readonly onClose: () => void;
-  readonly relatedNotes?: Note[];
-  readonly onNoteClick?: (noteId: string) => void;
+  readonly note: Note | null
+  readonly open: boolean
+  readonly onClose: () => void
+  readonly relatedNotes?: Note[]
+  readonly onNoteClick?: (noteId: string) => void
 }
 
 export function NoteSidebar({
@@ -24,16 +25,16 @@ export function NoteSidebar({
   relatedNotes = [],
   onNoteClick,
 }: Readonly<NoteSidebarProps>) {
-  const maxWidth = (globalThis.window?.innerWidth ?? 1200) * 0.8;
+  const maxWidth = (globalThis.window?.innerWidth ?? 1200) * 0.8
 
   const { width, isResizing, handleMouseDown, resizeRef } = useResizable({
     minWidth: 320,
     maxWidth,
     defaultWidth: 480,
     storageKey: "note-sidebar-width",
-  });
+  })
 
-  if (!note) return null;
+  if (!note) return null
 
   const formattedCreatedAt = new Date(note.createdAt).toLocaleString("fr-FR", {
     day: "2-digit",
@@ -41,7 +42,7 @@ export function NoteSidebar({
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
+  })
 
   const formattedUpdatedAt = new Date(note.updatedAt).toLocaleString("fr-FR", {
     day: "2-digit",
@@ -49,7 +50,7 @@ export function NoteSidebar({
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
+  })
 
   return (
     <aside
@@ -61,111 +62,29 @@ export function NoteSidebar({
         isResizing && "transition-none"
       )}
     >
-      <button
-        type="button"
-        onMouseDown={handleMouseDown}
-        onPointerDown={handleMouseDown}
-        onTouchStart={handleMouseDown}
-        aria-label="Redimensionner la barre latérale"
-        className={cn(
-          "absolute left-0 top-0 h-full w-1 cursor-ew-resize hover:bg-primary/50 transition-colors group",
-          isResizing && "bg-primary"
-        )}
-        onClick={(e) => e.preventDefault()}
-      >
-        <span className="sr-only">Redimensionner</span>
-        <div className="absolute left-0 top-0 h-full w-4 -translate-x-1.5" />
-      </button>
-
-      <div className="flex items-center justify-between px-6 py-4 border-b">
-        <h2 className="text-lg font-semibold">Détails de la note</h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-8 w-8"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+      <NoteSidebarResizer isResizing={isResizing} onResizeStart={handleMouseDown} />
+      <NoteSidebarHeader onClose={onClose} />
 
       <div className="flex-1 overflow-y-auto">
-        {relatedNotes.length > 0 && (
-          <div className="px-6 py-4 bg-muted/30">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-              Notes liées ({relatedNotes.length})
-            </h3>
-            <div className="space-y-2">
-              {relatedNotes.map((relatedNote) => (
-                <button
-                  key={relatedNote.id}
-                  type="button"
-                  onClick={() => onNoteClick?.(relatedNote.id)}
-                  className="w-full text-left p-3 rounded-lg border bg-background hover:bg-accent hover:border-accent-foreground/20 transition-colors group flex items-center justify-between gap-2"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {relatedNote.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {getContentPreview(relatedNote.content || "", 100)}
-                    </p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground shrink-0" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <NoteSidebarRelatedNotes notes={relatedNotes} onNoteClick={onNoteClick} />
 
         <div className="px-6 py-6 space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold leading-tight mb-3">
-              {note.title}
-            </h1>
-            <Badge
-              variant={note.visibility === "public" ? "default" : "secondary"}
-              className="flex items-center gap-1 w-fit"
-            >
-              {note.visibility === "public" ? (
-                <Eye className="h-3 w-3" />
-              ) : (
-                <EyeOff className="h-3 w-3" />
-              )}
-              {note.visibility === "public" ? "Publique" : "Privée"}
-            </Badge>
-          </div>
+          <NoteSidebarOverview note={note} />
 
           <Separator />
 
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-              Contenu
-            </h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Contenu</h3>
             <RichTextDisplay content={note.content} />
           </div>
 
           <Separator />
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground">
-              Informations
-            </h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4 shrink-0" />
-                <span>Créée le {formattedCreatedAt}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4 shrink-0" />
-                <span>Modifiée le {formattedUpdatedAt}</span>
-              </div>
-            </div>
-          </div>
+          <NoteSidebarInfo createdAt={formattedCreatedAt} updatedAt={formattedUpdatedAt} />
 
           <FlashcardsSection noteId={note.id} />
         </div>
       </div>
     </aside>
-  );
+  )
 }

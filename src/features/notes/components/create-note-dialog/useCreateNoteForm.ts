@@ -1,0 +1,53 @@
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
+import type { NoteVisibility } from "../../models/note.model"
+import { noteCreateFormSchema, type NoteCreateFormInput } from "../../schemas/note.schema"
+
+type UseCreateNoteFormArgs = {
+  submitting: boolean
+  onSubmit: (payload: {
+    title: string
+    collectionId: string | null
+    visibility: NoteVisibility
+    tags: string[]
+  }) => Promise<void> | void
+}
+
+export function useCreateNoteForm({ submitting, onSubmit }: UseCreateNoteFormArgs) {
+  const { data: collectionsData, isLoading: loadingCollections } = useCollectionsQuery()
+  const collections = collectionsData?.items ?? []
+
+  const form = useForm<NoteCreateFormInput>({
+    resolver: zodResolver(noteCreateFormSchema),
+    defaultValues: {
+      title: "",
+      collectionId: null,
+      visibility: "private",
+      tags: [],
+    },
+  })
+
+  const titleValue = form.watch("title")
+
+  const handleFormSubmit = form.handleSubmit(async (values) => {
+    await onSubmit({
+      title: values.title,
+      collectionId: values.collectionId ?? null,
+      visibility: values.visibility,
+      tags: values.tags,
+    })
+    form.reset()
+  })
+
+  const isFormDisabled = submitting || form.formState.isSubmitting
+
+  return {
+    form,
+    collections,
+    loadingCollections,
+    titleValue,
+    isFormDisabled,
+    handleFormSubmit,
+  }
+}
