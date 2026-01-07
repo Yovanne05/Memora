@@ -24,26 +24,6 @@ responses:
   200:
     description: Série temporelle des statistiques
     schema:
-      type: object
-      properties:
-        metric:
-          type: string
-          enum: [notes, collections, reviews]
-          description: Type de métrique
-        days:
-          type: integer
-          description: Nombre de jours de la période
-        points:
-          type: array
-          items:
-            type: object
-            properties:
-              date:
-                type: string
-                format: date
-                description: Date du point de données
-              value:
-                type: integer
-                description: Valeur pour cette date
+      $ref: "#/definitions/UserStatisticsTimeSeries"
   422:
     description: 'Paramètres invalides (metric ou days incorrect)'

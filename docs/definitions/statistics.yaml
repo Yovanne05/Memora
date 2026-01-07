@@ -90,3 +90,45 @@ definitions:
         description: Statistiques de revision (null si non encore implementees).
     required:
       - contentStatistics
+
+  TimeSeriesPoint:
+    type: object
+    description: Point de données dans une série temporelle.
+    properties:
+      date:
+        type: string
+        format: date
+        description: Date du point de données (format YYYY-MM-DD).
+        example: "2025-01-07"
+      value:
+        type: integer
+        format: int32
+        description: Valeur pour cette date.
+        example: 5
+    required:
+      - date
+      - value
+
+  UserStatisticsTimeSeries:
+    type: object
+    description: Série temporelle des statistiques utilisateur.
+    properties:
+      metric:
+        type: string
+        enum: [notes, collections, reviews]
+        description: Type de métrique.
+        example: "notes"
+      days:
+        type: integer
+        enum: [7, 30, 90]
+        description: Nombre de jours de la période.
+        example: 30
+      points:
+        type: array
+        description: Points de données de la série temporelle.
+        items:
+          $ref: "#/definitions/TimeSeriesPoint"
+    required:
+      - metric
+      - days
+      - points
