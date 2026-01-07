@@ -30,17 +30,17 @@ export function RegisterForm({
 }: Readonly<RegisterFormProps>) {
   return (
     <AuthFormCard
-      title="CrÈer un compte"
+      title="Cr√©er un compte"
       description="Rejoignez Memora pour structurer vos connaissances."
       footer={
         <>
-          <span>DÈj‡ inscrit ?</span>
+          <span>D√©j√† inscrit ?</span>
           <Link
             to="/auth/login"
             search={{ redirect: redirectTo }}
             className="font-medium text-primary hover:underline"
           >
-            Retour ‡ la connexion
+            Retour √† la connexion
           </Link>
         </>
       }
@@ -56,7 +56,7 @@ export function RegisterForm({
             onTogglePassword={onTogglePassword}
           />
           <Button type="submit" className="w-full" disabled={isRegistering}>
-            {isRegistering ? "CrÈation du compte..." : "S'inscrire"}
+            {isRegistering ? "Cr√©ation du compte..." : "S'inscrire"}
           </Button>
         </form>
       </Form>
