@@ -221,7 +221,7 @@ def test_get_upcoming_reviews_response_structure(client_with_review_data):
         assert isinstance(group["flashcards"], list)
         for flashcard in group["flashcards"]:
             assert isinstance(flashcard, dict)
-            assert "flashcardId" in flashcard
+            assert "flashcard_id" in flashcard
             assert "question" in flashcard
             assert "next_review_at" in flashcard
             next_review_str = flashcard["next_review_at"]

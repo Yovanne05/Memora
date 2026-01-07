@@ -24,7 +24,7 @@ bp_note_share_links = Blueprint(
 @swag_from("../docs/note_share_links/list.yaml")
 def find_many(note_id: UUID):
     raw_query = request.args.to_dict(flat=True)
-    raw_query["noteId"] = str(note_id)
+    raw_query["note_id"] = str(note_id)
     query = NoteShareLinkFindQuery.model_validate(raw_query)
     params = query.to_params()
 

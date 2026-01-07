@@ -27,7 +27,7 @@ bp_collection_shares = Blueprint(
 @swag_from("../docs/shares_collections/share_list.yaml")
 def find_many(collection_id: UUID):
     raw_query = request.args.to_dict(flat=True)
-    raw_query["collectionId"] = str(collection_id)
+    raw_query["collection_id"] = str(collection_id)
     query = CollectionShareFindQuery.model_validate(raw_query)
     params = query.to_params()
 
