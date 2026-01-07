@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
+from dtos.user_dto import UserDTO
 from utils.security import is_password_strong, PASSWORD_VALIDATION_ERROR
 
 
@@ -23,3 +24,12 @@ class LoginDTO(BaseModel):
     password: str = Field(min_length=12, max_length=255)
 
     model_config = ConfigDict(extra="forbid")
+
+
+class AuthResponseDTO(BaseModel):
+    user: UserDTO
+    access_token: str
+
+
+class AuthMeResponseDTO(BaseModel):
+    user: UserDTO

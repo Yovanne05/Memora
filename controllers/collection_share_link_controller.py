@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.collection_share_link_dto import CollectionShareLinkCreateDTO
+from dtos.common_dto import ListResponseDTO
 from querys.collection_share_link_query import CollectionShareLinkFindQuery
 from services.impl.collection.collection_share_link_service_impl import (
     collection_share_link_service,
@@ -28,12 +29,11 @@ def find_many(collection_id: UUID):
     params = query.to_params()
 
     share_link_dtos, total = collection_share_link_service.find_many(params)
-    return (
-        jsonify(
-            {"items": [dto.model_dump() for dto in share_link_dtos], "total": total}
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in share_link_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_collection_share_links.post("")

@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.report_dto import ReportCreateDTO, ReportUpdateDTO
+from dtos.common_dto import ListResponseDTO
 from querys.report_query import ReportFindQuery
 from services.impl.report_service_impl import report_service
 
@@ -39,15 +40,11 @@ def list_reports():
     params = query.to_params()
 
     reports, total = report_service.find_many(params)
-    return (
-        jsonify(
-            {
-                "items": [report.model_dump() for report in reports],
-                "total": total,
-            }
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[report.model_dump() for report in reports],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_reports.get("/reports/<uuid:report_id>")
