@@ -102,8 +102,9 @@ def db_session(db_engine):
 
     yield session
 
+    if transaction.is_active:
+        transaction.rollback()
     session.close()
-    transaction.rollback()
     connection.close()
 
     db_utils.SessionLocal.registry.clear()
