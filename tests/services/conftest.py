@@ -24,6 +24,7 @@ def mock_user_repository(monkeypatch):
     monkeypatch.setattr("services.impl.auth_service_impl.user_repository", mock)
     monkeypatch.setattr("services.impl.note.note_crud_service_impl.user_repository", mock)
     monkeypatch.setattr("services.impl.collection.collection_share_service_impl.user_repository", mock)
+    monkeypatch.setattr("services.impl.note.note_share_service_impl.user_repository", mock)
     return mock
 
 
@@ -34,7 +35,10 @@ def mock_collection_repository(monkeypatch):
     monkeypatch.setattr("repositorys.collection_repository", mock)
     monkeypatch.setattr("services.impl.collection.collection_service_impl.collection_repository", mock)
     monkeypatch.setattr("services.impl.collection.collection_share_service_impl.collection_repository", mock)
+    monkeypatch.setattr("services.impl.collection.collection_share_link_service_impl.collection_repository", mock)
     monkeypatch.setattr("services.impl.note.note_crud_service_impl.collection_repository", mock)
+    monkeypatch.setattr("services.impl.favorite.collection_favorite_service_impl.collection_repository", mock)
+    monkeypatch.setattr("services.impl.report_service_impl.collection_repository", mock)
     return mock
 
 
@@ -63,6 +67,11 @@ def mock_note_repository(monkeypatch):
     monkeypatch.setattr("repositorys.note_repository", mock)
     monkeypatch.setattr("services.impl.note.note_crud_service_impl.note_repository", mock)
     monkeypatch.setattr("services.impl.note.flashcard_service_impl.note_repository", mock)
+    monkeypatch.setattr("services.impl.favorite.note_favorite_service_impl.note_repository", mock)
+    monkeypatch.setattr("services.impl.note.note_link_service_impl.note_repository", mock)
+    monkeypatch.setattr("services.impl.note.note_share_link_service_impl.note_repository", mock)
+    monkeypatch.setattr("services.impl.note.note_share_service_impl.note_repository", mock)
+    monkeypatch.setattr("services.impl.report_service_impl.note_repository", mock)
     return mock
 
 
@@ -99,6 +108,7 @@ def mock_flashcard_repository(monkeypatch):
     mock = Mock()
     monkeypatch.setattr("repositorys.flashcard_repository", mock)
     monkeypatch.setattr("services.impl.note.flashcard_service_impl.flashcard_repository", mock)
+    monkeypatch.setattr("services.impl.review_service_impl.flashcard_repository", mock)
     return mock
 
 

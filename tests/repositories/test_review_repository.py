@@ -29,14 +29,16 @@ class TestReviewRepositoryUpsert:
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
         # Créer flashcard manuellement car test_factory n'a pas create_flashcard
-        from daos.flashcard_dao import Flashcard, Answer
+        from daos.flashcard_dao import Flashcard
+        from daos.flashcard_answer_dao import FlashcardAnswer
         from repositorys import flashcard_repository
 
+        flashcard_id = str(uuid4())
         flashcard = Flashcard(
-            id=str(uuid4()),
+            id=flashcard_id,
             question="Question?",
             note_id=note_id,
-            answers=[Answer(id=str(uuid4()), text="Answer", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=flashcard_id, answer_text="Answer", is_correct=True, created_at=datetime.now())]
         )
         flashcard_repository.add(flashcard)
 
@@ -57,7 +59,7 @@ class TestReviewRepositoryUpsert:
         result = review_repository.upsert_review(review)
 
         # Assert
-        assert result.id is not None
+        # Composite key: (user_id, flashcard_id)
         assert result.user_id == user_id
         assert result.flashcard_id == flashcard.id
 
@@ -68,14 +70,16 @@ class TestReviewRepositoryUpsert:
         collection_id = test_factory.create_collection(owner_id=user_id)
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
-        from daos.flashcard_dao import Flashcard, Answer
+        from daos.flashcard_dao import Flashcard
+        from daos.flashcard_answer_dao import FlashcardAnswer
         from repositorys import flashcard_repository
 
+        flashcard_id = str(uuid4())
         flashcard = Flashcard(
-            id=str(uuid4()),
+            id=flashcard_id,
             question="Q?",
             note_id=note_id,
-            answers=[Answer(id=str(uuid4()), text="A", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=flashcard_id, answer_text="A", is_correct=True, created_at=datetime.now())]
         )
         flashcard_repository.add(flashcard)
 
@@ -100,7 +104,7 @@ class TestReviewRepositoryUpsert:
             flashcard_id=flashcard.id,
             selected_answer_id=flashcard.answers[0].id,
             is_correct=True,
-            difficulty=ReviewDifficultyEnum.MEDIUM,
+            difficulty=ReviewDifficultyEnum.GOOD,
             e_factor=Decimal("2.6"),
             repetitions=1,
             interval_days=1,
@@ -126,14 +130,16 @@ class TestReviewRepositoryGet:
         collection_id = test_factory.create_collection(owner_id=user_id)
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
-        from daos.flashcard_dao import Flashcard, Answer
+        from daos.flashcard_dao import Flashcard
+        from daos.flashcard_answer_dao import FlashcardAnswer
         from repositorys import flashcard_repository
 
+        flashcard_id = str(uuid4())
         flashcard = Flashcard(
-            id=str(uuid4()),
+            id=flashcard_id,
             question="Q?",
             note_id=note_id,
-            answers=[Answer(id=str(uuid4()), text="A", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=flashcard_id, answer_text="A", is_correct=True, created_at=datetime.now())]
         )
         flashcard_repository.add(flashcard)
 

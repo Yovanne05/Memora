@@ -19,14 +19,15 @@ class TestNoteLinkControllerList:
     def test_list_note_links_returns_200(self, app_client, mock_note_link_service):
         """Le endpoint GET /notes/<id>/relations retourne 200."""
         from dtos.note_link_dto import NoteLinkDTO
+        from datetime import datetime
 
         # Arrange
         note_id = str(uuid4())
         links = [
             NoteLinkDTO(
-                note_id_1=note_id,
-                note_id_2=str(uuid4()),
-                created_at="2024-01-01T00:00:00Z"
+                note_id=note_id,
+                linked_note_id=str(uuid4()),
+                created_at=datetime.now()
             )
         ]
         mock_note_link_service.find_many.return_value = (links, 1)
@@ -48,15 +49,16 @@ class TestNoteLinkControllerCreate:
     def test_create_note_link_returns_201(self, app_client, mock_note_link_service):
         """Le endpoint POST /notes/<id>/relations retourne 201."""
         from dtos.note_link_dto import NoteLinkDTO
+        from datetime import datetime
 
         # Arrange
         note_id = str(uuid4())
         linked_note_id = str(uuid4())
 
         link = NoteLinkDTO(
-            note_id_1=note_id,
-            note_id_2=linked_note_id,
-            created_at="2024-01-01T00:00:00Z"
+            note_id=note_id,
+            linked_note_id=linked_note_id,
+            created_at=datetime.now()
         )
         mock_note_link_service.create_link.return_value = link
 
@@ -70,8 +72,8 @@ class TestNoteLinkControllerCreate:
         # Assert
         assert response.status_code == HTTPStatus.CREATED
         body = response.get_json()
-        assert body["note_id_1"] == note_id
-        assert body["note_id_2"] == linked_note_id
+        assert body["note_id"] == note_id
+        assert body["linked_note_id"] == linked_note_id
         mock_note_link_service.create_link.assert_called_once()
 
 

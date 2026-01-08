@@ -11,6 +11,7 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
+from datetime import datetime
 
 from dtos.note_link_dto import NoteLinkDTO, NoteLinkCreateDTO
 from daos.note_dao import NoteLink
@@ -30,8 +31,18 @@ class TestNoteLinkServiceCreate:
         note_id_1 = str(uuid4())
         note_id_2 = str(uuid4())
 
-        note1 = Note(id=note_id_1, title="Note 1", content="", owner_id=owner_id, collection_id=collection_id)
-        note2 = Note(id=note_id_2, title="Note 2", content="", owner_id=owner_id, collection_id=collection_id)
+        note1 = Note(
+            id=note_id_1, title="Note 1", content="", owner_id=owner_id,
+            collection_id=collection_id, tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
+        note2 = Note(
+            id=note_id_2, title="Note 2", content="", owner_id=owner_id,
+            collection_id=collection_id, tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
 
         def get_note(nid):
             return note1 if nid == note_id_1 else note2
@@ -41,7 +52,8 @@ class TestNoteLinkServiceCreate:
 
         link = NoteLink(
             note_id_1=note_id_1,
-            note_id_2=note_id_2
+            note_id_2=note_id_2,
+            created_at=datetime.now()
         )
         mock_note_link_repository.add.return_value = link
 
@@ -69,11 +81,14 @@ class TestNoteLinkServiceList:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=user_id, email="test@example.com", username="test",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.note.note_link_service_impl.get_current_user", lambda: current_user)
 
         links = [
-            NoteLink(note_id_1=note_id, note_id_2=str(uuid4()))
+            NoteLink(note_id_1=note_id, note_id_2=str(uuid4()), created_at=datetime.now())
         ]
         mock_note_link_repository.find_many.return_value = (links, 1)
 
@@ -104,8 +119,18 @@ class TestNoteLinkServiceDelete:
         note_id_1 = str(uuid4())
         note_id_2 = str(uuid4())
 
-        note1 = Note(id=note_id_1, title="Note 1", content="", owner_id=owner_id, collection_id=collection_id)
-        note2 = Note(id=note_id_2, title="Note 2", content="", owner_id=owner_id, collection_id=collection_id)
+        note1 = Note(
+            id=note_id_1, title="Note 1", content="", owner_id=owner_id,
+            collection_id=collection_id, tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
+        note2 = Note(
+            id=note_id_2, title="Note 2", content="", owner_id=owner_id,
+            collection_id=collection_id, tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
 
         def get_note(nid):
             return note1 if nid == note_id_1 else note2

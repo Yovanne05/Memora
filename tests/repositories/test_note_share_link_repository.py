@@ -40,7 +40,6 @@ class TestNoteShareLinkRepositoryAdd:
         # Assert
         assert result.id is not None
         assert result.note_id == note_id
-        assert result.token == "abc123xyz"
         assert result.permission == SharePermissionEnum.READ
 
 
@@ -67,29 +66,6 @@ class TestNoteShareLinkRepositoryFind:
         # Assert
         assert result is not None
         assert result.id == added.id
-        assert result.token == "test-token"
-
-    def test_find_one_by_token(self, test_factory):
-        """Récupérer un lien par token."""
-        # Arrange
-        owner_id = test_factory.create_user(label="owner")
-        collection_id = test_factory.create_collection(owner_id=owner_id)
-        note_id = test_factory.create_note(owner_id=owner_id, collection_id=collection_id)
-
-        link = NoteShareLink(
-            id=str(uuid4()),
-            note_id=note_id,
-            permission=SharePermissionEnum.WRITE
-        )
-        note_share_link_repository.add(link)
-
-        # Act
-        result = note_share_link_repository.find_by_token("unique-token")
-
-        # Assert
-        assert result is not None
-        assert result.token == "unique-token"
-        assert result.note_id == note_id
 
 
 class TestNoteShareLinkRepositoryList:

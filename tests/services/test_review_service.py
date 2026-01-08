@@ -48,7 +48,6 @@ class TestReviewServiceSubmit:
         mock_review_repository.get_review.return_value = None
 
         saved_review = Review(
-            id=str(uuid4()),
             user_id=user_id,
             flashcard_id=flashcard_id,
             selected_answer_id=answer_id,
@@ -58,8 +57,7 @@ class TestReviewServiceSubmit:
             repetitions=1,
             interval_days=1,
             next_review_at=datetime.now(timezone.utc),
-            reviewed_at=datetime.now(timezone.utc),
-            created_at=datetime.now()
+            reviewed_at=datetime.now(timezone.utc)
         )
         mock_review_repository.upsert_review.return_value = saved_review
 

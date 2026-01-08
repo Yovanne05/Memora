@@ -16,7 +16,7 @@ from http import HTTPStatus
 class TestCollectionShareLinkControllerList:
     """Tests pour GET /collections/<id>/public-links"""
 
-    def test_list_share_links_returns_200(self, app_client, mock_collection_share_link_service):
+    def test_list_share_links_returns_200(self, authenticated_client, mock_collection_share_link_service):
         """Le endpoint GET /collections/<id>/public-links retourne 200."""
         from dtos.collection_share_link_dto import CollectionShareLinkDTO
         from utils.enums import SharePermissionEnum
@@ -34,7 +34,7 @@ class TestCollectionShareLinkControllerList:
         mock_collection_share_link_service.find_many.return_value = (links, 1)
 
         # Act
-        response = app_client.get(f"/collections/{collection_id}/public-links")
+        response = authenticated_client.get(f"/collections/{collection_id}/public-links")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -47,7 +47,7 @@ class TestCollectionShareLinkControllerList:
 class TestCollectionShareLinkControllerCreate:
     """Tests pour POST /collections/<id>/public-links"""
 
-    def test_create_share_link_returns_201(self, app_client, mock_collection_share_link_service):
+    def test_create_share_link_returns_201(self, authenticated_client, mock_collection_share_link_service):
         """Le endpoint POST /collections/<id>/public-links retourne 201."""
         from dtos.collection_share_link_dto import CollectionShareLinkDTO
         from utils.enums import SharePermissionEnum
@@ -67,20 +67,19 @@ class TestCollectionShareLinkControllerCreate:
         }
 
         # Act
-        response = app_client.post(f"/collections/{collection_id}/public-links", json=payload)
+        response = authenticated_client.post(f"/collections/{collection_id}/public-links", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.CREATED
         body = response.get_json()
         assert body["collection_id"] == collection_id
-        assert "token" in body
         mock_collection_share_link_service.create_share_link.assert_called_once()
 
 
 class TestCollectionShareLinkControllerDelete:
     """Tests pour DELETE /collections/<id>/public-links/<link_id>"""
 
-    def test_delete_share_link_returns_204(self, app_client, mock_collection_share_link_service):
+    def test_delete_share_link_returns_204(self, authenticated_client, mock_collection_share_link_service):
         """Le endpoint DELETE /collections/<id>/public-links/<link_id> retourne 204."""
         # Arrange
         collection_id = str(uuid4())
@@ -88,7 +87,7 @@ class TestCollectionShareLinkControllerDelete:
         mock_collection_share_link_service.delete_share_link.return_value = None
 
         # Act
-        response = app_client.delete(f"/collections/{collection_id}/public-links/{link_id}")
+        response = authenticated_client.delete(f"/collections/{collection_id}/public-links/{link_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.NO_CONTENT

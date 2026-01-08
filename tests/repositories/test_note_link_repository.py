@@ -37,8 +37,8 @@ class TestNoteLinkRepositoryAdd:
         result = note_link_repository.add(link)
 
         # Assert
-        assert result.note_id_1 == note_id_1
-        assert result.note_id_2 == note_id_2
+        # IDs are normalized (sorted), so check both are present
+        assert {result.note_id_1, result.note_id_2} == {note_id_1, note_id_2}
 
 
 class TestNoteLinkRepositoryFind:
@@ -63,8 +63,8 @@ class TestNoteLinkRepositoryFind:
 
         # Assert
         assert result is not None
-        assert result.note_id_1 == note_id_1
-        assert result.note_id_2 == note_id_2
+        # IDs are normalized (sorted), so check both are present
+        assert {result.note_id_1, result.note_id_2} == {note_id_1, note_id_2}
 
 
 class TestNoteLinkRepositoryList:

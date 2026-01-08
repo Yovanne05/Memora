@@ -13,36 +13,39 @@ Le service report_service est MOCKÉ.
 import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from datetime import datetime
+from utils.enums import ReportReasonEnum, ReportStatusEnum, ReportTargetEnum
 
 
 class TestReportControllerReportNote:
     """Tests pour POST /notes/<id>/reports"""
 
-    def test_report_note_returns_201(self, app_client, mock_report_service):
+    def test_report_note_returns_201(self, authenticated_client, mock_report_service):
         """Le endpoint POST /notes/<id>/reports retourne 201."""
         from dtos.report_dto import ReportDTO
-        from utils.enums import ReportStatusEnum
 
         # Arrange
         note_id = str(uuid4())
         report = ReportDTO(
             id=str(uuid4()),
+            target_type=ReportTargetEnum.NOTE,
             note_id=note_id,
             reporter_id=str(uuid4()),
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Contenu inapproprié",
             status=ReportStatusEnum.PENDING,
-            created_at="2024-01-01T00:00:00Z"
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_report_service.report_note.return_value = report
 
         payload = {
-            "reason": "spam",
+            "reason": "spam_or_abuse",
             "description": "Contenu inapproprié"
         }
 
         # Act
-        response = app_client.post(f"/notes/{note_id}/reports", json=payload)
+        response = authenticated_client.post(f"/notes/{note_id}/reports", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.CREATED
@@ -54,31 +57,32 @@ class TestReportControllerReportNote:
 class TestReportControllerReportCollection:
     """Tests pour POST /collections/<id>/reports"""
 
-    def test_report_collection_returns_201(self, app_client, mock_report_service):
+    def test_report_collection_returns_201(self, authenticated_client, mock_report_service):
         """Le endpoint POST /collections/<id>/reports retourne 201."""
         from dtos.report_dto import ReportDTO
-        from utils.enums import ReportStatusEnum
 
         # Arrange
         collection_id = str(uuid4())
         report = ReportDTO(
             id=str(uuid4()),
+            target_type=ReportTargetEnum.COLLECTION,
             collection_id=collection_id,
             reporter_id=str(uuid4()),
-            reason="inappropriate",
+            reason=ReportReasonEnum.SHOCKING_OR_INAPPROPRIATE,
             description="Collection inappropriée",
             status=ReportStatusEnum.PENDING,
-            created_at="2024-01-01T00:00:00Z"
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_report_service.report_collection.return_value = report
 
         payload = {
-            "reason": "inappropriate",
+            "reason": "shocking_or_inappropriate",
             "description": "Collection inappropriée"
         }
 
         # Act
-        response = app_client.post(f"/collections/{collection_id}/reports", json=payload)
+        response = authenticated_client.post(f"/collections/{collection_id}/reports", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.CREATED
@@ -90,27 +94,28 @@ class TestReportControllerReportCollection:
 class TestReportControllerList:
     """Tests pour GET /reports"""
 
-    def test_list_reports_returns_200(self, app_client, mock_report_service):
+    def test_list_reports_returns_200(self, authenticated_client, mock_report_service):
         """Le endpoint GET /reports retourne 200."""
         from dtos.report_dto import ReportDTO
-        from utils.enums import ReportStatusEnum
 
         # Arrange
         reports = [
             ReportDTO(
                 id=str(uuid4()),
+                target_type=ReportTargetEnum.NOTE,
                 note_id=str(uuid4()),
                 reporter_id=str(uuid4()),
-                reason="spam",
+                reason=ReportReasonEnum.SPAM_OR_ABUSE,
                 description="Test",
                 status=ReportStatusEnum.PENDING,
-                created_at="2024-01-01T00:00:00Z"
+                created_at=datetime.now(),
+                updated_at=datetime.now()
             )
         ]
         mock_report_service.find_many.return_value = (reports, 1)
 
         # Act
-        response = app_client.get("/reports")
+        response = authenticated_client.get("/reports")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -123,26 +128,27 @@ class TestReportControllerList:
 class TestReportControllerGet:
     """Tests pour GET /reports/<id>"""
 
-    def test_get_report_returns_200(self, app_client, mock_report_service):
+    def test_get_report_returns_200(self, authenticated_client, mock_report_service):
         """Le endpoint GET /reports/<id> retourne 200."""
         from dtos.report_dto import ReportDTO
-        from utils.enums import ReportStatusEnum
 
         # Arrange
         report_id = str(uuid4())
         report = ReportDTO(
             id=report_id,
+            target_type=ReportTargetEnum.NOTE,
             note_id=str(uuid4()),
             reporter_id=str(uuid4()),
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Test",
             status=ReportStatusEnum.PENDING,
-            created_at="2024-01-01T00:00:00Z"
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_report_service.find_one.return_value = report
 
         # Act
-        response = app_client.get(f"/reports/{report_id}")
+        response = authenticated_client.get(f"/reports/{report_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -154,21 +160,22 @@ class TestReportControllerGet:
 class TestReportControllerUpdate:
     """Tests pour PATCH /reports/<id>"""
 
-    def test_update_report_returns_200(self, app_client, mock_report_service):
+    def test_update_report_returns_200(self, authenticated_client, mock_report_service):
         """Le endpoint PATCH /reports/<id> retourne 200."""
         from dtos.report_dto import ReportDTO
-        from utils.enums import ReportStatusEnum
 
         # Arrange
         report_id = str(uuid4())
         report = ReportDTO(
             id=report_id,
+            target_type=ReportTargetEnum.NOTE,
             note_id=str(uuid4()),
             reporter_id=str(uuid4()),
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Test",
             status=ReportStatusEnum.RESOLVED,
-            created_at="2024-01-01T00:00:00Z"
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_report_service.update.return_value = report
 
@@ -177,7 +184,7 @@ class TestReportControllerUpdate:
         }
 
         # Act
-        response = app_client.patch(f"/reports/{report_id}", json=payload)
+        response = authenticated_client.patch(f"/reports/{report_id}", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.OK

@@ -35,7 +35,8 @@ class TestAuthServiceRegister:
             email="test@example.com",
             username="testuser",
             display_name="Test User",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
 
         mock_user_service = Mock()
@@ -79,11 +80,23 @@ class TestAuthServiceLogin:
             username="testuser",
             display_name="Test User",
             password_hash=password_hash,
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
 
         mock_user_repository.find_one_by_identifier.return_value = user_entity
         mock_user_repository.update.return_value = user_entity
+
+        mock_dto = UserDTO(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            display_name="Test User",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        mock_mapper = Mock(return_value=mock_dto)
+        monkeypatch.setattr("services.impl.auth_service_impl.user_to_dto", mock_mapper)
 
         login_dto = LoginDTO(
             identifier="test@example.com",
@@ -110,7 +123,7 @@ class TestAuthServiceLogin:
 
         login_dto = LoginDTO(
             identifier="unknown@example.com",
-            password="Password1!"
+            password="Password1234!"
         )
 
         # Act & Assert
@@ -127,7 +140,7 @@ class TestAuthServiceLogin:
 
         # Arrange
         user_id = str(uuid4())
-        correct_password = "CorrectPass1!"
+        correct_password = "CorrectPass123!"
         password_hash = bcrypt.hashpw(correct_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
         user_entity = User(
@@ -135,14 +148,15 @@ class TestAuthServiceLogin:
             email="test@example.com",
             username="testuser",
             password_hash=password_hash,
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
 
         mock_user_repository.find_one_by_identifier.return_value = user_entity
 
         login_dto = LoginDTO(
             identifier="test@example.com",
-            password="WrongPass1!"
+            password="WrongPass1234!"
         )
 
         # Act & Assert
@@ -155,7 +169,7 @@ class TestAuthServiceLogin:
 class TestAuthServiceGetMe:
     """Tests pour récupérer les informations de l'utilisateur connecté"""
 
-    def test_get_me_success(self, mock_user_repository):
+    def test_get_me_success(self, mock_user_repository, monkeypatch):
         """Récupérer les informations de l'utilisateur connecté."""
         from services.impl.auth_service_impl import auth_service
 
@@ -167,10 +181,22 @@ class TestAuthServiceGetMe:
             username="testuser",
             display_name="Test User",
             password_hash="hash",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
 
         mock_user_repository.find_one.return_value = user_entity
+
+        mock_dto = UserDTO(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            display_name="Test User",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        mock_mapper = Mock(return_value=mock_dto)
+        monkeypatch.setattr("services.impl.auth_service_impl.user_to_dto", mock_mapper)
 
         # Act
         result = auth_service.get_me(user_id)

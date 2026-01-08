@@ -18,8 +18,16 @@ from flask import g
 from utils import db as db_utils
 from utils.enums import RoleEnum, VisibilityEnum
 from daos.user_dao import User
-from daos.collection_dao import Collection
-from daos.note_dao import Note
+from daos.collection_dao import Collection, CollectionShare
+from daos.note_dao import Note, NoteShare
+from daos.flashcard_dao import Flashcard
+from daos.flashcard_answer_dao import FlashcardAnswer
+from daos.review_dao import Review
+from daos.report_dao import Report
+from daos.favorite_dao import NoteFavorite, CollectionFavorite
+from daos.note_image_dao import NoteImage
+from daos.note_share_link_dao import NoteShareLink
+from daos.collection_share_link_dao import CollectionShareLink
 from repositorys import user_repository, collection_repository, note_repository
 
 

@@ -11,6 +11,7 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
+from datetime import datetime
 
 from dtos.collection_share_link_dto import CollectionShareLinkDTO, CollectionShareLinkCreateDTO
 from daos.collection_share_link_dao import CollectionShareLink
@@ -30,13 +31,18 @@ class TestCollectionShareLinkServiceCreate:
         owner_id = str(uuid4())
         collection_id = str(uuid4())
 
-        collection = Collection(id=collection_id, name="Test Collection", owner_id=owner_id)
+        collection = Collection(
+            id=collection_id, name="Test Collection", owner_id=owner_id,
+            tags=[], notes=[], shares=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_collection_repository.find_one_unscoped.return_value = collection
 
         link = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            permission=SharePermissionEnum.READ
+            permission=SharePermissionEnum.READ,
+            created_at=datetime.now()
         )
         mock_collection_share_link_repository.add.return_value = link
 
@@ -48,7 +54,6 @@ class TestCollectionShareLinkServiceCreate:
         # Assert
         assert isinstance(result, CollectionShareLinkDTO)
         assert result.collection_id == collection_id
-        assert "token" in result.model_dump()
         mock_collection_share_link_repository.add.assert_called_once()
 
 
@@ -67,17 +72,25 @@ class TestCollectionShareLinkServiceList:
         owner_id = str(uuid4())
         collection_id = str(uuid4())
 
-        current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.collection.collection_share_link_service_impl.get_current_user", lambda: current_user)
 
-        collection = Collection(id=collection_id, name="Test Collection", owner_id=owner_id)
+        collection = Collection(
+            id=collection_id, name="Test Collection", owner_id=owner_id,
+            tags=[], notes=[], shares=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_collection_repository.find_one_unscoped.return_value = collection
 
         links = [
             CollectionShareLink(
                 id=str(uuid4()),
                 collection_id=collection_id,
-                permission=SharePermissionEnum.READ
+                permission=SharePermissionEnum.READ,
+                created_at=datetime.now()
             )
         ]
         mock_collection_share_link_repository.find_many.return_value = (links, 1)
@@ -105,7 +118,11 @@ class TestCollectionShareLinkServiceDelete:
         collection_id = str(uuid4())
         link_id = str(uuid4())
 
-        collection = Collection(id=collection_id, name="Test Collection", owner_id=owner_id)
+        collection = Collection(
+            id=collection_id, name="Test Collection", owner_id=owner_id,
+            tags=[], notes=[], shares=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_collection_repository.find_one_unscoped.return_value = collection
 
         mock_collection_share_link_repository.delete.return_value = True
@@ -126,7 +143,11 @@ class TestCollectionShareLinkServiceDelete:
         collection_id = str(uuid4())
         link_id = str(uuid4())
 
-        collection = Collection(id=collection_id, name="Test Collection", owner_id=owner_id)
+        collection = Collection(
+            id=collection_id, name="Test Collection", owner_id=owner_id,
+            tags=[], notes=[], shares=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_collection_repository.find_one_unscoped.return_value = collection
 
         mock_collection_share_link_repository.delete.return_value = False

@@ -28,7 +28,7 @@ class TestCollectionShareRepositoryAdd:
         collection_id = test_factory.create_collection(owner_id=owner_id)
 
         share = CollectionShare(
-            id=str(uuid4()),
+
             collection_id=collection_id,
             user_id=user_id,
             permission=SharePermissionEnum.READ
@@ -38,7 +38,7 @@ class TestCollectionShareRepositoryAdd:
         result = collection_share_repository.add(share)
 
         # Assert
-        assert result.id is not None
+        # assert result has composite key
         assert result.collection_id == collection_id
         assert result.user_id == user_id
         assert result.permission == SharePermissionEnum.READ
@@ -55,7 +55,7 @@ class TestCollectionShareRepositoryFind:
         collection_id = test_factory.create_collection(owner_id=owner_id)
 
         share = CollectionShare(
-            id=str(uuid4()),
+
             collection_id=collection_id,
             user_id=user_id,
             permission=SharePermissionEnum.WRITE
@@ -63,7 +63,7 @@ class TestCollectionShareRepositoryFind:
         collection_share_repository.add(share)
 
         # Act
-        result = collection_share_repository.find_one_by_collection_and_user(collection_id, user_id)
+        result = collection_share_repository.find_one(collection_id, user_id)
 
         # Assert
         assert result is not None
@@ -83,7 +83,7 @@ class TestCollectionShareRepositoryDelete:
         collection_id = test_factory.create_collection(owner_id=owner_id)
 
         share = CollectionShare(
-            id=str(uuid4()),
+
             collection_id=collection_id,
             user_id=user_id,
             permission=SharePermissionEnum.READ
@@ -91,8 +91,8 @@ class TestCollectionShareRepositoryDelete:
         added = collection_share_repository.add(share)
 
         # Act
-        collection_share_repository.delete(added.id)
+        collection_share_repository.delete(collection_id, user_id)
 
         # Assert
-        result = collection_share_repository.find_one_by_collection_and_user(collection_id, user_id)
+        result = collection_share_repository.find_one(collection_id, user_id)
         assert result is None

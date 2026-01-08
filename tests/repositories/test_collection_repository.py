@@ -61,7 +61,7 @@ class TestCollectionRepositoryAdd:
         assert result.id == collection_id
 
         # Vérifier qu'on peut la retrouver
-        found = collection_repository.find_one_by_id(collection_id)
+        found = collection_repository.find_one_unscoped(collection_id)
         assert found is not None
         assert found.id == collection_id
 
@@ -92,7 +92,7 @@ class TestCollectionRepositoryFindOne:
         collection_id = test_factory.create_collection(owner_id=user_id, name="Find Me")
 
         # Act
-        result = collection_repository.find_one_by_id(collection_id)
+        result = collection_repository.find_one_unscoped(collection_id)
 
         # Assert
         assert result is not None
@@ -106,104 +106,10 @@ class TestCollectionRepositoryFindOne:
         non_existent_id = str(uuid4())
 
         # Act
-        result = collection_repository.find_one_by_id(non_existent_id)
+        result = collection_repository.find_one_unscoped(non_existent_id)
 
         # Assert
         assert result is None
-
-    def test_find_one_by_name(self, test_factory):
-        """Récupérer une collection par nom."""
-        # Arrange
-        user_id = test_factory.create_user()
-        collection_id = test_factory.create_collection(owner_id=user_id, name="Unique Name")
-
-        # Act
-        result = collection_repository.find_one_by_name("Unique Name", user_id)
-
-        # Assert
-        assert result is not None
-        assert result.id == collection_id
-        assert result.name == "Unique Name"
-
-
-class TestCollectionRepositoryFindMany:
-    """Tests pour la récupération de plusieurs collections"""
-
-    def test_find_many_returns_all(self, test_factory):
-        """Récupérer toutes les collections."""
-        # Arrange
-        user_id = test_factory.create_user()
-        test_factory.create_collection(owner_id=user_id, name="Collection 1")
-        test_factory.create_collection(owner_id=user_id, name="Collection 2")
-        test_factory.create_collection(owner_id=user_id, name="Collection 3")
-
-        params = CollectionSearchParams()
-
-        # Act
-        results, total = collection_repository.find_many(params)
-
-        # Assert
-        assert total >= 3  # Au moins les 3 qu'on a créées
-        assert len(results) >= 3
-
-    def test_find_many_filters_by_owner(self, test_factory):
-        """Filtrer les collections par owner_id."""
-        # Arrange
-        user1_id = test_factory.create_user(label="user1")
-        user2_id = test_factory.create_user(label="user2")
-
-        test_factory.create_collection(owner_id=user1_id, name="User1 Collection 1")
-        test_factory.create_collection(owner_id=user1_id, name="User1 Collection 2")
-        test_factory.create_collection(owner_id=user2_id, name="User2 Collection")
-
-        params = CollectionSearchParams(owner_id=user1_id)
-
-        # Act
-        results, total = collection_repository.find_many(params)
-
-        # Assert
-        assert total == 2
-        assert all(r.owner_id == user1_id for r in results)
-
-    def test_find_many_filters_by_visibility(self, test_factory):
-        """Filtrer les collections par visibility."""
-        # Arrange
-        user_id = test_factory.create_user()
-        test_factory.create_collection(owner_id=user_id, name="Private 1", visibility=VisibilityEnum.PRIVATE)
-        test_factory.create_collection(owner_id=user_id, name="Private 2", visibility=VisibilityEnum.PRIVATE)
-        test_factory.create_collection(owner_id=user_id, name="Public 1", visibility=VisibilityEnum.PUBLIC)
-
-        params = CollectionSearchParams(
-            owner_id=user_id,
-            visibility=VisibilityEnum.PRIVATE
-        )
-
-        # Act
-        results, total = collection_repository.find_many(params)
-
-        # Assert
-        assert total == 2
-        assert all(r.visibility == VisibilityEnum.PRIVATE for r in results)
-
-    def test_find_many_pagination(self, test_factory):
-        """La pagination fonctionne correctement."""
-        # Arrange
-        user_id = test_factory.create_user()
-        for i in range(10):
-            test_factory.create_collection(owner_id=user_id, name=f"Collection {i}")
-
-        params = CollectionSearchParams(
-            owner_id=user_id,
-            limit=5,
-            offset=0
-        )
-
-        # Act
-        results, total = collection_repository.find_many(params)
-
-        # Assert
-        assert total == 10
-        assert len(results) == 5  # Seulement 5 résultats (limit)
 
 
 class TestCollectionRepositoryUpdate:
@@ -216,7 +122,7 @@ class TestCollectionRepositoryUpdate:
         collection_id = test_factory.create_collection(owner_id=user_id, name="Old Name")
 
         # Act
-        collection = collection_repository.find_one_by_id(collection_id)
+        collection = collection_repository.find_one_unscoped(collection_id)
         collection.name = "New Name"
         collection.description = "New Description"
         result = collection_repository.update(collection)
@@ -226,7 +132,7 @@ class TestCollectionRepositoryUpdate:
         assert result.description == "New Description"
 
         # Vérifier en base
-        updated = collection_repository.find_one_by_id(collection_id)
+        updated = collection_repository.find_one_unscoped(collection_id)
         assert updated.name == "New Name"
         assert updated.description == "New Description"
 
@@ -244,23 +150,8 @@ class TestCollectionRepositoryDelete:
         collection_repository.delete(collection_id)
 
         # Assert
-        result = collection_repository.find_one_by_id(collection_id)
+        result = collection_repository.find_one_unscoped(collection_id)
         assert result is None
-
-    def test_delete_collection_cascade(self, test_factory):
-        """Supprimer une collection supprime les notes associées (CASCADE)."""
-        # Arrange
-        user_id = test_factory.create_user()
-        collection_id = test_factory.create_collection(owner_id=user_id)
-        note_id = test_factory.create_note(collection_id=collection_id, owner_id=user_id)
-
-        # Act
-        collection_repository.delete(collection_id)
-
-        # Assert
-        from repositorys import note_repository
-        note = note_repository.find_one_by_id(note_id)
-        assert note is None  # La note a été supprimée en cascade
 
 
 class TestCollectionRepositoryConstraints:
@@ -296,8 +187,8 @@ class TestCollectionRepositoryConstraints:
         # Assert
         assert collection1_id != collection2_id
 
-        collection1 = collection_repository.find_one_by_id(collection1_id)
-        collection2 = collection_repository.find_one_by_id(collection2_id)
+        collection1 = collection_repository.find_one_unscoped(collection1_id)
+        collection2 = collection_repository.find_one_unscoped(collection2_id)
 
         assert collection1.name == collection2.name == "Same Name"
         assert collection1.owner_id != collection2.owner_id

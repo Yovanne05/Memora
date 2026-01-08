@@ -1,6 +1,7 @@
 import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from datetime import datetime
 
 
 class TestAuthRegister:
@@ -9,6 +10,7 @@ class TestAuthRegister:
     def test_register_returns_201(self, app_client, mock_user_service):
         """L'inscription retourne 201 avec l'utilisateur créé."""
         from dtos.user_dto import UserDTO
+        from utils.enums import RoleEnum
 
         # Arrange
         mock_user_service.create.return_value = UserDTO(
@@ -16,7 +18,8 @@ class TestAuthRegister:
             email="test@example.com",
             username="testuser",
             display_name="Test User",
-            role="client"
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
 
         payload = {
@@ -56,19 +59,19 @@ class TestAuthLogin:
 
     def test_login_returns_200_with_token(self, app_client, mock_auth_service):
         """La connexion retourne 200 avec un token JWT."""
-        from dtos.auth_dto import AuthResponseDTO, AuthMeResponseDTO
+        from dtos.user_dto import UserDTO
+        from utils.enums import RoleEnum
 
-        # Arrange
-        mock_auth_service.login.return_value = AuthResponseDTO(
-            user=AuthMeResponseDTO(
-                id=str(uuid4()),
-                email="test@example.com",
-                username="testuser",
-                display_name="Test User",
-                role="client"
-            ),
-            access_token="fake.jwt.token"
+        # Arrange - Service returns tuple (UserDTO, token)
+        user_dto = UserDTO(
+            id=str(uuid4()),
+            email="test@example.com",
+            username="testuser",
+            display_name="Test User",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
+        mock_auth_service.login.return_value = (user_dto, "fake.jwt.token")
 
         payload = {
             "identifier": "test@example.com",
@@ -94,7 +97,7 @@ class TestAuthLogin:
 
         payload = {
             "identifier": "test@example.com",
-            "password": "WrongPass1!"
+            "password": "WrongPass123!"
         }
 
         # Act
@@ -109,15 +112,17 @@ class TestAuthMe:
 
     def test_get_me_returns_current_user(self, authenticated_client, mock_auth_service):
         """GET /sessions/me retourne l'utilisateur connecté."""
-        from dtos.auth_dto import AuthMeResponseDTO
+        from dtos.user_dto import UserDTO
+        from utils.enums import RoleEnum
 
-        # Arrange
-        mock_auth_service.me.return_value = AuthMeResponseDTO(
+        # Arrange - Service returns UserDTO directly
+        mock_auth_service.get_me.return_value = UserDTO(
             id="test-user-id-123",
             email="test@example.com",
             username="testuser",
             display_name="Test User",
-            role="client"
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
         )
 
         # Act

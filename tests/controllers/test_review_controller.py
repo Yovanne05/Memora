@@ -10,6 +10,7 @@ Le service review_service est MOCKÉ.
 import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from datetime import datetime
 
 
 class TestReviewControllerCreate:
@@ -33,24 +34,25 @@ class TestReviewControllerCreate:
         )
         monkeypatch.setattr("controllers.review_controller.get_current_user", lambda: current_user)
 
+        flashcard_id = str(uuid4())
+        selected_answer_id = str(uuid4())
         created_review = ReviewDTO(
-            id=str(uuid4()),
             user_id=user_id,
-            flashcard_id=str(uuid4()),
-            selected_answer_id=str(uuid4()),
+            flashcard_id=flashcard_id,
+            selected_answer_id=selected_answer_id,
             is_correct=True,
             difficulty=ReviewDifficultyEnum.EASY,
             e_factor=Decimal("2.6"),
             repetitions=1,
             interval_days=1,
-            next_review_at="2024-01-02T00:00:00Z",
-            reviewed_at="2024-01-01T00:00:00Z"
+            next_review_at=datetime.now(),
+            reviewed_at=datetime.now()
         )
         mock_review_service.submit_review.return_value = created_review
 
         payload = {
-            "flashcard_id": created_review.flashcard_id,
-            "selected_answer_id": created_review.selected_answer_id,
+            "flashcard_id": flashcard_id,
+            "selected_answer_id": selected_answer_id,
             "difficulty": "easy"
         }
 
@@ -60,7 +62,7 @@ class TestReviewControllerCreate:
         # Assert
         assert response.status_code == HTTPStatus.CREATED
         body = response.get_json()
-        assert body["id"] == created_review.id
+        assert body["flashcard_id"] == flashcard_id
         assert body["is_correct"] is True
         mock_review_service.submit_review.assert_called_once()
 
@@ -86,7 +88,7 @@ class TestReviewControllerCreate:
         payload = {
             "flashcard_id": str(uuid4()),
             "selected_answer_id": str(uuid4()),
-            "difficulty": "medium"
+            "difficulty": "good"
         }
 
         # Act
@@ -119,16 +121,12 @@ class TestReviewControllerFindMany:
 
         upcoming = [
             UpcomingReviewsGroupDTO(
-                note_id=str(uuid4()),
-                note_title="Test Note",
+                date="2024-01-01",
                 flashcards=[
                     FlashcardWithReviewDTO(
                         flashcard_id=str(uuid4()),
                         question="Question 1",
-                        next_review_at="2024-01-01T00:00:00Z",
-                        e_factor=Decimal("2.5"),
-                        repetitions=0,
-                        interval_days=0
+                        next_review_at=datetime.now()
                     )
                 ]
             )
@@ -143,7 +141,7 @@ class TestReviewControllerFindMany:
         body = response.get_json()
         assert isinstance(body, list)
         assert len(body) == 1
-        assert "note_id" in body[0]
+        assert "date" in body[0]
         assert "flashcards" in body[0]
         mock_review_service.get_upcoming_reviews.assert_called_once_with(user_id)
 

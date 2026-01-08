@@ -11,6 +11,7 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
+from datetime import datetime
 
 from dtos.note_share_dto import NoteShareDTO, NoteShareCreateDTO, NoteShareUpdateDTO
 from daos.note_dao import NoteShare
@@ -32,13 +33,24 @@ class TestNoteShareServiceCreate:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
-        target_user = User(id=user_id, email="target@example.com", username="target", password_hash="hash", role=RoleEnum.CLIENT)
+        target_user = User(
+            id=user_id, email="target@example.com", username="target",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         mock_user_repository.find_one.return_value = target_user
 
         mock_note_share_repository.find_one.return_value = None
@@ -46,7 +58,8 @@ class TestNoteShareServiceCreate:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=SharePermissionEnum.READ
+            permission=SharePermissionEnum.READ,
+            created_at=datetime.now()
         )
         mock_note_share_repository.add.return_value = share
 
@@ -79,16 +92,25 @@ class TestNoteShareServiceUpdate:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=SharePermissionEnum.READ
+            permission=SharePermissionEnum.READ,
+            created_at=datetime.now()
         )
         mock_note_share_repository.find_one.return_value = share
         mock_note_share_repository.update.return_value = share
@@ -120,10 +142,18 @@ class TestNoteShareServiceRevoke:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         mock_note_share_repository.delete.return_value = True
@@ -148,10 +178,18 @@ class TestNoteShareServiceRevoke:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         mock_note_share_repository.delete.return_value = False

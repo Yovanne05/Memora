@@ -15,7 +15,7 @@ from uuid import uuid4
 
 from daos.report_dao import Report
 from repositorys import report_repository
-from utils.enums import ReportStatusEnum
+from utils.enums import ReportStatusEnum, ReportReasonEnum, ReportTargetEnum
 
 
 class TestReportRepositoryAdd:
@@ -33,7 +33,7 @@ class TestReportRepositoryAdd:
             id=str(uuid4()),
             note_id=note_id,
             reporter_id=reporter_id,
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Contenu inapproprié",
             status=ReportStatusEnum.PENDING
         )
@@ -57,7 +57,7 @@ class TestReportRepositoryAdd:
             id=str(uuid4()),
             collection_id=collection_id,
             reporter_id=reporter_id,
-            reason="inappropriate",
+            reason=ReportReasonEnum.SHOCKING_OR_INAPPROPRIATE,
             description="Collection inappropriée",
             status=ReportStatusEnum.PENDING
         )
@@ -86,7 +86,7 @@ class TestReportRepositoryFind:
             id=str(uuid4()),
             note_id=note_id,
             reporter_id=reporter_id,
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Test",
             status=ReportStatusEnum.PENDING
         )
@@ -98,7 +98,7 @@ class TestReportRepositoryFind:
         # Assert
         assert result is not None
         assert result.id == added.id
-        assert result.reason == "spam"
+        assert result.reason == ReportReasonEnum.SPAM_OR_ABUSE
 
 
 class TestReportRepositoryList:
@@ -118,7 +118,7 @@ class TestReportRepositoryList:
             id=str(uuid4()),
             note_id=note_id,
             reporter_id=reporter_id,
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Test 1",
             status=ReportStatusEnum.PENDING
         )
@@ -126,7 +126,7 @@ class TestReportRepositoryList:
             id=str(uuid4()),
             collection_id=collection_id,
             reporter_id=reporter_id,
-            reason="inappropriate",
+            reason=ReportReasonEnum.SHOCKING_OR_INAPPROPRIATE,
             description="Test 2",
             status=ReportStatusEnum.PENDING
         )
@@ -158,7 +158,7 @@ class TestReportRepositoryUpdate:
             id=str(uuid4()),
             note_id=note_id,
             reporter_id=reporter_id,
-            reason="spam",
+            reason=ReportReasonEnum.SPAM_OR_ABUSE,
             description="Test",
             status=ReportStatusEnum.PENDING
         )

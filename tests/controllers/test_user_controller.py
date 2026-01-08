@@ -5,6 +5,7 @@ Mock le service user_service.
 import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from datetime import datetime
 
 
 class TestUserControllerGet:
@@ -21,7 +22,8 @@ class TestUserControllerGet:
             email="test@example.com",
             username="testuser",
             display_name="Test User",
-            role="client"
+            role="client",
+            created_at=datetime.now()
         )
 
         # Act
@@ -47,7 +49,8 @@ class TestUserControllerUpdate:
             email="test@example.com",
             username="newusername",
             display_name="New Display Name",
-            role="client"
+            role="client",
+            created_at=datetime.now()
         )
         mock_user_service.update.return_value = updated_user
 

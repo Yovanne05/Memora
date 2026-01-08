@@ -1,6 +1,8 @@
 import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from datetime import datetime
+from utils.enums import VisibilityEnum
 
 
 class TestNoteControllerList:
@@ -17,10 +19,10 @@ class TestNoteControllerList:
                     id=str(uuid4()),
                     title="Note 1",
                     content="Content 1",
-                    owner_id=str(uuid4()),
                     collection_id=str(uuid4()),
-                    visibility="private",
-                    created_at="2024-01-01T00:00:00Z",
+                    visibility=VisibilityEnum.PRIVATE,
+                    created_at=datetime.now(),
+                    updated_at=datetime.now(),
                     tags=[]
                 ),
             ],
@@ -50,10 +52,10 @@ class TestNoteControllerGet:
             id=note_id,
             title="Test Note",
             content="Test content",
-            owner_id=str(uuid4()),
             collection_id=str(uuid4()),
-            visibility="private",
-            created_at="2024-01-01T00:00:00Z",
+            visibility=VisibilityEnum.PRIVATE,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
             tags=[]
         )
 
@@ -74,14 +76,16 @@ class TestNoteControllerCreate:
         from dtos.note_dto import NoteDTO
 
         # Arrange
+        owner_id = str(uuid4())
+        collection_id = str(uuid4())
         created_note = NoteDTO(
             id=str(uuid4()),
             title="New Note",
             content="New content",
-            owner_id=str(uuid4()),
-            collection_id=str(uuid4()),
-            visibility="private",
-            created_at="2024-01-01T00:00:00Z",
+            collection_id=collection_id,
+            visibility=VisibilityEnum.PRIVATE,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
             tags=[]
         )
         mock_note_crud_service.create.return_value = created_note
@@ -89,8 +93,8 @@ class TestNoteControllerCreate:
         payload = {
             "title": "New Note",
             "content": "New content",
-            "owner_id": created_note.owner_id,
-            "collection_id": created_note.collection_id,
+            "owner_id": owner_id,
+            "collection_id": collection_id,
             "visibility": "private"
         }
 
@@ -136,10 +140,10 @@ class TestNoteControllerUpdate:
             id=note_id,
             title="Updated Title",
             content="Updated content",
-            owner_id=str(uuid4()),
             collection_id=str(uuid4()),
-            visibility="public",
-            created_at="2024-01-01T00:00:00Z",
+            visibility=VisibilityEnum.PUBLIC,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
             tags=[]
         )
         mock_note_crud_service.update.return_value = updated_note

@@ -12,12 +12,13 @@ Le service collection_share_service est MOCKÉ.
 import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from datetime import datetime
 
 
 class TestShareCollectionControllerList:
     """Tests pour GET /collections/<id>/shares"""
 
-    def test_list_shares_returns_200(self, app_client, mock_collection_share_service):
+    def test_list_shares_returns_200(self, authenticated_client, mock_collection_share_service):
         """Le endpoint GET /collections/<id>/shares retourne 200."""
         from dtos.collection_share_dto import CollectionShareDTO
         from utils.enums import SharePermissionEnum
@@ -30,13 +31,13 @@ class TestShareCollectionControllerList:
                 collection_id=collection_id,
                 user_id=str(uuid4()),
                 permission=SharePermissionEnum.READ,
-                created_at="2024-01-01T00:00:00Z"
+                created_at=datetime.now()
             )
         ]
         mock_collection_share_service.find_many.return_value = (shares, 1)
 
         # Act
-        response = app_client.get(f"/collections/{collection_id}/shares")
+        response = authenticated_client.get(f"/collections/{collection_id}/shares")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -49,7 +50,7 @@ class TestShareCollectionControllerList:
 class TestShareCollectionControllerCreate:
     """Tests pour POST /collections/<id>/shares"""
 
-    def test_create_share_returns_201(self, app_client, mock_collection_share_service):
+    def test_create_share_returns_201(self, authenticated_client, mock_collection_share_service):
         """Le endpoint POST /collections/<id>/shares retourne 201."""
         from dtos.collection_share_dto import CollectionShareDTO
         from utils.enums import SharePermissionEnum
@@ -63,7 +64,7 @@ class TestShareCollectionControllerCreate:
             collection_id=collection_id,
             user_id=user_id,
             permission=SharePermissionEnum.WRITE,
-            created_at="2024-01-01T00:00:00Z"
+            created_at=datetime.now()
         )
         mock_collection_share_service.share_collection.return_value = share
 
@@ -73,7 +74,7 @@ class TestShareCollectionControllerCreate:
         }
 
         # Act
-        response = app_client.post(f"/collections/{collection_id}/shares", json=payload)
+        response = authenticated_client.post(f"/collections/{collection_id}/shares", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.CREATED
@@ -86,7 +87,7 @@ class TestShareCollectionControllerCreate:
 class TestShareCollectionControllerDelete:
     """Tests pour DELETE /collections/<id>/shares/<id>"""
 
-    def test_delete_share_returns_204(self, app_client, mock_collection_share_service):
+    def test_delete_share_returns_204(self, authenticated_client, mock_collection_share_service):
         """Le endpoint DELETE /collections/<id>/shares/<id> retourne 204."""
         # Arrange
         collection_id = str(uuid4())
@@ -94,8 +95,8 @@ class TestShareCollectionControllerDelete:
         mock_collection_share_service.revoke_share.return_value = None
 
         # Act
-        response = app_client.delete(f"/collections/{collection_id}/shares/{share_id}")
+        response = authenticated_client.delete(f"/collections/{collection_id}/shares/{share_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.NO_CONTENT
-        mock_collection_share_service.revoke_share.assert_called_once_with(share_id)
+        mock_collection_share_service.revoke_share.assert_called_once_with(collection_id, share_id)

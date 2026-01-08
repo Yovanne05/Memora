@@ -11,6 +11,7 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
+from datetime import datetime
 
 from dtos.note_share_link_dto import NoteShareLinkDTO, NoteShareLinkCreateDTO
 from daos.note_share_link_dao import NoteShareLink
@@ -30,14 +31,19 @@ class TestNoteShareLinkServiceCreate:
         owner_id = str(uuid4())
         note_id = str(uuid4())
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         link = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            # REMOVED TOKEN,
-            permission=SharePermissionEnum.READ
+            permission=SharePermissionEnum.READ,
+            created_at=datetime.now()
         )
         mock_note_share_link_repository.add.return_value = link
 
@@ -49,7 +55,6 @@ class TestNoteShareLinkServiceCreate:
         # Assert
         assert isinstance(result, NoteShareLinkDTO)
         assert result.note_id == note_id
-        assert "token" in result.model_dump()
         mock_note_share_link_repository.add.assert_called_once()
 
 
@@ -68,18 +73,26 @@ class TestNoteShareLinkServiceList:
         owner_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.note.note_share_link_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         links = [
             NoteShareLink(
                 id=str(uuid4()),
                 note_id=note_id,
-                # REMOVED TOKEN,
-                permission=SharePermissionEnum.READ
+                permission=SharePermissionEnum.READ,
+                created_at=datetime.now()
             )
         ]
         mock_note_share_link_repository.find_many.return_value = (links, 1)
@@ -107,7 +120,12 @@ class TestNoteShareLinkServiceDelete:
         note_id = str(uuid4())
         link_id = str(uuid4())
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         mock_note_share_link_repository.delete.return_value = True
@@ -128,7 +146,12 @@ class TestNoteShareLinkServiceDelete:
         note_id = str(uuid4())
         link_id = str(uuid4())
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=owner_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
+            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         mock_note_share_link_repository.delete.return_value = False

@@ -147,21 +147,49 @@ def mock_note_image_service(monkeypatch):
 # =============================================================================
 
 @pytest.fixture
-def authenticated_client(app_client, monkeypatch):
+def authenticated_client(app_client):
     """
     Client Flask authentifié avec un utilisateur de test.
-    Mock le décorateur @jwt_required pour bypasser l'authentification.
+    Crée un vrai JWT token pour bypasser l'authentification.
     """
-    from flask import g
+    from flask_jwt_extended import create_access_token
 
-    # Mock du user_id dans le contexte Flask
-    def mock_get_jwt_identity():
-        return "test-user-id-123"
-
-    monkeypatch.setattr("flask_jwt_extended.get_jwt_identity", mock_get_jwt_identity)
-
-    # Définit le current_user dans le contexte g
+    # Créer un token JWT valide pour les tests
     with app_client.application.app_context():
-        g.current_user_id = "test-user-id-123"
+        access_token = create_access_token(identity="test-user-id-123")
 
-    return app_client
+    # Créer un wrapper qui ajoute automatiquement le token aux headers
+    class AuthenticatedClient:
+        def __init__(self, client, token):
+            self.client = client
+            self.token = token
+
+        def get(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.get(*args, **kwargs)
+
+        def post(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.post(*args, **kwargs)
+
+        def patch(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.patch(*args, **kwargs)
+
+        def delete(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.delete(*args, **kwargs)
+
+        @property
+        def application(self):
+            return self.client.application
+
+    return AuthenticatedClient(app_client, access_token)

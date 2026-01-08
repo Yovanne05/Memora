@@ -36,7 +36,7 @@ class TestNoteFavoriteRepository:
         result = note_favorite_repository.add(favorite)
 
         # Assert
-        assert result.id is not None
+        # Composite key: (user_id, note_id)
         assert result.user_id == user_id
         assert result.note_id == note_id
 
@@ -69,7 +69,7 @@ class TestNoteFavoriteRepository:
         added = note_favorite_repository.add(favorite)
 
         # Act
-        note_favorite_repository.delete(added.id)
+        note_favorite_repository.delete(user_id, note_id)
 
         # Assert
         result = note_favorite_repository.find_one(user_id, note_id)
@@ -95,7 +95,7 @@ class TestCollectionFavoriteRepository:
         result = collection_favorite_repository.add(favorite)
 
         # Assert
-        assert result.id is not None
+        # Composite key: (user_id, note_id)
         assert result.user_id == user_id
         assert result.collection_id == collection_id
 
