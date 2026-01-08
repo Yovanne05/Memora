@@ -9,7 +9,7 @@ from dtos.note_share_dto import NoteShareCreateDTO, NoteShareUpdateDTO
 from dtos.common_dto import ListResponseDTO
 from querys.note_share_query import NoteShareFindQuery
 from services.impl.note.note_share_service_impl import note_share_service
-from utils.permission_decorators import require_note_read, require_note_manage
+from utils.permission_decorators import require_note_manage
 
 bp_note_shares = Blueprint(
     "note_shares", __name__, url_prefix="/notes/<uuid:note_id>/shares"
@@ -19,7 +19,6 @@ bp_note_shares = Blueprint(
 @bp_note_shares.get("")
 @jwt_required()
 @swag_from("../docs/share_notes/share_list.yaml")
-@require_note_read()
 def find_many(note_id: UUID):
     raw_query = request.args.to_dict(flat=True)
     raw_query["note_id"] = str(note_id)

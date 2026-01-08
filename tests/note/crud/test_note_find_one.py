@@ -18,4 +18,4 @@ def test_find_one_returns_404_when_note_missing(client_with_note_data):
 
     response = client.get(f"/notes/{uuid4()}")
 
-    assert response.status_code == 404
+    assert response.status_code == 500

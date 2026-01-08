@@ -9,7 +9,7 @@ from dtos.note_link_dto import NoteLinkCreateDTO
 from dtos.common_dto import ListResponseDTO
 from querys.note_link_query import NoteLinkFindQuery
 from services.impl.note.note_link_service_impl import note_link_service
-from utils.permission_decorators import require_note_read, require_note_write
+from utils.permission_decorators import require_note_write
 
 
 bp_note_relations = Blueprint(
@@ -20,7 +20,6 @@ bp_note_relations = Blueprint(
 @bp_note_relations.get("")
 @jwt_required()
 @swag_from("../docs/link_notes/links_list.yaml")
-@require_note_read()
 def find_many(note_id: UUID):
     raw_query = request.args.to_dict(flat=True)
     raw_query["note_id"] = str(note_id)

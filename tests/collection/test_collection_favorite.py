@@ -37,6 +37,3 @@ def test_remove_collection_favorite_returns_404_when_not_favorited(client_with_n
     response = client.delete(f"/collections/{data.collection_id}/favorites")
 
     assert response.status_code == 404
-pytest_plugins = ["tests.note.conftest"]
-
-import pytest

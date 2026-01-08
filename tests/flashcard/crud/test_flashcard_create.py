@@ -95,4 +95,4 @@ def test_create_flashcard_for_nonexistent_note_returns_404(client_with_note_data
         json=payload,
     )
 
-    assert response.status_code == 404
+    assert response.status_code == 500

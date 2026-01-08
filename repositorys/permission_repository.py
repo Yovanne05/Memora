@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from daos.collection_dao import Collection, CollectionShare
 from daos.note_dao import Note, NoteShare
 from utils.permission_models import PermissionContext
-from utils.enums import SharePermissionEnum
+from utils.enums import SharePermissionEnum, VisibilityEnum
 from daos.user_dao import User
 
 
@@ -102,6 +102,7 @@ class PermissionRepository:
                     NoteShare.user_id == user_id,
                     CollectionShare.user_id == user_id,
                     Collection.owner_id == user_id,
+                    Note.visibility == VisibilityEnum.PUBLIC,
                 )
             )
         )
@@ -119,6 +120,7 @@ class PermissionRepository:
                 or_(
                     Collection.owner_id == user_id,
                     CollectionShare.user_id == user_id,
+                    Collection.visibility == VisibilityEnum.PUBLIC,
                 )
             )
         )

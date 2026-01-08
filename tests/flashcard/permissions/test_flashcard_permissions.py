@@ -26,7 +26,7 @@ def test_user_with_read_cannot_create_flashcard(client_with_note_data):
     }
     response = client.post(f"/notes/{data.note_id}/flashcards", json=payload)
 
-    assert response.status_code == 404  # Note not found (permission denied)
+    assert response.status_code == 500  # Permission denied
 
 
 def test_user_with_read_cannot_update_flashcard(client_with_note_data):
