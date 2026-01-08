@@ -12,7 +12,7 @@ def test_list_shares_returns_items(client_with_note_data):
     payload = response.get_json()
     assert payload["total"] == 1
     assert len(payload["items"]) == 1
-    assert payload["items"][0]["user_id"] == data.share_user_id
+    assert payload["items"][0]["user"]["id"] == data.share_user_id
 
 
 def test_list_shares_returns_empty_for_unknown_note(client_with_note_data):

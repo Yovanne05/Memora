@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from utils.enums import SharePermissionEnum
+from dtos.user_dto import UserDTO
 
 
 class CollectionShareCreateDTO(BaseModel):
@@ -16,7 +17,7 @@ class CollectionShareUpdateDTO(BaseModel):
 
 class CollectionShareDTO(BaseModel):
     collection_id: str
-    user_id: str
+    user: UserDTO
     permission: SharePermissionEnum
     created_at: datetime
 

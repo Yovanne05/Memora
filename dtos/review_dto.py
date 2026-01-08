@@ -17,6 +17,7 @@ class ReviewDTO(BaseModel):
     flashcard_id: str
     selected_answer_id: str
     is_correct: bool
+    correct_answer_id: str
     difficulty: ReviewDifficultyEnum
     e_factor: Decimal
     repetitions: int

@@ -16,7 +16,7 @@ def test_share_note_returns_created_share(client_with_note_data):
     assert response.status_code == 201
     body = response.get_json()
     assert body["note_id"] == data.note_id
-    assert body["user_id"] == data.share_user_id
+    assert body["user"]["id"] == data.share_user_id
     assert body["permission"] == SharePermissionEnum.WRITE.value
     data.track_created_share(data.note_id, data.share_user_id)
 
@@ -69,6 +69,6 @@ def test_share_note_with_owner_permission(client_with_note_data):
     assert response.status_code == 201
     body = response.get_json()
     assert body["note_id"] == data.note_id
-    assert body["user_id"] == data.share_user_id
+    assert body["user"]["id"] == data.share_user_id
     assert body["permission"] == SharePermissionEnum.OWNER.value
     data.track_created_share(data.note_id, data.share_user_id)
