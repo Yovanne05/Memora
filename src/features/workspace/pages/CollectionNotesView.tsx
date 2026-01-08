@@ -48,7 +48,6 @@ export default function CollectionNotesView({
   }
 
   const collection = collectionQuery.data ?? null
-
   return (
     <div className="space-y-6">
       <CollectionNotesHeader

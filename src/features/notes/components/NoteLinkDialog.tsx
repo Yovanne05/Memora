@@ -49,7 +49,7 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
     if (!selectedNoteId) return
     const success = await handleCreateLink(selectedNoteId)
     if (!success) {
-      alert("Impossible de cr�er le lien")
+      alert("Impossible de créer le lien")
     }
   }
 
@@ -64,7 +64,7 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
         <DialogHeader>
           <DialogTitle>Lier une note</DialogTitle>
           <DialogDescription>
-            S�lectionnez une note de la m�me collection � lier
+            Sélectionnez une note de la même collection à lier
           </DialogDescription>
         </DialogHeader>
 
