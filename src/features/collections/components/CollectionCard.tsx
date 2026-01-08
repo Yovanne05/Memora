@@ -36,6 +36,8 @@ export const CollectionCard = memo(function CollectionCard({
 }: Readonly<CollectionCardProps>) {
   const router = useRouter()
   const favorite = collection.isFavorite === true
+  const canManage = collection.userPermission === 'owner'
+  const canWrite = canManage || collection.userPermission === 'write'
 
   const handleNavigate = useCallback(() => {
     router.navigate({
@@ -54,9 +56,9 @@ export const CollectionCard = memo(function CollectionCard({
 
   const actions = buildCollectionCardActions({
     collection,
-    onEdit,
-    onShare,
-    onDelete,
+    onEdit: canWrite ? onEdit : undefined,
+    onShare: canManage ? onShare : undefined,
+    onDelete: canManage ? onDelete : undefined,
   })
 
   return (

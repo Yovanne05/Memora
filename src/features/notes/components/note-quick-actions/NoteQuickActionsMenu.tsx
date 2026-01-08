@@ -21,6 +21,11 @@ type NoteQuickActionsMenuProps = {
   onOpenDelete: () => void
   triggerVariant: 'ghost' | 'outline' | 'default'
   showLabel: boolean
+  canMove: boolean
+  canToggleVisibility: boolean
+  canShare: boolean
+  canDuplicate: boolean
+  canDelete: boolean
 }
 
 export function NoteQuickActionsMenu({
@@ -36,6 +41,11 @@ export function NoteQuickActionsMenu({
   onOpenDelete,
   triggerVariant,
   showLabel,
+  canMove,
+  canToggleVisibility,
+  canShare,
+  canDuplicate,
+  canDelete,
 }: Readonly<NoteQuickActionsMenuProps>) {
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
@@ -63,6 +73,11 @@ export function NoteQuickActionsMenu({
         onOpenShare={onOpenShare}
         onDuplicate={onDuplicate}
         onOpenDelete={onOpenDelete}
+        canMove={canMove}
+        canToggleVisibility={canToggleVisibility}
+        canShare={canShare}
+        canDuplicate={canDuplicate}
+        canDelete={canDelete}
       />
     </DropdownMenu>
   )

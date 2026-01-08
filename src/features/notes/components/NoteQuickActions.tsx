@@ -28,17 +28,28 @@ export function NoteQuickActions({
     setShareDialogOpen,
     isDropdownOpen,
     setIsDropdownOpen,
+    canMove,
+    canToggleVisibility,
+    canShare,
+    canDuplicate,
+    canDelete,
     handleToggleVisibility,
     handleMoveToCollection,
     handleDuplicate,
     handleDelete,
   } = useNoteQuickActions({ note, onActionComplete })
 
+  const hasMenuActions =
+    canToggleVisibility || canShare || canMove || canDuplicate || canDelete
   const isInteracting = isDropdownOpen || shareDialogOpen || deleteDialogOpen
 
   useEffect(() => {
     onInteractionChange?.(isInteracting)
   }, [isInteracting, onInteractionChange])
+
+  if (!hasMenuActions) {
+    return null
+  }
 
   return (
     <>
@@ -61,6 +72,11 @@ export function NoteQuickActions({
         }}
         triggerVariant={triggerVariant}
         showLabel={showLabel}
+        canMove={canMove}
+        canToggleVisibility={canToggleVisibility}
+        canShare={canShare}
+        canDuplicate={canDuplicate}
+        canDelete={canDelete}
       />
 
       <NoteQuickActionsDialogs
@@ -71,6 +87,8 @@ export function NoteQuickActions({
         onDeleteDialogChange={setDeleteDialogOpen}
         onConfirmDelete={handleDelete}
         isDeleting={isPending}
+        canShare={canShare}
+        canDelete={canDelete}
       />
     </>
   )

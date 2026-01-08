@@ -19,6 +19,7 @@ import { CollectionNotesLoading } from '../components/collection-notes/Collectio
 import { CollectionShareDialog } from '@/features/collections/components/CollectionShareDialog'
 import { useDeleteCollectionMutation } from '@/features/collections/hooks/useDeleteCollectionMutation'
 import { useCollectionNotesView } from '../hooks/useCollectionNotesView'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 interface CollectionNotesViewProps {
   readonly collectionId: string
@@ -47,6 +48,7 @@ export default function CollectionNotesView({
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const deleteCollectionMutation = useDeleteCollectionMutation()
+  const { user } = useAuth()
 
   const handleDeleteConfirm = async () => {
     await deleteCollectionMutation.mutateAsync(collectionId)
@@ -73,6 +75,17 @@ export default function CollectionNotesView({
   }
 
   const collection = collectionQuery.data ?? null
+  const hasCollection = Boolean(collection)
+  const isOwner = Boolean(user && collection && collection.ownerId === user.id)
+  const userPermission = collection?.userPermission ?? null
+  const canManage =
+    hasCollection &&
+    (userPermission === 'owner' ||
+      isOwner ||
+      user?.role === 'admin' ||
+      user?.role === 'super_admin')
+  const canWrite = hasCollection && (canManage || userPermission === 'write')
+  const canAddNote = hasCollection && isOwner
   return (
     <div className="space-y-6">
       <CollectionNotesHeader
@@ -81,6 +94,10 @@ export default function CollectionNotesView({
         onEdit={() => setEditDialogOpen(true)}
         onShare={() => setShareDialogOpen(true)}
         onDelete={() => setDeleteDialogOpen(true)}
+        canAddNote={canAddNote}
+        canEdit={canWrite}
+        canShare={canManage}
+        canDelete={canManage}
       />
 
       {notes && notes.length > 0 ? (
@@ -92,7 +109,10 @@ export default function CollectionNotesView({
           onPageChange={actions.setPage}
         />
       ) : (
-        <CollectionNotesEmpty collectionId={collectionId} />
+        <CollectionNotesEmpty
+          collectionId={collectionId}
+          canAddNote={canAddNote}
+        />
       )}
 
       <CollectionNotesEditDialog
@@ -103,7 +123,7 @@ export default function CollectionNotesView({
         isPending={updateCollectionMutation.isPending}
       />
 
-      {collection && (
+      {collection && canManage && (
         <CollectionShareDialog
           collectionId={collection.id}
           collectionName={collection.name}

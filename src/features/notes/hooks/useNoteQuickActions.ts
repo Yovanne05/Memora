@@ -1,11 +1,12 @@
-import { useState } from "react"
-import { toast } from "sonner"
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import { useCreateNoteMutation } from "./useCreateNoteMutation"
-import { useDeleteNoteMutation } from "./useDeleteNoteMutation"
-import { useUpdateNoteMutation } from "./useUpdateNoteMutation"
-import type { Note } from "../models/note.model"
+import { useCollectionsQuery } from '@/features/collections/hooks/useCollectionsQuery'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useCreateNoteMutation } from './useCreateNoteMutation'
+import { useDeleteNoteMutation } from './useDeleteNoteMutation'
+import { useUpdateNoteMutation } from './useUpdateNoteMutation'
+import type { Note } from '../models/note.model'
 
 type UseNoteQuickActionsArgs = {
   note: Note
@@ -20,14 +21,32 @@ export function useNoteQuickActions({
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
+  const { user } = useAuth()
   const updateMutation = useUpdateNoteMutation({ onSuccess: onActionComplete })
   const deleteMutation = useDeleteNoteMutation({ onSuccess: onActionComplete })
-  const duplicateMutation = useCreateNoteMutation({ onSuccess: onActionComplete })
+  const duplicateMutation = useCreateNoteMutation({
+    onSuccess: onActionComplete,
+  })
   const { data: collectionsData } = useCollectionsQuery()
-  const collections = collectionsData?.items ?? []
+  const userId = user?.id
+  const isOwner = Boolean(userId && note.ownerId === userId)
+  const canWrite =
+    note.userPermission === 'write' ||
+    note.userPermission === 'owner' ||
+    isOwner
+  const canManage = note.userPermission === 'owner' || isOwner
+  const canMove = isOwner
+  const canToggleVisibility = canWrite
+  const canShare = canManage
+  const canDelete = canManage
+  const canDuplicate = isOwner
+  const collections = (collectionsData?.items ?? []).filter(
+    (collection) => collection.ownerId === userId
+  )
+  const moveCollections = canMove ? collections : []
 
   const handleToggleVisibility = async () => {
-    const newVisibility = note.visibility === "private" ? "public" : "private"
+    const newVisibility = note.visibility === 'private' ? 'public' : 'private'
     await updateMutation.mutateAsync({
       noteId: note.id,
       payload: { visibility: newVisibility },
@@ -52,7 +71,7 @@ export function useNoteQuickActions({
       visibility: note.visibility,
       tags: note.tags,
     })
-    toast.success("Note dupliquée")
+    toast.success('Note dupliquée')
     setIsDropdownOpen(false)
   }
 
@@ -67,7 +86,12 @@ export function useNoteQuickActions({
     duplicateMutation.isPending
 
   return {
-    collections,
+    collections: moveCollections,
+    canMove,
+    canToggleVisibility,
+    canShare,
+    canDuplicate,
+    canDelete,
     isPending,
     deleteDialogOpen,
     setDeleteDialogOpen,
@@ -81,4 +105,3 @@ export function useNoteQuickActions({
     handleDelete,
   }
 }
-

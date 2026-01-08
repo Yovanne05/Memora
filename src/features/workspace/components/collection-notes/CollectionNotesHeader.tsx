@@ -9,6 +9,10 @@ type CollectionNotesHeaderProps = {
   onEdit: () => void
   onShare: () => void
   onDelete: () => void
+  canAddNote: boolean
+  canEdit: boolean
+  canShare: boolean
+  canDelete: boolean
 }
 
 export function CollectionNotesHeader({
@@ -17,6 +21,10 @@ export function CollectionNotesHeader({
   onEdit,
   onShare,
   onDelete,
+  canAddNote,
+  canEdit,
+  canShare,
+  canDelete,
 }: Readonly<CollectionNotesHeaderProps>) {
   return (
     <div className="flex items-start justify-between gap-4">
@@ -31,12 +39,14 @@ export function CollectionNotesHeader({
           collectionId={collectionId}
           triggerVariant="default"
           showLabel
+          disabled={!canAddNote}
         />
         <Button
           variant="outline"
           size="default"
           onClick={onShare}
           className="gap-2"
+          disabled={!canShare}
         >
           <Users className="h-4 w-4" />
           Partager
@@ -46,6 +56,7 @@ export function CollectionNotesHeader({
           size="default"
           onClick={onEdit}
           className="gap-2"
+          disabled={!canEdit}
         >
           <Edit className="h-4 w-4" />
           Modifier
@@ -55,6 +66,7 @@ export function CollectionNotesHeader({
           size="default"
           onClick={onDelete}
           className="gap-2"
+          disabled={!canDelete}
         >
           <Trash2 className="h-4 w-4" />
           Supprimer
