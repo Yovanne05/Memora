@@ -1,31 +1,31 @@
-import { Position, type NodeProps } from "reactflow";
-import { NodeHandle } from "./NodeHandle";
-import { NodeContent } from "./NodeContent";
-import type { CustomNodeData, HandleSide } from "../types/visualization.type";
+import { Position, type NodeProps } from 'reactflow'
+import { NodeHandle } from './NodeHandle'
+import { NodeContent } from './NodeContent'
+import type { CustomNodeData, HandleSide } from '../types/visualization.type'
 
 interface HandleConfig {
-  position: Position;
-  side: HandleSide;
+  position: Position
+  side: HandleSide
 }
 
 const HANDLE_POSITIONS: readonly HandleConfig[] = [
-  { position: Position.Top, side: "top" },
-  { position: Position.Right, side: "right" },
-  { position: Position.Bottom, side: "bottom" },
-  { position: Position.Left, side: "left" },
-] as const;
+  { position: Position.Top, side: 'top' },
+  { position: Position.Right, side: 'right' },
+  { position: Position.Bottom, side: 'bottom' },
+  { position: Position.Left, side: 'left' },
+] as const
 
 const getConnectionLabel = (connections: number): string => {
-  return `${connections} connexion${connections === 1 ? "" : "s"}`;
-};
+  return `${connections} connexion${connections === 1 ? '' : 's'}`
+}
 
 export function CustomNode({ data }: NodeProps<CustomNodeData>) {
-  const connections = data.connections ?? 0;
-  const connectionLabel = getConnectionLabel(connections);
+  const connections = data.connections ?? 0
+  const connectionLabel = getConnectionLabel(connections)
 
   return (
     <article
-      className="group relative min-w-[140px] rounded-lg border-2 border-blue-400 bg-white px-4 py-3 shadow-lg transition-colors hover:border-blue-600"
+      className="group relative min-w-35 rounded-lg border-2 border-blue-400 bg-white px-4 py-3 shadow-lg transition-colors hover:border-blue-600"
       aria-label={`Note: ${data.title}, ${connectionLabel}`}
     >
       {HANDLE_POSITIONS.map(({ position, side }) => (
@@ -34,5 +34,5 @@ export function CustomNode({ data }: NodeProps<CustomNodeData>) {
 
       <NodeContent title={data.title} connections={connections} />
     </article>
-  );
+  )
 }
