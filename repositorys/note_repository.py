@@ -157,6 +157,22 @@ def update(note_entity: Note) -> Note:
         return merged
 
 
+def update_collab_data(
+    note_id: str,
+    yjs_snapshot: str,
+    prose_mirror_json: str,
+) -> Optional[Note]:
+    with get_db_session() as session:
+        entity = session.get(Note, note_id)
+        if not entity:
+            return None
+        entity.yjs_snapshot = yjs_snapshot
+        entity.content = prose_mirror_json
+        session.flush()
+        session.refresh(entity)
+        return entity
+
+
 def delete(note_id: str) -> bool:
     with get_db_session() as session:
         entity = session.get(Note, note_id)
