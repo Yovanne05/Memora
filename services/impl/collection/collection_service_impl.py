@@ -30,6 +30,7 @@ class CollectionService(CollectionServiceInterface):
                 entity,
                 collection_favorite_ids=collection_favorites,
                 note_favorite_ids=note_favorites,
+                current_user=user,
             )
             for entity in entities
         ]
@@ -51,16 +52,19 @@ class CollectionService(CollectionServiceInterface):
             collection_entity,
             collection_favorite_ids=collection_favorites,
             note_favorite_ids=note_favorites,
+            current_user=user,
         )
 
     def create(self, collection_create_dto: CollectionCreateDTO) -> CollectionDTO:
+        user = get_current_user()
         entity = dto_to_collection(collection_create_dto)
         saved = collection_repository.add(entity)
-        return collection_to_dto(saved)
+        return collection_to_dto(saved, current_user=user)
 
     def update(
         self, collection_id: str, collection_update_dto: CollectionUpdateDTO
     ) -> CollectionDTO:
+        user = get_current_user()
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
@@ -68,7 +72,7 @@ class CollectionService(CollectionServiceInterface):
             collection_entity, collection_update_dto
         )
         saved = collection_repository.update(updated_entity)
-        return collection_to_dto(saved)
+        return collection_to_dto(saved, current_user=user)
 
     def delete(self, collection_id: str) -> None:
         deleted = collection_repository.delete(collection_id)

@@ -28,6 +28,8 @@ class NoteUpdateDTO(BaseModel):
 
 class NoteDTO(BaseModel):
     id: str
+    owner_id: str
+    owner_username: str
     title: str
     content: str
     visibility: VisibilityEnum
