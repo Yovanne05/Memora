@@ -18,17 +18,17 @@ const server = new Server({
   async onAuthenticate(data) {
     return controller.onAuthenticate({
       token: data.token,
-      documentName: data.documentName,
+      documentId: data.documentId,
     });
   },
   async onLoadDocument(data) {
     return controller.onLoadDocument({
-      documentName: data.documentName,
+      documentId: data.documentId,
     });
   },
   async onStoreDocument(data) {
     await controller.onStoreDocument({
-      documentName: data.documentName,
+      documentId: data.documentId,
       document: data.document,
       context: data.context,
     });
