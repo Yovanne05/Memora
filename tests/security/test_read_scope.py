@@ -24,8 +24,9 @@ from repositorys.note_repository import (
     get_for_user as note_get_for_user,
     list_for_user as note_list_for_user,
 )
-from services.impl.collection.collection_service_impl import collection_service
+from repositorys import collection_repository
 from services.impl.note.note_crud_service_impl import note_crud_service
+from mappers.collection_mapper import dto_to_collection
 from utils import db as db_utils
 from utils.enums import RoleEnum, VisibilityEnum, SharePermissionEnum
 from daos.note_dao import NoteShare
@@ -99,7 +100,7 @@ def _bootstrap_data():
         owner_id=owner.id,
         visibility=VisibilityEnum.PRIVATE,
     )
-    created_collection = collection_service.create(collection_dto)
+    created_collection = collection_repository.add(dto_to_collection(collection_dto))
 
     note_dto = NoteCreateDTO(
         title=f"Scoped Note {uuid4().hex[:6]}",
@@ -159,12 +160,14 @@ def test_collection_read_scope_allows_shared_collection():
 
 def test_collection_read_scope_allows_public_collection():
     owner, other = _create_user("owner-pub-collection"), _create_user("other-pub-collection")
-    public_collection = collection_service.create(
-        CollectionCreateDTO(
-            name=f"Public Collection {uuid4().hex[:6]}",
-            description="Public collection",
-            owner_id=owner.id,
-            visibility=VisibilityEnum.PUBLIC,
+    public_collection = collection_repository.add(
+        dto_to_collection(
+            CollectionCreateDTO(
+                name=f"Public Collection {uuid4().hex[:6]}",
+                description="Public collection",
+                owner_id=owner.id,
+                visibility=VisibilityEnum.PUBLIC,
+            )
         )
     )
     _clear_scope_cache()
@@ -208,7 +211,7 @@ def test_note_read_scope_allows_public_note():
         owner_id=owner.id,
         visibility=VisibilityEnum.PUBLIC,
     )
-    created_collection = collection_service.create(collection_dto)
+    created_collection = collection_repository.add(dto_to_collection(collection_dto))
 
     public_note = note_crud_service.create(
         NoteCreateDTO(

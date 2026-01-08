@@ -5,12 +5,12 @@ import pytest
 from daos.user_dao import User
 from dtos.collection_dto import CollectionCreateDTO
 from dtos.collection_share_dto import CollectionShareCreateDTO
+from mappers.collection_mapper import dto_to_collection
 from repositorys import (
     collection_repository,
     collection_share_repository,
     user_repository,
 )
-from services.impl.collection.collection_service_impl import collection_service
 from services.impl.collection.collection_share_service_impl import (
     collection_share_service,
 )
@@ -72,7 +72,7 @@ class CollectionTestData:
             owner_id=self.owner_id if owner_id is None else owner_id,
             visibility=VisibilityEnum.PRIVATE,
         )
-        created = collection_service.create(dto)
+        created = collection_repository.add(dto_to_collection(dto))
         self.created_collections.add(created.id)
         return created.id
 

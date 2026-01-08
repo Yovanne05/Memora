@@ -9,14 +9,15 @@ from repositorys import (
     user_repository,
     note_favorite_repository,
     collection_favorite_repository,
+    collection_repository,
 )
 from repositorys.note_repository import NoteSearchParams, list_for_user as note_list_for_user
 from repositorys.collection_repository import (
     CollectionSearchParams,
     list_for_user as collection_list_for_user,
 )
-from services.impl.collection.collection_service_impl import collection_service
 from services.impl.note.note_crud_service_impl import note_crud_service
+from mappers.collection_mapper import dto_to_collection
 from utils.enums import RoleEnum, VisibilityEnum
 
 
@@ -39,7 +40,8 @@ def _create_collection(owner_id: str):
         owner_id=owner_id,
         visibility=VisibilityEnum.PRIVATE,
     )
-    return collection_service.create(dto)
+    entity = dto_to_collection(dto)
+    return collection_repository.add(entity)
 
 
 def _create_note(owner_id: str, collection_id: str):
