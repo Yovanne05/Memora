@@ -4,8 +4,10 @@ from domain_services.collection_domain_service import (
     apply_collection_update,
     ensure_collection_exists,
 )
+from domain_services.permission_domain_service import permission_domain_service
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO, CollectionUpdateDTO
 from exceptions.collection_exception import CollectionNotFound
+from exceptions.permission_exception import ReadPermissionDenied
 from mappers.collection_mapper import collection_to_dto, dto_to_collection
 from repositorys import collection_favorite_repository, collection_repository
 from repositorys import note_favorite_repository
@@ -35,8 +37,15 @@ class CollectionService(CollectionServiceInterface):
 
     def find_one(self, collection_id: str) -> CollectionDTO:
         user = get_current_user()
-        collection_entity = collection_repository.get_for_user(user, collection_id)
+
+        if not permission_domain_service.can_read_collection(
+            collection_id, user.id, user.role
+        ):
+            raise ReadPermissionDenied("collection", collection_id)
+
+        collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
+
         collection_favorites, note_favorites = self._get_favorite_ids(user.id)
         return collection_to_dto(
             collection_entity,

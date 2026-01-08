@@ -17,6 +17,7 @@ bp_users = Blueprint("users", __name__, url_prefix="/users")
 
 
 @bp_users.get("")
+@jwt_required()
 @swag_from("../docs/users/list.yaml")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
@@ -32,6 +33,7 @@ def find_many():
 
 
 @bp_users.get("/<uuid:user_id>")
+@jwt_required()
 @swag_from("../docs/users/find_one.yaml")
 def find_one(user_id: UUID):
     user = user_service.find_one(str(user_id))
@@ -54,6 +56,7 @@ def create():
 
 
 @bp_users.patch("/<uuid:user_id>")
+@jwt_required()
 @swag_from("../docs/users/update.yaml")
 def update(user_id: UUID):
     payload = UserUpdateDTO.model_validate_json(request.data)
@@ -62,6 +65,7 @@ def update(user_id: UUID):
 
 
 @bp_users.delete("/<uuid:user_id>")
+@jwt_required()
 @swag_from("../docs/users/delete.yaml")
 def delete(user_id: UUID):
     user_service.delete(str(user_id))

@@ -47,10 +47,17 @@ class Collection(
     description: Mapped[str | None] = mapped_column(Text)
 
     owner: Mapped["User"] = relationship(back_populates="collections")
-    notes: Mapped[list["Note"]] = relationship(back_populates="collection", lazy="selectin")
+    notes: Mapped[list["Note"]] = relationship(
+        back_populates="collection",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     shares: Mapped[list["CollectionShare"]] = relationship(
         back_populates="collection",
         lazy="selectin",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     share_links: Mapped[list["CollectionShareLink"]] = relationship(
         back_populates="collection",

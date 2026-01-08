@@ -2,6 +2,7 @@ from http import HTTPStatus
 from uuid import UUID
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.flashcard_dto import (
@@ -11,6 +12,7 @@ from dtos.flashcard_dto import (
 from dtos.common_dto import ListResponseDTO
 from querys.flashcard_query import FlashcardFindQuery
 from services.impl.note.flashcard_service_impl import flashcard_service
+from utils.permission_decorators import require_note_write
 
 bp_flashcards = Blueprint("flashcards", __name__, url_prefix="/flashcards")
 bp_note_flashcards = Blueprint(
@@ -21,6 +23,7 @@ bp_note_flashcards = Blueprint(
 
 
 @bp_flashcards.get("")
+@jwt_required()
 @swag_from("../docs/flashcards/list.yaml")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
@@ -36,6 +39,7 @@ def find_many():
 
 
 @bp_flashcards.get("/<uuid:flashcard_id>")
+@jwt_required()
 @swag_from("../docs/flashcards/find_one.yaml")
 def find_one(flashcard_id: UUID):
     flashcard = flashcard_service.find_one(str(flashcard_id))
@@ -43,7 +47,9 @@ def find_one(flashcard_id: UUID):
 
 
 @bp_note_flashcards.post("")
+@jwt_required()
 @swag_from("../docs/flashcards/create.yaml")
+@require_note_write()
 def create(note_id: UUID):
     payload = FlashcardCreateDTO.model_validate_json(request.data)
     flashcard = flashcard_service.create(str(note_id), payload)
@@ -51,6 +57,7 @@ def create(note_id: UUID):
 
 
 @bp_flashcards.patch("/<uuid:flashcard_id>")
+@jwt_required()
 @swag_from("../docs/flashcards/update.yaml")
 def update(flashcard_id: UUID):
     payload = FlashcardUpdateDTO.model_validate_json(request.data)
@@ -59,6 +66,7 @@ def update(flashcard_id: UUID):
 
 
 @bp_flashcards.delete("/<uuid:flashcard_id>")
+@jwt_required()
 @swag_from("../docs/flashcards/delete.yaml")
 def delete(flashcard_id: UUID):
     flashcard_service.delete(str(flashcard_id))
@@ -66,6 +74,7 @@ def delete(flashcard_id: UUID):
 
 
 @bp_flashcards.post("/<uuid:flashcard_id>/duplicates")
+@jwt_required()
 @swag_from("../docs/flashcards/duplicate.yaml")
 def duplicate(flashcard_id: UUID):
     flashcard = flashcard_service.duplicate(str(flashcard_id))

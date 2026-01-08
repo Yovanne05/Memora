@@ -36,7 +36,22 @@ class CollectionShareService(CollectionShareServiceInterface):
     def find_many(
         self, params: CollectionShareSearchParams
     ) -> Tuple[List[CollectionShareDTO], int]:
+        user = get_current_user()
         shares, total = collection_share_repository.find_many(params)
+
+        allowed_collections = permission_domain_service.get_accessible_collection_ids(
+            user.id, user.role
+        )
+        if allowed_collections is not None:
+            if not allowed_collections:
+                return [], 0
+            shares = [
+                share
+                for share in shares
+                if share.collection_id in allowed_collections
+            ]
+            total = len(shares)
+
         return [collection_share_to_dto(share) for share in shares], total
 
     def share_collection(

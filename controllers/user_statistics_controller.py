@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from querys.user_statistics_query import UserStatisticsTimeSeriesQuery
@@ -13,6 +14,7 @@ bp_user_statistics = Blueprint(
 
 
 @bp_user_statistics.get("/statistics")
+@jwt_required()
 @swag_from("../docs/users/statistics.yaml")
 def get_statistics():
     user = get_current_user()
@@ -21,11 +23,11 @@ def get_statistics():
 
 
 @bp_user_statistics.get("/statistics/timeseries")
+@jwt_required()
 @swag_from("../docs/users/statistics_timeseries.yaml")
 def get_statistics_timeseries():
     user = get_current_user()
 
-    # Validation Pydantic via Query DTO (pas de try/except nécessaire)
     raw_query = request.args.to_dict(flat=True)
     query = UserStatisticsTimeSeriesQuery.model_validate(raw_query)
 
