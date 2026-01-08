@@ -54,8 +54,8 @@ export function NoteQuickActionsDialogs({
             <AlertDialogHeader>
               <AlertDialogTitle>Supprimer la note</AlertDialogTitle>
               <AlertDialogDescription>
-                Êtes-vous sûr de vouloir supprimer "{note.title}" ? Cette action
-                est irréversible.
+                ?tes-vous s?r de vouloir supprimer "{note.title}" ? Cette action
+                est irr?versible.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useCollectionsQuery } from '@/features/collections/hooks/useCollectionsQuery'
+import { filterManageableCollections } from '@/features/collections/lib/collection-permissions'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useCreateNoteMutation } from './useCreateNoteMutation'
 import { useDeleteNoteMutation } from './useDeleteNoteMutation'
@@ -40,8 +41,9 @@ export function useNoteQuickActions({
   const canShare = canManage
   const canDelete = canManage
   const canDuplicate = isOwner
-  const collections = (collectionsData?.items ?? []).filter(
-    (collection) => collection.ownerId === userId
+  const collections = filterManageableCollections(
+    collectionsData?.items ?? [],
+    user
   )
   const moveCollections = canMove ? collections : []
 

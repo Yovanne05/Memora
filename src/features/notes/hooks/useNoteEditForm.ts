@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useCollectionsQuery } from '@/features/collections/hooks/useCollectionsQuery'
+import { filterManageableCollections } from '@/features/collections/lib/collection-permissions'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { formatTime } from '@/lib/format.utils'
 import { noteEditFormSchema } from '../schemas/note.schema'
@@ -25,8 +26,9 @@ export function useNoteEditForm({
   const { user } = useAuth()
   const { data: collectionsData, isLoading: loadingCollections } =
     useCollectionsQuery()
-  const collections = (collectionsData?.items ?? []).filter(
-    (collection) => collection.ownerId === user?.id
+  const collections = filterManageableCollections(
+    collectionsData?.items ?? [],
+    user
   )
 
   const form = useForm({

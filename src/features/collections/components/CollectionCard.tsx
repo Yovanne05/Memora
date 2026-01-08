@@ -8,6 +8,7 @@ import { buildCollectionCardActions } from './collection-card/actions'
 import { CollectionCardBadges } from './collection-card/CollectionCardBadges'
 import { CollectionCardFavoriteButton } from './collection-card/CollectionCardFavoriteButton'
 import { CollectionCardFooter } from './collection-card/CollectionCardFooter'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 interface CollectionCardProps {
   readonly collection: Collection
@@ -35,8 +36,14 @@ export const CollectionCard = memo(function CollectionCard({
   readOnly = false,
 }: Readonly<CollectionCardProps>) {
   const router = useRouter()
+  const { user } = useAuth()
   const favorite = collection.isFavorite === true
-  const canManage = collection.userPermission === 'owner'
+  const isOwner = Boolean(user && collection.ownerId === user.id)
+  const canManage =
+    collection.userPermission === 'owner' ||
+    isOwner ||
+    user?.role === 'admin' ||
+    user?.role === 'super_admin'
   const canWrite = canManage || collection.userPermission === 'write'
 
   const handleNavigate = useCallback(() => {
