@@ -1,17 +1,18 @@
-import { memo, useCallback } from "react"
-import { FileText } from "lucide-react"
-import { useRouter } from "@tanstack/react-router"
+import { memo, useCallback } from 'react'
+import { FileText } from 'lucide-react'
+import { useRouter } from '@tanstack/react-router'
 
-import type { Collection } from "../models/collection.model"
-import { ResourceCard } from "@/components/shared/ResourceCard"
-import { buildCollectionCardActions } from "./collection-card/actions"
-import { CollectionCardBadges } from "./collection-card/CollectionCardBadges"
-import { CollectionCardFavoriteButton } from "./collection-card/CollectionCardFavoriteButton"
-import { CollectionCardFooter } from "./collection-card/CollectionCardFooter"
+import type { Collection } from '../models/collection.model'
+import { ResourceCard } from '@/components/shared/ResourceCard'
+import { buildCollectionCardActions } from './collection-card/actions'
+import { CollectionCardBadges } from './collection-card/CollectionCardBadges'
+import { CollectionCardFavoriteButton } from './collection-card/CollectionCardFavoriteButton'
+import { CollectionCardFooter } from './collection-card/CollectionCardFooter'
 
 interface CollectionCardProps {
   readonly collection: Collection
   readonly onEdit?: (collection: Collection) => void
+  readonly onShare?: (collection: Collection) => void
   readonly onDelete?: (collection: Collection) => void
   readonly onCardClick?: (collection: Collection) => void
   readonly isSelected?: boolean
@@ -24,6 +25,7 @@ interface CollectionCardProps {
 export const CollectionCard = memo(function CollectionCard({
   collection,
   onEdit,
+  onShare,
   onDelete,
   onCardClick,
   isSelected = false,
@@ -37,7 +39,7 @@ export const CollectionCard = memo(function CollectionCard({
 
   const handleNavigate = useCallback(() => {
     router.navigate({
-      to: "/app/workspace/collections/$collectionId",
+      to: '/app/workspace/collections/$collectionId',
       params: { collectionId: collection.id },
     })
   }, [router, collection.id])
@@ -50,7 +52,12 @@ export const CollectionCard = memo(function CollectionCard({
     handleNavigate()
   }, [collection, handleNavigate, onCardClick])
 
-  const actions = buildCollectionCardActions({ collection, onEdit, onDelete })
+  const actions = buildCollectionCardActions({
+    collection,
+    onEdit,
+    onShare,
+    onDelete,
+  })
 
   return (
     <ResourceCard
@@ -72,7 +79,9 @@ export const CollectionCard = memo(function CollectionCard({
       compact={compact}
       readOnly={readOnly}
       badges={<CollectionCardBadges collection={collection} />}
-      footer={<CollectionCardFooter collection={collection} compact={compact} />}
+      footer={
+        <CollectionCardFooter collection={collection} compact={compact} />
+      }
     />
   )
 })
