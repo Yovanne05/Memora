@@ -1,20 +1,23 @@
-import type { Note } from "../models/note.model"
-import { NoteQuickActionsDialogs } from "./note-quick-actions/NoteQuickActionsDialogs"
-import { NoteQuickActionsMenu } from "./note-quick-actions/NoteQuickActionsMenu"
-import { useNoteQuickActions } from "../hooks/useNoteQuickActions"
+import { useEffect } from 'react'
+import type { Note } from '../models/note.model'
+import { NoteQuickActionsDialogs } from './note-quick-actions/NoteQuickActionsDialogs'
+import { NoteQuickActionsMenu } from './note-quick-actions/NoteQuickActionsMenu'
+import { useNoteQuickActions } from '../hooks/useNoteQuickActions'
 
 interface NoteQuickActionsProps {
   readonly note: Note
   readonly onActionComplete?: () => void
-  readonly triggerVariant?: "ghost" | "outline" | "default"
+  readonly triggerVariant?: 'ghost' | 'outline' | 'default'
   readonly showLabel?: boolean
+  readonly onInteractionChange?: (isInteracting: boolean) => void
 }
 
 export function NoteQuickActions({
   note,
   onActionComplete,
-  triggerVariant = "ghost",
+  triggerVariant = 'ghost',
   showLabel = false,
+  onInteractionChange,
 }: Readonly<NoteQuickActionsProps>) {
   const {
     collections,
@@ -30,6 +33,12 @@ export function NoteQuickActions({
     handleDuplicate,
     handleDelete,
   } = useNoteQuickActions({ note, onActionComplete })
+
+  const isInteracting = isDropdownOpen || shareDialogOpen || deleteDialogOpen
+
+  useEffect(() => {
+    onInteractionChange?.(isInteracting)
+  }, [isInteracting, onInteractionChange])
 
   return (
     <>
@@ -66,4 +75,3 @@ export function NoteQuickActions({
     </>
   )
 }
-

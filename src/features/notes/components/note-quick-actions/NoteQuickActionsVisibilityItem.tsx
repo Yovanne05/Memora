@@ -1,6 +1,6 @@
-import { Eye, EyeOff } from "lucide-react"
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import type { Note } from "../../models/note.model"
+import { Eye, EyeOff } from 'lucide-react'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import type { Note } from '../../models/note.model'
 
 type NoteQuickActionsVisibilityItemProps = {
   note: Note
@@ -14,8 +14,15 @@ export function NoteQuickActionsVisibilityItem({
   onToggleVisibility,
 }: Readonly<NoteQuickActionsVisibilityItemProps>) {
   return (
-    <DropdownMenuItem onClick={onToggleVisibility} disabled={isPending}>
-      {note.visibility === "private" ? (
+    <DropdownMenuItem
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        onToggleVisibility()
+      }}
+      disabled={isPending}
+    >
+      {note.visibility === 'private' ? (
         <>
           <Eye className="h-4 w-4" />
           Rendre publique

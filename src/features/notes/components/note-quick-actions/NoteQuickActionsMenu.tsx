@@ -1,9 +1,12 @@
-import { MoreVertical } from "lucide-react"
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import type { Note } from "../../models/note.model"
-import type { Collection } from "@/features/collections/models/collection.model"
-import { NoteQuickActionsMenuContent } from "./NoteQuickActionsMenuContent"
+import { MoreVertical } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import type { Note } from '../../models/note.model'
+import type { Collection } from '@/features/collections/models/collection.model'
+import { NoteQuickActionsMenuContent } from './NoteQuickActionsMenuContent'
 
 type NoteQuickActionsMenuProps = {
   note: Note
@@ -16,7 +19,7 @@ type NoteQuickActionsMenuProps = {
   onOpenShare: () => void
   onDuplicate: () => void
   onOpenDelete: () => void
-  triggerVariant: "ghost" | "outline" | "default"
+  triggerVariant: 'ghost' | 'outline' | 'default'
   showLabel: boolean
 }
 
@@ -39,12 +42,16 @@ export function NoteQuickActionsMenu({
       <DropdownMenuTrigger asChild>
         <Button
           variant={triggerVariant}
-          size={showLabel ? "sm" : "icon"}
-          className={showLabel ? "gap-2" : ""}
+          size={showLabel ? 'sm' : 'icon'}
+          className={showLabel ? 'gap-2' : ''}
           disabled={isPending}
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+          }}
         >
           <MoreVertical className="h-4 w-4" />
-          {showLabel && "Actions"}
+          {showLabel && 'Actions'}
         </Button>
       </DropdownMenuTrigger>
       <NoteQuickActionsMenuContent

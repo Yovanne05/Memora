@@ -1,13 +1,13 @@
-import { Copy, Trash2, Users } from "lucide-react"
+import { Copy, Trash2, Users } from 'lucide-react'
 import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import type { Note } from "../../models/note.model"
-import type { Collection } from "@/features/collections/models/collection.model"
-import { NoteQuickActionsMoveSubmenu } from "./NoteQuickActionsMoveSubmenu"
-import { NoteQuickActionsVisibilityItem } from "./NoteQuickActionsVisibilityItem"
+} from '@/components/ui/dropdown-menu'
+import type { Note } from '../../models/note.model'
+import type { Collection } from '@/features/collections/models/collection.model'
+import { NoteQuickActionsMoveSubmenu } from './NoteQuickActionsMoveSubmenu'
+import { NoteQuickActionsVisibilityItem } from './NoteQuickActionsVisibilityItem'
 
 type NoteQuickActionsMenuContentProps = {
   note: Note
@@ -63,14 +63,29 @@ export function NoteQuickActionsMenuContent({
 
       <DropdownMenuSeparator />
 
-      <DropdownMenuItem onClick={onDuplicate} disabled={isPending}>
+      <DropdownMenuItem
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          onDuplicate()
+        }}
+        disabled={isPending}
+      >
         <Copy className="h-4 w-4" />
         Dupliquer
       </DropdownMenuItem>
 
       <DropdownMenuSeparator />
 
-      <DropdownMenuItem variant="destructive" onClick={onOpenDelete} disabled={isPending}>
+      <DropdownMenuItem
+        variant="destructive"
+        onClick={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          onOpenDelete()
+        }}
+        disabled={isPending}
+      >
         <Trash2 className="h-4 w-4" />
         Supprimer
       </DropdownMenuItem>
