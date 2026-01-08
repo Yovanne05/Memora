@@ -106,7 +106,7 @@ def mock_report_service(monkeypatch):
 def mock_collection_favorite_service(monkeypatch):
     """Mock du service de favoris de collection."""
     mock = Mock()
-    monkeypatch.setattr("controllers.favorite_controller.collection_favorite_service", mock)
+    monkeypatch.setattr("controllers.collection_favorite_controller.collection_favorite_service", mock)
     return mock
 
 
@@ -114,7 +114,7 @@ def mock_collection_favorite_service(monkeypatch):
 def mock_note_favorite_service(monkeypatch):
     """Mock du service de favoris de note."""
     mock = Mock()
-    monkeypatch.setattr("controllers.favorite_controller.note_favorite_service", mock)
+    monkeypatch.setattr("controllers.note_favorite_controller.note_favorite_service", mock)
     return mock
 
 

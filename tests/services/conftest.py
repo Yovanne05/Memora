@@ -6,6 +6,7 @@ Cela permet de tester uniquement la logique métier des services
 sans dépendre de la base de données.
 """
 import pytest
+from datetime import datetime
 from unittest.mock import Mock, MagicMock
 
 
@@ -21,6 +22,8 @@ def mock_user_repository(monkeypatch):
     # Mock aussi dans les services qui l'utilisent
     monkeypatch.setattr("services.impl.user_service_impl.user_repository", mock)
     monkeypatch.setattr("services.impl.auth_service_impl.user_repository", mock)
+    monkeypatch.setattr("services.impl.note.note_crud_service_impl.user_repository", mock)
+    monkeypatch.setattr("services.impl.collection.collection_share_service_impl.user_repository", mock)
     return mock
 
 
@@ -30,6 +33,8 @@ def mock_collection_repository(monkeypatch):
     mock = Mock()
     monkeypatch.setattr("repositorys.collection_repository", mock)
     monkeypatch.setattr("services.impl.collection.collection_service_impl.collection_repository", mock)
+    monkeypatch.setattr("services.impl.collection.collection_share_service_impl.collection_repository", mock)
+    monkeypatch.setattr("services.impl.note.note_crud_service_impl.collection_repository", mock)
     return mock
 
 
@@ -57,6 +62,7 @@ def mock_note_repository(monkeypatch):
     mock = Mock()
     monkeypatch.setattr("repositorys.note_repository", mock)
     monkeypatch.setattr("services.impl.note.note_crud_service_impl.note_repository", mock)
+    monkeypatch.setattr("services.impl.note.flashcard_service_impl.note_repository", mock)
     return mock
 
 

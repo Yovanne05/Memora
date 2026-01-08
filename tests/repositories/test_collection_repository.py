@@ -10,6 +10,7 @@ Ces tests vérifient l'interaction avec la base de données :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
 from daos.collection_dao import Collection

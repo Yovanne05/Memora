@@ -26,7 +26,8 @@ class TestReviewServiceSubmit:
     def test_submit_review_success(self, mock_flashcard_repository, mock_review_repository, monkeypatch):
         """Soumettre une review met à jour l'algorithme SM-2."""
         from services.impl.review_service_impl import review_service
-        from daos.flashcard_dao import Flashcard, Answer
+        from daos.flashcard_dao import Flashcard
+        from daos.flashcard_answer_dao import FlashcardAnswer
 
         # Arrange
         user_id = str(uuid4())
@@ -38,8 +39,10 @@ class TestReviewServiceSubmit:
             question="Question?",
             note_id=str(uuid4()),
             answers=[
-                Answer(id=answer_id, text="Answer", is_correct=True)
-            ]
+                FlashcardAnswer(id=answer_id, flashcard_id=flashcard_id, answer_text="Answer", is_correct=True, created_at=datetime.now())
+            ],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_flashcard_repository.find_one_unscoped.return_value = flashcard
         mock_review_repository.get_review.return_value = None
@@ -55,7 +58,8 @@ class TestReviewServiceSubmit:
             repetitions=1,
             interval_days=1,
             next_review_at=datetime.now(timezone.utc),
-            reviewed_at=datetime.now(timezone.utc)
+            reviewed_at=datetime.now(timezone.utc),
+            created_at=datetime.now()
         )
         mock_review_repository.upsert_review.return_value = saved_review
 
@@ -82,14 +86,18 @@ class TestReviewServiceSubmit:
     def test_submit_review_invalid_answer(self, mock_flashcard_repository):
         """Soumettre une review avec un answer_id invalide lève InvalidAnswerForFlashcard."""
         from services.impl.review_service_impl import review_service
-        from daos.flashcard_dao import Flashcard, Answer
+        from daos.flashcard_dao import Flashcard
+        from daos.flashcard_answer_dao import FlashcardAnswer
 
         # Arrange
+        flashcard_id = str(uuid4())
         flashcard = Flashcard(
-            id=str(uuid4()),
+            id=flashcard_id,
             question="Q?",
             note_id=str(uuid4()),
-            answers=[Answer(id=str(uuid4()), text="A", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=flashcard_id, answer_text="A", is_correct=True, created_at=datetime.now())],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_flashcard_repository.find_one_unscoped.return_value = flashcard
 

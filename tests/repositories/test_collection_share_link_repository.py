@@ -10,11 +10,12 @@ Ces tests vérifient :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
 from daos.collection_share_link_dao import CollectionShareLink
 from repositorys import collection_share_link_repository
-from utils.enums import PermissionEnum
+from utils.enums import SharePermissionEnum
 
 
 class TestCollectionShareLinkRepositoryAdd:
@@ -29,8 +30,7 @@ class TestCollectionShareLinkRepositoryAdd:
         link = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="abc123xyz",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
 
         # Act
@@ -40,7 +40,7 @@ class TestCollectionShareLinkRepositoryAdd:
         assert result.id is not None
         assert result.collection_id == collection_id
         assert result.token == "abc123xyz"
-        assert result.permission == PermissionEnum.READ
+        assert result.permission == SharePermissionEnum.READ
 
 
 class TestCollectionShareLinkRepositoryFind:
@@ -55,8 +55,7 @@ class TestCollectionShareLinkRepositoryFind:
         link = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="test-token",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         added = collection_share_link_repository.add(link)
 
@@ -77,8 +76,7 @@ class TestCollectionShareLinkRepositoryFind:
         link = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="unique-token",
-            permission=PermissionEnum.WRITE
+            permission=SharePermissionEnum.WRITE
         )
         collection_share_link_repository.add(link)
 
@@ -105,14 +103,12 @@ class TestCollectionShareLinkRepositoryList:
         link1 = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="token1",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         link2 = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="token2",
-            permission=PermissionEnum.WRITE
+            permission=SharePermissionEnum.WRITE
         )
         collection_share_link_repository.add(link1)
         collection_share_link_repository.add(link2)
@@ -140,8 +136,7 @@ class TestCollectionShareLinkRepositoryDelete:
         link = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="to-delete",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         added = collection_share_link_repository.add(link)
 

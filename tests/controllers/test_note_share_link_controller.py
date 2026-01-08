@@ -19,7 +19,7 @@ class TestNoteShareLinkControllerList:
     def test_list_share_links_returns_200(self, app_client, mock_note_share_link_service):
         """Le endpoint GET /notes/<id>/public-links retourne 200."""
         from dtos.note_share_link_dto import NoteShareLinkDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         note_id = str(uuid4())
@@ -27,8 +27,7 @@ class TestNoteShareLinkControllerList:
             NoteShareLinkDTO(
                 id=str(uuid4()),
                 note_id=note_id,
-                token="abc123",
-                permission=PermissionEnum.READ,
+                permission=SharePermissionEnum.READ,
                 created_at="2024-01-01T00:00:00Z"
             )
         ]
@@ -51,15 +50,14 @@ class TestNoteShareLinkControllerCreate:
     def test_create_share_link_returns_201(self, app_client, mock_note_share_link_service):
         """Le endpoint POST /notes/<id>/public-links retourne 201."""
         from dtos.note_share_link_dto import NoteShareLinkDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         note_id = str(uuid4())
         link = NoteShareLinkDTO(
             id=str(uuid4()),
             note_id=note_id,
-            token="xyz789",
-            permission=PermissionEnum.READ,
+            permission=SharePermissionEnum.READ,
             created_at="2024-01-01T00:00:00Z"
         )
         mock_note_share_link_service.create_share_link.return_value = link

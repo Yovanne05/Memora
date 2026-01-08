@@ -19,7 +19,7 @@ class TestCollectionShareLinkControllerList:
     def test_list_share_links_returns_200(self, app_client, mock_collection_share_link_service):
         """Le endpoint GET /collections/<id>/public-links retourne 200."""
         from dtos.collection_share_link_dto import CollectionShareLinkDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         collection_id = str(uuid4())
@@ -27,8 +27,7 @@ class TestCollectionShareLinkControllerList:
             CollectionShareLinkDTO(
                 id=str(uuid4()),
                 collection_id=collection_id,
-                token="abc123",
-                permission=PermissionEnum.READ,
+                permission=SharePermissionEnum.READ,
                 created_at="2024-01-01T00:00:00Z"
             )
         ]
@@ -51,15 +50,14 @@ class TestCollectionShareLinkControllerCreate:
     def test_create_share_link_returns_201(self, app_client, mock_collection_share_link_service):
         """Le endpoint POST /collections/<id>/public-links retourne 201."""
         from dtos.collection_share_link_dto import CollectionShareLinkDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         collection_id = str(uuid4())
         link = CollectionShareLinkDTO(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="xyz789",
-            permission=PermissionEnum.READ,
+            permission=SharePermissionEnum.READ,
             created_at="2024-01-01T00:00:00Z"
         )
         mock_collection_share_link_service.create_share_link.return_value = link

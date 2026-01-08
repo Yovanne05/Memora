@@ -24,7 +24,7 @@ class TestCollectionShareLinkServiceCreate:
         """Créer un lien public de partage."""
         from services.impl.collection.collection_share_link_service_impl import collection_share_link_service
         from daos.collection_dao import Collection
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         owner_id = str(uuid4())
@@ -36,12 +36,11 @@ class TestCollectionShareLinkServiceCreate:
         link = CollectionShareLink(
             id=str(uuid4()),
             collection_id=collection_id,
-            token="abc123",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         mock_collection_share_link_repository.add.return_value = link
 
-        payload = CollectionShareLinkCreateDTO(permission=PermissionEnum.READ)
+        payload = CollectionShareLinkCreateDTO(permission=SharePermissionEnum.READ)
 
         # Act
         result = collection_share_link_service.create_share_link(collection_id, payload)
@@ -61,7 +60,7 @@ class TestCollectionShareLinkServiceList:
         from services.impl.collection.collection_share_link_service_impl import collection_share_link_service
         from daos.collection_dao import Collection
         from daos.user_dao import User
-        from utils.enums import RoleEnum, PermissionEnum
+        from utils.enums import RoleEnum, SharePermissionEnum
         from repositorys.collection_share_link_repository import CollectionShareLinkSearchParams
 
         # Arrange
@@ -78,8 +77,7 @@ class TestCollectionShareLinkServiceList:
             CollectionShareLink(
                 id=str(uuid4()),
                 collection_id=collection_id,
-                token="abc123",
-                permission=PermissionEnum.READ
+                permission=SharePermissionEnum.READ
             )
         ]
         mock_collection_share_link_repository.find_many.return_value = (links, 1)

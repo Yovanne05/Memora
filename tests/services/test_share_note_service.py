@@ -13,7 +13,7 @@ import pytest
 from uuid import uuid4
 
 from dtos.note_share_dto import NoteShareDTO, NoteShareCreateDTO, NoteShareUpdateDTO
-from daos.note_share_dao import NoteShare
+from daos.note_dao import NoteShare
 from exceptions.note_share_exception import NoteShareNotFound
 
 
@@ -25,7 +25,7 @@ class TestNoteShareServiceCreate:
         from services.impl.note.note_share_service_impl import note_share_service
         from daos.note_dao import Note
         from daos.user_dao import User
-        from utils.enums import RoleEnum, PermissionEnum
+        from utils.enums import RoleEnum, SharePermissionEnum
 
         # Arrange
         owner_id = str(uuid4())
@@ -46,13 +46,13 @@ class TestNoteShareServiceCreate:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         mock_note_share_repository.add.return_value = share
 
         monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
 
-        payload = NoteShareCreateDTO(user_id=user_id, permission=PermissionEnum.READ)
+        payload = NoteShareCreateDTO(user_id=user_id, permission=SharePermissionEnum.READ)
 
         # Act
         result = note_share_service.share_note(note_id, payload)
@@ -72,7 +72,7 @@ class TestNoteShareServiceUpdate:
         from services.impl.note.note_share_service_impl import note_share_service
         from daos.note_dao import Note
         from daos.user_dao import User
-        from utils.enums import RoleEnum, PermissionEnum
+        from utils.enums import RoleEnum, SharePermissionEnum
 
         # Arrange
         owner_id = str(uuid4())
@@ -88,14 +88,14 @@ class TestNoteShareServiceUpdate:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         mock_note_share_repository.find_one.return_value = share
         mock_note_share_repository.update.return_value = share
 
         monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
 
-        payload = NoteShareUpdateDTO(permission=PermissionEnum.WRITE)
+        payload = NoteShareUpdateDTO(permission=SharePermissionEnum.WRITE)
 
         # Act
         result = note_share_service.update_share(note_id, user_id, payload)

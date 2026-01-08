@@ -10,11 +10,12 @@ Ces tests vérifient :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
 from daos.note_share_link_dao import NoteShareLink
 from repositorys import note_share_link_repository
-from utils.enums import PermissionEnum
+from utils.enums import SharePermissionEnum
 
 
 class TestNoteShareLinkRepositoryAdd:
@@ -30,8 +31,7 @@ class TestNoteShareLinkRepositoryAdd:
         link = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="abc123xyz",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
 
         # Act
@@ -41,7 +41,7 @@ class TestNoteShareLinkRepositoryAdd:
         assert result.id is not None
         assert result.note_id == note_id
         assert result.token == "abc123xyz"
-        assert result.permission == PermissionEnum.READ
+        assert result.permission == SharePermissionEnum.READ
 
 
 class TestNoteShareLinkRepositoryFind:
@@ -57,8 +57,7 @@ class TestNoteShareLinkRepositoryFind:
         link = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="test-token",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         added = note_share_link_repository.add(link)
 
@@ -80,8 +79,7 @@ class TestNoteShareLinkRepositoryFind:
         link = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="unique-token",
-            permission=PermissionEnum.WRITE
+            permission=SharePermissionEnum.WRITE
         )
         note_share_link_repository.add(link)
 
@@ -109,14 +107,12 @@ class TestNoteShareLinkRepositoryList:
         link1 = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="token1",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         link2 = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="token2",
-            permission=PermissionEnum.WRITE
+            permission=SharePermissionEnum.WRITE
         )
         note_share_link_repository.add(link1)
         note_share_link_repository.add(link2)
@@ -145,8 +141,7 @@ class TestNoteShareLinkRepositoryDelete:
         link = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="to-delete",
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         added = note_share_link_repository.add(link)
 

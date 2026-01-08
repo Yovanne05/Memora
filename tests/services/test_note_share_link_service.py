@@ -24,7 +24,7 @@ class TestNoteShareLinkServiceCreate:
         """Créer un lien public de partage."""
         from services.impl.note.note_share_link_service_impl import note_share_link_service
         from daos.note_dao import Note
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         owner_id = str(uuid4())
@@ -36,12 +36,12 @@ class TestNoteShareLinkServiceCreate:
         link = NoteShareLink(
             id=str(uuid4()),
             note_id=note_id,
-            token="abc123",
-            permission=PermissionEnum.READ
+            # REMOVED TOKEN,
+            permission=SharePermissionEnum.READ
         )
         mock_note_share_link_repository.add.return_value = link
 
-        payload = NoteShareLinkCreateDTO(permission=PermissionEnum.READ)
+        payload = NoteShareLinkCreateDTO(permission=SharePermissionEnum.READ)
 
         # Act
         result = note_share_link_service.create_share_link(note_id, payload)
@@ -61,7 +61,7 @@ class TestNoteShareLinkServiceList:
         from services.impl.note.note_share_link_service_impl import note_share_link_service
         from daos.note_dao import Note
         from daos.user_dao import User
-        from utils.enums import RoleEnum, PermissionEnum
+        from utils.enums import RoleEnum, SharePermissionEnum
         from repositorys.note_share_link_repository import NoteShareLinkSearchParams
 
         # Arrange
@@ -78,8 +78,8 @@ class TestNoteShareLinkServiceList:
             NoteShareLink(
                 id=str(uuid4()),
                 note_id=note_id,
-                token="abc123",
-                permission=PermissionEnum.READ
+                # REMOVED TOKEN,
+                permission=SharePermissionEnum.READ
             )
         ]
         mock_note_share_link_repository.find_many.return_value = (links, 1)

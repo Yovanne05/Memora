@@ -3,6 +3,7 @@ Tests pour le service statistics.
 Mock le repository statistics_repository.
 """
 import pytest
+from datetime import datetime
 
 # TODO: Migrer la logique métier
 # Voir les exemples dans test_collection_service.py

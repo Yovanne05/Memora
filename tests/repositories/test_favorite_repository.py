@@ -9,6 +9,7 @@ Ces tests vérifient :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
 from daos.favorite_dao import NoteFavorite, CollectionFavorite
@@ -26,7 +27,7 @@ class TestNoteFavoriteRepository:
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
         favorite = NoteFavorite(
-            id=str(uuid4()),
+            
             user_id=user_id,
             note_id=note_id
         )
@@ -46,7 +47,7 @@ class TestNoteFavoriteRepository:
         collection_id = test_factory.create_collection(owner_id=user_id)
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
-        favorite = NoteFavorite(id=str(uuid4()), user_id=user_id, note_id=note_id)
+        favorite = NoteFavorite(user_id=user_id, note_id=note_id)
         note_favorite_repository.add(favorite)
 
         # Act
@@ -64,7 +65,7 @@ class TestNoteFavoriteRepository:
         collection_id = test_factory.create_collection(owner_id=user_id)
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
-        favorite = NoteFavorite(id=str(uuid4()), user_id=user_id, note_id=note_id)
+        favorite = NoteFavorite(user_id=user_id, note_id=note_id)
         added = note_favorite_repository.add(favorite)
 
         # Act
@@ -85,7 +86,7 @@ class TestCollectionFavoriteRepository:
         collection_id = test_factory.create_collection(owner_id=user_id)
 
         favorite = CollectionFavorite(
-            id=str(uuid4()),
+            
             user_id=user_id,
             collection_id=collection_id
         )
@@ -104,7 +105,7 @@ class TestCollectionFavoriteRepository:
         user_id = test_factory.create_user()
         collection_id = test_factory.create_collection(owner_id=user_id)
 
-        favorite = CollectionFavorite(id=str(uuid4()), user_id=user_id, collection_id=collection_id)
+        favorite = CollectionFavorite(user_id=user_id, collection_id=collection_id)
         collection_favorite_repository.add(favorite)
 
         # Act

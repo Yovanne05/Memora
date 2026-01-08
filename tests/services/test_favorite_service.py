@@ -40,7 +40,7 @@ class TestNoteFavoriteService:
         mock_note_repository.get_for_user.return_value = note
         mock_note_favorite_repository.find_one.return_value = None
 
-        favorite = NoteFavorite(id=str(uuid4()), user_id=user_id, note_id=note_id)
+        favorite = NoteFavorite(user_id=user_id, note_id=note_id)
         mock_note_favorite_repository.add.return_value = favorite
 
         # Act
@@ -65,7 +65,7 @@ class TestNoteFavoriteService:
         current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
         monkeypatch.setattr("services.impl.favorite.note_favorite_service_impl.get_current_user", lambda: current_user)
 
-        favorite = NoteFavorite(id=str(uuid4()), user_id=user_id, note_id=note_id)
+        favorite = NoteFavorite(user_id=user_id, note_id=note_id)
         mock_note_favorite_repository.find_one.return_value = favorite
         mock_note_favorite_repository.delete.return_value = None
 
@@ -98,7 +98,7 @@ class TestCollectionFavoriteService:
         mock_collection_repository.get_for_user.return_value = collection
         mock_collection_favorite_repository.find_one.return_value = None
 
-        favorite = CollectionFavorite(id=str(uuid4()), user_id=user_id, collection_id=collection_id)
+        favorite = CollectionFavorite(user_id=user_id, collection_id=collection_id)
         mock_collection_favorite_repository.add.return_value = favorite
 
         # Act

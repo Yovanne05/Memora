@@ -12,10 +12,13 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
+from unittest.mock import Mock
+from datetime import datetime
 
 from dtos.flashcard_dto import FlashcardDTO, FlashcardCreateDTO, FlashcardUpdateDTO
 from dtos.flashcard_answer_dto import FlashcardAnswerCreateDTO
-from daos.flashcard_dao import Flashcard, FlashcardAnswer
+from daos.flashcard_dao import Flashcard
+from daos.flashcard_answer_dao import FlashcardAnswer
 from exceptions.flashcard_exception import (
     FlashcardNotFound,
     FlashcardMustHaveAnswers,
@@ -38,17 +41,34 @@ class TestFlashcardServiceCreate:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=user_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id,
+            title="Test Note",
+            content="",
+            owner_id=user_id,
+            collection_id=str(uuid4()),
+            tags=[],
+            shares=[],
+            share_links=[],
+            flashcards=[],
+            reports=[],
+            outgoing_links=[],
+            incoming_links=[],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         flashcard = Flashcard(
             id=str(uuid4()),
             question="Question?",
             note_id=note_id,
-            answers=[FlashcardAnswer(id=str(uuid4()), answer_text="Answer", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=str(uuid4()), answer_text="Answer", is_correct=True, created_at=datetime.now())],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_flashcard_repository.add.return_value = flashcard
 
@@ -69,7 +89,8 @@ class TestFlashcardServiceCreate:
         mock_flashcard_repository.add.assert_called_once()
 
     def test_create_flashcard_no_answers_raises_exception(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
-        """Créer une flashcard sans réponses lève FlashcardMustHaveAnswers."""
+        """Créer une flashcard sans réponses lève une ValidationError (validation Pydantic)."""
+        from pydantic import ValidationError
         from services.impl.note.flashcard_service_impl import flashcard_service
         from daos.note_dao import Note
         from daos.user_dao import User
@@ -79,19 +100,32 @@ class TestFlashcardServiceCreate:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=user_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id,
+            title="Test Note",
+            content="",
+            owner_id=user_id,
+            collection_id=str(uuid4()),
+            tags=[],
+            shares=[],
+            share_links=[],
+            flashcards=[],
+            reports=[],
+            outgoing_links=[],
+            incoming_links=[],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.permission_domain_service.can_write_note", lambda *args: True)
 
-        payload = FlashcardCreateDTO(question="Question?", answers=[])
-
         # Act & Assert
-        with pytest.raises(FlashcardMustHaveAnswers):
-            flashcard_service.create(note_id, payload)
+        with pytest.raises(ValidationError):
+            payload = FlashcardCreateDTO(question="Question?", answers=[])
 
     def test_create_flashcard_no_correct_answer_raises_exception(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
         """Créer une flashcard sans réponse correcte lève FlashcardMustHaveAtLeastOneCorrectAnswer."""
@@ -104,10 +138,25 @@ class TestFlashcardServiceCreate:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=user_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id,
+            title="Test Note",
+            content="",
+            owner_id=user_id,
+            collection_id=str(uuid4()),
+            tags=[],
+            shares=[],
+            share_links=[],
+            flashcards=[],
+            reports=[],
+            outgoing_links=[],
+            incoming_links=[],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.permission_domain_service.can_write_note", lambda *args: True)
@@ -135,14 +184,16 @@ class TestFlashcardServiceUpdate:
         user_id = str(uuid4())
         flashcard_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
         flashcard = Flashcard(
             id=flashcard_id,
             question="Old question?",
             note_id=str(uuid4()),
-            answers=[FlashcardAnswer(id=str(uuid4()), answer_text="Answer", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=str(uuid4()), answer_text="Answer", is_correct=True, created_at=datetime.now())],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_flashcard_repository.find_one_unscoped.return_value = flashcard
         mock_flashcard_repository.update.return_value = flashcard
@@ -172,7 +223,7 @@ class TestFlashcardServiceDelete:
         user_id = str(uuid4())
         flashcard_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
         flashcard = Flashcard(
@@ -208,25 +259,44 @@ class TestFlashcardServiceDuplicate:
         flashcard_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT)
+        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
         source_flashcard = Flashcard(
             id=flashcard_id,
             question="Original?",
             note_id=note_id,
-            answers=[FlashcardAnswer(id=str(uuid4()), answer_text="Answer", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=str(uuid4()), answer_text="Answer", is_correct=True, created_at=datetime.now())],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_flashcard_repository.find_one_unscoped.return_value = source_flashcard
 
-        note = Note(id=note_id, title="Test Note", content="", owner_id=user_id, collection_id=str(uuid4()))
+        note = Note(
+            id=note_id,
+            title="Test Note",
+            content="",
+            owner_id=user_id,
+            collection_id=str(uuid4()),
+            tags=[],
+            shares=[],
+            share_links=[],
+            flashcards=[],
+            reports=[],
+            outgoing_links=[],
+            incoming_links=[],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
         mock_note_repository.find_one_unscoped.return_value = note
 
         duplicated = Flashcard(
             id=str(uuid4()),
             question="Original?",
             note_id=note_id,
-            answers=[FlashcardAnswer(id=str(uuid4()), answer_text="Answer", is_correct=True)]
+            answers=[FlashcardAnswer(id=str(uuid4()), flashcard_id=str(uuid4()), answer_text="Answer", is_correct=True, created_at=datetime.now())],
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
         mock_flashcard_repository.add.return_value = duplicated
 

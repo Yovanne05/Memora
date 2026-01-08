@@ -9,11 +9,12 @@ Ces tests vérifient :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
-from daos.collection_share_dao import CollectionShare
+from daos.collection_dao import CollectionShare
 from repositorys import collection_share_repository
-from utils.enums import PermissionEnum
+from utils.enums import SharePermissionEnum
 
 
 class TestCollectionShareRepositoryAdd:
@@ -30,7 +31,7 @@ class TestCollectionShareRepositoryAdd:
             id=str(uuid4()),
             collection_id=collection_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
 
         # Act
@@ -40,7 +41,7 @@ class TestCollectionShareRepositoryAdd:
         assert result.id is not None
         assert result.collection_id == collection_id
         assert result.user_id == user_id
-        assert result.permission == PermissionEnum.READ
+        assert result.permission == SharePermissionEnum.READ
 
 
 class TestCollectionShareRepositoryFind:
@@ -57,7 +58,7 @@ class TestCollectionShareRepositoryFind:
             id=str(uuid4()),
             collection_id=collection_id,
             user_id=user_id,
-            permission=PermissionEnum.WRITE
+            permission=SharePermissionEnum.WRITE
         )
         collection_share_repository.add(share)
 
@@ -68,7 +69,7 @@ class TestCollectionShareRepositoryFind:
         assert result is not None
         assert result.collection_id == collection_id
         assert result.user_id == user_id
-        assert result.permission == PermissionEnum.WRITE
+        assert result.permission == SharePermissionEnum.WRITE
 
 
 class TestCollectionShareRepositoryDelete:
@@ -85,7 +86,7 @@ class TestCollectionShareRepositoryDelete:
             id=str(uuid4()),
             collection_id=collection_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         added = collection_share_repository.add(share)
 

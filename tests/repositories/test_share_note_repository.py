@@ -9,11 +9,12 @@ Ces tests vérifient :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
-from daos.note_share_dao import NoteShare
+from daos.note_dao import NoteShare
 from repositorys import note_share_repository
-from utils.enums import PermissionEnum
+from utils.enums import SharePermissionEnum
 
 
 class TestNoteShareRepositoryAdd:
@@ -30,7 +31,7 @@ class TestNoteShareRepositoryAdd:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
 
         # Act
@@ -39,7 +40,7 @@ class TestNoteShareRepositoryAdd:
         # Assert
         assert result.note_id == note_id
         assert result.user_id == user_id
-        assert result.permission == PermissionEnum.READ
+        assert result.permission == SharePermissionEnum.READ
 
 
 class TestNoteShareRepositoryFind:
@@ -56,7 +57,7 @@ class TestNoteShareRepositoryFind:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.WRITE
+            permission=SharePermissionEnum.WRITE
         )
         note_share_repository.add(share)
 
@@ -67,7 +68,7 @@ class TestNoteShareRepositoryFind:
         assert result is not None
         assert result.note_id == note_id
         assert result.user_id == user_id
-        assert result.permission == PermissionEnum.WRITE
+        assert result.permission == SharePermissionEnum.WRITE
 
 
 class TestNoteShareRepositoryUpdate:
@@ -84,20 +85,20 @@ class TestNoteShareRepositoryUpdate:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         added = note_share_repository.add(share)
 
         # Act
-        added.permission = PermissionEnum.WRITE
+        added.permission = SharePermissionEnum.WRITE
         result = note_share_repository.update(added)
 
         # Assert
-        assert result.permission == PermissionEnum.WRITE
+        assert result.permission == SharePermissionEnum.WRITE
 
         # Verify in DB
         found = note_share_repository.find_one(note_id, user_id)
-        assert found.permission == PermissionEnum.WRITE
+        assert found.permission == SharePermissionEnum.WRITE
 
 
 class TestNoteShareRepositoryDelete:
@@ -114,7 +115,7 @@ class TestNoteShareRepositoryDelete:
         share = NoteShare(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.READ
+            permission=SharePermissionEnum.READ
         )
         note_share_repository.add(share)
 

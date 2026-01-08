@@ -20,7 +20,7 @@ class TestShareNoteControllerList:
     def test_list_shares_returns_200(self, app_client, mock_note_share_service):
         """Le endpoint GET /notes/<id>/shares retourne 200."""
         from dtos.note_share_dto import NoteShareDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         note_id = str(uuid4())
@@ -28,7 +28,7 @@ class TestShareNoteControllerList:
             NoteShareDTO(
                 note_id=note_id,
                 user_id=str(uuid4()),
-                permission=PermissionEnum.READ,
+                permission=SharePermissionEnum.READ,
                 created_at="2024-01-01T00:00:00Z"
             )
         ]
@@ -51,7 +51,7 @@ class TestShareNoteControllerCreate:
     def test_create_share_returns_201(self, app_client, mock_note_share_service):
         """Le endpoint POST /notes/<id>/shares retourne 201."""
         from dtos.note_share_dto import NoteShareDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         note_id = str(uuid4())
@@ -60,7 +60,7 @@ class TestShareNoteControllerCreate:
         share = NoteShareDTO(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.WRITE,
+            permission=SharePermissionEnum.WRITE,
             created_at="2024-01-01T00:00:00Z"
         )
         mock_note_share_service.share_note.return_value = share
@@ -87,7 +87,7 @@ class TestShareNoteControllerUpdate:
     def test_update_share_returns_200(self, app_client, mock_note_share_service):
         """Le endpoint PATCH /notes/<id>/shares/<user_id> retourne 200."""
         from dtos.note_share_dto import NoteShareDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         note_id = str(uuid4())
@@ -96,7 +96,7 @@ class TestShareNoteControllerUpdate:
         share = NoteShareDTO(
             note_id=note_id,
             user_id=user_id,
-            permission=PermissionEnum.WRITE,
+            permission=SharePermissionEnum.WRITE,
             created_at="2024-01-01T00:00:00Z"
         )
         mock_note_share_service.update_share.return_value = share

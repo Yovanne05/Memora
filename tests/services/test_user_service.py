@@ -11,7 +11,9 @@ Ces tests vérifient la logique métier du service user :
 Les repositories sont MOCKÉS pour isoler la logique du service.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
+from unittest.mock import Mock
 
 from dtos.user_dto import UserCreateDTO, UserUpdateDTO, UserDTO
 from daos.user_dao import User
@@ -23,7 +25,7 @@ from repositorys.user_repository import UserSearchParams
 class TestUserServiceCreate:
     """Tests pour la création d'utilisateur"""
 
-    def test_create_user_success(self, mock_user_repository):
+    def test_create_user_success(self, mock_user_repository, monkeypatch):
         """Créer un utilisateur avec des données valides."""
         from services.impl.user_service_impl import user_service
 
@@ -38,9 +40,21 @@ class TestUserServiceCreate:
             username="testuser",
             display_name="Test User",
             password_hash="hashed_password",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
         )
         mock_user_repository.add.return_value = created_entity
+
+        mock_dto = UserDTO(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            display_name="Test User",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        mock_mapper = Mock(return_value=mock_dto)
+        monkeypatch.setattr("services.impl.user_service_impl.user_to_dto", mock_mapper)
 
         dto = UserCreateDTO(
             email="test@example.com",
@@ -66,6 +80,7 @@ class TestUserServiceCreate:
 
         # Arrange
         existing_user = User(
+            created_at=datetime.now(),
             id=str(uuid4()),
             email="existing@example.com",
             username="existing",
@@ -93,6 +108,7 @@ class TestUserServiceCreate:
 
         # Arrange
         existing_user = User(
+            created_at=datetime.now(),
             id=str(uuid4()),
             email="existing@example.com",
             username="existinguser",
@@ -119,7 +135,7 @@ class TestUserServiceCreate:
 class TestUserServiceFindOne:
     """Tests pour la récupération d'un utilisateur"""
 
-    def test_find_one_success(self, mock_user_repository):
+    def test_find_one_success(self, mock_user_repository, monkeypatch):
         """Récupérer un utilisateur existant."""
         from services.impl.user_service_impl import user_service
 
@@ -131,9 +147,21 @@ class TestUserServiceFindOne:
             username="testuser",
             display_name="Test User",
             password_hash="hash",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
         )
         mock_user_repository.find_one.return_value = user_entity
+
+        mock_dto = UserDTO(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            display_name="Test User",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        mock_mapper = Mock(return_value=mock_dto)
+        monkeypatch.setattr("services.impl.user_service_impl.user_to_dto", mock_mapper)
 
         # Act
         result = user_service.find_one(user_id)
@@ -162,7 +190,7 @@ class TestUserServiceFindOne:
 class TestUserServiceUpdate:
     """Tests pour la mise à jour d'utilisateur"""
 
-    def test_update_user_success(self, mock_user_repository):
+    def test_update_user_success(self, mock_user_repository, monkeypatch):
         """Mettre à jour un utilisateur existant."""
         from services.impl.user_service_impl import user_service
 
@@ -174,7 +202,8 @@ class TestUserServiceUpdate:
             username="olduser",
             display_name="Old Name",
             password_hash="hash",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
         )
         updated_entity = User(
             id=user_id,
@@ -182,13 +211,26 @@ class TestUserServiceUpdate:
             username="newuser",
             display_name="New Name",
             password_hash="new_hash",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
         )
 
         mock_user_repository.find_one.return_value = existing_entity
         mock_user_repository.find_one_by_email.return_value = None
         mock_user_repository.find_one_by_username.return_value = None
         mock_user_repository.update.return_value = updated_entity
+
+
+        mock_dto = UserDTO(
+            id=user_id,
+            email="new@example.com",
+            username="newuser",
+            display_name="New Name",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        mock_mapper = Mock(return_value=mock_dto)
+        monkeypatch.setattr("services.impl.user_service_impl.user_to_dto", mock_mapper)
 
         dto = UserUpdateDTO(
             email="new@example.com",
@@ -235,14 +277,16 @@ class TestUserServiceUpdate:
             email="old@example.com",
             username="user",
             password_hash="hash",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
         )
         other_user = User(
             id=other_user_id,
             email="taken@example.com",
             username="other",
             password_hash="hash",
-            role=RoleEnum.CLIENT
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
         )
 
         mock_user_repository.find_one.return_value = existing_entity
@@ -292,16 +336,30 @@ class TestUserServiceDelete:
 class TestUserServiceFindMany:
     """Tests pour la récupération de plusieurs utilisateurs"""
 
-    def test_find_many_returns_all(self, mock_user_repository):
+    def test_find_many_returns_all(self, mock_user_repository, monkeypatch):
         """Récupérer tous les utilisateurs."""
         from services.impl.user_service_impl import user_service
 
         # Arrange
         entities = [
-            User(id=str(uuid4()), email=f"user{i}@example.com", username=f"user{i}", password_hash="hash", role=RoleEnum.CLIENT)
+            User(id=str(uuid4()), email=f"user{i}@example.com", username=f"user{i}", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
             for i in range(3)
         ]
         mock_user_repository.find_many.return_value = (entities, 3)
+
+
+        mock_dtos = [
+            UserDTO(
+                id=entity.id,
+                email=entity.email,
+                username=entity.username,
+                role=RoleEnum.CLIENT,
+                created_at=datetime.now()
+            )
+            for entity in entities
+        ]
+        mock_mapper = Mock(side_effect=mock_dtos)
+        monkeypatch.setattr("services.impl.user_service_impl.user_to_dto", mock_mapper)
 
         params = UserSearchParams()
 

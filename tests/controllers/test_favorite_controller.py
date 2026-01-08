@@ -24,7 +24,6 @@ class TestNoteFavoriteController:
         # Arrange
         note_id = str(uuid4())
         favorite = NoteFavoriteDTO(
-            id=str(uuid4()),
             user_id=str(uuid4()),
             note_id=note_id,
             created_at="2024-01-01T00:00:00Z"
@@ -64,7 +63,6 @@ class TestCollectionFavoriteController:
         # Arrange
         collection_id = str(uuid4())
         favorite = CollectionFavoriteDTO(
-            id=str(uuid4()),
             user_id=str(uuid4()),
             collection_id=collection_id,
             created_at="2024-01-01T00:00:00Z"

@@ -7,6 +7,7 @@ via le test_factory pour créer des données de test.
 Cela permet de tester les requêtes SQL et la persistance réelle des données.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 
 # Le test_factory est hérité de tests/conftest.py

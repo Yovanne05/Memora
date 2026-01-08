@@ -10,6 +10,7 @@ Ces tests vérifient la logique métier du service auth :
 Les repositories et services sont MOCKÉS pour isoler la logique du service.
 """
 import pytest
+from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
 

@@ -20,7 +20,7 @@ class TestShareCollectionControllerList:
     def test_list_shares_returns_200(self, app_client, mock_collection_share_service):
         """Le endpoint GET /collections/<id>/shares retourne 200."""
         from dtos.collection_share_dto import CollectionShareDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         collection_id = str(uuid4())
@@ -29,7 +29,7 @@ class TestShareCollectionControllerList:
                 id=str(uuid4()),
                 collection_id=collection_id,
                 user_id=str(uuid4()),
-                permission=PermissionEnum.READ,
+                permission=SharePermissionEnum.READ,
                 created_at="2024-01-01T00:00:00Z"
             )
         ]
@@ -52,7 +52,7 @@ class TestShareCollectionControllerCreate:
     def test_create_share_returns_201(self, app_client, mock_collection_share_service):
         """Le endpoint POST /collections/<id>/shares retourne 201."""
         from dtos.collection_share_dto import CollectionShareDTO
-        from utils.enums import PermissionEnum
+        from utils.enums import SharePermissionEnum
 
         # Arrange
         collection_id = str(uuid4())
@@ -62,7 +62,7 @@ class TestShareCollectionControllerCreate:
             id=str(uuid4()),
             collection_id=collection_id,
             user_id=user_id,
-            permission=PermissionEnum.WRITE,
+            permission=SharePermissionEnum.WRITE,
             created_at="2024-01-01T00:00:00Z"
         )
         mock_collection_share_service.share_collection.return_value = share

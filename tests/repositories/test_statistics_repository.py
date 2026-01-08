@@ -3,6 +3,7 @@ Tests pour le repository statistics.
 Utilise la vraie BD via test_factory.
 """
 import pytest
+from datetime import datetime
 
 # TODO: Migrer les tests de base de données
 # Voir les exemples dans test_collection_repository.py
