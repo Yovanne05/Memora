@@ -65,6 +65,7 @@ export default function CollectionNotesView({
       deletePending={deleteCollectionMutation.isPending}
       isLoading={collectionQuery.isLoading || isLoading}
       isCollectionError={collectionQuery.isError}
+      collectionError={collectionQuery.error}
       isNotesError={isError}
       notesError={error}
       onEdit={() => setEditDialogOpen(true)}

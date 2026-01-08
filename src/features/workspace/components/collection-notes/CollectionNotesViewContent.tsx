@@ -6,6 +6,7 @@ import { CollectionNotesLoading } from './CollectionNotesLoading'
 import { CollectionNotesHeader } from './CollectionNotesHeader'
 import { CollectionNotesContent } from './CollectionNotesContent'
 import { CollectionNotesDialogs } from './CollectionNotesDialogs'
+import { ApiError } from '@/lib/errors'
 
 type CollectionNotesViewContentProps = {
   collection: Collection | null
@@ -25,6 +26,7 @@ type CollectionNotesViewContentProps = {
   deletePending: boolean
   isLoading: boolean
   isCollectionError: boolean
+  collectionError: unknown
   isNotesError: boolean
   notesError: Error | null
   onEdit: () => void
@@ -56,6 +58,7 @@ export function CollectionNotesViewContent({
   deletePending,
   isLoading,
   isCollectionError,
+  collectionError,
   isNotesError,
   notesError,
   onEdit,
@@ -68,12 +71,34 @@ export function CollectionNotesViewContent({
   onDeleteOpenChange,
   onDeleteConfirm,
 }: Readonly<CollectionNotesViewContentProps>) {
-  if (isLoading) {
-    return <CollectionNotesLoading />
+  const collectionErrorMessage =
+    collectionError instanceof Error ? collectionError.message : ''
+  const normalizedMessage = collectionErrorMessage.toLowerCase()
+  const hasPermissionHint =
+    normalizedMessage.includes('permission') ||
+    normalizedMessage.includes('acces')
+  const isPermissionError =
+    (collectionError instanceof ApiError &&
+      (collectionError.status === 403 ||
+        collectionError.status === 500 ||
+        hasPermissionHint)) ||
+    (collectionError instanceof Error && hasPermissionHint)
+
+  if (collectionError && isPermissionError) {
+    return (
+      <CollectionNotesError
+        title="Acces refuse"
+        message="Vous n'avez pas acces aux donnees de cette collection."
+      />
+    )
   }
 
   if (isCollectionError) {
     return <CollectionNotesError title="Collection introuvable" />
+  }
+
+  if (isLoading) {
+    return <CollectionNotesLoading />
   }
 
   if (isNotesError) {
