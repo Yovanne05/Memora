@@ -1,14 +1,4 @@
 import { useState } from 'react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { CollectionsGrid } from '@/features/collections/components/CollectionsGrid'
 import { CollectionFormDialog } from '@/features/collections/components/CollectionFormDialog'
 import { CollectionShareDialog } from '@/features/collections/components/CollectionShareDialog'
@@ -16,6 +6,7 @@ import { useUpdateCollectionMutation } from '@/features/collections/hooks/useUpd
 import { useDeleteCollectionMutation } from '@/features/collections/hooks/useDeleteCollectionMutation'
 import type { Collection } from '@/features/collections/models/collection.model'
 import type { CollectionFormValues } from '@/features/collections/types/collection-form.types'
+import { CollectionDeleteDialog } from './CollectionDeleteDialog'
 
 type FavoritesCollectionsProps = {
   collections: Collection[]
@@ -50,8 +41,8 @@ export function FavoritesCollectionsWithActions({
   const handleEditSubmit = async (values: CollectionFormValues) => {
     if (!editingCollection) return
     await updateMutation.mutateAsync({
-      collectionId: editingCollection.id,
-      payload: values,
+      id: editingCollection.id,
+      data: values,
     })
     setEditingCollection(null)
   }
@@ -76,7 +67,12 @@ export function FavoritesCollectionsWithActions({
           mode="edit"
           open
           isPending={updateMutation.isPending}
-          initial={editingCollection}
+          initial={{
+            name: editingCollection.name,
+            description: editingCollection.description ?? undefined,
+            visibility: editingCollection.visibility,
+            tags: editingCollection.tags,
+          }}
           onSubmit={handleEditSubmit}
           onClose={() => setEditingCollection(null)}
         />
@@ -91,31 +87,13 @@ export function FavoritesCollectionsWithActions({
         />
       )}
 
-      <AlertDialog
+      <CollectionDeleteDialog
+        collectionName={deletingCollection?.name}
+        isPending={deleteMutation.isPending}
         open={!!deletingCollection}
         onOpenChange={(open) => !open && setDeletingCollection(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la collection</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer "{deletingCollection?.name}" ?
-              Cette action supprimera également toutes les notes contenues dans
-              cette collection et est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              disabled={deleteMutation.isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteMutation.isPending ? 'Suppression...' : 'Supprimer'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onConfirm={handleDeleteConfirm}
+      />
     </>
   )
 }
