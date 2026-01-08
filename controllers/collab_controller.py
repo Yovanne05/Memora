@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request, g
+from flasgger import swag_from
 
 from dtos.collab_dto import (
     CollabDocumentUpdateDTO,
@@ -15,6 +16,7 @@ bp_collab = Blueprint("collab", __name__, url_prefix="/collab")
 
 
 @bp_collab.post("/sessions")
+@swag_from("../docs/collab/sessions_create.yaml")
 def create_session():
     payload = CollabSessionCreateDTO.model_validate_json(request.data)
     dto = collab_service.create_session(payload.note_id)
@@ -22,6 +24,7 @@ def create_session():
 
 
 @bp_collab.post("/sessions/verify")
+@swag_from("../docs/collab/sessions_verify.yaml")
 @require_collab_api_key()
 @require_collab_scope()
 def verify_session():
@@ -31,6 +34,7 @@ def verify_session():
 
 
 @bp_collab.get("/documents/<string:note_id>")
+@swag_from("../docs/collab/documents_get.yaml")
 @require_collab_api_key()
 def get_document(note_id: str):
     dto = collab_service.get_document(note_id)
@@ -38,6 +42,7 @@ def get_document(note_id: str):
 
 
 @bp_collab.put("/documents/<string:note_id>")
+@swag_from("../docs/collab/documents_put.yaml")
 @require_collab_api_key()
 def store_document(note_id: str):
     payload = CollabDocumentUpdateDTO.model_validate_json(request.data)

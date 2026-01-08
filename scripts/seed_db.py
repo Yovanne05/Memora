@@ -28,7 +28,9 @@ from utils.utils import generate_uuid
 # Import all DAO models so metadata is registered before create_all
 from daos.user_dao import User
 from daos.collection_dao import Collection, CollectionShare
+from daos.collection_share_link_dao import CollectionShareLink
 from daos.note_dao import Note, NoteLink, NoteShare
+from daos.note_share_link_dao import NoteShareLink
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
@@ -122,7 +124,12 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_docs.id,
             title="Architecture generale",
-            content="Description de l'architecture et des services.",
+            content=(
+                '{"type":"doc","content":[{"type":"paragraph","content":['
+                '{"type":"text","text":"Description de l\\u2019architecture et des services."}'
+                "]}]}"
+            ),
+            yjs_snapshot="AAECAwQ=",
             visibility=VisibilityEnum.PUBLIC,
             tags=["architecture", "overview"],
         )
@@ -130,7 +137,12 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_docs.id,
             title="API checklist",
-            content="Endpoints, auth, rate-limit et validation.",
+            content=(
+                '{"type":"doc","content":[{"type":"paragraph","content":['
+                '{"type":"text","text":"Endpoints, auth, rate-limit et validation."}'
+                "]}]}"
+            ),
+            yjs_snapshot="AAECAwQ=",
             visibility=VisibilityEnum.PUBLIC,
             tags=["api", "checklist"],
         )
@@ -138,7 +150,12 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_templates.id,
             title="Template de note",
-            content="Titre, resume, sections, taches et ressources.",
+            content=(
+                '{"type":"doc","content":[{"type":"paragraph","content":['
+                '{"type":"text","text":"Titre, resume, sections, taches et ressources."}'
+                "]}]}"
+            ),
+            yjs_snapshot="AAECAwQ=",
             visibility=VisibilityEnum.PRIVATE,
             tags=["template"],
         )
@@ -146,7 +163,12 @@ def seed() -> None:
             owner_id=alice.id,
             collection_id=coll_courses.id,
             title="Memo Flask",
-            content="Routes, blueprints, middlewares et tests.",
+            content=(
+                '{"type":"doc","content":[{"type":"paragraph","content":['
+                '{"type":"text","text":"Routes, blueprints, middlewares et tests."}'
+                "]}]}"
+            ),
+            yjs_snapshot="AAECAwQ=",
             visibility=VisibilityEnum.PRIVATE,
             tags=["flask", "python"],
         )
