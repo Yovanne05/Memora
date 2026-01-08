@@ -39,12 +39,8 @@ export function FlashcardViewer({
   const showResult =
     selection.flashcardId === flashcard.id ? selection.showResult : false
 
-  // En mode review, utiliser le résultat du serveur et afficher si disponible
   const correctAnswerId = reviewResult?.correctAnswerId ?? null
-  const isCorrect =
-    reviewMode && selectedAnswerId && correctAnswerId
-      ? selectedAnswerId === correctAnswerId
-      : (reviewResult?.isCorrect ?? false)
+  const isCorrect = reviewResult?.isCorrect ?? false
   const shouldShowResult = reviewMode ? !!reviewResult : showResult
   const shouldShowDifficulty = reviewMode && !!selectedAnswerId && !reviewResult
 

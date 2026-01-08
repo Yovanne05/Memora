@@ -23,8 +23,9 @@ export function FlashcardAnswersList({
       {answers.map((answer) => {
         const isSelected = selectedAnswerId === answer.id
         const isThisCorrect = answer.id === correctAnswerId
-        const shouldShowCorrect = showResult && isThisCorrect
-        const shouldShowIncorrect = showResult && isSelected && !isThisCorrect
+        const shouldShowCorrect = showResult && correctAnswerId && isThisCorrect
+        const shouldShowIncorrect =
+          showResult && correctAnswerId && isSelected && !isThisCorrect
 
         return (
           <button
