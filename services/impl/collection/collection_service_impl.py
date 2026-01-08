@@ -16,9 +16,17 @@ from services.interfaces.collection.collection_service_interface import (
     CollectionServiceInterface,
 )
 from utils.auth import get_current_user
+from flask_jwt_extended.exceptions import NoAuthorizationError
 
 
 class CollectionService(CollectionServiceInterface):
+    @staticmethod
+    def _get_current_user_optional():
+        try:
+            return get_current_user()
+        except (RuntimeError, NoAuthorizationError):
+            return None
+
     def find_many(
         self, params: Optional[CollectionSearchParams] = None
     ) -> Tuple[List[CollectionDTO], int]:
@@ -56,7 +64,7 @@ class CollectionService(CollectionServiceInterface):
         )
 
     def create(self, collection_create_dto: CollectionCreateDTO) -> CollectionDTO:
-        user = get_current_user()
+        user = self._get_current_user_optional()
         entity = dto_to_collection(collection_create_dto)
         saved = collection_repository.add(entity)
         return collection_to_dto(saved, current_user=user)
@@ -64,7 +72,7 @@ class CollectionService(CollectionServiceInterface):
     def update(
         self, collection_id: str, collection_update_dto: CollectionUpdateDTO
     ) -> CollectionDTO:
-        user = get_current_user()
+        user = self._get_current_user_optional()
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
