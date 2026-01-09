@@ -187,10 +187,8 @@ definitions:
         type: string
         format: uuid
         description: Identifier of the shared collection.
-      user_id:
-        type: string
-        format: uuid
-        description: Target user.
+      user:
+        $ref: "#/definitions/User"
       permission:
         type: string
         enum: ["read", "write", "owner"]
@@ -199,7 +197,7 @@ definitions:
         type: string
         format: date-time
         description: Date de creation du partage.
-    required: ["collection_id", "user_id", "permission", "created_at"]
+    required: ["collection_id", "user", "permission", "created_at"]
 
   CollectionShareCreatePayload:
     type: object

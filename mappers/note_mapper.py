@@ -44,6 +44,13 @@ def _safe_collection_name(note: Note) -> Optional[str]:
     return note.collection.name if note.collection else None
 
 
+def _safe_owner_username(note: Note) -> str:
+    insp = inspect(note)
+    if "owner" in insp.unloaded or not note.owner:
+        return ""
+    return note.owner.username or note.owner.display_name or ""
+
+
 def note_to_dto(
     note: Note,
     favorite_note_ids: set[str] | None = None,
@@ -71,6 +78,8 @@ def note_to_dto(
 
     data = {
         "id": note.id,
+        "owner_id": note.owner_id,
+        "owner_username": _safe_owner_username(note),
         "title": note.title,
         "visibility": note.visibility,
         "owners": _get_all_owners(note),

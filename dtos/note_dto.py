@@ -26,6 +26,8 @@ class NoteUpdateDTO(BaseModel):
 
 class NoteDTO(BaseModel):
     id: str
+    owner_id: str
+    owner_username: str
     title: str
     visibility: VisibilityEnum
     owners: List[OwnerDTO] = Field(default_factory=list)

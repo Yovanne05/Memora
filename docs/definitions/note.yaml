@@ -178,10 +178,8 @@ definitions:
         type: string
         format: uuid
         description: Identifiant de la note partagée.
-      user_id:
-        type: string
-        format: uuid
-        description: Utilisateur cible.
+      user:
+        $ref: "#/definitions/User"
       permission:
         type: string
         enum: ["read", "write", "owner"]
@@ -190,7 +188,7 @@ definitions:
         type: string
         format: date-time
         description: Date de création du partage.
-    required: ["note_id", "user_id", "permission", "created_at"]
+    required: ["note_id", "user", "permission", "created_at"]
 
   NoteShareCreatePayload:
     type: object

@@ -48,6 +48,11 @@ definitions:
         type: boolean
         description: Indique si la réponse était correcte.
         example: true
+      correct_answer_id:
+        type: string
+        format: uuid
+        description: Identifiant de la réponse correcte pour cette flashcard.
+        example: "b2c3d4e5-f6a7-8901-2345-678901bcdefg"
       difficulty:
         type: string
         enum: ["again", "hard", "good", "easy"]
@@ -83,6 +88,7 @@ definitions:
       - flashcard_id
       - selected_answer_id
       - is_correct
+      - correct_answer_id
       - difficulty
       - e_factor
       - repetitions

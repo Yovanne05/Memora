@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Set, Optional
 from sqlalchemy import inspect
 
 from daos.collection_dao import Collection
@@ -8,6 +8,8 @@ from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from dtos.note_dto import NoteDTO
 from dtos.owner_dto import OwnerDTO
 from mappers.note_mapper import note_to_dto
+from domain_services.permission_domain_service import permission_domain_service
+from utils.permission_models import AccessLevel
 from utils.enums import SharePermissionEnum
 
 
@@ -94,10 +96,28 @@ def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
     return edges
 
 
+def _get_user_permission(collection: Collection, current_user) -> Optional[str]:
+    if not current_user:
+        return None
+
+    perm = permission_domain_service.get_collection_permission(
+        collection.id, current_user.id, current_user.role
+    )
+    perm_level = perm.access_level
+    if perm_level in {AccessLevel.OWNER, AccessLevel.ADMIN}:
+        return "owner"
+    if perm_level == AccessLevel.WRITE:
+        return "write"
+    if perm_level == AccessLevel.READ:
+        return "read"
+    return None
+
+
 def collection_to_dto(
     collection_entity: Collection,
     collection_favorite_ids: set[str] | None = None,
     note_favorite_ids: set[str] | None = None,
+    current_user=None,
 ) -> CollectionDTO:
     notes = collection_entity.notes
     note_ids = {note.id for note in notes}
@@ -108,12 +128,14 @@ def collection_to_dto(
     return CollectionDTO.model_validate(
         {
             "id": collection_entity.id,
+            "owner_id": collection_entity.owner_id,
             "name": collection_entity.name,
             "description": collection_entity.description,
             "visibility": collection_entity.visibility,
             "owners": _get_all_owners(collection_entity),
             "tags": collection_entity.tags,
             "is_favorite": is_favorite,
+            "user_permission": _get_user_permission(collection_entity, current_user),
             "created_at": collection_entity.created_at,
             "updated_at": collection_entity.updated_at,
             "notes": _build_note_dtos(notes, note_favorite_ids),
