@@ -105,15 +105,18 @@ export function useRichTextEditor({
     }
   }, [collabDocument, collabToken, noteId])
 
-  const caretUser = useMemo(
-    () => ({
-      name: user?.username ?? "Utilisateur",
-      color: "#f59e0b",
-    }),
-    [user?.username]
-  )
+  const caretUser = useMemo(() => {
+    const name = user?.displayName ?? user?.username ?? "Utilisateur"
+    const color = user?.color
+    return { name, color }
+  }, [user?.color, user?.displayName, user?.username])
 
   const enableCollaboration = Boolean(collabDocument)
+
+  useEffect(() => {
+    if (!provider) return
+    provider.awareness?.setLocalStateField("user", caretUser)
+  }, [caretUser, provider])
 
   const extensions = useMemo(() => {
     const baseExtensions = [
