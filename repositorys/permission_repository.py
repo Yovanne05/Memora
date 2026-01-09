@@ -1,8 +1,3 @@
-"""
-Permission Repository
-Data access layer for permission-related queries.
-Separates SQL logic from business logic.
-"""
 from typing import Optional, Set
 
 from sqlalchemy import or_, select
@@ -104,11 +99,10 @@ class PermissionRepository:
             .where(
                 or_(
                     Note.owner_id == user_id,
-                    Note.visibility == VisibilityEnum.PUBLIC,
                     NoteShare.user_id == user_id,
                     CollectionShare.user_id == user_id,
-                    Collection.visibility == VisibilityEnum.PUBLIC,
                     Collection.owner_id == user_id,
+                    Note.visibility == VisibilityEnum.PUBLIC,
                 )
             )
         )
@@ -125,8 +119,8 @@ class PermissionRepository:
             .where(
                 or_(
                     Collection.owner_id == user_id,
-                    Collection.visibility == VisibilityEnum.PUBLIC,
                     CollectionShare.user_id == user_id,
+                    Collection.visibility == VisibilityEnum.PUBLIC,
                 )
             )
         )

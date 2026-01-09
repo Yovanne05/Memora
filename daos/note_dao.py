@@ -52,7 +52,7 @@ class Note(
         nullable=True,
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    content: Mapped[str] = mapped_column(Text, nullable=False)
+    yjs_snapshot: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     collection: Mapped["Collection | None"] = relationship(
         back_populates="notes", lazy="selectin"

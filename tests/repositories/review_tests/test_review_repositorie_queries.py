@@ -8,7 +8,6 @@ Ces tests vérifient les requêtes SQL :
 
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
-import pytest
 from uuid import uuid4
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal

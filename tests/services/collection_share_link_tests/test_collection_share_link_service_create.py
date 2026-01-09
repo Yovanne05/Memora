@@ -9,7 +9,6 @@ Ces tests vérifient :
 
 Les repositories sont MOCKÉS.
 """
-import pytest
 from uuid import uuid4
 from datetime import datetime
 from dtos.collection_share_link_dto import CollectionShareLinkDTO, CollectionShareLinkCreateDTO

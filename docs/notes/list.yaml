@@ -35,11 +35,6 @@ parameters:
     required: false
     description: Sous-chaine a rechercher dans les titres.
   - in: query
-    name: content_contains
-    type: string
-    required: false
-    description: Sous-chaine recherchee dans le contenu.
-  - in: query
     name: ids
     type: string
     required: false

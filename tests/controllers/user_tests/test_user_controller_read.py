@@ -2,7 +2,6 @@
 Tests pour le controller utilisateur.
 Mock le service user_service.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime
@@ -11,7 +10,7 @@ from datetime import datetime
 class TestUserControllerGet:
     """Tests pour GET /users/<id>"""
 
-    def test_get_user_returns_200(self, app_client, mock_user_service):
+    def test_get_user_returns_200(self, authenticated_client, mock_user_service):
         """Le endpoint GET /users/<id> retourne 200."""
         from dtos.user_dto import UserDTO
 
@@ -27,7 +26,7 @@ class TestUserControllerGet:
         )
 
         # Act
-        response = app_client.get(f"/users/{user_id}")
+        response = authenticated_client.get(f"/users/{user_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.OK

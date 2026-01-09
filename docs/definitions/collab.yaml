@@ -1,0 +1,79 @@
+definitions:
+  CollabSessionCreatePayload:
+    type: object
+    required: ["note_id"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note identifier.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+
+  CollabSessionResponse:
+    type: object
+    required: ["collab_token", "scope", "expires_in"]
+    properties:
+      collab_token:
+        type: string
+        description: Short-lived collab JWT.
+      scope:
+        type: array
+        items:
+          type: string
+          enum: ["read", "write"]
+      expires_in:
+        type: integer
+        format: int32
+        description: Token TTL in seconds.
+        example: 300
+
+  CollabSessionVerifyPayload:
+    type: object
+    required: ["collab_token", "note_id"]
+    properties:
+      collab_token:
+        type: string
+        description: Collab JWT to validate.
+      note_id:
+        type: string
+        format: uuid
+        description: Note identifier.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+
+  CollabSessionVerifyResponse:
+    type: object
+    required: ["user_id", "name", "scope"]
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: User identifier.
+      name:
+        type: string
+        description: Display name used for awareness.
+      scope:
+        type: array
+        items:
+          type: string
+          enum: ["read", "write"]
+
+  CollabDocumentResponse:
+    type: object
+    required: ["note_id"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note identifier.
+      yjs_snapshot:
+        type: string
+        description: Base64-encoded Yjs snapshot.
+        nullable: true
+
+  CollabDocumentUpdatePayload:
+    type: object
+    required: ["yjs_snapshot"]
+    properties:
+      yjs_snapshot:
+        type: string
+        description: Base64-encoded Yjs snapshot.

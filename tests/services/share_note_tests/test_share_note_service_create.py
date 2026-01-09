@@ -9,7 +9,6 @@ Ces tests vérifient :
 
 Les repositories sont MOCKÉS.
 """
-import pytest
 from uuid import uuid4
 from datetime import datetime
 from dtos.note_share_dto import NoteShareDTO, NoteShareCreateDTO, NoteShareUpdateDTO
@@ -39,7 +38,7 @@ class TestNoteShareServiceCreate:
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
         note = Note(
-            id=note_id, title="Test Note", content="", owner_id=owner_id,
+            id=note_id, title="Test Note", yjs_snapshot=None, owner_id=owner_id,
             collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
             flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
             created_at=datetime.now(), updated_at=datetime.now()
@@ -47,7 +46,7 @@ class TestNoteShareServiceCreate:
         mock_note_repository.find_one_unscoped.return_value = note
 
         target_user = User(
-            id=user_id, email="target@example.com", username="target",
+            id=user_id, email="target@example.com", username="target", display_name="Target User",
             password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
         )
         mock_user_repository.find_one.return_value = target_user
@@ -60,6 +59,7 @@ class TestNoteShareServiceCreate:
             permission=SharePermissionEnum.READ,
             created_at=datetime.now()
         )
+        share.user = target_user  # Attach the user relation
         mock_note_share_repository.add.return_value = share
 
         monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
@@ -72,5 +72,5 @@ class TestNoteShareServiceCreate:
         # Assert
         assert isinstance(result, NoteShareDTO)
         assert result.note_id == note_id
-        assert result.user_id == user_id
+        assert result.user.id == user_id
         mock_note_share_repository.add.assert_called_once()

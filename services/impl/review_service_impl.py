@@ -38,6 +38,12 @@ class ReviewService(ReviewServiceInterface):
             for answer in flashcard.answers
         )
 
+        correct_answer = next(
+            (answer for answer in flashcard.answers if answer.is_correct),
+            None
+        )
+        correct_answer_id = correct_answer.id if correct_answer else selected_answer_id
+
         existing_review = review_repository.get_review(user_id, flashcard_id)
 
         if existing_review:
@@ -72,7 +78,19 @@ class ReviewService(ReviewServiceInterface):
 
         saved_review = review_repository.upsert_review(review)
 
-        return ReviewDTO.model_validate(saved_review)
+        return ReviewDTO(
+            user_id=saved_review.user_id,
+            flashcard_id=saved_review.flashcard_id,
+            selected_answer_id=saved_review.selected_answer_id,
+            is_correct=saved_review.is_correct,
+            correct_answer_id=correct_answer_id,
+            difficulty=saved_review.difficulty,
+            e_factor=saved_review.e_factor,
+            repetitions=saved_review.repetitions,
+            interval_days=saved_review.interval_days,
+            next_review_at=saved_review.next_review_at,
+            reviewed_at=saved_review.reviewed_at,
+        )
 
     def get_upcoming_reviews(self, user_id: str) -> list[UpcomingReviewsGroupDTO]:
         grouped_reviews = review_repository.get_upcoming_reviews(user_id)

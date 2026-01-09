@@ -8,7 +8,6 @@ Ces tests vérifient :
 
 Le service note_link_service est MOCKÉ.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 
@@ -16,7 +15,7 @@ from http import HTTPStatus
 class TestNoteLinkControllerList:
     """Tests pour GET /notes/<id>/relations"""
 
-    def test_list_note_links_returns_200(self, app_client, mock_note_link_service):
+    def test_list_note_links_returns_200(self, authenticated_client, mock_note_link_service):
         """Le endpoint GET /notes/<id>/relations retourne 200."""
         from dtos.note_link_dto import NoteLinkDTO
         from datetime import datetime
@@ -33,7 +32,7 @@ class TestNoteLinkControllerList:
         mock_note_link_service.find_many.return_value = (links, 1)
 
         # Act
-        response = app_client.get(f"/notes/{note_id}/relations")
+        response = authenticated_client.get(f"/notes/{note_id}/relations")
 
         # Assert
         assert response.status_code == HTTPStatus.OK

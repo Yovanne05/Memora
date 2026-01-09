@@ -8,7 +8,6 @@ Ces tests vérifient :
 
 Le service collection_share_link_service est MOCKÉ.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 

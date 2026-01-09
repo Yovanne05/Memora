@@ -8,7 +8,6 @@ Ces tests vérifient :
 
 Les repositories sont MOCKÉS.
 """
-import pytest
 from uuid import uuid4
 from datetime import datetime
 from dtos.note_favorite_dto import NoteFavoriteDTO

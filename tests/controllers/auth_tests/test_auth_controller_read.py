@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime
@@ -7,7 +6,7 @@ from datetime import datetime
 class TestAuthLogin:
     """Tests pour POST /sessions (login)"""
 
-    def test_login_returns_200_with_token(self, app_client, mock_auth_service):
+    def test_login_returns_200_with_token(self, authenticated_client, mock_auth_service):
         """La connexion retourne 200 avec un token JWT."""
         from dtos.user_dto import UserDTO
         from utils.enums import RoleEnum
@@ -29,7 +28,7 @@ class TestAuthLogin:
         }
 
         # Act
-        response = app_client.post("/sessions", json=payload)
+        response = authenticated_client.post("/sessions", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -38,7 +37,7 @@ class TestAuthLogin:
         assert "access_token" in body
         mock_auth_service.login.assert_called_once()
 
-    def test_login_returns_401_on_invalid_password(self, app_client, mock_auth_service):
+    def test_login_returns_401_on_invalid_password(self, authenticated_client, mock_auth_service):
         """La connexion retourne 401 avec un mauvais mot de passe."""
         from exceptions.auth_exception import InvalidCredentials
 
@@ -51,7 +50,7 @@ class TestAuthLogin:
         }
 
         # Act
-        response = app_client.post("/sessions", json=payload)
+        response = authenticated_client.post("/sessions", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.UNAUTHORIZED

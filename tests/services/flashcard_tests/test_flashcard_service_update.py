@@ -10,7 +10,6 @@ Ces tests vérifient :
 
 Les repositories sont MOCKÉS.
 """
-import pytest
 from uuid import uuid4
 from unittest.mock import Mock
 from datetime import datetime

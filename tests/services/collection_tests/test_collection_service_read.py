@@ -27,14 +27,23 @@ class TestCollectionServiceFindOne:
     def test_find_one_success(self, mock_collection_repository, monkeypatch):
         """Récupérer une collection existante."""
         from services.impl.collection.collection_service_impl import collection_service
+        from daos.user_dao import User
+        from utils.enums import RoleEnum
 
         # Arrange
         collection_id = str(uuid4())
         user_id = str(uuid4())
 
-        mock_user = Mock()
-        mock_user.id = user_id
+        mock_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.collection.collection_service_impl.get_current_user", Mock(return_value=mock_user))
+        monkeypatch.setattr("services.impl.collection.collection_service_impl.permission_domain_service.can_read_collection", lambda *args: True)
 
         mock_collection_favorite_repository = Mock()
         mock_collection_favorite_repository.favorite_collection_ids_for_user.return_value = set()
@@ -56,10 +65,11 @@ class TestCollectionServiceFindOne:
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
-        mock_collection_repository.get_for_user.return_value = dao
+        mock_collection_repository.find_one_unscoped.return_value = dao
 
         mock_dto = CollectionDTO(
             id=collection_id,
+            owner_id=user_id,
             name="Test Collection",
             description="Test desc",
             visibility=VisibilityEnum.PUBLIC,
@@ -81,27 +91,36 @@ class TestCollectionServiceFindOne:
         assert isinstance(result, CollectionDTO)
         assert result.id == collection_id
         assert result.name == "Test Collection"
-        mock_collection_repository.get_for_user.assert_called_once()
+        mock_collection_repository.find_one_unscoped.assert_called_once()
 
     def test_find_one_not_found(self, mock_collection_repository, monkeypatch):
         """Récupérer une collection inexistante lève CollectionNotFound."""
         from services.impl.collection.collection_service_impl import collection_service
+        from daos.user_dao import User
+        from utils.enums import RoleEnum
 
         # Arrange
         collection_id = str(uuid4())
         user_id = str(uuid4())
 
-        mock_user = Mock()
-        mock_user.id = user_id
+        mock_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
         monkeypatch.setattr("services.impl.collection.collection_service_impl.get_current_user", Mock(return_value=mock_user))
+        monkeypatch.setattr("services.impl.collection.collection_service_impl.permission_domain_service.can_read_collection", lambda *args: True)
 
-        mock_collection_repository.get_for_user.return_value = None
+        mock_collection_repository.find_one_unscoped.return_value = None
 
         # Act & Assert
         with pytest.raises(CollectionNotFound):
             collection_service.find_one(collection_id)
 
-        mock_collection_repository.get_for_user.assert_called_once()
+        mock_collection_repository.find_one_unscoped.assert_called_once()
 
 
 class TestCollectionServiceFindMany:
@@ -144,6 +163,7 @@ class TestCollectionServiceFindMany:
         mock_dtos = [
             CollectionDTO(
                 id=dao.id,
+                owner_id=user_id,
                 name=dao.name,
                 visibility=VisibilityEnum.PRIVATE,
                 owners=[OwnerDTO(user_id=user_id, username="testuser")],

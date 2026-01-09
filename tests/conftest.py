@@ -184,6 +184,7 @@ class TestDataFactory:
         )
         assert response.status_code == 200, response.get_data(as_text=True)
         token = response.get_json()["access_token"]
+        self.access_token = token
         self.client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
 
     def create_collection(
@@ -214,7 +215,7 @@ class TestDataFactory:
     def create_note(
         self,
         title: str = None,
-        content: str = "Test content",
+        yjs_snapshot: str = None,
         collection_id: str = None,
         owner_id: str = None,
         visibility: VisibilityEnum = VisibilityEnum.PRIVATE
@@ -228,7 +229,7 @@ class TestDataFactory:
         note = Note(
             id=str(uuid4()),
             title=title or f"Note {self.base_slug}-{uuid4().hex[:4]}",
-            content=content,
+            yjs_snapshot=yjs_snapshot,
             owner_id=owner_id,
             collection_id=collection_id,
             visibility=visibility,
@@ -260,6 +261,13 @@ def test_factory(app_client):
             collection_id = test_factory.create_collection(owner_id=user_id)
     """
     return TestDataFactory(client=app_client)
+
+    def _delete_if_exists(self, path: str) -> None:
+        response = self.client.delete(path)
+        if response.status_code not in (204, 404):
+            raise AssertionError(
+                f"Cleanup failed for {path}: {response.status_code} {response.get_data(as_text=True)}"
+            )
 
 
 @pytest.fixture

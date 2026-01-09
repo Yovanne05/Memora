@@ -34,7 +34,7 @@ class TestNoteRepositoryConstraints:
             note = Note(
                 id=str(uuid4()),
                 title="Duplicate Title",
-                content="Content",
+                yjs_snapshot=None,
                 owner_id=user_id,
                 collection_id=collection_id
             )

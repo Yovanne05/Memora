@@ -11,7 +11,6 @@ class NoteFindQuery(BaseModel):
     shared_with_user_id: Optional[UUID] = Field(default=None)
     visibility: VisibilityEnum | None = None
     title_contains: Optional[str] = Field(default=None)
-    content_contains: Optional[str] = Field(default=None)
     ids: Optional[list[UUID]] = None
     tags: Optional[list[str]] = None
     is_favorite: Optional[bool] = Field(default=None)
@@ -42,7 +41,6 @@ class NoteFindQuery(BaseModel):
             shared_with_user_id=None,
             visibility=self.visibility,
             title_contains=self.title_contains,
-            content_contains=self.content_contains,
             ids=[str(item) for item in self.ids] if self.ids else None,
             tags=self.tags,
             is_favorite=self.is_favorite,

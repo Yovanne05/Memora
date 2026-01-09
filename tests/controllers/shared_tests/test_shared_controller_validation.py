@@ -2,7 +2,6 @@
 Tests pour le controller shared.
 Mock le service shared_service.
 """
-import pytest
 from http import HTTPStatus
 
 

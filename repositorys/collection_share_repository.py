@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 
 from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
 
 from daos.collection_dao import CollectionShare
 from utils.db import get_db_session
@@ -31,7 +32,9 @@ def find_many(
     if param.user_id:
         filters.append(CollectionShare.user_id == param.user_id)
 
-    stmt = select(CollectionShare).where(*filters)
+    stmt = select(CollectionShare).where(*filters).options(
+        selectinload(CollectionShare.user)
+    )
 
     sort_map = {
         "created_at": CollectionShare.created_at,
@@ -55,7 +58,7 @@ def find_many(
 def find_by_collection(collection_id: str) -> List[CollectionShare]:
     stmt = select(CollectionShare).where(
         CollectionShare.collection_id == collection_id
-    )
+    ).options(selectinload(CollectionShare.user))
     with get_db_session() as session:
         return session.scalars(stmt).all()
 
@@ -66,7 +69,7 @@ def find_one(
     stmt = select(CollectionShare).where(
         CollectionShare.collection_id == collection_id,
         CollectionShare.user_id == user_id,
-    )
+    ).options(selectinload(CollectionShare.user))
     with get_db_session() as session:
         return session.execute(stmt).scalar_one_or_none()
 
@@ -75,16 +78,22 @@ def add(share: CollectionShare) -> CollectionShare:
     with get_db_session() as session:
         session.add(share)
         session.flush()
-        session.refresh(share)
-        return share
+        stmt = select(CollectionShare).where(
+            CollectionShare.collection_id == share.collection_id,
+            CollectionShare.user_id == share.user_id,
+        ).options(selectinload(CollectionShare.user))
+        return session.execute(stmt).scalar_one()
 
 
 def update(share: CollectionShare) -> CollectionShare:
     with get_db_session() as session:
         merged: CollectionShare = session.merge(share)
         session.flush()
-        session.refresh(merged)
-        return merged
+        stmt = select(CollectionShare).where(
+            CollectionShare.collection_id == merged.collection_id,
+            CollectionShare.user_id == merged.user_id,
+        ).options(selectinload(CollectionShare.user))
+        return session.execute(stmt).scalar_one()
 
 
 def delete(collection_id: str, user_id: str) -> bool:

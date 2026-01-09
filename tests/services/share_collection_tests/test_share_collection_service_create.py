@@ -8,7 +8,6 @@ Ces tests vérifient :
 
 Les repositories sont MOCKÉS.
 """
-import pytest
 from uuid import uuid4
 from datetime import datetime
 from dtos.collection_share_dto import CollectionShareDTO, CollectionShareCreateDTO
@@ -40,7 +39,7 @@ class TestShareCollectionServiceCreate:
         mock_collection_repository.find_one_unscoped.return_value = collection
         mock_collection_repository.find_one.return_value = collection
 
-        target_user = User(id=user_id, email="target@example.com", username="target", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
+        target_user = User(id=user_id, email="target@example.com", username="target", display_name="Target User", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         mock_user_repository.find_one.return_value = target_user
 
         mock_collection_share_repository.find_one.return_value = None
@@ -51,6 +50,7 @@ class TestShareCollectionServiceCreate:
             permission=SharePermissionEnum.READ,
             created_at=datetime.now()
         )
+        share.user = target_user  # Attach the user relation
         mock_collection_share_repository.add.return_value = share
 
         dto = CollectionShareCreateDTO(user_id=user_id, permission=SharePermissionEnum.READ)
@@ -61,6 +61,6 @@ class TestShareCollectionServiceCreate:
         # Assert
         assert isinstance(result, CollectionShareDTO)
         assert result.collection_id == collection_id
-        assert result.user_id == user_id
+        assert result.user.id == user_id
         mock_collection_repository.find_one_unscoped.assert_called_once()
         mock_collection_share_repository.add.assert_called_once()

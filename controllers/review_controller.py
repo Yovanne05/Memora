@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from flasgger import swag_from
 
 from dtos.review_dto import ReviewCreateDTO
@@ -11,6 +12,7 @@ bp_reviews = Blueprint("reviews", __name__, url_prefix="/reviews")
 
 
 @bp_reviews.post("")
+@jwt_required()
 @swag_from("../docs/reviews/create.yaml")
 def create_review():
     user = get_current_user()
@@ -27,6 +29,7 @@ def create_review():
 
 
 @bp_reviews.get("")
+@jwt_required()
 @swag_from("../docs/reviews/upcoming.yaml")
 def find_many():
     status = request.args.get("status")

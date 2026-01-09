@@ -27,10 +27,22 @@ class TestCollectionServiceUpdate:
     def test_update_collection_success(self, mock_collection_repository, monkeypatch):
         """Mettre à jour une collection existante."""
         from services.impl.collection.collection_service_impl import collection_service
+        from daos.user_dao import User
+        from utils.enums import RoleEnum
 
         # Arrange
         collection_id = str(uuid4())
         user_id = str(uuid4())
+
+        mock_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        monkeypatch.setattr("services.impl.collection.collection_service_impl.get_current_user", Mock(return_value=mock_user))
 
         existing_dao = Collection(
             id=collection_id,
@@ -62,6 +74,7 @@ class TestCollectionServiceUpdate:
 
         mock_dto = CollectionDTO(
             id=collection_id,
+            owner_id=user_id,
             name="New Name",
             description="New desc",
             visibility=VisibilityEnum.PUBLIC,
@@ -92,12 +105,26 @@ class TestCollectionServiceUpdate:
         mock_collection_repository.find_one_unscoped.assert_called_once_with(collection_id)
         mock_collection_repository.update.assert_called_once()
 
-    def test_update_collection_not_found(self, mock_collection_repository):
+    def test_update_collection_not_found(self, mock_collection_repository, monkeypatch):
         """Mettre à jour une collection inexistante lève CollectionNotFound."""
         from services.impl.collection.collection_service_impl import collection_service
+        from daos.user_dao import User
+        from utils.enums import RoleEnum
 
         # Arrange
         collection_id = str(uuid4())
+        user_id = str(uuid4())
+
+        mock_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        monkeypatch.setattr("services.impl.collection.collection_service_impl.get_current_user", Mock(return_value=mock_user))
+
         mock_collection_repository.find_one_unscoped.return_value = None
 
         dto = CollectionUpdateDTO(name="New Name")
