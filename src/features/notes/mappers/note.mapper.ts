@@ -11,7 +11,6 @@ export function dtoToNote(dto: NoteDto): Note {
     ownerUsername: dto.owner_username,
     title: dto.title,
     isFavorite: dto.is_favorite ?? false,
-    content: dto.content,
     tags: dto.tags ?? [],
     visibility: dto.visibility ?? "private",
     userPermission: dto.user_permission ?? null,

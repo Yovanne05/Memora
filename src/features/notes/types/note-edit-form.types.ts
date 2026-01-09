@@ -2,7 +2,7 @@ import type { Note, NoteVisibility } from "../models/note.model"
 
 export interface NoteFormValues {
   title: string
-  content: string
+  content?: string
   visibility: NoteVisibility
   collectionId?: string | null
   tags: string[]

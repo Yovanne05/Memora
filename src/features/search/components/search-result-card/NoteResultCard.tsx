@@ -37,7 +37,7 @@ export function NoteResultCard({ note }: Readonly<NoteResultCardProps>) {
                 {note.title}
               </CardTitle>
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {note.content || "Aucun contenu"}
+                Contenu non disponible
               </p>
             </div>
           </div>

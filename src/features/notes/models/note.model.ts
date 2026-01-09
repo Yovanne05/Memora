@@ -8,7 +8,6 @@ export interface Note {
   ownerId: string
   ownerUsername: string
   title: string
-  content: string
   isFavorite?: boolean
   tags: string[]
   visibility: NoteVisibility

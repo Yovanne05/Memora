@@ -6,6 +6,7 @@ import { CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getContentPreview } from "@/lib/html-utils"
 import type { LinkedNoteView } from "../../hooks/useLinkedNotesQuery"
+import type { Note } from "../../models/note.model"
 
 type NoteLinksListProps = {
   notes: LinkedNoteView[]
@@ -50,7 +51,7 @@ export function NoteLinksList({
               )}
 
               <p className="text-xs text-muted-foreground line-clamp-1">
-                {getContentPreview(linkedNote.content || "", 100)}
+                Contenu non disponible
               </p>
             </div>
 

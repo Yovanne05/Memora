@@ -11,6 +11,14 @@ const DEFAULT_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1000; // 1 second
 const DEFAULT_RETRY_MULTIPLIER = 2; // Exponential backoff
 
+type UnauthorizedHandler = (error: ApiError) => void;
+
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+  unauthorizedHandler = handler;
+}
+
 export interface HttpClient {
   get<T>(path: string, options?: HttpRequestOptions): Promise<T>;
   post<T, B = unknown>(path: string, body?: B, options?: HttpRequestOptions): Promise<T>;
@@ -83,6 +91,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
     return (await response.json()) as T;
   } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      unauthorizedHandler?.(error);
+    }
     throw normalizeError(error);
   }
 }

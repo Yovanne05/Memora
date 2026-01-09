@@ -7,6 +7,7 @@ export function dtoToUser(dto: UserDto): User {
     email: dto.email,
     username: dto.username,
     displayName: dto.display_name,
+    color: dto.color ?? null,
     role: dto.role,
     createdAt: dto.created_at,
     lastLogin: dto.last_login ?? null,
