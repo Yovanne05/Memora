@@ -2,7 +2,6 @@
 Tests pour le service statistics.
 Mock le repository statistics_repository.
 """
-import pytest
 from datetime import datetime
 
 

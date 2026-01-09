@@ -61,7 +61,7 @@ class TestNoteServiceCreate:
         created_note = Note(
             id=note_id,
             title="Test Note",
-            content="Test content",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id,
             visibility=VisibilityEnum.PRIVATE,
@@ -80,7 +80,8 @@ class TestNoteServiceCreate:
         mock_dto = NoteDTO(
             id=note_id,
             title="Test Note",
-            content="Test content",
+            owner_id=user_id,
+            owner_username="testuser",
             visibility=VisibilityEnum.PRIVATE,
             owners=[OwnerDTO(user_id=user_id, username="testuser")],
             collection_id=collection_id,
@@ -93,7 +94,7 @@ class TestNoteServiceCreate:
 
         dto = NoteCreateDTO(
             title="Test Note",
-            content="Test content",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id,
             visibility=VisibilityEnum.PRIVATE
@@ -121,7 +122,7 @@ class TestNoteServiceCreate:
 
         dto = NoteCreateDTO(
             title="Test Note",
-            content="Test content",
+            yjs_snapshot=None,
             owner_id=user_id,
             visibility=VisibilityEnum.PRIVATE
         )
@@ -180,7 +181,7 @@ class TestNoteServiceCreate:
 
         dto = NoteCreateDTO(
             title="Duplicate Title",
-            content="Test",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id
         )

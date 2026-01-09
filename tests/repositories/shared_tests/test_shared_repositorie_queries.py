@@ -2,7 +2,6 @@
 Tests pour le repository shared.
 Utilise la vraie BD via test_factory.
 """
-import pytest
 from datetime import datetime
 
 

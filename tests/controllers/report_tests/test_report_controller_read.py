@@ -10,7 +10,6 @@ Ces tests vérifient :
 
 Le service report_service est MOCKÉ.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime

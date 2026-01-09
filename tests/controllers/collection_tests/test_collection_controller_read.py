@@ -9,7 +9,6 @@ Ces tests vérifient uniquement la couche controller :
 
 Le service collection_service est MOCKÉ pour isoler le controller.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime
@@ -22,13 +21,14 @@ from exceptions.collection_exception import CollectionNotFound, CollectionTitleC
 class TestCollectionControllerList:
     """Tests pour GET /collections (list)"""
 
-    def test_list_collections_returns_200(self, app_client, mock_collection_service):
+    def test_list_collections_returns_200(self, authenticated_client, mock_collection_service):
         """Le endpoint GET /collections retourne 200 avec une liste."""
         # Arrange: Le service retourne 2 collections
         mock_collection_service.find_many.return_value = (
             [
                 CollectionDTO(
                     id=str(uuid4()),
+                    owner_id=str(uuid4()),
                     name="Collection 1",
                     description="Desc 1",
                     visibility=VisibilityEnum.PRIVATE,
@@ -38,6 +38,7 @@ class TestCollectionControllerList:
                 ),
                 CollectionDTO(
                     id=str(uuid4()),
+                    owner_id=str(uuid4()),
                     name="Collection 2",
                     description="Desc 2",
                     visibility=VisibilityEnum.PUBLIC,
@@ -50,7 +51,7 @@ class TestCollectionControllerList:
         )
 
         # Act
-        response = app_client.get("/collections")
+        response = authenticated_client.get("/collections")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -61,13 +62,13 @@ class TestCollectionControllerList:
         assert body["total"] == 2
         mock_collection_service.find_many.assert_called_once()
 
-    def test_list_collections_with_filters(self, app_client, mock_collection_service):
+    def test_list_collections_with_filters(self, authenticated_client, mock_collection_service):
         """Le endpoint accepte les query parameters de filtrage."""
         # Arrange
         mock_collection_service.find_many.return_value = ([], 0)
 
         # Act
-        response = app_client.get("/collections?title_contains=test&visibility=public")
+        response = authenticated_client.get("/collections?title_contains=test&visibility=public")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -81,12 +82,13 @@ class TestCollectionControllerList:
 class TestCollectionControllerGet:
     """Tests pour GET /collections/<id> (get one)"""
 
-    def test_get_collection_returns_200(self, app_client, mock_collection_service):
+    def test_get_collection_returns_200(self, authenticated_client, mock_collection_service):
         """Le endpoint GET /collections/<id> retourne 200 avec la collection."""
         # Arrange
         collection_id = str(uuid4())
         mock_collection_service.find_one.return_value = CollectionDTO(
             id=collection_id,
+            owner_id=str(uuid4()),
             name="Test Collection",
             description="Test desc",
             visibility=VisibilityEnum.PRIVATE,
@@ -96,7 +98,7 @@ class TestCollectionControllerGet:
         )
 
         # Act
-        response = app_client.get(f"/collections/{collection_id}")
+        response = authenticated_client.get(f"/collections/{collection_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -105,14 +107,14 @@ class TestCollectionControllerGet:
         assert body["name"] == "Test Collection"
         mock_collection_service.find_one.assert_called_once_with(collection_id)
 
-    def test_get_collection_returns_404_when_not_found(self, app_client, mock_collection_service):
+    def test_get_collection_returns_404_when_not_found(self, authenticated_client, mock_collection_service):
         """Le endpoint retourne 404 si la collection n'existe pas."""
         # Arrange
         collection_id = str(uuid4())
         mock_collection_service.find_one.side_effect = CollectionNotFound()
 
         # Act
-        response = app_client.get(f"/collections/{collection_id}")
+        response = authenticated_client.get(f"/collections/{collection_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.NOT_FOUND

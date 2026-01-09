@@ -147,12 +147,41 @@ def mock_note_image_service(monkeypatch):
 # =============================================================================
 
 @pytest.fixture
-def authenticated_client(app_client):
+def mock_current_user():
+    """Mock user for authenticated requests."""
+    from daos.user_dao import User
+    from utils.enums import RoleEnum
+    return User(
+        id="test-user-id-123",
+        email="test@example.com",
+        username="testuser",
+        display_name="Test User",
+        password_hash="hash",
+        role=RoleEnum.CLIENT
+    )
+
+
+@pytest.fixture
+def authenticated_client(app_client, mock_current_user, monkeypatch):
     """
     Client Flask authentifié avec un utilisateur de test.
-    Crée un vrai JWT token pour bypasser l'authentification.
+    Crée un vrai JWT token et mock get_current_user + permissions.
     """
     from flask_jwt_extended import create_access_token
+
+    # Mock get_current_user everywhere it's imported
+    monkeypatch.setattr("utils.auth.get_current_user", lambda: mock_current_user)
+    monkeypatch.setattr("utils.permission_decorators.get_current_user", lambda: mock_current_user)
+
+    # Mock permission_domain_service to always allow access
+    mock_permission = Mock()
+    mock_permission.can_read_note.return_value = True
+    mock_permission.can_write_note.return_value = True
+    mock_permission.can_manage_note.return_value = True
+    mock_permission.can_read_collection.return_value = True
+    mock_permission.can_write_collection.return_value = True
+    mock_permission.can_manage_collection.return_value = True
+    monkeypatch.setattr("utils.permission_decorators.permission_domain_service", mock_permission)
 
     # Créer un token JWT valide pour les tests
     with app_client.application.app_context():
@@ -160,9 +189,10 @@ def authenticated_client(app_client):
 
     # Créer un wrapper qui ajoute automatiquement le token aux headers
     class AuthenticatedClient:
-        def __init__(self, client, token):
+        def __init__(self, client, token, user):
             self.client = client
             self.token = token
+            self.user = user
 
         def get(self, *args, **kwargs):
             if 'headers' not in kwargs:
@@ -192,4 +222,4 @@ def authenticated_client(app_client):
         def application(self):
             return self.client.application
 
-    return AuthenticatedClient(app_client, access_token)
+    return AuthenticatedClient(app_client, access_token, mock_current_user)

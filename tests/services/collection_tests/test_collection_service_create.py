@@ -9,7 +9,6 @@ Ces tests vérifient la logique métier du service :
 
 Les repositories sont MOCKÉS pour isoler la logique du service.
 """
-import pytest
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
@@ -27,10 +26,22 @@ class TestCollectionServiceCreate:
     def test_create_collection_success(self, mock_collection_repository, monkeypatch):
         """Créer une collection avec des données valides."""
         from services.impl.collection.collection_service_impl import collection_service
+        from daos.user_dao import User
+        from utils.enums import RoleEnum
 
         # Arrange
         user_id = str(uuid4())
         collection_id = str(uuid4())
+
+        mock_user = User(
+            id=user_id,
+            email="test@example.com",
+            username="testuser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+        monkeypatch.setattr("services.impl.collection.collection_service_impl.get_current_user", Mock(return_value=mock_user))
 
         created_dao = Collection(
             id=collection_id,
@@ -48,6 +59,7 @@ class TestCollectionServiceCreate:
 
         mock_dto = CollectionDTO(
             id=collection_id,
+            owner_id=user_id,
             name="Test Collection",
             description="Test desc",
             visibility=VisibilityEnum.PRIVATE,

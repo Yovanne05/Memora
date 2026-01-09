@@ -46,7 +46,7 @@ class TestFlashcardServiceCreate:
         note = Note(
             id=note_id,
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=str(uuid4()),
             tags=[],
@@ -105,7 +105,7 @@ class TestFlashcardServiceCreate:
         note = Note(
             id=note_id,
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=str(uuid4()),
             tags=[],
@@ -143,7 +143,7 @@ class TestFlashcardServiceCreate:
         note = Note(
             id=note_id,
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=str(uuid4()),
             tags=[],
@@ -201,7 +201,7 @@ class TestFlashcardServiceDuplicate:
         note = Note(
             id=note_id,
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=str(uuid4()),
             tags=[],

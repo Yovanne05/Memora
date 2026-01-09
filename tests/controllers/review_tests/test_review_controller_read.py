@@ -7,7 +7,6 @@ Ces tests vérifient le routing et les réponses HTTP :
 
 Le service review_service est MOCKÉ.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime
@@ -16,7 +15,7 @@ from datetime import datetime
 class TestReviewControllerFindMany:
     """Tests pour GET /reviews"""
 
-    def test_get_upcoming_reviews_returns_200(self, app_client, mock_review_service, monkeypatch):
+    def test_get_upcoming_reviews_returns_200(self, authenticated_client, mock_review_service, monkeypatch):
         """Le endpoint GET /reviews?status=upcoming retourne 200 avec les reviews groupées."""
         from dtos.review_dto import UpcomingReviewsGroupDTO, FlashcardWithReviewDTO
         from daos.user_dao import User
@@ -49,7 +48,7 @@ class TestReviewControllerFindMany:
         mock_review_service.get_upcoming_reviews.return_value = upcoming
 
         # Act
-        response = app_client.get("/reviews?status=upcoming")
+        response = authenticated_client.get("/reviews?status=upcoming")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -60,7 +59,7 @@ class TestReviewControllerFindMany:
         assert "flashcards" in body[0]
         mock_review_service.get_upcoming_reviews.assert_called_once_with(user_id)
 
-    def test_get_reviews_invalid_status_returns_400(self, app_client, monkeypatch):
+    def test_get_reviews_invalid_status_returns_400(self, authenticated_client, monkeypatch):
         """Le endpoint retourne 400 si le status est invalide."""
         from daos.user_dao import User
         from utils.enums import RoleEnum
@@ -77,7 +76,7 @@ class TestReviewControllerFindMany:
         monkeypatch.setattr("controllers.review_controller.get_current_user", lambda: current_user)
 
         # Act
-        response = app_client.get("/reviews?status=invalid")
+        response = authenticated_client.get("/reviews?status=invalid")
 
         # Assert
         assert response.status_code == HTTPStatus.BAD_REQUEST

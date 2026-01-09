@@ -9,9 +9,9 @@ Ces tests vérifient :
 
 Le service collection_share_service est MOCKÉ.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
+from utils.enums import RoleEnum
 from datetime import datetime
 
 
@@ -21,15 +21,25 @@ class TestShareCollectionControllerList:
     def test_list_shares_returns_200(self, authenticated_client, mock_collection_share_service):
         """Le endpoint GET /collections/<id>/shares retourne 200."""
         from dtos.collection_share_dto import CollectionShareDTO
+        from dtos.user_dto import UserDTO
         from utils.enums import SharePermissionEnum
 
         # Arrange
         collection_id = str(uuid4())
+
+        user1 = UserDTO(
+            id=str(uuid4()),
+            email="user1@example.com",
+            username="user1",
+            display_name="User 1",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now()
+        )
+
         shares = [
             CollectionShareDTO(
-                id=str(uuid4()),
                 collection_id=collection_id,
-                user_id=str(uuid4()),
+                user=user1,
                 permission=SharePermissionEnum.READ,
                 created_at=datetime.now()
             )

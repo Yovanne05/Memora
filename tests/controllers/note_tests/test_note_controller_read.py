@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime
@@ -8,7 +7,7 @@ from utils.enums import VisibilityEnum
 class TestNoteControllerList:
     """Tests pour GET /notes (list)"""
 
-    def test_list_notes_returns_200(self, app_client, mock_note_crud_service):
+    def test_list_notes_returns_200(self, authenticated_client, mock_note_crud_service):
         """Le endpoint GET /notes retourne 200 avec une liste."""
         from dtos.note_dto import NoteDTO
 
@@ -17,10 +16,11 @@ class TestNoteControllerList:
             [
                 NoteDTO(
                     id=str(uuid4()),
+                    owner_id=str(uuid4()),
+                    owner_username="testuser",
                     title="Note 1",
-                    content="Content 1",
-                    collection_id=str(uuid4()),
                     visibility=VisibilityEnum.PRIVATE,
+                    collection_id=str(uuid4()),
                     created_at=datetime.now(),
                     updated_at=datetime.now(),
                     tags=[]
@@ -30,7 +30,7 @@ class TestNoteControllerList:
         )
 
         # Act
-        response = app_client.get("/notes")
+        response = authenticated_client.get("/notes")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -42,7 +42,7 @@ class TestNoteControllerList:
 class TestNoteControllerGet:
     """Tests pour GET /notes/<id>"""
 
-    def test_get_note_returns_200(self, app_client, mock_note_crud_service):
+    def test_get_note_returns_200(self, authenticated_client, mock_note_crud_service):
         """Le endpoint GET /notes/<id> retourne 200."""
         from dtos.note_dto import NoteDTO
 
@@ -50,17 +50,18 @@ class TestNoteControllerGet:
         note_id = str(uuid4())
         mock_note_crud_service.find_one.return_value = NoteDTO(
             id=note_id,
+            owner_id=str(uuid4()),
+            owner_username="testuser",
             title="Test Note",
-            content="Test content",
-            collection_id=str(uuid4()),
             visibility=VisibilityEnum.PRIVATE,
+            collection_id=str(uuid4()),
             created_at=datetime.now(),
             updated_at=datetime.now(),
             tags=[]
         )
 
         # Act
-        response = app_client.get(f"/notes/{note_id}")
+        response = authenticated_client.get(f"/notes/{note_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.OK

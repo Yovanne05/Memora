@@ -11,7 +11,6 @@ Ces tests vérifient :
 
 Le service flashcard_service est MOCKÉ.
 """
-import pytest
 from uuid import uuid4
 from http import HTTPStatus
 
@@ -19,7 +18,7 @@ from http import HTTPStatus
 class TestFlashcardControllerList:
     """Tests pour GET /flashcards"""
 
-    def test_list_flashcards_returns_200(self, app_client, mock_flashcard_service):
+    def test_list_flashcards_returns_200(self, authenticated_client, mock_flashcard_service):
         """Le endpoint GET /flashcards retourne 200."""
         from dtos.flashcard_dto import FlashcardDTO
 
@@ -37,7 +36,7 @@ class TestFlashcardControllerList:
         mock_flashcard_service.find_many.return_value = (flashcards, 1)
 
         # Act
-        response = app_client.get("/flashcards")
+        response = authenticated_client.get("/flashcards")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -50,7 +49,7 @@ class TestFlashcardControllerList:
 class TestFlashcardControllerGet:
     """Tests pour GET /flashcards/<id>"""
 
-    def test_get_flashcard_returns_200(self, app_client, mock_flashcard_service):
+    def test_get_flashcard_returns_200(self, authenticated_client, mock_flashcard_service):
         """Le endpoint GET /flashcards/<id> retourne 200."""
         from dtos.flashcard_dto import FlashcardDTO
 
@@ -67,7 +66,7 @@ class TestFlashcardControllerGet:
         mock_flashcard_service.find_one.return_value = flashcard
 
         # Act
-        response = app_client.get(f"/flashcards/{flashcard_id}")
+        response = authenticated_client.get(f"/flashcards/{flashcard_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.OK

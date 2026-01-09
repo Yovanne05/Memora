@@ -47,7 +47,7 @@ class TestNoteServiceFindOne:
         note_entity = Note(
             id=note_id,
             title="Test Note",
-            content="Test content",
+            yjs_snapshot=None,
             owner_id=user_id,
             visibility=VisibilityEnum.PRIVATE,
             tags=[],
@@ -65,8 +65,9 @@ class TestNoteServiceFindOne:
 
         mock_dto = NoteDTO(
             id=note_id,
+            owner_id=user_id,
+            owner_username="testuser",
             title="Test Note",
-            content="Test content",
             visibility=VisibilityEnum.PRIVATE,
             owners=[OwnerDTO(user_id=user_id, username="testuser")],
             tags=[],

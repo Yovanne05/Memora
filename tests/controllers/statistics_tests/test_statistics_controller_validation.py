@@ -2,7 +2,6 @@
 Tests pour le controller statistics.
 Mock le service statistics_service.
 """
-import pytest
 from http import HTTPStatus
 
 
