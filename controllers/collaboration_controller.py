@@ -343,8 +343,19 @@ def handle_send_operation(data):
                 f"position={operation_dto.operation.position}, "
                 f"content_length={content_len}, "
                 f"operation_content_len={len(operation_dto.operation.content) if operation_dto.operation.content else 0}, "
-                f"operation_length={operation_dto.operation.length}"
+                f"operation_length={operation_dto.operation.length}, "
+                f"operation_version={operation_dto.operation.version}, "
+                f"current_version={current_version}"
             )
+
+            # Check version conflict before validation
+            if operation_dto.operation.version != current_version + 1:
+                logger.warning(
+                    f"Version conflict: operation version={operation_dto.operation.version}, "
+                    f"expected version={current_version + 1}"
+                )
+                raise CollaborationVersionConflict(current_version + 1, operation_dto.operation.version)
+
             collaboration_domain_service.validate_operation(
                 operation_dto.operation, content_len, current_version
             )
@@ -352,8 +363,7 @@ def handle_send_operation(data):
             new_version = collaboration_repository.increment_version_for_note(
                 operation_dto.note_id
             )
-            if new_version != operation_dto.operation.version:
-                operation_dto.operation.version = new_version
+            operation_dto.operation.version = new_version
 
             new_content = collaboration_domain_service.apply_operation(
                 note.content, operation_dto.operation
@@ -394,7 +404,17 @@ def handle_send_operation(data):
         emit("operation_acknowledged", {"version": operation_dto.operation.version})
 
     except CollaborationVersionConflict as e:
-        emit("error", {"code": 409, "message": str(e), "type": "version_conflict"})
+        # Send current version to help client recover from conflict
+        current_version = collaboration_repository.get_latest_version_for_note(
+            operation_dto.note_id
+        )
+        logger.info(f"Sending version conflict response with current_version={current_version}")
+        emit("error", {
+            "code": 409,
+            "message": str(e),
+            "type": "version_conflict",
+            "current_version": current_version
+        })
     except CollaborationInvalidOperation as e:
         emit("error", {"code": 400, "message": str(e), "type": "invalid_operation"})
     except Exception as e:
