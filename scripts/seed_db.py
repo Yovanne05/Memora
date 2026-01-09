@@ -31,6 +31,7 @@ from daos.collection_dao import Collection, CollectionShare
 from daos.collection_share_link_dao import CollectionShareLink
 from daos.note_dao import Note, NoteLink, NoteShare
 from daos.note_share_link_dao import NoteShareLink
+from daos.note_image_dao import NoteImage
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
