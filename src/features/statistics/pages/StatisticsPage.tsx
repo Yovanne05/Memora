@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react"
 import { BookOpenCheck, Folder, StickyNote } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import { StatisticsLoading } from "../states/StatisticsLoading"
-import { StatisticsError } from "../states/StatisticsError"
-import { StatisticsHeader } from "../layout/StatisticsHeader"
-import { useUserStatisticsQuery } from "../../hooks/useUserStatisticsQuery"
-import { useUserStatisticsTimeseriesQuery } from "../../hooks/useUserStatisticsTimeSeriesQuery"
-import { SummaryGrid } from "../summary/SummaryGrid"
-import { SummaryCard } from "../summary/SummaryCard"
-import { TimeseriesChartCard } from "../charts/TimeSeriesChartCard"
-import type { StatisticsMetric, StatisticsRangeDays } from "../../types/statistics-types"
+
+
+import type { StatisticsMetric, StatisticsRangeDays } from "../types/statistics-types"
+import { useUserStatisticsQuery } from "../hooks/useUserStatisticsQuery"
+import { useUserStatisticsTimeseriesQuery } from "../hooks/useUserStatisticsTimeSeriesQuery"
+import { StatisticsLoading } from "../components/states/StatisticsLoading"
+import { StatisticsError } from "../components/states/StatisticsError"
+import { StatisticsHeader } from "../components/layout/StatisticsHeader"
+import { SummaryCard } from "../components/summary/SummaryCard"
+import { SummaryGrid } from "../components/summary/SummaryGrid"
+import { TimeseriesChartCard } from "../components/charts/TimeSeriesChartCard"
 
 export default function StatisticsPage() {
   const statsQuery = useUserStatisticsQuery()
