@@ -12,10 +12,6 @@ function isCollection(item: Collection | Note): item is Collection {
   return "notes" in item
 }
 
-function isNote(item: Collection | Note): item is Note {
-  return "content" in item
-}
-
 export function SearchResultCard({ result }: Readonly<SearchResultCardProps>) {
   const { type, item } = result
 
@@ -23,7 +19,7 @@ export function SearchResultCard({ result }: Readonly<SearchResultCardProps>) {
     return <CollectionResultCard collection={item} />
   }
 
-  if (type === "note" && isNote(item)) {
+  if (type === "note" && !isCollection(item)) {
     return <NoteResultCard note={item} />
   }
 

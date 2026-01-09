@@ -33,8 +33,7 @@ export function useLinkNotes({ note, existingLinks = [], onSuccess }: UseLinkNot
       .filter(n => !existingLinkIds.has(n.id))
       .filter(n =>
         searchQuery === "" ||
-        n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        n.content.toLowerCase().includes(searchQuery.toLowerCase())
+        n.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
   }, [notesData, note.id, existingLinkIds, searchQuery])
 

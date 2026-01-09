@@ -29,7 +29,7 @@ export function useNoteEditForm({
     resolver: zodResolver(noteEditFormSchema),
     defaultValues: {
       title: note?.title ?? "",
-      content: note?.content ?? "",
+      content: "",
       visibility: note?.visibility ?? "private",
       collectionId: note?.collectionId ?? null,
       tags: note?.tags ?? [],

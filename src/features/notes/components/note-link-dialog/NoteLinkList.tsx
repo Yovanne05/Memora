@@ -1,10 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { getContentPreview } from "@/lib/html-utils"
-
 type NoteLinkListItem = {
   id: string
   title: string
-  content?: string | null
 }
 
 type NoteLinkListProps = {
@@ -50,7 +47,7 @@ export function NoteLinkList({
           >
             <h4 className="font-medium text-sm mb-1">{item.title}</h4>
             <p className="text-xs text-muted-foreground line-clamp-2">
-              {getContentPreview(item.content || "", 150)}
+              Contenu non disponible
             </p>
           </button>
         ))}

@@ -47,7 +47,7 @@ export function useNoteQuickActions({
     await duplicateMutation.mutateAsync({
       ownerId: note.ownerId,
       title: `${note.title} (copie)`,
-      content: note.content,
+      content: "",
       collectionId: note.collectionId,
       visibility: note.visibility,
       tags: note.tags,

@@ -1,5 +1,7 @@
 import type { UseFormReturn } from "react-hook-form"
+import { Save } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   FormControl,
@@ -18,6 +20,8 @@ interface NoteContentFieldsProps {
 }
 
 export function NoteContentFields({ form, disabled, noteId }: Readonly<NoteContentFieldsProps>) {
+  const isTitleDirty = !!form.formState.dirtyFields?.title
+
   return (
     <Card className="border border-border/70 shadow-sm">
       <CardHeader className="pb-2">
@@ -32,13 +36,26 @@ export function NoteContentFields({ form, disabled, noteId }: Readonly<NoteConte
             <FormItem>
               <FormLabel>Titre</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  id="note-title"
-                  placeholder="Titre de la note"
-                  className="h-12 text-lg"
-                  disabled={disabled}
-                />
+                <div className="relative">
+                  <Input
+                    {...field}
+                    id="note-title"
+                    placeholder="Titre de la note"
+                    className="h-12 pr-11 text-lg"
+                    disabled={disabled}
+                  />
+                  {isTitleDirty && !disabled && (
+                    <Button
+                      type="submit"
+                      size="icon"
+                      variant="ghost"
+                      className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2"
+                      aria-label="Enregistrer le titre"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
