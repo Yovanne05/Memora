@@ -148,28 +148,6 @@ export function AccountDeletionSection({ user }: AccountDeletionSectionProps) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-
-      <div className="rounded-lg bg-muted p-4 space-y-2">
-        <p className="text-sm font-medium">Vos droits RGPD</p>
-        <ul className="text-xs text-muted-foreground space-y-1">
-          <li>
-            <strong>Droit d'accès :</strong> Vous pouvez consulter vos données à
-            tout moment dans votre profil
-          </li>
-          <li>
-            <strong>Droit de rectification :</strong> Vous pouvez modifier vos
-            informations personnelles
-          </li>
-          <li>
-            <strong>Droit à la portabilité :</strong> Vous pouvez exporter vos
-            données au format JSON
-          </li>
-          <li>
-            <strong>Droit à l'effacement :</strong> Vous pouvez supprimer votre
-            compte et toutes vos données
-          </li>
-        </ul>
-      </div>
     </div>
   )
 }

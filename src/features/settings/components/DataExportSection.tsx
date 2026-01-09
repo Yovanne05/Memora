@@ -10,32 +10,44 @@ export function DataExportSection() {
   const handleExportData = async () => {
     setIsExporting(true)
     try {
-      // Fetch user data from various endpoints
-      const [profile, notes, collections, flashcards, statistics] =
-        await Promise.all([
-          httpClient.get('/sessions/me').catch(() => null),
-          httpClient
-            .get('/notes', { params: { limit: 1000 } })
-            .catch(() => ({ items: [] })),
-          httpClient
-            .get('/collections', { params: { limit: 1000 } })
-            .catch(() => ({ items: [] })),
-          httpClient
-            .get('/flashcards', { params: { limit: 1000 } })
-            .catch(() => ({ items: [] })),
-          httpClient.get('/users/me/statistics').catch(() => null),
-        ])
+      // Fetch user data from various endpoints (limit: 200 max per backend validation)
+      const [
+        profile,
+        notesResponse,
+        collectionsResponse,
+        flashcardsResponse,
+        statistics,
+      ] = await Promise.all([
+        httpClient.get('/sessions/me').catch(() => null),
+        httpClient
+          .get<{
+            items: unknown[]
+            total: number
+          }>('/notes', { params: { limit: 200 } })
+          .catch(() => ({ items: [], total: 0 })),
+        httpClient
+          .get<{
+            items: unknown[]
+            total: number
+          }>('/collections', { params: { limit: 200 } })
+          .catch(() => ({ items: [], total: 0 })),
+        httpClient
+          .get<{
+            items: unknown[]
+            total: number
+          }>('/flashcards', { params: { limit: 200 } })
+          .catch(() => ({ items: [], total: 0 })),
+        httpClient.get('/users/me/statistics').catch(() => null),
+      ])
 
       const exportData = {
         exportDate: new Date().toISOString(),
         exportVersion: '1.0',
         userData: {
           profile,
-          notes: Array.isArray(notes) ? notes : notes || [],
-          collections: Array.isArray(collections)
-            ? collections
-            : collections || [],
-          flashcards: Array.isArray(flashcards) ? flashcards : flashcards || [],
+          notes: notesResponse.items,
+          collections: collectionsResponse.items,
+          flashcards: flashcardsResponse.items,
           statistics,
         },
       }
