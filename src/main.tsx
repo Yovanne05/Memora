@@ -6,9 +6,26 @@ import { router } from "./routing/router";
 import { queryClient } from "./lib/query-client";
 import { registerAuthInterceptors } from "./features/auth/lib/interceptors";
 import { initSentry } from "./lib/sentry";
+import { clearAccessToken } from "./features/auth/lib/token-storage";
+import { setUnauthorizedHandler } from "./lib/http-client";
 
 initSentry();
 registerAuthInterceptors();
+
+let isRedirectingToLogin = false;
+setUnauthorizedHandler(() => {
+  clearAccessToken();
+  queryClient.removeQueries({ queryKey: ["auth", "user"] });
+
+  const { pathname, search, hash } = globalThis.window.location;
+  if (pathname === "/auth/login") return;
+  if (isRedirectingToLogin) return;
+  isRedirectingToLogin = true;
+
+  const redirect = `${pathname}${search}${hash}`;
+  const loginUrl = `/auth/login?redirect=${encodeURIComponent(redirect)}`;
+  globalThis.window.location.assign(loginUrl);
+});
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
