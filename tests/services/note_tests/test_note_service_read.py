@@ -47,7 +47,6 @@ class TestNoteServiceFindOne:
         note_entity = Note(
             id=note_id,
             title="Test Note",
-            yjs_snapshot=None,
             owner_id=user_id,
             visibility=VisibilityEnum.PRIVATE,
             tags=[],

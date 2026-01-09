@@ -30,13 +30,13 @@ class TestNoteLinkServiceCreate:
         note_id_2 = str(uuid4())
 
         note1 = Note(
-            id=note_id_1, title="Note 1", yjs_snapshot=None, owner_id=owner_id,
+            id=note_id_1, title="Note 1", owner_id=owner_id,
             collection_id=collection_id, tags=[], shares=[], share_links=[],
             flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
             created_at=datetime.now(), updated_at=datetime.now()
         )
         note2 = Note(
-            id=note_id_2, title="Note 2", yjs_snapshot=None, owner_id=owner_id,
+            id=note_id_2, title="Note 2", owner_id=owner_id,
             collection_id=collection_id, tags=[], shares=[], share_links=[],
             flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
             created_at=datetime.now(), updated_at=datetime.now()

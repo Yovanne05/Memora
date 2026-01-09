@@ -61,7 +61,6 @@ class TestNoteServiceCreate:
         created_note = Note(
             id=note_id,
             title="Test Note",
-            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id,
             visibility=VisibilityEnum.PRIVATE,
@@ -94,7 +93,6 @@ class TestNoteServiceCreate:
 
         dto = NoteCreateDTO(
             title="Test Note",
-            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id,
             visibility=VisibilityEnum.PRIVATE
@@ -122,7 +120,6 @@ class TestNoteServiceCreate:
 
         dto = NoteCreateDTO(
             title="Test Note",
-            yjs_snapshot=None,
             owner_id=user_id,
             visibility=VisibilityEnum.PRIVATE
         )
@@ -181,7 +178,6 @@ class TestNoteServiceCreate:
 
         dto = NoteCreateDTO(
             title="Duplicate Title",
-            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id
         )
