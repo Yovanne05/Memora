@@ -72,7 +72,7 @@ class CollabService:
             raise Forbidden("User not found.")
         return CollabSessionVerifyResponseDTO(
             user_id=payload["user_id"],
-            username=user.username,
+            username=user.display_name,
             color=random.choice(self.USER_COLORS),
             scope=payload["scope"],
         )
