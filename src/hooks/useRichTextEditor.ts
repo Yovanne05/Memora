@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Underline from "@tiptap/extension-underline"
@@ -6,8 +6,16 @@ import Link from "@tiptap/extension-link"
 import Placeholder from "@tiptap/extension-placeholder"
 import TextAlign from "@tiptap/extension-text-align"
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight"
+import Collaboration from "@tiptap/extension-collaboration"
+import CollaborationCaret from "@tiptap/extension-collaboration-caret"
+import * as Y from "yjs"
+import { HocuspocusProvider } from "@hocuspocus/provider"
 import { common, createLowlight } from "lowlight"
 
+import { useAuth } from "@/features/auth/hooks/useAuth"
+import { collabService } from "@/features/collab/services/collab.service"
+import { config } from "@/lib/config"
+import { logger } from "@/lib/logger"
 import { cn } from "@/lib/utils"
 import { ResizableImage } from "../lib/ResizableImage"
 import { parseContent } from "../lib/content"
@@ -17,6 +25,7 @@ type UseRichTextEditorArgs = {
   onChange: (content: string) => void
   placeholder: string
   editable: boolean
+  noteId?: string
 }
 
 const lowlight = createLowlight(common)
@@ -26,11 +35,91 @@ export function useRichTextEditor({
   onChange,
   placeholder,
   editable,
+  noteId,
 }: UseRichTextEditorArgs) {
-  const editor = useEditor({
-    extensions: [
+  const { user } = useAuth()
+  const [collabDocument, setCollabDocument] = useState<Y.Doc | null>(null)
+  const [collabToken, setCollabToken] = useState<string | null>(null)
+  const [provider, setProvider] = useState<HocuspocusProvider | null>(null)
+
+  useEffect(() => {
+    setCollabToken(null)
+    setProvider(null)
+  }, [noteId])
+
+  useEffect(() => {
+    if (!noteId || !config.collabWsUrl) {
+      setCollabDocument(null)
+      return
+    }
+
+    const document = new Y.Doc()
+    setCollabDocument(document)
+
+    return () => {
+      document.destroy()
+      setCollabDocument(null)
+    }
+  }, [noteId])
+
+  useEffect(() => {
+    if (!noteId) return
+
+    let isActive = true
+
+    const fetchToken = async () => {
+      try {
+        const session = await collabService.createSession(noteId)
+        if (isActive) {
+          setCollabToken(session.collab_token)
+        }
+      } catch (error) {
+        logger.error("Failed to create collab session:", error)
+      }
+    }
+
+    fetchToken()
+
+    return () => {
+      isActive = false
+    }
+  }, [noteId])
+
+  useEffect(() => {
+    if (!collabDocument || !collabToken || !noteId || !config.collabWsUrl) {
+      setProvider(null)
+      return
+    }
+
+    const nextProvider = new HocuspocusProvider({
+      url: config.collabWsUrl,
+      name: noteId,
+      token: collabToken,
+      document: collabDocument,
+    })
+
+    setProvider(nextProvider)
+
+    return () => {
+      nextProvider.destroy()
+    }
+  }, [collabDocument, collabToken, noteId])
+
+  const caretUser = useMemo(
+    () => ({
+      name: user?.username ?? "Utilisateur",
+      color: "#f59e0b",
+    }),
+    [user?.username]
+  )
+
+  const enableCollaboration = Boolean(collabDocument)
+
+  const extensions = useMemo(() => {
+    const baseExtensions = [
       StarterKit.configure({
         codeBlock: false,
+        history: !collabDocument,
       }),
       Underline,
       Link.configure({
@@ -58,33 +147,60 @@ export function useRichTextEditor({
           class: "rounded-lg max-w-full h-auto",
         },
       }),
-    ],
-    content: parseContent(content),
-    editable,
-    onUpdate: ({ editor: activeEditor }) => {
-      const json = activeEditor.getJSON()
-      onChange(JSON.stringify(json))
-    },
-    editorProps: {
-      attributes: {
-        class: cn(
-          "prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4",
-          "prose-headings:font-semibold prose-headings:tracking-tight",
-          "prose-p:leading-relaxed prose-p:text-muted-foreground",
-          "prose-a:text-primary prose-a:underline prose-a:cursor-pointer",
-          "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded",
-          "prose-pre:bg-muted prose-pre:p-4",
-          "prose-ul:list-disc prose-ol:list-decimal",
-          "prose-li:text-muted-foreground",
-          "prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground",
-          "prose-img:rounded-lg prose-img:shadow-md prose-img:my-4"
-        ),
+    ]
+
+    if (collabDocument) {
+      baseExtensions.push(
+        Collaboration.configure({
+          document: collabDocument,
+        })
+      )
+    }
+
+    if (provider) {
+      baseExtensions.push(
+        CollaborationCaret.configure({
+          provider,
+          user: caretUser,
+        })
+      )
+    }
+
+    return baseExtensions
+  }, [caretUser, collabDocument, placeholder, provider])
+
+  const editor = useEditor(
+    {
+      extensions,
+      content: enableCollaboration ? undefined : parseContent(content),
+      editable,
+      onUpdate: ({ editor: activeEditor }) => {
+        const json = activeEditor.getJSON()
+        onChange(JSON.stringify(json))
+      },
+      editorProps: {
+        attributes: {
+          class: cn(
+            "prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4",
+            "prose-headings:font-semibold prose-headings:tracking-tight",
+            "prose-p:leading-relaxed prose-p:text-muted-foreground",
+            "prose-a:text-primary prose-a:underline prose-a:cursor-pointer",
+            "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded",
+            "prose-pre:bg-muted prose-pre:p-4",
+            "prose-ul:list-disc prose-ol:list-decimal",
+            "prose-li:text-muted-foreground",
+            "prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground",
+            "prose-img:rounded-lg prose-img:shadow-md prose-img:my-4"
+          ),
+        },
       },
     },
-  })
+    [editable, enableCollaboration, extensions]
+  )
 
   useEffect(() => {
     if (!editor) return
+    if (enableCollaboration) return
 
     const currentContent = JSON.stringify(editor.getJSON())
     const newContent = parseContent(content)
@@ -99,7 +215,7 @@ export function useRichTextEditor({
         editor.commands.setContent(newContent)
       }
     }
-  }, [content, editor])
+  }, [content, editor, enableCollaboration])
 
   return editor
 }

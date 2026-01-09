@@ -27,6 +27,7 @@ export function RichTextEditor({
     onChange,
     placeholder,
     editable,
+    noteId,
   })
 
   if (!editor) {
