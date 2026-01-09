@@ -22,25 +22,39 @@ export function useLinkNotes({ note, existingLinks = [], onSuccess }: UseLinkNot
   const createLinkMutation = useCreateNoteLinkMutation(note.id)
 
   const existingLinkIds = useMemo(
-    () => new Set(existingLinks.map(l => l.linkedNoteId)),
+    () => new Set(existingLinks.map((link) => link.linkedNoteId)),
     [existingLinks]
   )
 
   const availableNotes = useMemo(() => {
     const notes = notesData?.items ?? []
+    const normalizedSearch = searchQuery.trim().toLowerCase()
+
     return notes
-      .filter(n => n.id !== note.id)
-      .filter(n => !existingLinkIds.has(n.id))
-      .filter(n =>
-        searchQuery === "" ||
-        n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        n.content.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      .filter((candidateNote) => candidateNote.id !== note.id)
+      .filter((candidateNote) => !existingLinkIds.has(candidateNote.id))
+      .filter((candidateNote) => {
+        if (normalizedSearch === "") return true
+        return (
+          candidateNote.title.toLowerCase().includes(normalizedSearch) ||
+          candidateNote.content.toLowerCase().includes(normalizedSearch)
+        )
+      })
   }, [notesData, note.id, existingLinkIds, searchQuery])
 
-  const handleCreateLink = async (linkedNoteId: string) => {
+  const handleCreateLink = async (linkedNoteId: string, label: string) => {
+    const normalizedLabel = label.trim()
+
+    if (normalizedLabel.length === 0) {
+      return false
+    }
+
     try {
-      await createLinkMutation.mutateAsync({ linkedNoteId })
+      await createLinkMutation.mutateAsync({
+        linkedNoteId,
+        label: normalizedLabel,
+      })
+
       setSelectedNoteId(null)
       setSearchQuery("")
       onSuccess?.()

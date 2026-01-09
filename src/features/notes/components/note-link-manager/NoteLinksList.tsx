@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button"
 import { CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getContentPreview } from "@/lib/html-utils"
-import type { Note } from "../../models/note.model"
+import type { LinkedNoteView } from "../../hooks/useLinkedNotesQuery"
 
 type NoteLinksListProps = {
-  notes: Note[]
+  notes: LinkedNoteView[]
   isLoading: boolean
   onDelete: (id: string) => void
 }
@@ -41,16 +41,29 @@ export function NoteLinksList({
           >
             <div className="flex-1 min-w-0">
               <h4 className="font-medium text-sm truncate">{linkedNote.title}</h4>
+
+              {linkedNote.linkLabel && (
+                <p className="text-xs text-muted-foreground">
+                  Lien :{" "}
+                  <span className="font-medium">{linkedNote.linkLabel}</span>
+                </p>
+              )}
+
               <p className="text-xs text-muted-foreground line-clamp-1">
                 {getContentPreview(linkedNote.content || "", 100)}
               </p>
             </div>
+
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/app/workspace/notes/$noteId" params={{ noteId: linkedNote.id }}>
+                <Link
+                  to="/app/workspace/notes/$noteId"
+                  params={{ noteId: linkedNote.id }}
+                >
                   Voir
                 </Link>
               </Button>
+
               <Button
                 variant="ghost"
                 size="icon"
