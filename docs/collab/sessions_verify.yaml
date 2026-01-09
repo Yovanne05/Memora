@@ -1,0 +1,29 @@
+tags:
+  - collab
+summary: Verify a collab session
+description: >
+  Validates a collab token for a note and returns the user scope and awareness profile.
+security:
+  - apiKeyAuth: []
+parameters:
+  - in: header
+    name: X-API-Key
+    type: string
+    required: true
+    description: API key for collab endpoints.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/CollabSessionVerifyPayload"
+responses:
+  200:
+    description: Collab token is valid.
+    schema:
+      $ref: "#/definitions/CollabSessionVerifyResponse"
+  401:
+    description: Missing or invalid API key or collab token.
+  403:
+    description: Token scope does not match the note.
+  422:
+    description: Invalid payload.

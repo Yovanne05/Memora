@@ -1,0 +1,28 @@
+tags:
+  - collab
+summary: Get collab document data
+description: >
+  Returns the Yjs snapshot (source of truth).
+security:
+  - apiKeyAuth: []
+parameters:
+  - in: header
+    name: X-API-Key
+    type: string
+    required: true
+    description: API key for collab endpoints.
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Note identifier.
+responses:
+  200:
+    description: Collab document fetched.
+    schema:
+      $ref: "#/definitions/CollabDocumentResponse"
+  401:
+    description: Missing or invalid API key.
+  404:
+    description: Note not found.

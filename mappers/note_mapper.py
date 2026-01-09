@@ -1,5 +1,4 @@
 from typing import Optional, List
-from typing import Optional
 
 from sqlalchemy import inspect
 
@@ -7,7 +6,6 @@ from daos.note_dao import Note
 from domain_services.permission_domain_service import permission_domain_service
 from dtos.note_dto import NoteCreateDTO, NoteDTO
 from utils.permission_models import AccessLevel
-from domain_services.permission_domain_service import permission_domain_service
 from dtos.owner_dto import OwnerDTO
 from utils.enums import SharePermissionEnum
 
@@ -74,7 +72,6 @@ def note_to_dto(
     data = {
         "id": note.id,
         "title": note.title,
-        "content": note.content,
         "visibility": note.visibility,
         "owners": _get_all_owners(note),
         "collection_id": note.collection_id,
@@ -91,7 +88,6 @@ def note_to_dto(
 def dto_to_note(note_create_dto: NoteCreateDTO) -> Note:
     return Note(
         title=note_create_dto.title,
-        content=note_create_dto.content,
         owner_id=note_create_dto.owner_id,
         collection_id=note_create_dto.collection_id,
         visibility=note_create_dto.visibility,

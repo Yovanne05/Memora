@@ -1,0 +1,16 @@
+{
+  "name": "realtime",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@hocuspocus/server": "^3.4.3",
+    "dotenv": "^16.4.5",
+    "pino": "^9.2.0",
+    "yjs": "^13.6.19"
+  }
+}
