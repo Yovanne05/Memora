@@ -18,7 +18,6 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AppWorkspaceRouteRouteImport } from './routes/app/workspace/route'
 import { Route as AppWorkspaceIndexRouteImport } from './routes/app/workspace/index'
 import { Route as AppVisualizationIndexRouteImport } from './routes/app/visualization/index'
-import { Route as AppStatisticsIndexRouteImport } from './routes/app/statistics/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as AppSearchIndexRouteImport } from './routes/app/search/index'
 import { Route as AppRevisionIndexRouteImport } from './routes/app/revision/index'
@@ -72,11 +71,6 @@ const AppWorkspaceIndexRoute = AppWorkspaceIndexRouteImport.update({
 const AppVisualizationIndexRoute = AppVisualizationIndexRouteImport.update({
   id: '/visualization/',
   path: '/visualization/',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppStatisticsIndexRoute = AppStatisticsIndexRouteImport.update({
-  id: '/statistics/',
-  path: '/statistics/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
@@ -161,7 +155,6 @@ export interface FileRoutesByFullPath {
   '/app/revision': typeof AppRevisionIndexRoute
   '/app/search': typeof AppSearchIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
-  '/app/statistics': typeof AppStatisticsIndexRoute
   '/app/visualization': typeof AppVisualizationIndexRoute
   '/app/workspace/': typeof AppWorkspaceIndexRoute
   '/app/workspace/favorites': typeof AppWorkspaceFavoritesIndexRoute
@@ -182,7 +175,6 @@ export interface FileRoutesByTo {
   '/app/revision': typeof AppRevisionIndexRoute
   '/app/search': typeof AppSearchIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
-  '/app/statistics': typeof AppStatisticsIndexRoute
   '/app/visualization': typeof AppVisualizationIndexRoute
   '/app/workspace': typeof AppWorkspaceIndexRoute
   '/app/workspace/favorites': typeof AppWorkspaceFavoritesIndexRoute
@@ -206,7 +198,6 @@ export interface FileRoutesById {
   '/app/revision/': typeof AppRevisionIndexRoute
   '/app/search/': typeof AppSearchIndexRoute
   '/app/settings/': typeof AppSettingsIndexRoute
-  '/app/statistics/': typeof AppStatisticsIndexRoute
   '/app/visualization/': typeof AppVisualizationIndexRoute
   '/app/workspace/': typeof AppWorkspaceIndexRoute
   '/app/workspace/favorites/': typeof AppWorkspaceFavoritesIndexRoute
@@ -231,7 +222,6 @@ export interface FileRouteTypes {
     | '/app/revision'
     | '/app/search'
     | '/app/settings'
-    | '/app/statistics'
     | '/app/visualization'
     | '/app/workspace/'
     | '/app/workspace/favorites'
@@ -252,7 +242,6 @@ export interface FileRouteTypes {
     | '/app/revision'
     | '/app/search'
     | '/app/settings'
-    | '/app/statistics'
     | '/app/visualization'
     | '/app/workspace'
     | '/app/workspace/favorites'
@@ -275,7 +264,6 @@ export interface FileRouteTypes {
     | '/app/revision/'
     | '/app/search/'
     | '/app/settings/'
-    | '/app/statistics/'
     | '/app/visualization/'
     | '/app/workspace/'
     | '/app/workspace/favorites/'
@@ -351,13 +339,6 @@ declare module '@tanstack/react-router' {
       path: '/visualization'
       fullPath: '/app/visualization'
       preLoaderRoute: typeof AppVisualizationIndexRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/app/statistics/': {
-      id: '/app/statistics/'
-      path: '/statistics'
-      fullPath: '/app/statistics'
-      preLoaderRoute: typeof AppStatisticsIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/settings/': {
@@ -484,7 +465,6 @@ interface AppRouteRouteChildren {
   AppRevisionIndexRoute: typeof AppRevisionIndexRoute
   AppSearchIndexRoute: typeof AppSearchIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
-  AppStatisticsIndexRoute: typeof AppStatisticsIndexRoute
   AppVisualizationIndexRoute: typeof AppVisualizationIndexRoute
   AppVisualizationCollectionsIdIndexRoute: typeof AppVisualizationCollectionsIdIndexRoute
 }
@@ -496,7 +476,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppRevisionIndexRoute: AppRevisionIndexRoute,
   AppSearchIndexRoute: AppSearchIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
-  AppStatisticsIndexRoute: AppStatisticsIndexRoute,
   AppVisualizationIndexRoute: AppVisualizationIndexRoute,
   AppVisualizationCollectionsIdIndexRoute:
     AppVisualizationCollectionsIdIndexRoute,

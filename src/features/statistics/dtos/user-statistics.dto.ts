@@ -1,18 +1,18 @@
 export type ReviewDifficulty = "again" | "hard" | "good" | "easy"
 
 export type UserStatisticsDto = {
-  contentStatistics: {
-    notesCreated: number
-    collectionsCreated: number
-    flashcardsCreated: number
-    notesSharedByUser: number
-    collectionsSharedByUser: number
+  content_statistics: {
+    notes_created: number
+    collections_created: number
+    flashcards_created: number
+    notes_shared_by_user: number
+    collections_shared_by_user: number
   }
-  reviewStatistics: {
-    totalReviews: number
-    reviewsLast7Days: number
-    reviewsLast30Days: number
-    averageQuality: number
-    qualityDistribution: Partial<Record<ReviewDifficulty, number>>
+  review_statistics: {
+    total_reviews: number
+    reviews_last_7_days: number
+    reviews_last_30_days: number
+    average_quality: number
+    quality_distribution: Partial<Record<ReviewDifficulty, number>>
   } | null
 }
