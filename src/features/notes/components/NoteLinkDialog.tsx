@@ -84,7 +84,6 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
           <div className="space-y-2">
             <label className="text-sm font-medium">Nom du lien</label>
             <Input
-              placeholder="Ex: Référence, À compléter, Voir aussi..."
               value={linkLabel}
               onChange={(event) => setLinkLabel(event.target.value)}
               maxLength={80}
