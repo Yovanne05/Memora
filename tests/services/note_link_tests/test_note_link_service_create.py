@@ -51,11 +51,12 @@ class TestNoteLinkServiceCreate:
         link = NoteLink(
             note_id_1=note_id_1,
             note_id_2=note_id_2,
+            label="Test Link Label",
             created_at=datetime.now()
         )
         mock_note_link_repository.add.return_value = link
 
-        payload = NoteLinkCreateDTO(linked_note_id=note_id_2)
+        payload = NoteLinkCreateDTO(linked_note_id=note_id_2, label="Test Link Label")
 
         # Act
         result = note_link_service.create_link(note_id_1, payload)

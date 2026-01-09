@@ -28,7 +28,8 @@ class TestNoteLinkRepositoryFind:
 
         link = NoteLink(
             note_id_1=note_id_1,
-            note_id_2=note_id_2
+            note_id_2=note_id_2,
+            label="Test Link"
         )
         note_link_repository.add(link)
 
@@ -55,8 +56,8 @@ class TestNoteLinkRepositoryList:
         note_id_2 = test_factory.create_note(owner_id=owner_id, collection_id=collection_id, title="Note 2")
         note_id_3 = test_factory.create_note(owner_id=owner_id, collection_id=collection_id, title="Note 3")
 
-        link1 = NoteLink(note_id_1=note_id_1, note_id_2=note_id_2)
-        link2 = NoteLink(note_id_1=note_id_1, note_id_2=note_id_3)
+        link1 = NoteLink(note_id_1=note_id_1, note_id_2=note_id_2, label="Link 1")
+        link2 = NoteLink(note_id_1=note_id_1, note_id_2=note_id_3, label="Link 2")
         note_link_repository.add(link1)
         note_link_repository.add(link2)
 

@@ -18,7 +18,7 @@ class TestNoteLinkRepositoryDelete:
         note_id_1 = test_factory.create_note(owner_id=owner_id, collection_id=collection_id, title="Note 1")
         note_id_2 = test_factory.create_note(owner_id=owner_id, collection_id=collection_id, title="Note 2")
 
-        link = NoteLink(note_id_1=note_id_1, note_id_2=note_id_2)
+        link = NoteLink(note_id_1=note_id_1, note_id_2=note_id_2, label="Test Link")
         note_link_repository.add(link)
 
         # Act

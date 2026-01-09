@@ -74,7 +74,7 @@ CREATE TABLE notes (
     collection_id  CHAR(36),
     owner_id       CHAR(36) NOT NULL,
     title          VARCHAR(255) NOT NULL,
-    content        TEXT NOT NULL,
+    yjs_snapshot   TEXT,
     visibility     visibilityenum NOT NULL DEFAULT 'private',
     tags           TEXT[] NOT NULL DEFAULT '{}',
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
