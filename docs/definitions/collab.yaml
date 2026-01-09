@@ -42,12 +42,18 @@ definitions:
 
   CollabSessionVerifyResponse:
     type: object
-    required: ["user_id", "scope"]
+    required: ["user_id", "username", "color", "scope"]
     properties:
       user_id:
         type: string
         format: uuid
         description: User identifier.
+      username:
+        type: string
+        description: Username used for awareness.
+      color:
+        type: string
+        description: Awareness color assigned to the user.
       scope:
         type: array
         items:
@@ -66,10 +72,6 @@ definitions:
         type: string
         description: Base64-encoded Yjs snapshot.
         nullable: true
-      prose_mirror_json:
-        type: string
-        description: ProseMirror JSON string.
-        nullable: true
 
   CollabDocumentUpdatePayload:
     type: object
@@ -78,7 +80,3 @@ definitions:
       yjs_snapshot:
         type: string
         description: Base64-encoded Yjs snapshot.
-      prose_mirror_json:
-        type: string
-        description: ProseMirror JSON string.
-        nullable: true

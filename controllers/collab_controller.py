@@ -49,6 +49,5 @@ def store_document(note_id: str):
     collab_service.store_document(
         note_id,
         payload.yjs_snapshot,
-        payload.prose_mirror_json,
     )
     return "", HTTPStatus.NO_CONTENT

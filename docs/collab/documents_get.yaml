@@ -2,7 +2,7 @@ tags:
   - collab
 summary: Get collab document data
 description: >
-  Returns the Yjs snapshot (source of truth) and the stored ProseMirror JSON.
+  Returns the Yjs snapshot (source of truth).
 security:
   - apiKeyAuth: []
 parameters:

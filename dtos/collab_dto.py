@@ -14,7 +14,6 @@ class CollabSessionVerifyDTO(BaseModel):
 
 class CollabDocumentUpdateDTO(BaseModel):
     yjs_snapshot: str = Field(min_length=1)
-    prose_mirror_json: Optional[str] = Field(default=None)
 
 
 class CollabSessionResponseDTO(BaseModel):
@@ -25,10 +24,11 @@ class CollabSessionResponseDTO(BaseModel):
 
 class CollabSessionVerifyResponseDTO(BaseModel):
     user_id: str = Field(min_length=1)
+    username: str = Field(min_length=1)
+    color: str = Field(min_length=1)
     scope: List[str]
 
 
 class CollabDocumentResponseDTO(BaseModel):
     note_id: str = Field(min_length=1)
     yjs_snapshot: Optional[str] = Field(default=None)
-    prose_mirror_json: Optional[str] = Field(default=None)

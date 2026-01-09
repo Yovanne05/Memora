@@ -1,3 +1,5 @@
+import random
+
 from werkzeug.exceptions import BadRequest, Forbidden
 
 import config
@@ -9,12 +11,23 @@ from dtos.collab_dto import (
     CollabSessionVerifyResponseDTO,
 )
 from exceptions.note_exception import NoteNotFound
-from repositorys import note_repository
+from repositorys import note_repository, user_repository
 from utils.auth import get_current_user
 from utils.collab_token import create_collab_token
 
 
 class CollabService:
+    USER_COLORS = [
+        "#FF6B6B",
+        "#F7B801",
+        "#6BCB77",
+        "#4D96FF",
+        "#845EC2",
+        "#FF9671",
+        "#00C9A7",
+        "#0081CF",
+    ]
+
     def create_session(self, note_id: str) -> CollabSessionResponseDTO:
         note_entity = note_repository.find_one_unscoped(note_id)
         if not note_entity:
@@ -54,8 +67,13 @@ class CollabService:
     ) -> CollabSessionVerifyResponseDTO:
         if request.note_id != payload["note_id"]:
             raise Forbidden("Invalid document scope.")
+        user = user_repository.find_one(payload["user_id"])
+        if not user:
+            raise Forbidden("User not found.")
         return CollabSessionVerifyResponseDTO(
             user_id=payload["user_id"],
+            username=user.username,
+            color=random.choice(self.USER_COLORS),
             scope=payload["scope"],
         )
 
@@ -67,14 +85,12 @@ class CollabService:
         return CollabDocumentResponseDTO(
             note_id=note_id,
             yjs_snapshot=note_entity.yjs_snapshot,
-            prose_mirror_json=note_entity.content,
         )
 
     def store_document(
         self,
         note_id: str,
         yjs_snapshot: str,
-        prose_mirror_json: str | None,
     ) -> None:
         if not yjs_snapshot:
             raise BadRequest("Missing yjsSnapshot.")
@@ -83,15 +99,9 @@ class CollabService:
         if not note_entity:
             raise NoteNotFound()
 
-        final_json = (
-            prose_mirror_json
-            if prose_mirror_json is not None
-            else note_entity.content
-        )
         note_repository.update_collab_data(
             note_id=note_id,
             yjs_snapshot=yjs_snapshot,
-            prose_mirror_json=final_json,
         )
 
 

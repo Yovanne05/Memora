@@ -124,12 +124,7 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_docs.id,
             title="Architecture generale",
-            content=(
-                '{"type":"doc","content":[{"type":"paragraph","content":['
-                '{"type":"text","text":"Description de l\\u2019architecture et des services."}'
-                "]}]}"
-            ),
-            yjs_snapshot="AAECAwQ=",
+            yjs_snapshot="",
             visibility=VisibilityEnum.PUBLIC,
             tags=["architecture", "overview"],
         )
@@ -137,12 +132,7 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_docs.id,
             title="API checklist",
-            content=(
-                '{"type":"doc","content":[{"type":"paragraph","content":['
-                '{"type":"text","text":"Endpoints, auth, rate-limit et validation."}'
-                "]}]}"
-            ),
-            yjs_snapshot="AAECAwQ=",
+            yjs_snapshot="",
             visibility=VisibilityEnum.PUBLIC,
             tags=["api", "checklist"],
         )
@@ -150,12 +140,7 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_templates.id,
             title="Template de note",
-            content=(
-                '{"type":"doc","content":[{"type":"paragraph","content":['
-                '{"type":"text","text":"Titre, resume, sections, taches et ressources."}'
-                "]}]}"
-            ),
-            yjs_snapshot="AAECAwQ=",
+            yjs_snapshot="",
             visibility=VisibilityEnum.PRIVATE,
             tags=["template"],
         )
@@ -163,12 +148,7 @@ def seed() -> None:
             owner_id=alice.id,
             collection_id=coll_courses.id,
             title="Memo Flask",
-            content=(
-                '{"type":"doc","content":[{"type":"paragraph","content":['
-                '{"type":"text","text":"Routes, blueprints, middlewares et tests."}'
-                "]}]}"
-            ),
-            yjs_snapshot="AAECAwQ=",
+            yjs_snapshot="",
             visibility=VisibilityEnum.PRIVATE,
             tags=["flask", "python"],
         )

@@ -2,7 +2,7 @@ tags:
   - collab
 summary: Verify a collab session
 description: >
-  Validates a collab token for a note and returns the user scope.
+  Validates a collab token for a note and returns the user scope and awareness profile.
 security:
   - apiKeyAuth: []
 parameters:

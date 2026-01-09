@@ -18,7 +18,6 @@ class NoteSearchParams:
     shared_with_user_id: Optional[str] = None
     visibility: VisibilityEnum | None = None
     title_contains: Optional[str] = None
-    content_contains: Optional[str] = None
     ids: Optional[list[str]] = None
     tags: Optional[list[str]] = None
     is_favorite: Optional[bool] = False
@@ -58,8 +57,6 @@ def list_for_user(
     if p.title_contains:
         filters.append(Note.title.ilike(f"%{p.title_contains}%"))
 
-    if p.content_contains:
-        filters.append(Note.content.ilike(f"%{p.content_contains}%"))
 
     if p.ids:
         filters.append(Note.id.in_(p.ids))
@@ -160,14 +157,12 @@ def update(note_entity: Note) -> Note:
 def update_collab_data(
     note_id: str,
     yjs_snapshot: str,
-    prose_mirror_json: str,
 ) -> Optional[Note]:
     with get_db_session() as session:
         entity = session.get(Note, note_id)
         if not entity:
             return None
         entity.yjs_snapshot = yjs_snapshot
-        entity.content = prose_mirror_json
         session.flush()
         session.refresh(entity)
         return entity
