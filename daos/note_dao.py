@@ -128,6 +128,8 @@ class NoteLink(CreatedAtMixin, Base):
         primary_key=True,
     )
 
+    label: Mapped[str] = mapped_column(String(255), nullable=False)
+
     source_note: Mapped["Note"] = relationship(
         foreign_keys=[note_id_1], back_populates="outgoing_links"
     )
