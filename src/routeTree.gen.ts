@@ -22,6 +22,7 @@ import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/inde
 import { Route as AppSearchIndexRouteImport } from './routes/app/search/index'
 import { Route as AppRevisionIndexRouteImport } from './routes/app/revision/index'
 import { Route as AppDashboardIndexRouteImport } from './routes/app/dashboard/index'
+import { Route as AppRevisionSessionRouteImport } from './routes/app/revision/session'
 import { Route as AppWorkspaceFavoritesIndexRouteImport } from './routes/app/workspace/favorites/index'
 import { Route as AppWorkspaceNotesNoteIdIndexRouteImport } from './routes/app/workspace/notes.$noteId/index'
 import { Route as AppWorkspaceCollectionsCollectionIdIndexRouteImport } from './routes/app/workspace/collections.$collectionId/index'
@@ -93,6 +94,11 @@ const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppRevisionSessionRoute = AppRevisionSessionRouteImport.update({
+  id: '/revision/session',
+  path: '/revision/session',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppWorkspaceFavoritesIndexRoute =
   AppWorkspaceFavoritesIndexRouteImport.update({
     id: '/favorites/',
@@ -141,7 +147,7 @@ const AppWorkspaceFavoritesCollectionsCollectionIdNotesNoteIdIndexRoute =
       id: '/favorites/collections/$collectionId/notes/$noteId/',
       path: '/favorites/collections/$collectionId/notes/$noteId/',
       getParentRoute: () => AppWorkspaceRouteRoute,
-    } as any,
+    } as any
   )
 
 export interface FileRoutesByFullPath {
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
+  '/app/revision/session': typeof AppRevisionSessionRoute
   '/app/dashboard': typeof AppDashboardIndexRoute
   '/app/revision': typeof AppRevisionIndexRoute
   '/app/search': typeof AppSearchIndexRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app': typeof AppIndexLazyRoute
+  '/app/revision/session': typeof AppRevisionSessionRoute
   '/app/dashboard': typeof AppDashboardIndexRoute
   '/app/revision': typeof AppRevisionIndexRoute
   '/app/search': typeof AppSearchIndexRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
+  '/app/revision/session': typeof AppRevisionSessionRoute
   '/app/dashboard/': typeof AppDashboardIndexRoute
   '/app/revision/': typeof AppRevisionIndexRoute
   '/app/search/': typeof AppSearchIndexRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/app/'
+    | '/app/revision/session'
     | '/app/dashboard'
     | '/app/revision'
     | '/app/search'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/app'
+    | '/app/revision/session'
     | '/app/dashboard'
     | '/app/revision'
     | '/app/search'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/app/'
+    | '/app/revision/session'
     | '/app/dashboard/'
     | '/app/revision/'
     | '/app/search/'
@@ -369,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/revision/session': {
+      id: '/app/revision/session'
+      path: '/revision/session'
+      fullPath: '/app/revision/session'
+      preLoaderRoute: typeof AppRevisionSessionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/workspace/favorites/': {
       id: '/app/workspace/favorites/'
       path: '/favorites'
@@ -461,6 +480,7 @@ const AppWorkspaceRouteRouteWithChildren =
 interface AppRouteRouteChildren {
   AppWorkspaceRouteRoute: typeof AppWorkspaceRouteRouteWithChildren
   AppIndexLazyRoute: typeof AppIndexLazyRoute
+  AppRevisionSessionRoute: typeof AppRevisionSessionRoute
   AppDashboardIndexRoute: typeof AppDashboardIndexRoute
   AppRevisionIndexRoute: typeof AppRevisionIndexRoute
   AppSearchIndexRoute: typeof AppSearchIndexRoute
@@ -472,6 +492,7 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppWorkspaceRouteRoute: AppWorkspaceRouteRouteWithChildren,
   AppIndexLazyRoute: AppIndexLazyRoute,
+  AppRevisionSessionRoute: AppRevisionSessionRoute,
   AppDashboardIndexRoute: AppDashboardIndexRoute,
   AppRevisionIndexRoute: AppRevisionIndexRoute,
   AppSearchIndexRoute: AppSearchIndexRoute,
@@ -482,7 +503,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
-  AppRouteRouteChildren,
+  AppRouteRouteChildren
 )
 
 const rootRouteChildren: RootRouteChildren = {

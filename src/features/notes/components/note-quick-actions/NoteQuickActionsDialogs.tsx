@@ -7,9 +7,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { NoteShareDialog } from "../NoteShareDialog"
-import type { Note } from "../../models/note.model"
+} from '@/components/ui/alert-dialog'
+import { NoteShareDialog } from '../NoteShareDialog'
+import type { Note } from '../../models/note.model'
 
 type NoteQuickActionsDialogsProps = {
   note: Note
@@ -19,6 +19,8 @@ type NoteQuickActionsDialogsProps = {
   onDeleteDialogChange: (open: boolean) => void
   onConfirmDelete: () => void
   isDeleting: boolean
+  canShare: boolean
+  canDelete: boolean
 }
 
 export function NoteQuickActionsDialogs({
@@ -29,37 +31,46 @@ export function NoteQuickActionsDialogs({
   onDeleteDialogChange,
   onConfirmDelete,
   isDeleting,
+  canShare,
+  canDelete,
 }: Readonly<NoteQuickActionsDialogsProps>) {
   return (
     <>
-      <NoteShareDialog
-        noteId={note.id}
-        noteTitle={note.title}
-        open={shareDialogOpen}
-        onOpenChange={onShareDialogChange}
-      />
+      {canShare && (
+        <NoteShareDialog
+          noteId={note.id}
+          noteTitle={note.title}
+          open={shareDialogOpen}
+          onOpenChange={onShareDialogChange}
+        />
+      )}
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={onDeleteDialogChange}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la note</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer "{note.title}" ? Cette action
-              est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onConfirmDelete}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? "Suppression..." : "Supprimer"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {canDelete && (
+        <AlertDialog
+          open={deleteDialogOpen}
+          onOpenChange={onDeleteDialogChange}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer la note</AlertDialogTitle>
+              <AlertDialogDescription>
+                ?tes-vous s?r de vouloir supprimer "{note.title}" ? Cette action
+                est irr?versible.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={onConfirmDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? 'Suppression...' : 'Supprimer'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </>
   )
 }

@@ -1,22 +1,24 @@
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { QuickAddNoteDialog } from "./quick-add-note/QuickAddNoteDialog"
-import { useQuickAddNote } from "../hooks/useQuickAddNote"
+import { Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { QuickAddNoteDialog } from './quick-add-note/QuickAddNoteDialog'
+import { useQuickAddNote } from '../hooks/useQuickAddNote'
 
 interface QuickAddNoteProps {
   readonly collectionId?: string | null
   readonly onSuccess?: () => void
-  readonly triggerVariant?: "default" | "outline" | "ghost"
-  readonly triggerSize?: "default" | "sm" | "lg" | "icon"
+  readonly triggerVariant?: 'default' | 'outline' | 'ghost'
+  readonly triggerSize?: 'default' | 'sm' | 'lg' | 'icon'
   readonly showLabel?: boolean
+  readonly disabled?: boolean
 }
 
 export function QuickAddNote({
   collectionId = null,
   onSuccess,
-  triggerVariant = "outline",
-  triggerSize = "sm",
+  triggerVariant = 'outline',
+  triggerSize = 'sm',
   showLabel = true,
+  disabled = false,
 }: Readonly<QuickAddNoteProps>) {
   const {
     open,
@@ -36,10 +38,11 @@ export function QuickAddNote({
         variant={triggerVariant}
         size={triggerSize}
         onClick={() => setOpen(true)}
-        className={showLabel ? "gap-2" : ""}
+        className={showLabel ? 'gap-2' : ''}
+        disabled={disabled}
       >
         <Plus className="h-4 w-4" />
-        {showLabel && "Nouvelle note"}
+        {showLabel && 'Nouvelle note'}
       </Button>
       <QuickAddNoteDialog
         open={open}

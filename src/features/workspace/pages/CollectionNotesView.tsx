@@ -1,10 +1,10 @@
-import { CollectionNotesEditDialog } from "../components/collection-notes/CollectionNotesEditDialog"
-import { CollectionNotesEmpty } from "../components/collection-notes/CollectionNotesEmpty"
-import { CollectionNotesError } from "../components/collection-notes/CollectionNotesError"
-import { CollectionNotesHeader } from "../components/collection-notes/CollectionNotesHeader"
-import { CollectionNotesList } from "../components/collection-notes/CollectionNotesList"
-import { CollectionNotesLoading } from "../components/collection-notes/CollectionNotesLoading"
-import { useCollectionNotesView } from "../hooks/useCollectionNotesView"
+import { useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
+import { CollectionNotesViewContent } from '../components/collection-notes/CollectionNotesViewContent'
+import { useDeleteCollectionMutation } from '@/features/collections/hooks/useDeleteCollectionMutation'
+import { useCollectionNotesView } from '../hooks/useCollectionNotesView'
+import { useCollectionPermissions } from '../hooks/useCollectionPermissions'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 interface CollectionNotesViewProps {
   readonly collectionId: string
@@ -13,6 +13,7 @@ interface CollectionNotesViewProps {
 export default function CollectionNotesView({
   collectionId,
 }: CollectionNotesViewProps) {
+  const router = useRouter()
   const {
     collectionQuery,
     notes,
@@ -29,56 +30,53 @@ export default function CollectionNotesView({
     maxPage,
     handleUpdateCollection,
   } = useCollectionNotesView(collectionId)
-
-  if (collectionQuery.isLoading || isLoading) {
-    return <CollectionNotesLoading />
-  }
-
-  if (collectionQuery.isError) {
-    return <CollectionNotesError title="Collection introuvable" />
-  }
-
-  if (isError) {
-    return (
-      <CollectionNotesError
-        title="Erreur lors du chargement des notes"
-        message={error instanceof Error ? error.message : "Une erreur est survenue"}
-      />
-    )
-  }
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const deleteCollectionMutation = useDeleteCollectionMutation()
+  const { user } = useAuth()
 
   const collection = collectionQuery.data ?? null
+  const { canManage, canWrite, canAddNote } = useCollectionPermissions(
+    collection,
+    user
+  )
+
+  const handleDeleteConfirm = async () => {
+    await deleteCollectionMutation.mutateAsync(collectionId)
+    router.navigate({ to: '/app/workspace' })
+  }
 
   return (
-    <div className="space-y-6">
-      <CollectionNotesHeader
-        collection={collection}
-        collectionId={collectionId}
-        onEdit={() => setEditDialogOpen(true)}
-      />
-
-      {notes && notes.length > 0 ? (
-        <CollectionNotesList
-          notes={notes}
-          page={state.page}
-          maxPage={maxPage}
-          showPagination={total > limit}
-          onPageChange={actions.setPage}
-        />
-      ) : (
-        <CollectionNotesEmpty collectionId={collectionId} />
-      )}
-
-      <CollectionNotesEditDialog
-        collection={collection}
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        onSubmit={handleUpdateCollection}
-        isPending={updateCollectionMutation.isPending}
-      />
-    </div>
+    <CollectionNotesViewContent
+      collection={collection}
+      collectionId={collectionId}
+      notes={notes}
+      total={total}
+      limit={limit}
+      page={state.page}
+      maxPage={maxPage}
+      canManage={canManage}
+      canWrite={canWrite}
+      canAddNote={canAddNote}
+      editDialogOpen={editDialogOpen}
+      shareDialogOpen={shareDialogOpen}
+      deleteDialogOpen={deleteDialogOpen}
+      updatePending={updateCollectionMutation.isPending}
+      deletePending={deleteCollectionMutation.isPending}
+      isLoading={collectionQuery.isLoading || isLoading}
+      isCollectionError={collectionQuery.isError}
+      collectionError={collectionQuery.error}
+      isNotesError={isError}
+      notesError={error}
+      onEdit={() => setEditDialogOpen(true)}
+      onShare={() => setShareDialogOpen(true)}
+      onDelete={() => setDeleteDialogOpen(true)}
+      onPageChange={actions.setPage}
+      onEditClose={() => setEditDialogOpen(false)}
+      onEditSubmit={handleUpdateCollection}
+      onShareOpenChange={setShareDialogOpen}
+      onDeleteOpenChange={setDeleteDialogOpen}
+      onDeleteConfirm={handleDeleteConfirm}
+    />
   )
 }
-
-
-

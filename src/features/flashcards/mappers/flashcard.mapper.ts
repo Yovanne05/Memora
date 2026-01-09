@@ -5,33 +5,33 @@ import type {
   FlashcardUpdateDto,
   FlashcardDuplicateDto,
   FlashcardsListDto,
-} from "../dtos/flashcard.dto";
+} from '../dtos/flashcard.dto'
 import type {
   Flashcard,
   FlashcardAnswer,
   FlashcardCreate,
   FlashcardUpdate,
   FlashcardDuplicate,
-} from "../models/flashcard.model";
-import type { PaginatedFlashcards } from "../types/paginated-flashcard";
+} from '../models/flashcard.model'
+import type { PaginatedFlashcards } from '../types/paginated-flashcard'
 
 export function dtoToFlashcardAnswer(dto: FlashcardAnswerDto): FlashcardAnswer {
   return {
     id: dto.id,
     flashcardId: dto.flashcard_id,
     answerText: dto.answer_text,
-    isCorrect: dto.is_correct,
     createdAt: new Date(dto.created_at),
-  };
+  }
 }
 
-export function flashcardAnswerCreateToDto(
-  answer: { answerText: string; isCorrect: boolean }
-) {
+export function flashcardAnswerCreateToDto(answer: {
+  answerText: string
+  isCorrect: boolean
+}) {
   return {
     answer_text: answer.answerText,
     is_correct: answer.isCorrect,
-  };
+  }
 }
 
 export function dtoToFlashcard(dto: FlashcardDto): Flashcard {
@@ -42,7 +42,7 @@ export function dtoToFlashcard(dto: FlashcardDto): Flashcard {
     answers: dto.answers.map(dtoToFlashcardAnswer),
     createdAt: new Date(dto.created_at),
     updatedAt: new Date(dto.updated_at),
-  };
+  }
 }
 
 export function toFlashcardCreateDto(
@@ -51,35 +51,35 @@ export function toFlashcardCreateDto(
   return {
     question: flashcard.question,
     answers: flashcard.answers.map(flashcardAnswerCreateToDto),
-  };
+  }
 }
 
 export function toFlashcardUpdateDto(
   flashcard: FlashcardUpdate
 ): FlashcardUpdateDto {
-  const dto: FlashcardUpdateDto = {};
+  const dto: FlashcardUpdateDto = {}
 
   if (flashcard.question !== undefined) {
-    dto.question = flashcard.question;
+    dto.question = flashcard.question
   }
 
   if (flashcard.answers !== undefined) {
-    dto.answers = flashcard.answers.map(flashcardAnswerCreateToDto);
+    dto.answers = flashcard.answers.map(flashcardAnswerCreateToDto)
   }
 
-  return dto;
+  return dto
 }
 
 export function toFlashcardDuplicateDto(
   duplicate: FlashcardDuplicate
 ): FlashcardDuplicateDto {
-  const dto: FlashcardDuplicateDto = {};
+  const dto: FlashcardDuplicateDto = {}
 
   if (duplicate.targetNoteId !== undefined) {
-    dto.target_note_id = duplicate.targetNoteId;
+    dto.target_note_id = duplicate.targetNoteId
   }
 
-  return dto;
+  return dto
 }
 
 export function dtoToPaginatedFlashcards(
@@ -90,5 +90,5 @@ export function dtoToPaginatedFlashcards(
     total: dto.total,
     limit: dto.limit ?? 10,
     offset: dto.offset ?? 0,
-  };
+  }
 }

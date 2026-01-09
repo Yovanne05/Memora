@@ -1,35 +1,79 @@
-import { useState } from "react"
+import { useState } from 'react'
 
-import type { Flashcard } from "../models/flashcard.model"
-import { FlashcardAnswersList } from "./flashcard-viewer/FlashcardAnswersList"
-import { FlashcardResult } from "./flashcard-viewer/FlashcardResult"
-import { FlashcardViewerActions } from "./flashcard-viewer/FlashcardViewerActions"
+import type { Flashcard } from '../models/flashcard.model'
+import { ReviewDifficulty } from '@/features/revision/types/difficulty'
+import { DifficultyRatingButtons } from '@/features/revision/components/DifficultyRatingButtons'
+import { FlashcardAnswersList } from './flashcard-viewer/FlashcardAnswersList'
+import { FlashcardResult } from './flashcard-viewer/FlashcardResult'
+import { FlashcardViewerActions } from './flashcard-viewer/FlashcardViewerActions'
 
 interface FlashcardViewerProps {
   readonly flashcard: Flashcard
   readonly onClose?: () => void
+  readonly reviewMode?: boolean
+  readonly onReviewSubmit?: (
+    difficulty: ReviewDifficulty,
+    selectedAnswerId: string
+  ) => void
+  readonly reviewResult?: {
+    isCorrect: boolean
+    correctAnswerId?: string
+  } | null
 }
 
 export function FlashcardViewer({
   flashcard,
   onClose,
+  reviewMode = false,
+  onReviewSubmit,
+  reviewResult = null,
 }: Readonly<FlashcardViewerProps>) {
-  const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null)
-  const [showResult, setShowResult] = useState(false)
+  const [selection, setSelection] = useState(() => ({
+    flashcardId: flashcard.id,
+    selectedAnswerId: null as string | null,
+    showResult: false,
+  }))
 
-  const correctAnswer = flashcard.answers.find((answer) => answer.isCorrect)
-  const isCorrect = selectedAnswerId === correctAnswer?.id
+  const selectedAnswerId =
+    selection.flashcardId === flashcard.id ? selection.selectedAnswerId : null
+  const showResult =
+    selection.flashcardId === flashcard.id ? selection.showResult : false
+
+  const correctAnswerId = reviewResult?.correctAnswerId ?? null
+  const isCorrect = reviewResult?.isCorrect ?? false
+  const shouldShowResult = reviewMode ? !!reviewResult : showResult
+  const shouldShowDifficulty = reviewMode && !!selectedAnswerId && !reviewResult
 
   const handleAnswerClick = (answerId: string) => {
-    if (!showResult) {
-      setSelectedAnswerId(answerId)
-      setShowResult(true)
+    if (reviewMode) {
+      setSelection({
+        flashcardId: flashcard.id,
+        selectedAnswerId: answerId,
+        showResult: false,
+      })
+    } else {
+      if (!showResult) {
+        setSelection({
+          flashcardId: flashcard.id,
+          selectedAnswerId: answerId,
+          showResult: true,
+        })
+      }
     }
   }
 
   const handleReset = () => {
-    setSelectedAnswerId(null)
-    setShowResult(false)
+    setSelection({
+      flashcardId: flashcard.id,
+      selectedAnswerId: null,
+      showResult: false,
+    })
+  }
+
+  const handleDifficultySelect = (difficulty: ReviewDifficulty) => {
+    if (selectedAnswerId && onReviewSubmit) {
+      onReviewSubmit(difficulty, selectedAnswerId)
+    }
   }
 
   return (
@@ -40,23 +84,31 @@ export function FlashcardViewer({
         <FlashcardAnswersList
           answers={flashcard.answers}
           selectedAnswerId={selectedAnswerId}
-          showResult={showResult}
+          correctAnswerId={correctAnswerId}
+          showResult={shouldShowResult}
           onSelect={handleAnswerClick}
         />
 
-        {showResult && (
+        {shouldShowResult && (
           <FlashcardResult
             isCorrect={isCorrect}
-            correctAnswer={correctAnswer}
+            correctAnswerId={correctAnswerId}
+            answers={flashcard.answers}
           />
         )}
       </div>
 
-      <FlashcardViewerActions
-        showResult={showResult}
-        onReset={handleReset}
-        onClose={onClose}
-      />
+      {reviewMode && shouldShowDifficulty && (
+        <DifficultyRatingButtons onRatingSelect={handleDifficultySelect} />
+      )}
+
+      {!reviewMode && (
+        <FlashcardViewerActions
+          showResult={showResult}
+          onReset={handleReset}
+          onClose={onClose}
+        />
+      )}
     </div>
   )
 }

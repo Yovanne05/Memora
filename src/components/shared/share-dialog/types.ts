@@ -1,7 +1,10 @@
-import type { SharePermission } from "@/features/notes/dtos/note-share.dto"
+import type { SharePermission } from '@/features/notes/dtos/note-share.dto'
+import type { User } from '@/features/users/models/user.model'
 
 export interface Share {
   userId: string
+  user?: User
+  userLabel?: string
   permission: SharePermission
   createdAt: Date
 }

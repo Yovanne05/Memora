@@ -1,12 +1,14 @@
-import { useMemo } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
-import { useCollectionsQuery } from "@/features/collections/hooks/useCollectionsQuery"
-import { formatTime } from "@/lib/format.utils"
-import { noteEditFormSchema } from "../schemas/note.schema"
-import type { Note } from "../models/note.model"
-import type { NoteFormValues } from "../types/note-edit-form.types"
+import { useCollectionsQuery } from '@/features/collections/hooks/useCollectionsQuery'
+import { filterManageableCollections } from '@/features/collections/lib/collection-permissions'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { formatTime } from '@/lib/format.utils'
+import { noteEditFormSchema } from '../schemas/note.schema'
+import type { Note } from '../models/note.model'
+import type { NoteFormValues } from '../types/note-edit-form.types'
 
 type UseNoteEditFormArgs = {
   note?: Note
@@ -21,16 +23,20 @@ export function useNoteEditForm({
   readOnly,
   onSubmit,
 }: UseNoteEditFormArgs) {
+  const { user } = useAuth()
   const { data: collectionsData, isLoading: loadingCollections } =
     useCollectionsQuery()
-  const collections = collectionsData?.items ?? []
+  const collections = filterManageableCollections(
+    collectionsData?.items ?? [],
+    user
+  )
 
   const form = useForm({
     resolver: zodResolver(noteEditFormSchema),
     defaultValues: {
-      title: note?.title ?? "",
-      content: note?.content ?? "",
-      visibility: note?.visibility ?? "private",
+      title: note?.title ?? '',
+      content: note?.content ?? '',
+      visibility: note?.visibility ?? 'private',
       collectionId: note?.collectionId ?? null,
       tags: note?.tags ?? [],
     },
@@ -62,5 +68,3 @@ export function useNoteEditForm({
     handleFormSubmit,
   }
 }
-
-
