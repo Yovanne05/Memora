@@ -1,5 +1,3 @@
-import random
-
 from werkzeug.exceptions import BadRequest, Forbidden
 
 import config
@@ -17,17 +15,6 @@ from utils.collab_token import create_collab_token
 
 
 class CollabService:
-    USER_COLORS = [
-        "#FF6B6B",
-        "#F7B801",
-        "#6BCB77",
-        "#4D96FF",
-        "#845EC2",
-        "#FF9671",
-        "#00C9A7",
-        "#0081CF",
-    ]
-
     def create_session(self, note_id: str) -> CollabSessionResponseDTO:
         note_entity = note_repository.find_one_unscoped(note_id)
         if not note_entity:
@@ -72,8 +59,7 @@ class CollabService:
             raise Forbidden("User not found.")
         return CollabSessionVerifyResponseDTO(
             user_id=payload["user_id"],
-            username=user.display_name,
-            color=random.choice(self.USER_COLORS),
+            name=user.display_name,
             scope=payload["scope"],
         )
 

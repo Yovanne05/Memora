@@ -33,9 +33,9 @@ const server = new Server({
       context: data.context,
     });
   },
-  onConnect({ context, awareness }) {
+  async connected({ context, connection }) {
     if (context && context.user) {
-      awareness.setLocalStateField('user', context.user);
+      connection.document.awareness.setLocalStateField('user', context.user);
     }
   },
   async onListen({ port }) {

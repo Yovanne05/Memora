@@ -8,8 +8,7 @@ function mapVerifySessionRequest(collabToken, noteId) {
 function mapVerifySessionResponse(response) {
   return {
     userId: response ? response.user_id : null,
-    username: response ? response.username : null,
-    color: response ? response.color : null,
+    name: response ? response.name : null,
     scope: response ? response.scope : undefined,
   };
 }

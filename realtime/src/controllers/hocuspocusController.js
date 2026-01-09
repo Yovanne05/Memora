@@ -67,12 +67,10 @@ class HocuspocusController {
       mapVerifySessionRequest(token, documentId),
     );
     const normalized = mapVerifySessionResponse(response);
-
     return {
       user: {
         id: normalized.userId,
-        name: normalized.username,
-        color: normalized.color,
+        name: normalized.name,
       },
       scope: normalized.scope,
     };

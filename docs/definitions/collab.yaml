@@ -42,18 +42,15 @@ definitions:
 
   CollabSessionVerifyResponse:
     type: object
-    required: ["user_id", "username", "color", "scope"]
+    required: ["user_id", "name", "scope"]
     properties:
       user_id:
         type: string
         format: uuid
         description: User identifier.
-      username:
+      name:
         type: string
-        description: Username used for awareness.
-      color:
-        type: string
-        description: Awareness color assigned to the user.
+        description: Display name used for awareness.
       scope:
         type: array
         items:

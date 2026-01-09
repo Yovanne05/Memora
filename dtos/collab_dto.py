@@ -24,8 +24,7 @@ class CollabSessionResponseDTO(BaseModel):
 
 class CollabSessionVerifyResponseDTO(BaseModel):
     user_id: str = Field(min_length=1)
-    username: str = Field(min_length=1)
-    color: str = Field(min_length=1)
+    name: str = Field(min_length=1)
     scope: List[str]
 
 
