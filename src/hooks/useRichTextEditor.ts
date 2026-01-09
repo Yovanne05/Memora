@@ -28,7 +28,36 @@ type UseRichTextEditorArgs = {
   noteId?: string
 }
 
+type CollabUser = {
+  id?: string | null
+  name: string
+  color?: string | null
+}
+
 const lowlight = createLowlight(common)
+
+const COLOR_PALETTE = [
+  "#f97316",
+  "#f59e0b",
+  "#84cc16",
+  "#10b981",
+  "#06b6d4",
+  "#3b82f6",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+  "#f43f5e",
+]
+
+function getUserColor(seed: string) {
+  let hash = 0
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i)
+    hash |= 0
+  }
+  const index = Math.abs(hash) % COLOR_PALETTE.length
+  return COLOR_PALETTE[index]
+}
 
 export function useRichTextEditor({
   content,
@@ -105,17 +134,49 @@ export function useRichTextEditor({
     }
   }, [collabDocument, collabToken, noteId])
 
-  const caretUser = useMemo(() => {
+  const caretUser = useMemo<CollabUser>(() => {
     const name = user?.displayName ?? user?.username ?? "Utilisateur"
-    const color = user?.color
-    return { name, color }
-  }, [user?.color, user?.displayName, user?.username])
+    const colorSource = user?.id ?? name
+    const color = user?.color ?? getUserColor(colorSource)
+    return { id: user?.id ?? null, name, color }
+  }, [user?.color, user?.displayName, user?.id, user?.username])
 
   const enableCollaboration = Boolean(collabDocument)
 
   useEffect(() => {
     if (!provider) return
     provider.awareness?.setLocalStateField("user", caretUser)
+  }, [caretUser, provider])
+
+  const [collabUsers, setCollabUsers] = useState<CollabUser[]>([])
+
+  useEffect(() => {
+    if (!provider?.awareness) {
+      setCollabUsers(caretUser ? [caretUser] : [])
+      return
+    }
+
+    const updateUsers = () => {
+      const states = Array.from(provider.awareness.getStates().values())
+      const users = states
+        .map((state) => state?.user as CollabUser | undefined)
+        .filter((u): u is CollabUser => Boolean(u?.name))
+        .map((u) => ({
+          id: u.id ?? null,
+          name: u.name,
+          color: u.color ?? null,
+        }))
+
+      console.log("Collab users:", users)
+      setCollabUsers(users.length > 0 ? users : [caretUser])
+    }
+
+    updateUsers()
+    provider.awareness.on("change", updateUsers)
+
+    return () => {
+      provider.awareness.off("change", updateUsers)
+    }
   }, [caretUser, provider])
 
   const extensions = useMemo(() => {
@@ -220,5 +281,5 @@ export function useRichTextEditor({
     }
   }, [content, editor, enableCollaboration])
 
-  return editor
+  return { editor, collabUsers }
 }
