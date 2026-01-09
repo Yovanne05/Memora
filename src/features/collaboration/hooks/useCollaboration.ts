@@ -67,6 +67,7 @@ export function useCollaboration(
 
   const socketRef = useRef<Socket | null>(null)
   const reconnectionAttemptsRef = useRef(0)
+  const currentVersionRef = useRef(0)
   const initialContentRef = useRef(initialContent)
   const onOperationReceivedRef = useRef(onOperationReceived)
   const onUserJoinedRef = useRef(onUserJoined)
@@ -82,6 +83,16 @@ export function useCollaboration(
   >([])
   const isProcessingQueueRef = useRef(false)
   const pendingOperationRef = useRef<CollaborationOperation | null>(null)
+
+  const updateCurrentVersion = useCallback((version: number) => {
+    currentVersionRef.current = version
+    setCurrentVersion(version)
+  }, [])
+
+  // Keep currentVersionRef in sync with currentVersion state
+  useEffect(() => {
+    currentVersionRef.current = currentVersion
+  }, [currentVersion])
 
   useEffect(() => {
     onOperationReceivedRef.current = onOperationReceived
@@ -131,15 +142,19 @@ export function useCollaboration(
 
     isProcessingQueueRef.current = true
 
+    // Use currentVersionRef to always get the latest version
+    const nextVersion = currentVersionRef.current + 1
     const fullOperation: CollaborationOperation = {
       ...nextOperation,
-      version: currentVersion + 1,
+      version: nextVersion,
     }
 
     pendingOperationRef.current = fullOperation
 
     logger.info('Sending operation from queue', {
       operation: fullOperation,
+      operationVersion: fullOperation.version,
+      currentVersion: currentVersionRef.current,
       queueLength: operationQueueRef.current.length,
       noteId,
     })
@@ -148,7 +163,7 @@ export function useCollaboration(
       note_id: noteId,
       operation: fullOperation,
     })
-  }, [noteId, currentVersion])
+  }, [noteId])
 
   // Store in ref for stable reference in socket handlers
   useEffect(() => {
@@ -243,8 +258,8 @@ export function useCollaboration(
       logger.info('Collaboration session received', { session: sessionData })
       setSession(sessionData)
       if (typeof sessionData.version === 'number') {
-        const prevVersion = currentVersion
-        setCurrentVersion(sessionData.version)
+        const prevVersion = currentVersionRef.current
+        updateCurrentVersion(sessionData.version)
 
         // If version changed and we have pending operations, retry queue
         if (
@@ -274,7 +289,11 @@ export function useCollaboration(
           break
         case 'content_changed':
           if (event.operation) {
-            setCurrentVersion(event.operation.version)
+            logger.info('Updating version from received operation', {
+              oldVersion: currentVersionRef.current,
+              newVersion: event.operation.version,
+            })
+            updateCurrentVersion(event.operation.version)
             onOperationReceivedRef.current?.(event.operation, event)
           }
           break
@@ -305,11 +324,13 @@ export function useCollaboration(
     })
 
     socket.on('operation_acknowledged', (data: { version: number }) => {
+      const previousVersion = currentVersionRef.current
       logger.info('Operation acknowledged', {
-        data,
+        acknowledgedVersion: data.version,
+        previousVersion,
         queueLength: operationQueueRef.current.length,
       })
-      setCurrentVersion(data.version)
+      updateCurrentVersion(data.version)
       pendingOperationRef.current = null
       isProcessingQueueRef.current = false
 
@@ -319,7 +340,12 @@ export function useCollaboration(
 
     socket.on(
       'error',
-      (errorData: { code?: number; message: string; type?: string }) => {
+      (errorData: {
+        code?: number
+        message: string
+        type?: string
+        current_version?: number
+      }) => {
         const socketError = new Error(errorData.message)
         logger.error('Collaboration socket error', {
           error: errorData,
@@ -336,8 +362,14 @@ export function useCollaboration(
             'Version conflict detected, will retry after version update',
             {
               pendingOperation: pendingOperationRef.current,
+              currentVersion: errorData.current_version,
             }
           )
+
+          // Update version from server if provided
+          if (typeof errorData.current_version === 'number') {
+            updateCurrentVersion(errorData.current_version)
+          }
 
           // Re-queue the pending operation (without version)
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -348,7 +380,10 @@ export function useCollaboration(
           pendingOperationRef.current = null
           isProcessingQueueRef.current = false
 
-          // The server should send an updated session/version, which will trigger processOperationQueue
+          // Immediately retry processing the queue with the updated version
+          setTimeout(() => {
+            processOperationQueueRef.current?.()
+          }, 10)
         } else {
           setError(socketError)
           onErrorRef.current?.(socketError)
@@ -434,21 +469,6 @@ export function useCollaboration(
       disconnect()
     }
   }, [enabled, connect, disconnect])
-
-  // Process queue when version updates and we're not already processing
-  useEffect(() => {
-    if (
-      !isProcessingQueueRef.current &&
-      operationQueueRef.current.length > 0 &&
-      isConnected
-    ) {
-      logger.info('Version changed, processing pending operations', {
-        currentVersion,
-        queueLength: operationQueueRef.current.length,
-      })
-      processOperationQueue()
-    }
-  }, [currentVersion, isConnected, processOperationQueue])
 
   return {
     isConnected,
