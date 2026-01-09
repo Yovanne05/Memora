@@ -19,14 +19,14 @@ class TestNoteRepositoryUpdate:
         # Act
         note = note_repository.find_one_unscoped(note_id)
         note.title = "New Title"
-        note.content = "test_snapshot_data"
+        note.yjs_snapshot = "test_snapshot_data"
         result = note_repository.update(note)
 
         # Assert
         assert result.title == "New Title"
-        assert result.content == "test_snapshot_data"
+        assert result.yjs_snapshot == "test_snapshot_data"
 
         # Vérifier en base
         updated = note_repository.find_one_unscoped(note_id)
         assert updated.title == "New Title"
-        assert updated.content == "test_snapshot_data"
+        assert updated.yjs_snapshot == "test_snapshot_data"

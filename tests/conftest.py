@@ -215,6 +215,7 @@ class TestDataFactory:
     def create_note(
         self,
         title: str = None,
+        yjs_snapshot: str = None,
         collection_id: str = None,
         owner_id: str = None,
         visibility: VisibilityEnum = VisibilityEnum.PRIVATE
@@ -228,6 +229,7 @@ class TestDataFactory:
         note = Note(
             id=str(uuid4()),
             title=title or f"Note {self.base_slug}-{uuid4().hex[:4]}",
+            yjs_snapshot=yjs_snapshot,
             owner_id=owner_id,
             collection_id=collection_id,
             visibility=visibility,

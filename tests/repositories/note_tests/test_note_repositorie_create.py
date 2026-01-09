@@ -21,7 +21,7 @@ class TestNoteRepositoryAdd:
         note = Note(
             id=str(uuid4()),
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id,
             visibility=VisibilityEnum.PRIVATE
@@ -47,7 +47,7 @@ class TestNoteRepositoryAdd:
         note = Note(
             id=note_id,
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,
             collection_id=collection_id
         )
@@ -72,7 +72,7 @@ class TestNoteRepositoryAdd:
         note = Note(
             id=str(uuid4()),
             title="Test Note",
-            content="",
+            yjs_snapshot=None,
             owner_id=user_id,  # User existe
             collection_id=collection_id  # Collection existe
         )
