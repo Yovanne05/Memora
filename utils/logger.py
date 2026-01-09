@@ -11,6 +11,11 @@ class InfoFilter(logging.Filter):
         return record.levelno < logging.ERROR
 
 
+def get_logger(name: str) -> logging.Logger:
+    """Gets a logger instance for the given name."""
+    return logging.getLogger(name)
+
+
 def init_logger(app: Flask):
 
     log_dir = app.config.get('LOG_DIR', 'logs')

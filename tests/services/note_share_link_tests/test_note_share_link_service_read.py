@@ -38,7 +38,7 @@ class TestNoteShareLinkServiceList:
         monkeypatch.setattr("services.impl.note.note_share_link_service_impl.get_current_user", lambda: current_user)
 
         note = Note(
-            id=note_id, title="Test Note", yjs_snapshot=None, owner_id=owner_id,
+            id=note_id, title="Test Note", content="", owner_id=owner_id,
             collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
             flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
             created_at=datetime.now(), updated_at=datetime.now()

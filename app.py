@@ -20,12 +20,16 @@ from controllers.flashcard_controller import bp_flashcards, bp_note_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
 from controllers.review_controller import bp_reviews
 from controllers.report_controller import bp_reports
-from controllers.collab_controller import bp_collab
+from controllers.collaboration_controller import socketio
 from utils import db
 from utils.jwt import init_jwt
 from utils.filter import register_global_filter
 from utils.logger import init_logger
 from utils.swagger import init_swagger
+from utils.redis_client import init_redis
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -38,7 +42,20 @@ def create_app() -> Flask:
     init_jwt(app)
     init_swagger(app)
     init_logger(app)
-    
+
+    # Initialize Redis for collaboration
+    try:
+        init_redis(
+            host=config.REDIS_HOST,
+            port=config.REDIS_PORT,
+            db=config.REDIS_DB
+        )
+        logger.info("Redis initialized successfully for collaboration")
+    except Exception as e:
+        logger.warning(f"Redis initialization failed: {e}. Collaboration features will be unavailable.")
+
+    socketio.init_app(app, cors_allowed_origins="*", async_mode="threading")
+
     if config.APP_ENV == "test":
         with app.app_context():
             db.create_all()
@@ -64,10 +81,9 @@ def create_app() -> Flask:
     app.register_blueprint(bp_note_favorites)
     app.register_blueprint(bp_collection_favorites)
     app.register_blueprint(bp_reports)
-    app.register_blueprint(bp_collab)
 
     return app
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    socketio.run(app, debug=True, host="0.0.0.0", port=5000)

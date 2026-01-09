@@ -23,6 +23,9 @@ def apply_note_update(note_entity: Note, note_update_dto: NoteUpdateDTO) -> Note
     if note_update_dto.title is not None:
         note_entity.title = note_update_dto.title
 
+    if note_update_dto.content is not None:
+        note_entity.content = note_update_dto.content
+
     if note_update_dto.visibility is not None:
         note_entity.visibility = note_update_dto.visibility
 

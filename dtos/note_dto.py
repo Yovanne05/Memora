@@ -7,6 +7,7 @@ from dtos.owner_dto import OwnerDTO
 
 class NoteCreateDTO(BaseModel):
     title: str = Field(min_length=1, max_length=255)
+    content: str = Field(default="")
     owner_id: str = Field(min_length=1, max_length=36)
     collection_id: str | None = Field(
         default=None, min_length=1, max_length=36
@@ -17,6 +18,7 @@ class NoteCreateDTO(BaseModel):
 
 class NoteUpdateDTO(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=255)
+    content: str | None = None
     visibility: VisibilityEnum | None = None
     collection_id: str | None = Field(
         default=None, min_length=1, max_length=36
@@ -29,6 +31,7 @@ class NoteDTO(BaseModel):
     owner_id: str
     owner_username: str
     title: str
+    content: str = ""
     visibility: VisibilityEnum
     owners: List[OwnerDTO] = Field(default_factory=list)
     collection_id: str | None = None

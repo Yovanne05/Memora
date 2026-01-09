@@ -125,7 +125,6 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_docs.id,
             title="Architecture generale",
-            yjs_snapshot="",
             visibility=VisibilityEnum.PUBLIC,
             tags=["architecture", "overview"],
         )
@@ -133,7 +132,6 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_docs.id,
             title="API checklist",
-            yjs_snapshot="",
             visibility=VisibilityEnum.PUBLIC,
             tags=["api", "checklist"],
         )
@@ -141,7 +139,6 @@ def seed() -> None:
             owner_id=admin.id,
             collection_id=coll_templates.id,
             title="Template de note",
-            yjs_snapshot="",
             visibility=VisibilityEnum.PRIVATE,
             tags=["template"],
         )
@@ -149,7 +146,6 @@ def seed() -> None:
             owner_id=alice.id,
             collection_id=coll_courses.id,
             title="Memo Flask",
-            yjs_snapshot="",
             visibility=VisibilityEnum.PRIVATE,
             tags=["flask", "python"],
         )

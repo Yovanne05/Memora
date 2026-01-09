@@ -37,7 +37,7 @@ class TestNoteServiceUpdate:
         existing_note = Note(
             id=note_id,
             title="Old Title",
-            yjs_snapshot=None,
+            content="",
             owner_id=user_id,
             visibility=VisibilityEnum.PRIVATE,
             tags=[],
@@ -53,7 +53,7 @@ class TestNoteServiceUpdate:
         updated_note = Note(
             id=note_id,
             title="New Title",
-            yjs_snapshot=None,
+            content="",
             owner_id=user_id,
             visibility=VisibilityEnum.PUBLIC,
             tags=[],
@@ -87,7 +87,7 @@ class TestNoteServiceUpdate:
 
         dto = NoteUpdateDTO(
             title="New Title",
-            yjs_snapshot=None,
+            content="",
             visibility=VisibilityEnum.PUBLIC
         )
 
@@ -96,7 +96,6 @@ class TestNoteServiceUpdate:
 
         # Assert
         assert result.title == "New Title"
-        # Content removed (now using yjs_snapshot for real-time collaboration)
         mock_note_repository.find_one_unscoped.assert_called_once_with(note_id)
         mock_note_repository.update.assert_called_once()
 
