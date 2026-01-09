@@ -60,8 +60,6 @@ class HocuspocusController {
 
   async onAuthenticate({ token, documentId }) {
     this.logger.info(
-      { documentId, token: token },)
-    this.logger.info(
       { documentId, hasToken: Boolean(token) },
       'onAuthenticate called',
     );

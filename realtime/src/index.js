@@ -16,7 +16,6 @@ const server = new Server({
   maxDebounce: env.maxDebounce,
   quiet: env.quiet,
   async onAuthenticate(data) {
-    console.log(data);
     return controller.onAuthenticate({
       token: data.token,
       documentId: data.documentId ?? data.documentName,
