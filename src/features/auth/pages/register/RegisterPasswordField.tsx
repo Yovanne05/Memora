@@ -42,7 +42,7 @@ export function RegisterPasswordField({
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right" align="start" className="max-w-xs text-sm">
-                8 caractères minimum, avec au moins 1 majuscule, 1 chiffre et 1 caractère spécial.
+                12 caractères minimum, avec au moins 1 majuscule, 1 chiffre et 1 caractère spécial.
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
