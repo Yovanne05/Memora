@@ -1,6 +1,7 @@
 from sqlalchemy import select
 
 from daos.crdt_snapshot_dao import CRDTSnapshot
+from daos.note_dao import Note
 from utils.db import get_db_session
 
 
@@ -16,6 +17,10 @@ def save_snapshot(
     document_update: bytes,
 ) -> bool:
     with get_db_session() as session:
+        note = session.get(Note, note_id)
+        if not note:
+            return False
+
         stmt = select(CRDTSnapshot).where(CRDTSnapshot.note_id == note_id)
         snapshot = session.scalar(stmt)
 

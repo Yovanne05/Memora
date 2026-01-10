@@ -1,4 +1,5 @@
 import base64
+import json
 
 from dtos.collaboration_dto import (
     CollaboratorDTO,
@@ -38,6 +39,25 @@ def ensure_can_write(note_id: str, user_id: str, user_role: RoleEnum) -> None:
 def resolve_note_content(note_content: str | None, initial_content: str | None) -> str:
     if not (note_content or "").strip():
         return initial_content or DEFAULT_EMPTY_DOCUMENT
+    return note_content
+
+
+def normalize_note_content(
+    note_content: str | None, fallback: str | None = None
+) -> str | None:
+    if not (note_content or "").strip():
+        return fallback
+
+    content = note_content.strip()
+
+    if _is_valid_json(content):
+        return content
+
+    if '"type":"doc"' in content:
+        extracted = _extract_last_json_payload(content)
+        if extracted:
+            return extracted
+
     return note_content
 
 
@@ -97,3 +117,35 @@ def decode_base64(value: str, label: str) -> bytes:
 
 def encode_base64(value: bytes) -> str:
     return base64.b64encode(value).decode("utf-8")
+
+
+def _is_valid_json(value: str) -> bool:
+    try:
+        json.loads(value)
+        return True
+    except ValueError:
+        return False
+
+
+def _extract_last_json_payload(value: str) -> str | None:
+    decoder = json.JSONDecoder()
+    last_span: tuple[int, int] | None = None
+    length = len(value)
+    index = 0
+
+    while index < length:
+        if value[index] not in "{[":
+            index += 1
+            continue
+        try:
+            _, end = decoder.raw_decode(value, index)
+        except ValueError:
+            index += 1
+            continue
+        last_span = (index, end)
+        index = end
+
+    if not last_span:
+        return None
+    start, end = last_span
+    return value[start:end]

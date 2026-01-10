@@ -26,7 +26,12 @@ class NoteImageService(NoteImageServiceInterface):
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
     def __init__(self):
-        self.upload_folder = getattr(config, "UPLOAD_FOLDER", "uploads")
+        self.upload_folder = (
+            getattr(config, "UPLOAD_LOCAL_ROOT", None)
+            or getattr(config, "UPLOAD_FOLDER", "uploads")
+        )
+
+    def _ensure_upload_folder(self) -> None:
         os.makedirs(self.upload_folder, exist_ok=True)
 
     def _allowed_extension(self, ext: str) -> bool:
@@ -61,6 +66,7 @@ class NoteImageService(NoteImageServiceInterface):
         if file_size > self.MAX_FILE_SIZE:
             raise FileTooLarge()
 
+        self._ensure_upload_folder()
         filename = f"{uuid4()}.{ext}"
         note_folder = os.path.join(self.upload_folder, note_id)
         os.makedirs(note_folder, exist_ok=True)

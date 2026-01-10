@@ -13,6 +13,7 @@ from domain_services.realtime_collaboration_domain_service import (
     ensure_can_write,
     ensure_note_exists,
     ensure_user_exists,
+    normalize_note_content,
     resolve_note_content,
 )
 from dtos.collaboration_dto import (
@@ -52,8 +53,11 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         ensure_user_exists(user)
         username = user.username
 
-        note_content = resolve_note_content(note.content, initial_content)
-        if note.content != note_content:
+        resolved_content = resolve_note_content(note.content, initial_content)
+        note_content = normalize_note_content(
+            resolved_content, fallback=DEFAULT_EMPTY_DOCUMENT
+        )
+        if note_content and note.content != note_content:
             note.content = note_content
             note_repository.update_content(note_id, note_content)
 
@@ -119,11 +123,33 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         )
         try:
             crdt_service.apply_update(update_dto.note_id, update_bytes)
+        except ValueError:
+            crdt_service.get_or_create_document(
+                update_dto.note_id, note.content or DEFAULT_EMPTY_DOCUMENT
+            )
+            crdt_service.apply_update(update_dto.note_id, update_bytes)
         except Exception as exc:
             raise CollaborationInvalidOperation("Invalid CRDT update") from exc
 
-        note.content = crdt_service.get_content_as_text(update_dto.note_id)
-        note_repository.update_content(update_dto.note_id, note.content)
+        try:
+            raw_content = crdt_service.get_content_as_text(update_dto.note_id)
+        except ValueError:
+            crdt_service.get_or_create_document(
+                update_dto.note_id, note.content or DEFAULT_EMPTY_DOCUMENT
+            )
+            raw_content = crdt_service.get_content_as_text(update_dto.note_id)
+        fallback_content = normalize_note_content(
+            note.content, fallback=DEFAULT_EMPTY_DOCUMENT
+        )
+        safe_content = normalize_note_content(
+            raw_content, fallback=fallback_content
+        )
+        if safe_content and safe_content != raw_content:
+            crdt_service.delete_document(update_dto.note_id)
+            crdt_service.get_or_create_document(update_dto.note_id, safe_content)
+        if safe_content and safe_content != note.content:
+            note.content = safe_content
+            note_repository.update_content(update_dto.note_id, note.content)
 
         return build_crdt_update_event(
             update_dto.note_id, user_id, username, update_dto.update
@@ -142,18 +168,26 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         note = note_repository.find_one_unscoped(sync_request_dto.note_id)
         ensure_note_exists(note)
 
-        crdt_service.get_or_create_document(
-            sync_request_dto.note_id, note.content or DEFAULT_EMPTY_DOCUMENT
+        seed_content = normalize_note_content(
+            note.content, fallback=DEFAULT_EMPTY_DOCUMENT
         )
+        crdt_service.get_or_create_document(sync_request_dto.note_id, seed_content)
 
         try:
             update_bytes = crdt_service.get_update_since_state(
                 sync_request_dto.note_id, client_state_vector
             )
+            server_state_vector = crdt_service.get_state_vector(sync_request_dto.note_id)
+        except ValueError:
+            crdt_service.get_or_create_document(
+                sync_request_dto.note_id, seed_content
+            )
+            update_bytes = crdt_service.get_update_since_state(
+                sync_request_dto.note_id, client_state_vector
+            )
+            server_state_vector = crdt_service.get_state_vector(sync_request_dto.note_id)
         except Exception as exc:
             raise CollaborationInvalidOperation("Invalid state vector") from exc
-
-        server_state_vector = crdt_service.get_state_vector(sync_request_dto.note_id)
 
         return encode_base64(server_state_vector), encode_base64(update_bytes)
 

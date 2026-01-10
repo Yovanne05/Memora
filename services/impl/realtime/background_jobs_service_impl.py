@@ -46,7 +46,7 @@ class CollaborationSessionCleanupJob:
                 socket_ids = redis_client.smembers(key)
 
                 for socket_id in socket_ids:
-                    session = store.get_session_by_socket(socket_id)
+                    session = collaboration_session_store.get_session_by_socket(socket_id)
                     if not session:
                         redis_client.srem(key, socket_id)
                         cleaned_count += 1

@@ -61,12 +61,18 @@ class CRDTService:
 
         doc = self._load_from_redis(note_id)
         if doc is not None:
+            doc = self._maybe_override_with_initial_content(
+                note_id, doc, initial_content
+            )
             self._store.set(note_id, doc)
             logger.info(f"CRDT document loaded from Redis: {note_id}")
             return doc
 
         doc = self._load_from_database(note_id)
         if doc is not None:
+            doc = self._maybe_override_with_initial_content(
+                note_id, doc, initial_content
+            )
             self._store.set(note_id, doc)
             self._save_to_redis(note_id, doc)
             logger.info(f"CRDT document loaded from PostgreSQL: {note_id}")
@@ -140,11 +146,17 @@ class CRDTService:
         document_update = doc.get_update()
 
         try:
-            crdt_snapshot_repository.save_snapshot(
+            saved = crdt_snapshot_repository.save_snapshot(
                 note_id=note_id,
                 state_vector=state_vector,
                 document_update=document_update,
             )
+            if not saved:
+                logger.warning(
+                    f"Cannot save snapshot: note not found for note {note_id}"
+                )
+                self.delete_document(note_id)
+                return False
             return True
         except Exception as exc:
             logger.error(
@@ -166,6 +178,27 @@ class CRDTService:
             return
         with doc.transaction():
             text += initial_content
+
+    def _get_doc_text(self, doc: Doc) -> Optional[str]:
+        text = doc.get("content", type=Text)
+        if isinstance(text, Text):
+            return str(text)
+        return None
+
+    def _maybe_override_with_initial_content(
+        self, note_id: str, doc: Doc, initial_content: Optional[str]
+    ) -> Doc:
+        if not initial_content:
+            return doc
+
+        current_text = self._get_doc_text(doc)
+        if current_text == initial_content:
+            return doc
+
+        new_doc = self._build_document(initial_content)
+        self._save_to_redis(note_id, new_doc)
+        logger.info(f"CRDT document resynced from note content: {note_id}")
+        return new_doc
 
     def _get_redis_key(self, note_id: str) -> str:
         return f"crdt:doc:{note_id}"
