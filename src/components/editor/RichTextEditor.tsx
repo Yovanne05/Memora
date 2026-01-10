@@ -17,7 +17,7 @@ interface RichTextEditorProps {
 export function RichTextEditor({
   content,
   onChange,
-  placeholder = "Commencez � �crire...",
+  placeholder = "Commencez à écrire...",
   editable = true,
   className,
   noteId,

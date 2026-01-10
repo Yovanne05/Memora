@@ -1,17 +1,19 @@
-import { memo, useCallback } from "react"
-import { FileText } from "lucide-react"
-import { useRouter } from "@tanstack/react-router"
+import { memo, useCallback } from 'react'
+import { FileText } from 'lucide-react'
+import { useRouter } from '@tanstack/react-router'
 
-import type { Collection } from "../models/collection.model"
-import { ResourceCard } from "@/components/shared/ResourceCard"
-import { buildCollectionCardActions } from "./collection-card/actions"
-import { CollectionCardBadges } from "./collection-card/CollectionCardBadges"
-import { CollectionCardFavoriteButton } from "./collection-card/CollectionCardFavoriteButton"
-import { CollectionCardFooter } from "./collection-card/CollectionCardFooter"
+import type { Collection } from '../models/collection.model'
+import { ResourceCard } from '@/components/shared/ResourceCard'
+import { buildCollectionCardActions } from './collection-card/actions'
+import { CollectionCardBadges } from './collection-card/CollectionCardBadges'
+import { CollectionCardFavoriteButton } from './collection-card/CollectionCardFavoriteButton'
+import { CollectionCardFooter } from './collection-card/CollectionCardFooter'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 interface CollectionCardProps {
   readonly collection: Collection
   readonly onEdit?: (collection: Collection) => void
+  readonly onShare?: (collection: Collection) => void
   readonly onDelete?: (collection: Collection) => void
   readonly onCardClick?: (collection: Collection) => void
   readonly isSelected?: boolean
@@ -24,6 +26,7 @@ interface CollectionCardProps {
 export const CollectionCard = memo(function CollectionCard({
   collection,
   onEdit,
+  onShare,
   onDelete,
   onCardClick,
   isSelected = false,
@@ -33,11 +36,19 @@ export const CollectionCard = memo(function CollectionCard({
   readOnly = false,
 }: Readonly<CollectionCardProps>) {
   const router = useRouter()
+  const { user } = useAuth()
   const favorite = collection.isFavorite === true
+  const isOwner = Boolean(user && collection.ownerId === user.id)
+  const canManage =
+    collection.userPermission === 'owner' ||
+    isOwner ||
+    user?.role === 'admin' ||
+    user?.role === 'super_admin'
+  const canWrite = canManage || collection.userPermission === 'write'
 
   const handleNavigate = useCallback(() => {
     router.navigate({
-      to: "/app/workspace/collections/$collectionId",
+      to: '/app/workspace/collections/$collectionId',
       params: { collectionId: collection.id },
     })
   }, [router, collection.id])
@@ -50,7 +61,12 @@ export const CollectionCard = memo(function CollectionCard({
     handleNavigate()
   }, [collection, handleNavigate, onCardClick])
 
-  const actions = buildCollectionCardActions({ collection, onEdit, onDelete })
+  const actions = buildCollectionCardActions({
+    collection,
+    onEdit: canWrite ? onEdit : undefined,
+    onShare: canManage ? onShare : undefined,
+    onDelete: canManage ? onDelete : undefined,
+  })
 
   return (
     <ResourceCard
@@ -72,7 +88,9 @@ export const CollectionCard = memo(function CollectionCard({
       compact={compact}
       readOnly={readOnly}
       badges={<CollectionCardBadges collection={collection} />}
-      footer={<CollectionCardFooter collection={collection} compact={compact} />}
+      footer={
+        <CollectionCardFooter collection={collection} compact={compact} />
+      }
     />
   )
 })

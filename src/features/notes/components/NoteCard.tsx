@@ -1,5 +1,6 @@
-import { Link } from "@tanstack/react-router"
-import { FileText } from "lucide-react"
+import { useState, useCallback } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { FileText } from 'lucide-react'
 
 import type { Note } from "../models/note.model"
 import { ResourceCard } from "@/components/shared/ResourceCard"
@@ -7,6 +8,13 @@ import { NoteQuickActions } from "./NoteQuickActions"
 import { buildNoteCardActions } from "./note-card/buildNoteCardActions"
 import { NoteCardFavoriteButton } from "./note-card/NoteCardFavoriteButton"
 import { NoteCardMeta } from "./note-card/NoteCardMeta"
+import type { Note } from '../models/note.model'
+import { ResourceCard } from '@/components/shared/ResourceCard'
+import { NoteQuickActions } from './NoteQuickActions'
+import { getContentPreview } from '@/lib/html-utils'
+import { buildNoteCardActions } from './note-card/buildNoteCardActions'
+import { NoteCardFavoriteButton } from './note-card/NoteCardFavoriteButton'
+import { NoteCardMeta } from './note-card/NoteCardMeta'
 
 interface NoteCardProps {
   note: Note
@@ -23,8 +31,19 @@ export function NoteCard({
   showQuickActions = false,
   showFavoriteButton = false,
 }: Readonly<NoteCardProps>) {
+  const navigate = useNavigate()
+  const [isInteracting, setIsInteracting] = useState(false)
   const favorite = note.isFavorite === true
-  const actions = buildNoteCardActions({ note, onEdit, onDelete, showQuickActions })
+  const actions = buildNoteCardActions({
+    note,
+    onEdit,
+    onDelete,
+    showQuickActions,
+  })
+
+  const handleInteractionChange = useCallback((interacting: boolean) => {
+    setIsInteracting(interacting)
+  }, [])
 
   const favoriteButton = showFavoriteButton ? (
     <NoteCardFavoriteButton noteId={note.id} favorite={favorite} />
@@ -33,30 +52,38 @@ export function NoteCard({
   const headerActions = showQuickActions ? (
     <div className="flex items-center gap-1">
       {favoriteButton}
-      <NoteQuickActions note={note} triggerVariant="ghost" />
+      <NoteQuickActions
+        note={note}
+        triggerVariant="ghost"
+        onInteractionChange={handleInteractionChange}
+      />
     </div>
   ) : (
     favoriteButton
   )
 
-  const contentPreview = "Contenu non disponible"
+  const contentPreview = note.content
+    ? getContentPreview(note.content, 150)
+    : 'Aucun contenu'
+
+  const handleClick = () => {
+    if (isInteracting) return
+    navigate({
+      to: '/app/workspace/notes/$noteId',
+      params: { noteId: note.id },
+    })
+  }
 
   return (
-    <Link
-      to="/app/workspace/notes/$noteId"
-      params={{ noteId: note.id }}
-      className="block h-full"
-      aria-label={`Ouvrir la note ${note.title}`}
-    >
-      <ResourceCard
-        id={note.id}
-        title={note.title}
-        description={contentPreview}
-        icon={FileText}
-        actions={actions}
-        headerActions={headerActions}
-        metadata={<NoteCardMeta note={note} />}
-      />
-    </Link>
+    <ResourceCard
+      id={note.id}
+      title={note.title}
+      description={contentPreview}
+      icon={FileText}
+      actions={actions}
+      headerActions={headerActions}
+      metadata={<NoteCardMeta note={note} />}
+      onClick={handleClick}
+    />
   )
 }

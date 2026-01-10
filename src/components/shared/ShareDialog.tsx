@@ -1,12 +1,13 @@
-import { Users } from "lucide-react"
+import { Users } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { ShareDialogBody } from "./share-dialog/ShareDialogBody"
-import type { ShareDialogProps } from "./share-dialog/types"
-import { useShareDialogState } from "./share-dialog/useShareDialogState"
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { ShareDialogBody } from './share-dialog/ShareDialogBody'
+import type { ShareDialogProps } from './share-dialog/types'
+import { useShareDialogState } from './share-dialog/useShareDialogState'
+import { useUsersByIds } from '@/features/users/hooks/useUsersByIds'
 
-export type { Share, ShareDialogProps } from "./share-dialog/types"
+export type { Share, ShareDialogProps } from './share-dialog/types'
 
 export function ShareDialog({
   title,
@@ -39,13 +40,23 @@ export function ShareDialog({
     onRemoveShare,
   })
 
+  const missingUserIds = shares
+    .filter((share) => !share.user)
+    .map((share) => share.userId)
+  const { usersById } = useUsersByIds(missingUserIds)
+  const sharesWithUsers = shares.map((share) => {
+    const user = share.user ?? usersById.get(share.userId)
+    const userLabel = user?.displayName || user?.username || share.userId
+    return { ...share, userLabel }
+  })
+
   const busy = isLoading || isSubmitting
 
   const body = (
     <ShareDialogBody
       title={title}
       description={description}
-      shares={shares}
+      shares={sharesWithUsers}
       selectedUser={selectedUser}
       permission={permission}
       excludedUserIds={excludedUserIds}

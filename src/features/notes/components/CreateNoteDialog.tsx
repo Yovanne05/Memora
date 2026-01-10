@@ -56,7 +56,7 @@ export function CreateNoteDialog({
         <DialogHeader>
           <DialogTitle>Nouvelle note</DialogTitle>
           <DialogDescription>
-            Renseigne le nom, la collection et la visibilit� de la note.
+            Renseigne le nom, la collection et la visibilité de la note.
           </DialogDescription>
         </DialogHeader>
 

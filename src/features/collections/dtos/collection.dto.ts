@@ -28,6 +28,7 @@ export const collectionDtoSchema = z.object({
   tags: z.array(z.string()).default([]),
   notes: z.array(noteDtoSchema),
   is_favorite: z.boolean().optional().default(false),
+  user_permission: z.enum(['read', 'write', 'owner']).nullable().optional(),
   nodes: z.array(graphNodeDtoSchema).default([]),
   edges: z.array(graphEdgeDtoSchema).default([]),
   created_at: z.iso.datetime(),
@@ -38,8 +39,8 @@ export const collectionsListDtoSchema = z.union([
   z.array(collectionDtoSchema),
   z.object({
     items: z.array(collectionDtoSchema),
-    total: z.number()
-  })
+    total: z.number(),
+  }),
 ])
 
 export const collectionCreateDtoSchema = z.object({
@@ -56,7 +57,6 @@ export const collectionUpdateDtoSchema = z.object({
   visibility: collectionVisibilitySchema.optional(),
   tags: z.array(z.string()).optional(),
 })
-
 
 export type CollectionVisibilityDto = z.infer<typeof collectionVisibilitySchema>
 export type GraphNodeDto = z.infer<typeof graphNodeDtoSchema>

@@ -1,10 +1,14 @@
-import { QuickAddNote } from "@/features/notes/components/QuickAddNote"
+import { QuickAddNote } from '@/features/notes/components/QuickAddNote'
 
 type CollectionNotesEmptyProps = {
   collectionId: string
+  canAddNote: boolean
 }
 
-export function CollectionNotesEmpty({ collectionId }: Readonly<CollectionNotesEmptyProps>) {
+export function CollectionNotesEmpty({
+  collectionId,
+  canAddNote,
+}: Readonly<CollectionNotesEmptyProps>) {
   return (
     <div className="flex h-64 flex-col items-center justify-center gap-4">
       <div className="text-center">
@@ -18,6 +22,7 @@ export function CollectionNotesEmpty({ collectionId }: Readonly<CollectionNotesE
         triggerVariant="default"
         triggerSize="lg"
         showLabel
+        disabled={!canAddNote}
       />
     </div>
   )

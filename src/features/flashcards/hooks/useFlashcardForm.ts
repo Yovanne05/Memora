@@ -1,12 +1,12 @@
-import { useFieldArray, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useFieldArray, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 import {
   flashcardEditFormSchema,
   type FlashcardEditForm,
   type FlashcardEditFormInput,
-} from "../schemas/flashcard.schema"
-import { MAX_ANSWERS } from "../types/flashcard-form.constants"
+} from '../schemas/flashcard.schema'
+import { MAX_ANSWERS } from '../types/flashcard-form.constants'
 
 type UseFlashcardFormArgs = {
   noteId: string
@@ -18,17 +18,17 @@ export function useFlashcardForm({ noteId, onSubmit }: UseFlashcardFormArgs) {
     resolver: zodResolver(flashcardEditFormSchema),
     defaultValues: {
       noteId,
-      question: "",
+      question: '',
       answers: [
-        { answerText: "", isCorrect: true },
-        { answerText: "", isCorrect: false },
+        { answerText: '', isCorrect: true },
+        { answerText: '', isCorrect: false },
       ],
     },
   })
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "answers",
+    name: 'answers',
   })
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
@@ -37,17 +37,17 @@ export function useFlashcardForm({ noteId, onSubmit }: UseFlashcardFormArgs) {
 
   const addAnswer = () => {
     if (fields.length < MAX_ANSWERS) {
-      append({ answerText: "", isCorrect: false })
+      append({ answerText: '', isCorrect: false })
     }
   }
 
   const toggleCorrectAnswer = (index: number) => {
-    const currentAnswers = form.getValues("answers")
+    const currentAnswers = form.getValues('answers')
     const updatedAnswers = currentAnswers.map((answer, idx) => ({
-      ...answer,
+      answerText: answer.answerText ?? '',
       isCorrect: idx === index,
     }))
-    form.setValue("answers", updatedAnswers)
+    form.setValue('answers', updatedAnswers)
   }
 
   return {

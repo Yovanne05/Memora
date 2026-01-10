@@ -1,14 +1,14 @@
-import { ApiError, TimeoutError, NetworkError } from "./errors";
-import { logger } from "./logger"
+import { ApiError, TimeoutError, NetworkError } from './errors'
+import { logger } from './logger'
 
-const DEFAULT_RETRY_DELAY = 1000; // 1 second
-const DEFAULT_RETRY_DELAY_MULTIPLIER = 2; // Exponential backoff
+const DEFAULT_RETRY_DELAY = 1000 // 1 second
+const DEFAULT_RETRY_DELAY_MULTIPLIER = 2 // Exponential backoff
 
-const RETRYABLE_METHODS = ["GET", "HEAD", "OPTIONS", "DELETE"];
-const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504];
+const RETRYABLE_METHODS = ['GET', 'HEAD', 'OPTIONS', 'DELETE']
+const RETRYABLE_STATUS_CODES = [408, 429, 502, 503, 504]
 
 export function isIdempotent(method: string): boolean {
-  return RETRYABLE_METHODS.includes(method.toUpperCase());
+  return RETRYABLE_METHODS.includes(method.toUpperCase())
 }
 
 /**
@@ -28,20 +28,20 @@ export function isRetryable(
       logger.warn(
         `Non-idempotent method ${method.toUpperCase()} failed, not retrying. ` +
           `Retry mechanism is disabled for non-idempotent requests to prevent duplicate operations.`
-      );
+      )
     }
-    return false;
+    return false
   }
 
   if (error instanceof ApiError) {
-    return RETRYABLE_STATUS_CODES.includes(error.status);
+    return RETRYABLE_STATUS_CODES.includes(error.status)
   }
 
   if (error instanceof TimeoutError || error instanceof NetworkError) {
-    return true;
+    return true
   }
 
-  return false;
+  return false
 }
 
 /**
@@ -56,9 +56,9 @@ export function getRetryDelay(
   baseDelay: number = DEFAULT_RETRY_DELAY,
   multiplier: number = DEFAULT_RETRY_DELAY_MULTIPLIER
 ): number {
-  return baseDelay * Math.pow(multiplier, attempt - 1);
+  return baseDelay * Math.pow(multiplier, attempt - 1)
 }
 
 export async function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

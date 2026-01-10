@@ -1,20 +1,20 @@
 import { memo, useState } from "react"
 import { Search } from "lucide-react"
 
+import { memo } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useLinkNotes } from "../hooks/useLinkNotes"
-import type { Note } from "../models/note.model"
-import type { NoteLink } from "../models/note-link.model"
-import { NoteLinkList } from "./note-link-dialog/NoteLinkList"
+} from '@/components/ui/dialog'
+import { useLinkNotes } from '../hooks/useLinkNotes'
+import type { Note } from '../models/note.model'
+import type { NoteLink } from '../models/note-link.model'
+import { NoteLinkList } from './note-link-dialog/NoteLinkList'
+import { NoteLinkSearchInput } from './note-link-dialog/NoteLinkSearchInput'
+import { NoteLinkDialogFooter } from './note-link-dialog/NoteLinkDialogFooter'
 
 interface NoteLinkDialogProps {
   readonly note: Note

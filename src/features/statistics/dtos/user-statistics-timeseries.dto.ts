@@ -7,6 +7,6 @@ export type TimeSeriesPointDto = {
 
 export type UserStatisticsTimeSeriesDto = {
   metric: StatisticsMetric
-  days: number
+  days: 7 | 30 | 90
   points: TimeSeriesPointDto[]
 }

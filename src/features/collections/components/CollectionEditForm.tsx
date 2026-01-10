@@ -44,7 +44,7 @@ export const CollectionEditForm = memo(function CollectionEditForm({
         id="collection-description"
         label="Description"
         rows={3}
-        placeholder="Décrivez l'objectif de cette collection..."
+        placeholder="DÃ©crivez l'objectif de cette collection..."
         disabled={isFormDisabled}
         error={errors.description}
         {...register("description")}

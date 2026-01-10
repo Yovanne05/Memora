@@ -1,11 +1,17 @@
-import type { UseFormReturn } from "react-hook-form"
+import type { UseFormReturn } from 'react-hook-form'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Collection } from "@/features/collections/models/collection.model"
-import type { NoteFormValues } from "../types/note-edit-form.types"
-import { NoteCollectionField } from "./note-settings-fields/NoteCollectionField"
-import { NoteTagsField } from "./note-settings-fields/NoteTagsField"
-import { NoteVisibilityField } from "./note-settings-fields/NoteVisibilityField"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import type { Collection } from '@/features/collections/models/collection.model'
+import type { NoteFormValues } from '../types/note-edit-form.types'
+import { NoteCollectionField } from './note-settings-fields/NoteCollectionField'
+import { NoteTagsField } from './note-settings-fields/NoteTagsField'
+import { NoteVisibilityField } from './note-settings-fields/NoteVisibilityField'
 
 interface NoteSettingsFieldsProps {
   form: UseFormReturn<NoteFormValues>
@@ -23,8 +29,8 @@ export function NoteSettingsFields({
   return (
     <Card className="border border-border/70 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Paramètres</CardTitle>
-        <CardDescription>Collection, tags et visibilité.</CardDescription>
+        <CardTitle className="text-lg">ParamÃ¨tres</CardTitle>
+        <CardDescription>Collection, tags et visibilitÃ©.</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -40,4 +46,3 @@ export function NoteSettingsFields({
     </Card>
   )
 }
-

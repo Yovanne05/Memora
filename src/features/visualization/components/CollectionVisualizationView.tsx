@@ -1,13 +1,13 @@
-import { useCollectionVisualizationQuery } from "../hooks/useCollectionVisualizationQuery"
-import { useVisualizationLayout } from "../hooks/useVisualizationLayout"
-import { VisualizationHeader } from "./VisualizationHeader"
-import { EmptyState } from "@/components/ui/empty-state"
-import { ErrorState } from "@/components/ui/error-state"
-import { NoteSidebar } from "../../notes/components/NoteSidebar"
-import { LoadingState } from "./VisualizationSkeleton"
-import { CollectionVisualizationCanvas } from "./collection-visualization/CollectionVisualizationCanvas"
-import { CollectionVisualizationExtras } from "./collection-visualization/CollectionVisualizationExtras"
-import { useCollectionVisualizationInteractions } from "../hooks/useCollectionVisualizationInteractions"
+import { useCollectionVisualizationQuery } from '../hooks/useCollectionVisualizationQuery'
+import { useVisualizationLayout } from '../hooks/useVisualizationLayout'
+import { VisualizationHeader } from './VisualizationHeader'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ErrorState } from '@/components/ui/error-state'
+import { NoteSidebar } from '../../notes/components/NoteSidebar'
+import { LoadingState } from './VisualizationSkeleton'
+import { CollectionVisualizationCanvas } from './collection-visualization/CollectionVisualizationCanvas'
+import { CollectionVisualizationExtras } from './collection-visualization/CollectionVisualizationExtras'
+import { useCollectionVisualizationInteractions } from '../hooks/useCollectionVisualizationInteractions'
 
 interface CollectionVisualizationViewProps {
   readonly collectionId?: string
@@ -18,16 +18,30 @@ export function CollectionVisualizationView({
   collectionId,
   onBack,
 }: Readonly<CollectionVisualizationViewProps>) {
-  const { data: collection, isLoading, isError } =
-    useCollectionVisualizationQuery(collectionId)
+  const {
+    data: collection,
+    isLoading,
+    isError,
+  } = useCollectionVisualizationQuery(collectionId)
 
   const { nodes, edges, orphanNodeIds } = useVisualizationLayout(collection)
-  const { styledNodes, styledEdges, selectedNote, relatedNotes, sidebar, handlers } =
-    useCollectionVisualizationInteractions({ nodes, edges, orphanNodeIds, collection })
+  const {
+    styledNodes,
+    styledEdges,
+    selectedNote,
+    relatedNotes,
+    sidebar,
+    handlers,
+  } = useCollectionVisualizationInteractions({
+    nodes,
+    edges,
+    orphanNodeIds,
+    collection,
+  })
 
   if (!collectionId) {
     return (
-      <EmptyState message="Sélectionnez une collection à gauche pour afficher la visualisation." />
+      <EmptyState message="SÃ©lectionnez une collection Ã  gauche pour afficher la visualisation." />
     )
   }
 
@@ -36,7 +50,9 @@ export function CollectionVisualizationView({
   }
 
   if (isError || !collection) {
-    return <ErrorState message="Erreur lors du chargement de la visualisation." />
+    return (
+      <ErrorState message="Erreur lors du chargement de la visualisation." />
+    )
   }
 
   const connectedNotesCount = collection.nodes.length - orphanNodeIds.size
@@ -69,6 +85,3 @@ export function CollectionVisualizationView({
     </div>
   )
 }
-
-
-
