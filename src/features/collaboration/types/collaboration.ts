@@ -2,7 +2,6 @@ export interface Collaborator {
   user_id: string
   username: string
   socket_id: string
-  joined_at: string
 }
 
 export interface CollaborationSession {

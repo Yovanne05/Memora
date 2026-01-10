@@ -56,7 +56,7 @@ export function useCollaborationCRDT(
   const socketRef = useRef<Socket | null>(null)
   const docRef = useRef<Y.Doc | null>(null)
   const providerRef = useRef<YjsSocketIOProvider | null>(null)
-  const reconnectionAttemptsRef = useRef(0)
+  const isDisconnectingRef = useRef(false)
 
   const onSyncedRef = useLatest(onSynced)
   const onUserJoinedRef = useLatest(onUserJoined)
@@ -112,6 +112,7 @@ export function useCollaborationCRDT(
 
     setIsConnecting(true)
     setError(null)
+    isDisconnectingRef.current = false
 
     const token = getAccessToken()
     if (!token) {
@@ -139,7 +140,6 @@ export function useCollaborationCRDT(
       setIsConnected(true)
       setIsConnecting(false)
       setError(null)
-      reconnectionAttemptsRef.current = 0
 
       // Rejoindre la session de collaboration
       socket.emit('join_collaboration', {
@@ -169,16 +169,16 @@ export function useCollaborationCRDT(
       setIsConnected(false)
       setIsSynced(false)
       setSession(null)
+      if (!isDisconnectingRef.current) {
+        setIsConnecting(true)
+      }
     })
 
     socket.on('connect_error', (err) => {
       setError(err)
-      setIsConnecting(false)
       onErrorRef.current?.(err)
-      reconnectionAttemptsRef.current++
-
-      if (reconnectionAttemptsRef.current >= MAX_RECONNECTION_ATTEMPTS) {
-        socket.close()
+      if (!isDisconnectingRef.current) {
+        setIsConnecting(true)
       }
     })
 
@@ -197,6 +197,7 @@ export function useCollaborationCRDT(
   ])
 
   const disconnect = useCallback(() => {
+    isDisconnectingRef.current = true
     if (providerRef.current) {
       providerRef.current.destroy()
       providerRef.current = null
@@ -216,7 +217,6 @@ export function useCollaborationCRDT(
 
   const reconnect = useCallback(() => {
     disconnect()
-    reconnectionAttemptsRef.current = 0
     connect()
   }, [connect, disconnect])
 
