@@ -8,6 +8,7 @@ from exceptions.collaboration_exception import (
     CollaborationNotAuthorized,
 )
 from utils.filter import GENERIC_MESSAGE
+from utils.rate_limiter import RateLimitExceeded
 
 
 def _build_error_payload(error: Exception) -> dict:
@@ -29,7 +30,9 @@ def _build_error_payload(error: Exception) -> dict:
     if isinstance(error, HTTPException):
         status_code = int(error.code) if error.code is not None else 500
         return {"code": status_code, "message": str(error), "type": "http_error"}
-
+    if isinstance(error, RateLimitExceeded):
+        return {"code": 429, "message": str(error), "type": "rate_limited"}
+    print("Unhandled error in realtime collaboration:", error)
     return {"code": 500, "message": GENERIC_MESSAGE, "type": "internal_error"}
 
 

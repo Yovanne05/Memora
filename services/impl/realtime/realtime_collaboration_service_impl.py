@@ -1,5 +1,5 @@
 from domain_services.collaboration_session_service import (
-    get_collaboration_session_service,
+    collaboration_domain_session_service,
 )
 from domain_services.realtime_collaboration_domain_service import (
     DEFAULT_EMPTY_DOCUMENT,
@@ -33,8 +33,7 @@ from utils.enums import RoleEnum
 
 class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
     def get_username_by_socket(self, socket_id: str) -> str:
-        session_service = get_collaboration_session_service()
-        session_data = session_service.find_session_by_socket(socket_id)
+        session_data = collaboration_domain_session_service.find_session_by_socket(socket_id)
         return session_data.get("username") if session_data else "Unknown"
 
     def join_collaboration_session(
@@ -64,11 +63,10 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         crdt_service = get_crdt_service()
         crdt_service.get_or_create_document(note_id, note_content)
 
-        session_service = get_collaboration_session_service()
-        session_service.cleanup_user_sessions(note_id, user_id)
-        session_service.create_session(note_id, user_id, socket_id, username)
+        collaboration_domain_session_service.cleanup_user_sessions(note_id, user_id)
+        collaboration_domain_session_service.create_session(note_id, user_id, socket_id, username)
 
-        all_sessions = session_service.list_sessions_by_note(note_id)
+        all_sessions = collaboration_domain_session_service.list_sessions_by_note(note_id)
         session_dto = build_session_dto(note_id, all_sessions)
         join_event = build_join_event(note_id, user_id, username)
 
@@ -77,21 +75,18 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
     def leave_collaboration_session(
         self, note_id: str, user_id: str, socket_id: str
     ) -> CollaborationEventDTO | None:
-        session_service = get_collaboration_session_service()
-        session_data = session_service.find_session_by_socket(socket_id)
+        session_data = collaboration_domain_session_service.find_session_by_socket(socket_id)
         if not session_data:
             return None
 
-        session_service.delete_session_by_socket(socket_id)
-
+        collaboration_domain_session_service.delete_session_by_socket(socket_id)
         resolved_note_id = session_data.get("note_id") or note_id
         username = session_data.get("username", "Unknown")
 
         return build_leave_event(resolved_note_id, user_id, username)
 
     def handle_disconnect(self, socket_id: str) -> CollaborationEventDTO | None:
-        session_service = get_collaboration_session_service()
-        session_data = session_service.find_session_by_socket(socket_id)
+        session_data = collaboration_domain_session_service.find_session_by_socket(socket_id)
         if not session_data:
             return None
 
@@ -99,7 +94,7 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         user_id = session_data.get("user_id")
         username = session_data.get("username", "Unknown")
 
-        session_service.delete_session_by_socket(socket_id)
+        collaboration_domain_session_service.delete_session_by_socket(socket_id)
 
         return build_leave_event(note_id, user_id, username)
 

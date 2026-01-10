@@ -39,7 +39,7 @@ def register_socketio_handlers():
         return True
 
     @socketio.on("disconnect", namespace=COLLABORATION_NAMESPACE)
-    def handle_disconnect():
+    def handle_disconnect(reason=None):
         socket_id = request.sid
         event = realtime_collaboration_service.handle_disconnect(socket_id)
 
@@ -53,7 +53,9 @@ def register_socketio_handlers():
             )
 
     @socketio.on("join_collaboration", namespace=COLLABORATION_NAMESPACE)
-    @socketio_rate_limit(max_requests=20, window_seconds=60)  # 20 joins per minute
+    @socketio_rate_limit(
+        max_requests=100, window_seconds=60, disconnect_on_exceed=False
+    )  # 100 joins per minute
     def handle_join_collaboration(data):
         user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         try:
