@@ -1,6 +1,5 @@
-import type { NoteCreateDto, NoteDto, NoteUpdateDto } from "../dtos/note.dto"
-import type { Note, NoteCreate, NoteUpdate } from "../models/note.model"
-
+import type { NoteCreateDto, NoteDto, NoteUpdateDto } from '../dtos/note.dto'
+import type { Note, NoteCreate, NoteUpdate } from '../models/note.model'
 
 export function dtoToNote(dto: NoteDto): Note {
   return {
@@ -10,9 +9,10 @@ export function dtoToNote(dto: NoteDto): Note {
     ownerId: dto.owner_id,
     ownerUsername: dto.owner_username,
     title: dto.title,
+    content: dto.yjs_snapshot ?? null,
     isFavorite: dto.is_favorite ?? false,
     tags: dto.tags ?? [],
-    visibility: dto.visibility ?? "private",
+    visibility: dto.visibility ?? 'private',
     userPermission: dto.user_permission ?? null,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
@@ -24,9 +24,9 @@ export function toNoteCreateDto(payload: NoteCreate): NoteCreateDto {
     collection_id: payload.collectionId ?? null,
     owner_id: payload.ownerId,
     title: payload.title,
-    content: payload.content,
+    yjs_snapshot: payload.content,
     tags: payload.tags,
-    visibility: payload.visibility ?? "private",
+    visibility: payload.visibility ?? 'private',
   }
 }
 
@@ -34,7 +34,7 @@ export function toNoteUpdateDto(payload: NoteUpdate): NoteUpdateDto {
   return {
     collection_id: payload.collectionId,
     title: payload.title,
-    content: payload.content,
+    yjs_snapshot: payload.content,
     tags: payload.tags,
     visibility: payload.visibility,
   }
