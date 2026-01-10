@@ -1,12 +1,10 @@
-import { Link } from "@tanstack/react-router"
-import { Trash2 } from "lucide-react"
+import { Link } from '@tanstack/react-router'
+import { Trash2 } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
-import { CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getContentPreview } from "@/lib/html-utils"
-import type { LinkedNoteView } from "../../hooks/useLinkedNotesQuery"
-import type { Note } from "../../models/note.model"
+import { Button } from '@/components/ui/button'
+import { CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { LinkedNoteView } from '../../hooks/useLinkedNotesQuery'
 
 type NoteLinksListProps = {
   notes: LinkedNoteView[]
@@ -41,11 +39,13 @@ export function NoteLinksList({
             className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors"
           >
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm truncate">{linkedNote.title}</h4>
+              <h4 className="font-medium text-sm truncate">
+                {linkedNote.title}
+              </h4>
 
               {linkedNote.linkLabel && (
                 <p className="text-xs text-muted-foreground">
-                  Lien :{" "}
+                  Lien :{' '}
                   <span className="font-medium">{linkedNote.linkLabel}</span>
                 </p>
               )}
