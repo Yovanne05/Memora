@@ -20,7 +20,8 @@ class TestNoteLinkRepositoryAdd:
 
         link = NoteLink(
             note_id_1=note_id_1,
-            note_id_2=note_id_2
+            note_id_2=note_id_2,
+            label="Test Link"
         )
 
         # Act

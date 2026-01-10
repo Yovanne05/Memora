@@ -22,12 +22,14 @@ class TestNoteLinkControllerCreate:
         link = NoteLinkDTO(
             note_id=note_id,
             linked_note_id=linked_note_id,
+            label="Test Link Label",
             created_at=datetime.now()
         )
         mock_note_link_service.create_link.return_value = link
 
         payload = {
-            "linked_note_id": linked_note_id
+            "linked_note_id": linked_note_id,
+            "label": "Test Link Label"
         }
 
         # Act

@@ -26,6 +26,7 @@ class TestNoteLinkControllerList:
             NoteLinkDTO(
                 note_id=note_id,
                 linked_note_id=str(uuid4()),
+                label="Test Label",
                 created_at=datetime.now()
             )
         ]

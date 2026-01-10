@@ -36,7 +36,7 @@ class TestNoteLinkServiceList:
         monkeypatch.setattr("services.impl.note.note_link_service_impl.get_current_user", lambda: current_user)
 
         links = [
-            NoteLink(note_id_1=note_id, note_id_2=str(uuid4()), created_at=datetime.now())
+            NoteLink(note_id_1=note_id, note_id_2=str(uuid4()), label="Test Label", created_at=datetime.now())
         ]
         mock_note_link_repository.find_many.return_value = (links, 1)
 
