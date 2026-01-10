@@ -28,6 +28,7 @@ from utils.realtime_filter import register_realtime_filter
 from utils.swagger import init_swagger
 from utils.redis_client import init_redis
 from utils.socketio_service import init_socketio
+from utils.crdt_service import init_crdt_service
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -50,6 +51,9 @@ def create_app() -> Flask:
         port=config.REDIS_PORT,
         db=config.REDIS_DB
     )
+
+    # Initialiser le service CRDT pour la collaboration temps réel
+    init_crdt_service()
 
     socketio = init_socketio(app, cors_allowed_origins="*", async_mode="threading")
     register_realtime_filter(socketio)

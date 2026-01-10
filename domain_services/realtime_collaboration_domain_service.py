@@ -1,5 +1,6 @@
 from typing import List
 from datetime import datetime, timezone
+import base64
 
 from daos.note_dao import Note
 from daos.user_dao import User
@@ -9,6 +10,8 @@ from dtos.collaboration_dto import (
     CollaborationOperationDTO,
     CollaborationEventDTO,
     SendOperationDTO,
+    CRDTUpdateDTO,
+    CRDTSyncRequestDTO,
 )
 from exceptions.collaboration_exception import (
     CollaborationNotAuthorized,
@@ -19,6 +22,10 @@ from domain_services.permission_domain_service import permission_domain_service
 from repositorys import collaboration_repository
 from utils.db import get_db_session
 from utils.enums import RoleEnum
+from utils.crdt_service import get_crdt_service
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_EMPTY_DOCUMENT = '{"type":"doc","content":[{"type":"paragraph"}]}'
 
@@ -43,6 +50,10 @@ class RealtimeCollaborationDomainService:
             if not user:
                 raise ValueError("User not found")
             username = user.username
+
+        # Initialiser le document CRDT avec le contenu de la note
+        crdt_service = get_crdt_service()
+        crdt_service.get_or_create_document(note_id, note.content)
 
         self._cleanup_stale_sessions(note_id, user_id)
 
@@ -277,6 +288,106 @@ class RealtimeCollaborationDomainService:
             return content[: operation.position] + operation.content + content[end_pos:]
 
         raise CollaborationInvalidOperation(f"Unknown operation type: {operation.operation_type}")
+
+    def process_crdt_update(
+        self, update_dto: CRDTUpdateDTO, user_id: str, user_role: RoleEnum
+    ) -> CollaborationEventDTO:
+        """
+        Traite une mise à jour CRDT et la propage aux autres utilisateurs.
+
+        Args:
+            update_dto: DTO contenant la mise à jour CRDT
+            user_id: Identifiant de l'utilisateur
+            user_role: Rôle de l'utilisateur
+
+        Returns:
+            Événement de collaboration à diffuser
+
+        Raises:
+            CollaborationNotAuthorized: Si l'utilisateur n'a pas les permissions
+        """
+        # Vérifier les permissions d'écriture
+        has_permission = permission_domain_service.can_write_note(
+            update_dto.note_id, user_id, user_role
+        )
+        if not has_permission:
+            raise CollaborationNotAuthorized()
+
+        # Décoder la mise à jour depuis base64
+        try:
+            update_bytes = base64.b64decode(update_dto.update)
+        except Exception as e:
+            logger.error(f"Failed to decode CRDT update: {e}")
+            raise CollaborationInvalidOperation("Invalid base64-encoded update")
+
+        # Appliquer la mise à jour au document CRDT
+        crdt_service = get_crdt_service()
+        crdt_service.apply_update(update_dto.note_id, update_bytes)
+
+        # Récupérer le nouveau contenu et le sauvegarder en DB
+        new_content = crdt_service.get_content_as_text(update_dto.note_id)
+        with get_db_session() as session:
+            note = session.get(Note, update_dto.note_id)
+            if note:
+                note.content = new_content
+
+        # Créer l'événement à diffuser
+        event = CollaborationEventDTO(
+            event_type="crdt_update",
+            user_id=user_id,
+            username="",  # Sera rempli par le controller
+            note_id=update_dto.note_id,
+            crdt_update=update_dto.update,
+        )
+
+        return event
+
+    def handle_crdt_sync_request(
+        self, sync_request_dto: CRDTSyncRequestDTO, user_id: str, user_role: RoleEnum
+    ) -> tuple[str, str]:
+        """
+        Gère une demande de synchronisation CRDT.
+
+        Args:
+            sync_request_dto: DTO contenant la demande de synchronisation
+            user_id: Identifiant de l'utilisateur
+            user_role: Rôle de l'utilisateur
+
+        Returns:
+            Tuple (state_vector encodé, update encodé)
+
+        Raises:
+            CollaborationNotAuthorized: Si l'utilisateur n'a pas les permissions
+        """
+        # Vérifier les permissions de lecture
+        has_permission = permission_domain_service.can_read_note(
+            sync_request_dto.note_id, user_id, user_role
+        )
+        if not has_permission:
+            raise CollaborationNotAuthorized()
+
+        crdt_service = get_crdt_service()
+
+        # Décoder le vecteur d'état du client
+        try:
+            client_state_vector = base64.b64decode(sync_request_dto.state_vector)
+        except Exception as e:
+            logger.error(f"Failed to decode state vector: {e}")
+            raise CollaborationInvalidOperation("Invalid base64-encoded state vector")
+
+        # Calculer les mises à jour nécessaires
+        update_bytes = crdt_service.get_update_since_state(
+            sync_request_dto.note_id, client_state_vector
+        )
+
+        # Obtenir le vecteur d'état actuel du serveur
+        server_state_vector = crdt_service.get_state_vector(sync_request_dto.note_id)
+
+        # Encoder en base64
+        update_b64 = base64.b64encode(update_bytes).decode("utf-8")
+        state_vector_b64 = base64.b64encode(server_state_vector).decode("utf-8")
+
+        return state_vector_b64, update_b64
 
 
 realtime_collaboration_domain_service = RealtimeCollaborationDomainService()
