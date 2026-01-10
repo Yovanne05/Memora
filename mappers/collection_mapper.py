@@ -1,4 +1,4 @@
-from typing import List, Set, Optional
+from typing import List, Set
 from sqlalchemy import inspect
 
 from daos.collection_dao import Collection
@@ -6,38 +6,33 @@ from daos.note_dao import Note
 
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from dtos.note_dto import NoteDTO
-from dtos.owner_dto import OwnerDTO
+from dtos.user_access_dto import UserAccessDTO
 from mappers.note_mapper import note_to_dto
-from domain_services.permission_domain_service import permission_domain_service
-from utils.permission_models import AccessLevel
 from utils.enums import SharePermissionEnum
 
 
-def _get_all_owners(collection: Collection) -> List[OwnerDTO]:
-    owners: list[OwnerDTO] = []
+def _get_user_access(collection: Collection) -> List[UserAccessDTO]:
+    access_list: list[UserAccessDTO] = []
 
     insp = inspect(collection)
     if "owner" not in insp.unloaded and collection.owner:
-        owners.append(
-            OwnerDTO(
+        access_list.append(
+            UserAccessDTO(
                 user_id=collection.owner_id,
-                username=collection.owner.username,
+                permission=SharePermissionEnum.WRITE,
             )
         )
 
     if "shares" not in insp.unloaded:
         for share in collection.shares:
-            if share.permission == SharePermissionEnum.OWNER:
-                share_insp = inspect(share)
-                if "user" not in share_insp.unloaded and share.user:
-                    owners.append(
-                        OwnerDTO(
-                            user_id=share.user_id,
-                            username=share.user.username,
-                        )
-                    )
+            access_list.append(
+                UserAccessDTO(
+                    user_id=share.user_id,
+                    permission=share.permission,
+                )
+            )
 
-    return owners
+    return access_list
 
 
 def _build_note_dtos(
@@ -117,26 +112,6 @@ def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
     return edges
 
 
-def _get_user_permission(collection: Collection, current_user) -> Optional[str]:
-    if not current_user:
-        return None
-
-    perm = permission_domain_service.get_collection_permission(
-        collection.id,
-        current_user.id,
-        current_user.role,
-    )
-
-    level = perm.access_level
-    if level in {AccessLevel.OWNER, AccessLevel.ADMIN}:
-        return "owner"
-    if level == AccessLevel.WRITE:
-        return "write"
-    if level == AccessLevel.READ:
-        return "read"
-    return None
-
-
 def collection_to_dto(
     collection_entity: Collection,
     collection_favorite_ids: set[str] | None = None,
@@ -157,10 +132,9 @@ def collection_to_dto(
             "name": collection_entity.name,
             "description": collection_entity.description,
             "visibility": collection_entity.visibility,
-            "owners": _get_all_owners(collection_entity),
+            "user_access": _get_user_access(collection_entity),
             "tags": collection_entity.tags,
             "is_favorite": is_favorite,
-            "user_permission": _get_user_permission(collection_entity, current_user),
             "created_at": collection_entity.created_at,
             "updated_at": collection_entity.updated_at,
             "notes": _build_note_dtos(notes, note_favorite_ids),

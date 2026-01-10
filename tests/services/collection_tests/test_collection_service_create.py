@@ -13,7 +13,8 @@ from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
 from dtos.collection_dto import CollectionCreateDTO, CollectionUpdateDTO, CollectionDTO
-from dtos.owner_dto import OwnerDTO
+from dtos.user_access_dto import UserAccessDTO
+from utils.enums import SharePermissionEnum
 from daos.collection_dao import Collection
 from utils.enums import VisibilityEnum
 from exceptions.collection_exception import CollectionNotFound
@@ -63,7 +64,12 @@ class TestCollectionServiceCreate:
             name="Test Collection",
             description="Test desc",
             visibility=VisibilityEnum.PRIVATE,
-            owners=[OwnerDTO(user_id=user_id, username="testuser")],
+            user_access=[
+                UserAccessDTO(
+                    user_id=user_id,
+                    permission=SharePermissionEnum.WRITE,
+                )
+            ],
             tags=[],
             created_at=datetime.now(),
             updated_at=datetime.now(),
@@ -88,6 +94,6 @@ class TestCollectionServiceCreate:
         # Assert
         assert isinstance(result, CollectionDTO)
         assert result.name == "Test Collection"
-        assert len(result.owners) > 0
-        assert result.owners[0].user_id == user_id
+        assert len(result.user_access) > 0
+        assert result.user_access[0].user_id == user_id
         mock_collection_repository.add.assert_called_once()

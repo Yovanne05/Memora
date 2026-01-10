@@ -139,6 +139,5 @@ def _share_permission_to_access_level(permission: Optional[SharePermissionEnum])
     mapping = {
         SharePermissionEnum.READ: AccessLevel.READ,
         SharePermissionEnum.WRITE: AccessLevel.WRITE,
-        SharePermissionEnum.OWNER: AccessLevel.OWNER,
     }
     return mapping.get(permission, AccessLevel.NONE)

@@ -3,7 +3,6 @@ from typing import List, Tuple
 from domain_services.note_domain_service import (
     ensure_not_sharing_with_owner,
     ensure_note_exists,
-    ensure_note_share_does_not_exist,
     ensure_share_target_exists,
 )
 from domain_services.permission_domain_service import permission_domain_service
@@ -61,7 +60,10 @@ class NoteShareService(NoteShareServiceInterface):
         existing_share = note_share_repository.find_one(
             note_id, share_dto.user_id
         )
-        ensure_note_share_does_not_exist(existing_share)
+        if existing_share:
+            existing_share.permission = share_dto.permission
+            saved = note_share_repository.update(existing_share)
+            return note_share_to_dto(saved)
 
         share_entity = dto_to_note_share(note_id, share_dto)
         saved = note_share_repository.add(share_entity)

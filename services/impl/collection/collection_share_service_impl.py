@@ -3,7 +3,6 @@ from typing import List, Tuple
 from domain_services.collection_domain_service import (
     ensure_collection_exists,
     ensure_not_sharing_with_owner,
-    ensure_share_does_not_exist,
     ensure_user_exists,
 )
 from domain_services.permission_domain_service import permission_domain_service
@@ -74,7 +73,10 @@ class CollectionShareService(CollectionShareServiceInterface):
         existing_share = collection_share_repository.find_one(
             collection_id, share_dto.user_id
         )
-        ensure_share_does_not_exist(existing_share)
+        if existing_share:
+            existing_share.permission = share_dto.permission
+            saved = collection_share_repository.update(existing_share)
+            return collection_share_to_dto(saved)
 
         share_entity = dto_to_collection_share(collection_id, share_dto)
         saved = collection_share_repository.add(share_entity)
