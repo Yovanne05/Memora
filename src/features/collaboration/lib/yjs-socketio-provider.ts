@@ -116,7 +116,7 @@ export class YjsSocketIOProvider {
     }
   }
 
-  private requestSync() {
+  public requestSync() {
     // Obtenir le vecteur d'état actuel du document
     const stateVector = Y.encodeStateVector(this.doc)
     const stateVectorBase64 = this.uint8ArrayToBase64(stateVector)

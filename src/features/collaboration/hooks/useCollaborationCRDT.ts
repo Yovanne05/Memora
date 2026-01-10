@@ -57,6 +57,7 @@ export function useCollaborationCRDT(
   const docRef = useRef<Y.Doc | null>(null)
   const providerRef = useRef<YjsSocketIOProvider | null>(null)
   const isDisconnectingRef = useRef(false)
+  const hasJoinedRef = useRef(false)
 
   const onSyncedRef = useLatest(onSynced)
   const onUserJoinedRef = useLatest(onUserJoined)
@@ -106,7 +107,10 @@ export function useCollaborationCRDT(
   )
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected) {
+    if (socketRef.current) {
+      if (!socketRef.current.connected) {
+        socketRef.current.connect()
+      }
       return
     }
 
@@ -136,15 +140,20 @@ export function useCollaborationCRDT(
       upgrade: false,
     })
 
+    socketRef.current = socket
+
     socket.on('connect', () => {
       setIsConnected(true)
       setIsConnecting(false)
       setError(null)
 
-      // Rejoindre la session de collaboration
-      socket.emit('join_collaboration', {
-        note_id: noteId,
-      })
+      if (!hasJoinedRef.current) {
+        // Rejoindre la session de collaboration
+        socket.emit('join_collaboration', {
+          note_id: noteId,
+        })
+        hasJoinedRef.current = true
+      }
 
       // Créer le document Yjs et le provider si pas déjà fait
       if (!docRef.current) {
@@ -152,9 +161,9 @@ export function useCollaborationCRDT(
         setDoc(docRef.current)
       }
 
-      if (!providerRef.current && socketRef.current) {
+      if (!providerRef.current) {
         providerRef.current = new YjsSocketIOProvider(docRef.current, {
-          socket: socketRef.current,
+          socket,
           noteId,
           onSynced: () => {
             setIsSynced(true)
@@ -162,6 +171,8 @@ export function useCollaborationCRDT(
           },
           onError: handleSocketError,
         })
+      } else {
+        providerRef.current.requestSync()
       }
     })
 
@@ -169,6 +180,7 @@ export function useCollaborationCRDT(
       setIsConnected(false)
       setIsSynced(false)
       setSession(null)
+      hasJoinedRef.current = false
       if (!isDisconnectingRef.current) {
         setIsConnecting(true)
       }
@@ -185,8 +197,6 @@ export function useCollaborationCRDT(
     socket.on('collaboration_session', handleSessionUpdate)
     socket.on('collaboration_event', handleCollaborationEvent)
     socket.on('error', handleSocketError)
-
-    socketRef.current = socket
   }, [
     noteId,
     handleSessionUpdate,
@@ -198,6 +208,7 @@ export function useCollaborationCRDT(
 
   const disconnect = useCallback(() => {
     isDisconnectingRef.current = true
+    hasJoinedRef.current = false
     if (providerRef.current) {
       providerRef.current.destroy()
       providerRef.current = null
