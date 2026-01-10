@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { FileText } from 'lucide-react'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
@@ -29,6 +29,7 @@ export function NoteCard({
   showFavoriteButton = false,
 }: Readonly<NoteCardProps>) {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isInteracting, setIsInteracting] = useState(false)
   const favorite = note.isFavorite === true
   const actions = buildNoteCardActions({
@@ -77,8 +78,14 @@ export function NoteCard({
 
   const handleClick = () => {
     if (isInteracting) return
+    const base = location.pathname.startsWith('/app/workspace/favorites')
+      ? '/app/workspace/favorites'
+      : '/app/workspace'
+    const path = note.collectionId
+      ? `${base}/collections/${note.collectionId}/notes/${note.id}`
+      : `${base}/notes/${note.id}`
     navigate({
-      to: '/app/workspace/notes/$noteId',
+      to: path,
       params: { noteId: note.id },
     })
   }
