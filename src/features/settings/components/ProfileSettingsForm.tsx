@@ -16,12 +16,6 @@ const profileFormSchema = z.object({
     .max(50)
     .nullable()
     .optional(),
-  displayName: z
-    .string()
-    .min(1)
-    .max(100, "Le nom d'affichage ne peut pas dépasser 100 caractères")
-    .nullable()
-    .optional(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
@@ -42,7 +36,6 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
     defaultValues: {
       email: user.email,
       username: user.username || '',
-      displayName: user.displayName || '',
     },
   })
 
@@ -51,7 +44,6 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
       await updateMutation.mutateAsync({
         email: data.email,
         username: data.username || null,
-        displayName: data.displayName || null,
       })
       toast.success('Profil mis à jour avec succès')
     } catch {
@@ -90,25 +82,7 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
           <p className="text-sm text-red-500">{errors.username.message}</p>
         )}
         <p className="text-xs text-muted-foreground">
-          Votre nom d'utilisateur peut être utilisé pour vous identifier
-          publiquement.
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="displayName">Nom d'affichage</Label>
-        <Input
-          id="displayName"
-          type="text"
-          {...register('displayName')}
-          disabled={updateMutation.isPending}
-          placeholder="Optionnel"
-        />
-        {errors.displayName && (
-          <p className="text-sm text-red-500">{errors.displayName.message}</p>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Le nom qui sera affiché aux autres utilisateurs.
+          Votre nom d'utilisateur sera affiché aux autres utilisateurs.
         </p>
       </div>
 

@@ -137,11 +137,11 @@ export function useRichTextEditor({
   }, [provider])
 
   const caretUser = useMemo<CollabUser>(() => {
-    const name = user?.displayName ?? user?.username ?? 'Utilisateur'
+    const name = user?.username ?? 'Utilisateur'
     const colorSource = user?.id ?? name
     const color = user?.color ?? getUserColor(colorSource)
     return { id: user?.id ?? null, name, color }
-  }, [user?.color, user?.displayName, user?.id, user?.username])
+  }, [user?.color, user?.id, user?.username])
 
   const enableCollaboration = Boolean(collabDocument)
 

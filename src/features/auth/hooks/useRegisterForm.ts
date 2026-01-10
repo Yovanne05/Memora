@@ -1,29 +1,33 @@
-import { useEffect, useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import type { z } from "zod"
-import { useRouter } from "@tanstack/react-router"
+import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import type { z } from 'zod'
+import { useRouter } from '@tanstack/react-router'
 
-import { useAuth } from "@/features/auth/hooks/useAuth"
-import { registerSchema } from "@/features/auth/schemas/register.schema"
-import { getRegisterErrorMessage } from "@/features/auth/lib/register-errors"
-import { logger } from "@/lib/logger"
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { registerSchema } from '@/features/auth/schemas/register.schema'
+import { getRegisterErrorMessage } from '@/features/auth/lib/register-errors'
+import { logger } from '@/lib/logger'
 
 export function useRegisterForm(redirectTo: string) {
   const router = useRouter()
-  const { register: registerUser, isRegistering, isAuthenticated, isLoadingUser } = useAuth()
+  const {
+    register: registerUser,
+    isRegistering,
+    isAuthenticated,
+    isLoadingUser,
+  } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      displayName: "",
-      email: "",
-      username: "",
-      password: "",
+      email: '',
+      username: '',
+      password: '',
     },
   })
 
@@ -37,10 +41,15 @@ export function useRegisterForm(redirectTo: string) {
     setFormError(null)
     try {
       await registerUser(values)
-      toast.success("Compte créé avec succès. Vous pouvez maintenant vous connecter.")
-      await router.navigate({ to: "/auth/login", search: { redirect: redirectTo } })
+      toast.success(
+        'Compte créé avec succès. Vous pouvez maintenant vous connecter.'
+      )
+      await router.navigate({
+        to: '/auth/login',
+        search: { redirect: redirectTo },
+      })
     } catch (error) {
-      logger.error("Failed to register user", error)
+      logger.error('Failed to register user', error)
       const message = getRegisterErrorMessage(error)
       toast.error(message)
       setFormError(message)
@@ -56,4 +65,3 @@ export function useRegisterForm(redirectTo: string) {
     isRegistering,
   }
 }
-

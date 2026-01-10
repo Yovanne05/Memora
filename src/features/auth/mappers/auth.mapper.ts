@@ -1,7 +1,17 @@
-import { dtoToUser } from "@/features/users/mappers/user.mapper"
-import type { User } from "@/features/users/models/user.model"
-import type { AuthMeResponseDto, AuthResponseDto, AuthUserDto, LoginDto, RegisterDto } from "../dtos/auth.dto"
-import type { AuthSession, LoginPayload, RegisterPayload } from "../models/auth.model"
+import { dtoToUser } from '@/features/users/mappers/user.mapper'
+import type { User } from '@/features/users/models/user.model'
+import type {
+  AuthMeResponseDto,
+  AuthResponseDto,
+  AuthUserDto,
+  LoginDto,
+  RegisterDto,
+} from '../dtos/auth.dto'
+import type {
+  AuthSession,
+  LoginPayload,
+  RegisterPayload,
+} from '../models/auth.model'
 
 export function authUserDtoToUser(dto: AuthUserDto): User {
   return dtoToUser(dto)
@@ -27,7 +37,6 @@ export function toLoginDto(payload: LoginPayload): LoginDto {
 
 export function toRegisterDto(payload: RegisterPayload): RegisterDto {
   return {
-    display_name: payload.displayName,
     email: payload.email,
     password: payload.password,
     username: payload.username,
