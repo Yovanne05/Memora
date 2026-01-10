@@ -59,9 +59,6 @@ def get_current_user_context_from_socket(auth=None) -> tuple[str | None, RoleEnu
             token = auth_header.replace("Bearer ", "", 1)
 
     if not token:
-        token = _strip_bearer(request.args.get("token"))
-
-    if not token:
         return None, None
 
     decoded = decode_token(token)

@@ -1,10 +1,21 @@
 import redis
+from redis.retry import Retry
+from redis.backoff import ExponentialBackoff
+from redis.exceptions import ConnectionError, TimeoutError, RedisError
+from utils.logger import get_logger
 
+logger = get_logger(__name__)
 _redis_client = None
 
 
 def init_redis(host: str = "localhost", port: int = 6379, db: int = 0) -> redis.Redis:
     global _redis_client
+
+    retry = Retry(
+        backoff=ExponentialBackoff(base=0.05, cap=2.0),
+        retries=3,
+    )
+
     _redis_client = redis.Redis(
         host=host,
         port=port,
@@ -12,7 +23,13 @@ def init_redis(host: str = "localhost", port: int = 6379, db: int = 0) -> redis.
         decode_responses=True,
         socket_connect_timeout=5,
         socket_timeout=5,
+        socket_keepalive=True,
+        socket_keepalive_options={},
+        retry=retry,
+        retry_on_error=[ConnectionError, TimeoutError],
+        health_check_interval=30,
     )
+
     _redis_client.ping()
     return _redis_client
 
@@ -28,62 +45,94 @@ class CollaborationRedisStore:
         self.client = get_redis_client()
         self.session_ttl = 86400  # 24 hours
 
+    def _safe_execute(self, operation, default=None):
+        try:
+            return operation()
+        except (ConnectionError, TimeoutError) as e:
+            logger.warning(f"Redis operation failed (transient): {e}")
+            return default
+        except RedisError as e:
+            logger.error(f"Redis operation failed: {e}")
+            return default
+        except Exception as e:
+            logger.error(f"Unexpected error in Redis operation: {e}")
+            return default
+
     def create_session(self, note_id: str, user_id: str, socket_id: str, username: str) -> None:
-        session_key = f"collab:session:{socket_id}"
-        session_data = {
-            "note_id": note_id,
-            "user_id": user_id,
-            "socket_id": socket_id,
-            "username": username,
-        }
-        self.client.hset(session_key, mapping=session_data)
-        self.client.expire(session_key, self.session_ttl)
+        def operation():
+            session_key = f"collab:session:{socket_id}"
+            session_data = {
+                "note_id": note_id,
+                "user_id": user_id,
+                "socket_id": socket_id,
+                "username": username,
+            }
+            pipe = self.client.pipeline()
+            pipe.hset(session_key, mapping=session_data)
+            pipe.expire(session_key, self.session_ttl)
 
-        note_sessions_key = f"collab:note:{note_id}:sessions"
-        self.client.sadd(note_sessions_key, socket_id)
-        self.client.expire(note_sessions_key, self.session_ttl)
+            note_sessions_key = f"collab:note:{note_id}:sessions"
+            pipe.sadd(note_sessions_key, socket_id)
+            pipe.expire(note_sessions_key, self.session_ttl)
 
-        user_sessions_key = f"collab:user:{user_id}:sessions"
-        self.client.sadd(user_sessions_key, socket_id)
-        self.client.expire(user_sessions_key, self.session_ttl)
+            user_sessions_key = f"collab:user:{user_id}:sessions"
+            pipe.sadd(user_sessions_key, socket_id)
+            pipe.expire(user_sessions_key, self.session_ttl)
+
+            pipe.execute()
+
+        self._safe_execute(operation)
 
     def get_session_by_socket(self, socket_id: str) -> dict | None:
-        session_key = f"collab:session:{socket_id}"
-        data = self.client.hgetall(session_key)
-        return data if data else None
+        def operation():
+            session_key = f"collab:session:{socket_id}"
+            data = self.client.hgetall(session_key)
+            return data if data else None
+
+        return self._safe_execute(operation, default=None)
 
     def delete_session(self, socket_id: str) -> None:
         session_data = self.get_session_by_socket(socket_id)
         if not session_data:
             return
 
-        note_id = session_data.get("note_id")
-        user_id = session_data.get("user_id")
+        def operation():
+            note_id = session_data.get("note_id")
+            user_id = session_data.get("user_id")
 
-        if note_id:
-            note_sessions_key = f"collab:note:{note_id}:sessions"
-            self.client.srem(note_sessions_key, socket_id)
+            pipe = self.client.pipeline()
 
-        if user_id:
-            user_sessions_key = f"collab:user:{user_id}:sessions"
-            self.client.srem(user_sessions_key, socket_id)
+            if note_id:
+                note_sessions_key = f"collab:note:{note_id}:sessions"
+                pipe.srem(note_sessions_key, socket_id)
 
-        session_key = f"collab:session:{socket_id}"
-        self.client.delete(session_key)
+            if user_id:
+                user_sessions_key = f"collab:user:{user_id}:sessions"
+                pipe.srem(user_sessions_key, socket_id)
+
+            session_key = f"collab:session:{socket_id}"
+            pipe.delete(session_key)
+
+            pipe.execute()
+
+        self._safe_execute(operation)
 
     def list_sessions_by_note(self, note_id: str) -> list[dict]:
-        note_sessions_key = f"collab:note:{note_id}:sessions"
-        socket_ids = self.client.smembers(note_sessions_key)
+        def operation():
+            note_sessions_key = f"collab:note:{note_id}:sessions"
+            socket_ids = self.client.smembers(note_sessions_key)
 
-        sessions = []
-        for socket_id in socket_ids:
-            session = self.get_session_by_socket(socket_id)
-            if session:
-                sessions.append(session)
-            else:
-                self.client.srem(note_sessions_key, socket_id)
+            sessions = []
+            for socket_id in socket_ids:
+                session = self.get_session_by_socket(socket_id)
+                if session:
+                    sessions.append(session)
+                else:
+                    self.client.srem(note_sessions_key, socket_id)
 
-        return sessions
+            return sessions
+
+        return self._safe_execute(operation, default=[])
 
 
 _collab_store = None
