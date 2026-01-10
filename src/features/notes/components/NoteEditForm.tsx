@@ -1,12 +1,12 @@
-import { Form } from "@/components/ui/form"
+import { Form } from '@/components/ui/form'
 
-import { FormActions } from "./FormActions"
-import { NoteContentFields } from "./NoteContentFields"
-import { NoteSettingsFields } from "./NoteSettingsFields"
-import type { NoteEditFormProps } from "../types/note-edit-form.types"
-import { useNoteEditForm } from "../hooks/useNoteEditForm"
+import { FormActions } from './FormActions'
+import { NoteContentFields } from './NoteContentFields'
+import { NoteSettingsFields } from './NoteSettingsFields'
+import type { NoteEditFormProps } from '../types/note-edit-form.types'
+import { useNoteEditForm } from '../hooks/useNoteEditForm'
 
-export type { NoteFormValues } from "../types/note-edit-form.types"
+export type { NoteFormValues } from '../types/note-edit-form.types'
 
 export function NoteEditForm({
   note,
@@ -30,7 +30,9 @@ export function NoteEditForm({
     <Form {...form} key={note?.id}>
       <form
         className="space-y-6"
-        onSubmit={readOnly ? (event) => event.preventDefault() : handleFormSubmit}
+        onSubmit={
+          readOnly ? (event) => event.preventDefault() : handleFormSubmit
+        }
       >
         <FormActions
           savedTime={savedTime}
@@ -39,11 +41,14 @@ export function NoteEditForm({
           deleteLoading={deleteLoading}
           onCancel={onCancel}
           onDelete={onDelete}
-          readOnly={readOnly}
         />
 
         <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-          <NoteContentFields form={form} disabled={isFormDisabled} noteId={note?.id} />
+          <NoteContentFields
+            form={form}
+            disabled={isFormDisabled}
+            noteId={note?.id}
+          />
           <NoteSettingsFields
             form={form}
             disabled={isFormDisabled}
@@ -55,7 +60,3 @@ export function NoteEditForm({
     </Form>
   )
 }
-
-
-
-

@@ -26,11 +26,12 @@ export function RichTextEditor({
   noteId,
   enableCollaboration = false,
 }: Readonly<RichTextEditorProps>) {
-  const editor = useRichTextEditor({
+  const { editor } = useRichTextEditor({
     content,
     onChange,
     placeholder,
     editable,
+    noteId,
   })
 
   const collaboration = useCollaborativeEditorCRDT({

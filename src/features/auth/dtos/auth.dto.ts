@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { userDtoSchema } from "@/features/users/dto/user.dto"
+import { z } from 'zod'
+import { userDtoSchema } from '@/features/users/dto/user.dto'
 
 export const loginDtoSchema = z.object({
   identifier: z.string(),
@@ -7,7 +7,6 @@ export const loginDtoSchema = z.object({
 })
 
 export const registerDtoSchema = z.object({
-  display_name: z.string().min(1),
   email: z.email(),
   password: z.string().min(1),
   username: z.string().min(1),

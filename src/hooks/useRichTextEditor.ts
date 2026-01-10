@@ -1,34 +1,190 @@
-import { useEffect } from "react"
-import { useEditor } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import Underline from "@tiptap/extension-underline"
-import Link from "@tiptap/extension-link"
-import Placeholder from "@tiptap/extension-placeholder"
-import TextAlign from "@tiptap/extension-text-align"
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight"
-import { common, createLowlight } from "lowlight"
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { Extensions } from '@tiptap/core'
+import { useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Link from '@tiptap/extension-link'
+import Placeholder from '@tiptap/extension-placeholder'
+import TextAlign from '@tiptap/extension-text-align'
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import Collaboration from '@tiptap/extension-collaboration'
+import CollaborationCaret from '@tiptap/extension-collaboration-caret'
+import * as Y from 'yjs'
+import { HocuspocusProvider } from '@hocuspocus/provider'
+import { common, createLowlight } from 'lowlight'
 
-import { cn } from "@/lib/utils"
-import { ResizableImage } from "../lib/ResizableImage"
-import { parseContent } from "../lib/content"
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { collabService } from '@/features/collab/services/collab.service'
+import { config } from '@/lib/config'
+import { logger } from '@/lib/logger'
+import { cn } from '@/lib/utils'
+import { ResizableImage } from '../lib/ResizableImage'
+import { parseContent } from '../lib/content'
 
 type UseRichTextEditorArgs = {
   content: string
   onChange: (content: string) => void
   placeholder: string
   editable: boolean
+  noteId?: string
+}
+
+type CollabUser = {
+  id?: string | null
+  name: string
+  color?: string | null
 }
 
 const lowlight = createLowlight(common)
+
+const COLOR_PALETTE = [
+  '#f97316',
+  '#f59e0b',
+  '#84cc16',
+  '#10b981',
+  '#06b6d4',
+  '#3b82f6',
+  '#6366f1',
+  '#a855f7',
+  '#ec4899',
+  '#f43f5e',
+]
+
+function getUserColor(seed: string) {
+  let hash = 0
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i)
+    hash |= 0
+  }
+  const index = Math.abs(hash) % COLOR_PALETTE.length
+  return COLOR_PALETTE[index]
+}
 
 export function useRichTextEditor({
   content,
   onChange,
   placeholder,
   editable,
+  noteId,
 }: UseRichTextEditorArgs) {
-  const editor = useEditor({
-    extensions: [
+  const { user } = useAuth()
+  const [collabTokenState, setCollabTokenState] = useState<{
+    noteId: string
+    token: string
+  } | null>(null)
+
+  const collabDocument = useMemo(() => {
+    if (!noteId || !config.collabWsUrl) return null
+    return new Y.Doc()
+  }, [noteId, config.collabWsUrl])
+
+  useEffect(() => {
+    if (!noteId) return
+
+    let isActive = true
+
+    const fetchToken = async () => {
+      try {
+        const session = await collabService.createSession(noteId)
+        if (isActive) {
+          setCollabTokenState({ noteId, token: session.collab_token })
+        }
+      } catch (error) {
+        logger.error('Failed to create collab session:', error)
+      }
+    }
+
+    fetchToken()
+
+    return () => {
+      isActive = false
+    }
+  }, [noteId])
+
+  useEffect(() => {
+    if (!collabDocument) return
+
+    return () => {
+      collabDocument.destroy()
+    }
+  }, [collabDocument])
+
+  const collabToken =
+    collabTokenState && collabTokenState.noteId === noteId
+      ? collabTokenState.token
+      : null
+
+  const provider = useMemo(() => {
+    if (!collabDocument || !collabToken || !noteId || !config.collabWsUrl) {
+      return null
+    }
+
+    const nextProvider = new HocuspocusProvider({
+      url: config.collabWsUrl,
+      name: noteId,
+      token: collabToken,
+      document: collabDocument,
+    })
+
+    return nextProvider
+  }, [collabDocument, collabToken, noteId])
+
+  useEffect(() => {
+    if (!provider) return
+    return () => {
+      provider.destroy()
+    }
+  }, [provider])
+
+  const caretUser = useMemo<CollabUser>(() => {
+    const name = user?.username ?? 'Utilisateur'
+    const colorSource = user?.id ?? name
+    const color = user?.color ?? getUserColor(colorSource)
+    return { id: user?.id ?? null, name, color }
+  }, [user?.color, user?.id, user?.username])
+
+  const enableCollaboration = Boolean(collabDocument)
+
+  useEffect(() => {
+    if (!provider) return
+    provider.awareness?.setLocalStateField('user', caretUser)
+  }, [caretUser, provider])
+
+  const [collabUsers, setCollabUsers] = useState<CollabUser[]>([])
+
+  const updateUsers = useCallback(
+    (awareness: NonNullable<HocuspocusProvider['awareness']>) => {
+      const states = Array.from(awareness.getStates().values())
+      const users = states
+        .map((state) => state?.user as CollabUser | undefined)
+        .filter((u): u is CollabUser => Boolean(u?.name))
+        .map((u) => ({
+          id: u.id ?? null,
+          name: u.name,
+          color: u.color ?? null,
+        }))
+
+      console.log('Collab users:', users)
+      setCollabUsers(users)
+    },
+    []
+  )
+
+  useEffect(() => {
+    const awareness = provider?.awareness
+    if (!awareness) return
+
+    const handleChange = () => updateUsers(awareness)
+    awareness.on('change', handleChange)
+    handleChange()
+
+    return () => {
+      awareness.off('change', handleChange)
+    }
+  }, [provider, updateUsers])
+
+  const extensions = useMemo(() => {
+    const baseExtensions: Extensions = [
       StarterKit.configure({
         codeBlock: false,
       }),
@@ -36,60 +192,87 @@ export function useRichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-primary underline cursor-pointer",
+          class: 'text-primary underline cursor-pointer',
         },
       }),
       Placeholder.configure({
         placeholder,
       }),
       TextAlign.configure({
-        types: ["heading", "paragraph"],
+        types: ['heading', 'paragraph'],
       }),
       CodeBlockLowlight.configure({
         lowlight,
         HTMLAttributes: {
-          class: "bg-muted rounded-md p-4 font-mono text-sm",
+          class: 'bg-muted rounded-md p-4 font-mono text-sm',
         },
       }),
       ResizableImage.configure({
         inline: true,
         allowBase64: false,
         HTMLAttributes: {
-          class: "rounded-lg max-w-full h-auto",
+          class: 'rounded-lg max-w-full h-auto',
         },
       }),
-    ],
-    content: parseContent(content),
-    editable,
-    onUpdate: ({ editor: activeEditor }) => {
-      const json = activeEditor.getJSON()
-      onChange(JSON.stringify(json))
-    },
-    editorProps: {
-      attributes: {
-        class: cn(
-          "prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4",
-          "prose-headings:font-semibold prose-headings:tracking-tight",
-          "prose-p:leading-relaxed prose-p:text-muted-foreground",
-          "prose-a:text-primary prose-a:underline prose-a:cursor-pointer",
-          "prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded",
-          "prose-pre:bg-muted prose-pre:p-4",
-          "prose-ul:list-disc prose-ol:list-decimal",
-          "prose-li:text-muted-foreground",
-          "prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground",
-          "prose-img:rounded-lg prose-img:shadow-md prose-img:my-4"
-        ),
+    ]
+
+    if (collabDocument) {
+      baseExtensions.push(
+        Collaboration.configure({
+          document: collabDocument,
+        })
+      )
+    }
+
+    if (provider) {
+      baseExtensions.push(
+        CollaborationCaret.configure({
+          provider,
+          user: caretUser,
+        })
+      )
+    }
+
+    return baseExtensions
+  }, [caretUser, collabDocument, placeholder, provider])
+
+  const editor = useEditor(
+    {
+      extensions,
+      content: enableCollaboration ? undefined : parseContent(content),
+      editable,
+      onUpdate: ({ editor: activeEditor }) => {
+        const json = activeEditor.getJSON()
+        onChange(JSON.stringify(json))
+      },
+      editorProps: {
+        attributes: {
+          class: cn(
+            'prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4',
+            'prose-headings:font-semibold prose-headings:tracking-tight',
+            'prose-p:leading-relaxed prose-p:text-muted-foreground',
+            'prose-a:text-primary prose-a:underline prose-a:cursor-pointer',
+            'prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded',
+            'prose-pre:bg-muted prose-pre:p-4',
+            'prose-ul:list-disc prose-ol:list-decimal',
+            'prose-li:text-muted-foreground',
+            'prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground',
+            'prose-img:rounded-lg prose-img:shadow-md prose-img:my-4'
+          ),
+        },
       },
     },
-  })
+    [editable, enableCollaboration, extensions]
+  )
 
   useEffect(() => {
     if (!editor) return
+    if (enableCollaboration) return
 
     const currentContent = JSON.stringify(editor.getJSON())
     const newContent = parseContent(content)
 
-    if (typeof newContent === "string") {
+    if (typeof newContent === 'string') {
       if (currentContent !== newContent) {
         editor.commands.setContent(newContent)
       }
@@ -99,7 +282,13 @@ export function useRichTextEditor({
         editor.commands.setContent(newContent)
       }
     }
-  }, [content, editor])
+  }, [content, editor, enableCollaboration])
 
-  return editor
+  const displayCollabUsers = provider?.awareness
+    ? collabUsers
+    : caretUser
+      ? [caretUser]
+      : []
+
+  return { editor, collabUsers: displayCollabUsers }
 }

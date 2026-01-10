@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const noteLinkDtoSchema = z.object({
   note_id: z.uuid(),
   linked_note_id: z.uuid(),
+  label: z.string().min(1).max(80),
   created_at: z.iso.datetime(),
 })
 
@@ -17,6 +18,7 @@ export const paginatedNoteLinksSchema = z.object({
 
 export const createNoteLinkDtoSchema = z.object({
   linked_note_id: z.uuid(),
+  label: z.string().min(1).max(80),
 })
 
 export type NoteLinkDto = z.infer<typeof noteLinkDtoSchema>

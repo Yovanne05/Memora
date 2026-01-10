@@ -1,5 +1,5 @@
-export type NoteVisibility = "private" | "public"
-export type NotePermission = "read" | "write" | "owner"
+export type NoteVisibility = 'private' | 'public'
+export type NotePermission = 'read' | 'write' | 'owner'
 
 export interface Note {
   id: string
@@ -8,7 +8,7 @@ export interface Note {
   ownerId: string
   ownerUsername: string
   title: string
-  content: string
+  content?: string | null
   isFavorite?: boolean
   tags: string[]
   visibility: NoteVisibility

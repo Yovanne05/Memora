@@ -1,15 +1,21 @@
-import { useWorkspaceContext } from "../context"
-import { WorkspaceBreadcrumb } from "./workspace-header/WorkspaceBreadcrumb"
-import { WorkspaceGraphButton } from "./workspace-header/WorkspaceGraphButton"
-import { WorkspaceSearch } from "./workspace-header/WorkspaceSearch"
-import { WorkspaceViewToggle } from "./workspace-header/WorkspaceViewToggle"
-import { useWorkspaceBreadcrumbs } from "../hooks/useWorkspaceBreadcrumbs"
+import { useWorkspaceContext } from '../context'
+import { WorkspaceBreadcrumb } from './workspace-header/WorkspaceBreadcrumb'
+import { WorkspaceGraphButton } from './workspace-header/WorkspaceGraphButton'
+import { WorkspaceSearch } from './workspace-header/WorkspaceSearch'
+import { WorkspaceViewToggle } from './workspace-header/WorkspaceViewToggle'
+import { useWorkspaceBreadcrumbs } from '../hooks/useWorkspaceBreadcrumbs'
+import { useLocation } from '@tanstack/react-router'
 
 export function WorkspaceHeader() {
   const { state, actions } = useWorkspaceContext()
+  const location = useLocation()
+  const isFavoritesMode = location.pathname.startsWith(
+    '/app/workspace/favorites'
+  )
   const breadcrumbItems = useWorkspaceBreadcrumbs({
     selectedCollectionId: state.selectedCollectionId,
     selectedNoteId: state.selectedNoteId,
+    mode: isFavoritesMode ? 'favorites' : 'default',
   })
 
   return (
@@ -27,6 +33,3 @@ export function WorkspaceHeader() {
     </header>
   )
 }
-
-
-

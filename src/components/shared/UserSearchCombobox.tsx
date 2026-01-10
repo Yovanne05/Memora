@@ -1,11 +1,15 @@
-import { useState } from "react"
-import { ChevronsUpDown } from "lucide-react"
+import { useState } from 'react'
+import { ChevronsUpDown } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useUserSearchQuery } from "@/features/users/hooks/useUserSearchQuery"
-import type { User } from "@/features/users/models/user.model"
-import { UserSearchList } from "./user-search-combobox/UserSearchList"
+import { Button } from '@/components/ui/button'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { useUserSearchQuery } from '@/features/users/hooks/useUserSearchQuery'
+import type { User } from '@/features/users/models/user.model'
+import { UserSearchList } from './user-search-combobox/UserSearchList'
 
 interface UserSearchComboboxProps {
   value?: string
@@ -19,11 +23,11 @@ export function UserSearchCombobox({
   value,
   onChange,
   excludeUserIds = [],
-  placeholder = "Search users...",
+  placeholder = 'Search users...',
   disabled,
 }: Readonly<UserSearchComboboxProps>) {
   const [open, setOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
 
   const { data, isLoading } = useUserSearchQuery(searchQuery)
   const filteredUsers =
@@ -42,9 +46,7 @@ export function UserSearchCombobox({
           className="justify-between"
         >
           {selectedUser ? (
-            <span className="truncate">
-              {selectedUser.displayName || selectedUser.username}
-            </span>
+            <span className="truncate">{selectedUser.username}</span>
           ) : (
             <span className="text-muted-foreground">{placeholder}</span>
           )}

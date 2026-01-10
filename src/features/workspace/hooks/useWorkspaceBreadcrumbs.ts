@@ -1,7 +1,7 @@
-import { useMemo } from "react"
+import { useMemo } from 'react'
 
-import { useCollectionQuery } from "@/features/collections/hooks/useCollectionQuery"
-import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
+import { useCollectionQuery } from '@/features/collections/hooks/useCollectionQuery'
+import { useNoteQuery } from '@/features/notes/hooks/useNoteQuery'
 
 type BreadcrumbItem = {
   label: string
@@ -11,31 +11,45 @@ type BreadcrumbItem = {
 type UseWorkspaceBreadcrumbsArgs = {
   selectedCollectionId: string | null
   selectedNoteId: string | null
+  mode?: 'default' | 'favorites'
 }
 
 export function useWorkspaceBreadcrumbs({
   selectedCollectionId,
   selectedNoteId,
+  mode = 'default',
 }: UseWorkspaceBreadcrumbsArgs) {
-  const collectionQuery = useCollectionQuery(selectedCollectionId || "")
-  const noteQuery = useNoteQuery(selectedNoteId || "")
+  const collectionQuery = useCollectionQuery(selectedCollectionId || '')
+  const noteQuery = useNoteQuery(selectedNoteId || '')
 
   return useMemo<BreadcrumbItem[]>(() => {
-    const items: BreadcrumbItem[] = [{ label: "Workspace", href: "/app/workspace" }]
+    const base =
+      mode === 'favorites' ? '/app/workspace/favorites' : '/app/workspace'
+    const items: BreadcrumbItem[] = [{ label: 'Workspace', href: base }]
+
+    if (mode === 'favorites') {
+      items.push({ label: 'Favorites', href: base })
+    }
 
     if (selectedCollectionId && collectionQuery.data) {
       items.push({
         label: collectionQuery.data.name,
-        href: `/app/workspace/collections/${selectedCollectionId}`,
+        href: `${base}/collections/${selectedCollectionId}`,
       })
     }
 
     if (selectedNoteId && noteQuery.data) {
       items.push({
-        label: noteQuery.data.title || "Sans titre",
+        label: noteQuery.data.title || 'Sans titre',
       })
     }
 
     return items
-  }, [selectedCollectionId, selectedNoteId, collectionQuery.data, noteQuery.data])
+  }, [
+    selectedCollectionId,
+    selectedNoteId,
+    collectionQuery.data,
+    noteQuery.data,
+    mode,
+  ])
 }

@@ -9,7 +9,6 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { ProfileSettingsForm } from '../components/ProfileSettingsForm'
 import { PasswordChangeForm } from '../components/PasswordChangeForm'
-import { DataExportSection } from '../components/DataExportSection'
 import { AccountDeletionSection } from '../components/AccountDeletionSection'
 import { User, Lock, Shield, Info } from 'lucide-react'
 import { useEffect } from 'react'
@@ -115,26 +114,18 @@ export default function SettingsPage() {
                       informations dans les sections ci-dessus
                     </li>
                     <li>
-                      <strong>Droit à la portabilité</strong> : Exportez vos
-                      données au format lisible
-                    </li>
-                    <li>
                       <strong>Droit à l'effacement</strong> : Supprimez votre
                       compte et toutes vos données
                     </li>
                     <li>
-                      <strong>Droit d'opposition</strong> : Contactez-nous pour
-                      vous opposer au traitement de vos données
+                      <strong>Droit d'opposition</strong> : Contactez-nous via
+                      infoiut@iut.univ-paris8.fr pour vous opposer au traitement
+                      de vos données
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
-
-            <Separator />
-
-            {/* Data Export */}
-            <DataExportSection />
 
             <Separator />
 
@@ -156,16 +147,6 @@ export default function SettingsPage() {
                 <strong>Durée de conservation :</strong> Vos données sont
                 conservées tant que votre compte est actif. Après suppression,
                 vos données sont définitivement effacées sous 30 jours.
-              </p>
-              <p>
-                <strong>Responsable du traitement :</strong> Mémora - Projet
-                étudiant IUT
-              </p>
-              <p>
-                <strong>Réclamation :</strong> Vous avez le droit de déposer une
-                réclamation auprès de la CNIL (Commission Nationale de
-                l'Informatique et des Libertés) si vous estimez que vos droits
-                ne sont pas respectés.
               </p>
             </div>
           </CardContent>

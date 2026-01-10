@@ -1,10 +1,7 @@
-import { Skeleton } from "@/components/ui/skeleton"
-import { getContentPreview } from "@/lib/html-utils"
-
+import { Skeleton } from '@/components/ui/skeleton'
 type NoteLinkListItem = {
   id: string
   title: string
-  content?: string | null
 }
 
 type NoteLinkListProps = {
@@ -34,7 +31,7 @@ export function NoteLinkList({
 
       {!isLoading && items.length === 0 && (
         <div className="p-8 text-center text-muted-foreground">
-          {searchQuery ? "Aucune note trouvée" : "Aucune note disponible"}
+          {searchQuery ? 'Aucune note trouvée' : 'Aucune note disponible'}
         </div>
       )}
 
@@ -45,12 +42,12 @@ export function NoteLinkList({
             key={item.id}
             onClick={() => onSelect(item.id)}
             className={`w-full text-left p-4 border-b last:border-b-0 hover:bg-accent transition-colors ${
-              selectedId === item.id ? "bg-accent" : ""
+              selectedId === item.id ? 'bg-accent' : ''
             }`}
           >
             <h4 className="font-medium text-sm mb-1">{item.title}</h4>
             <p className="text-xs text-muted-foreground line-clamp-2">
-              {getContentPreview(item.content || "", 150)}
+              Contenu non disponible
             </p>
           </button>
         ))}

@@ -1,15 +1,14 @@
-import { Separator } from "@/components/ui/separator"
-import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection"
-import { RichTextDisplay } from "@/components/editor/RichTextDisplay"
-import { cn } from "@/lib/utils"
-import { formatLongDateTime } from "@/lib/format.utils"
-import { useResizable } from "@/hooks/useResizable"
-import type { Note } from "../models/note.model"
-import { NoteSidebarHeader } from "./note-sidebar/NoteSidebarHeader"
-import { NoteSidebarInfo } from "./note-sidebar/NoteSidebarInfo"
-import { NoteSidebarOverview } from "./note-sidebar/NoteSidebarOverview"
-import { NoteSidebarRelatedNotes } from "./note-sidebar/NoteSidebarRelatedNotes"
-import { NoteSidebarResizer } from "./note-sidebar/NoteSidebarResizer"
+import { Separator } from '@/components/ui/separator'
+import { FlashcardsSection } from '@/features/flashcards/components/FlashcardsSection'
+import { cn } from '@/lib/utils'
+import { formatLongDateTime } from '@/lib/format.utils'
+import { useResizable } from '@/hooks/useResizable'
+import type { Note } from '../models/note.model'
+import { NoteSidebarHeader } from './note-sidebar/NoteSidebarHeader'
+import { NoteSidebarInfo } from './note-sidebar/NoteSidebarInfo'
+import { NoteSidebarOverview } from './note-sidebar/NoteSidebarOverview'
+import { NoteSidebarRelatedNotes } from './note-sidebar/NoteSidebarRelatedNotes'
+import { NoteSidebarResizer } from './note-sidebar/NoteSidebarResizer'
 
 interface NoteSidebarProps {
   readonly note: Note | null
@@ -32,7 +31,7 @@ export function NoteSidebar({
     minWidth: 320,
     maxWidth,
     defaultWidth: 480,
-    storageKey: "note-sidebar-width",
+    storageKey: 'note-sidebar-width',
   })
 
   if (!note) return null
@@ -45,16 +44,22 @@ export function NoteSidebar({
       ref={resizeRef}
       style={{ width: `${width}px` }}
       className={cn(
-        "fixed top-0 right-0 h-full bg-background border-l shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col",
-        open ? "translate-x-0" : "translate-x-full",
-        isResizing && "transition-none"
+        'fixed top-0 right-0 h-full bg-background border-l shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col',
+        open ? 'translate-x-0' : 'translate-x-full',
+        isResizing && 'transition-none'
       )}
     >
-      <NoteSidebarResizer isResizing={isResizing} onResizeStart={handleMouseDown} />
+      <NoteSidebarResizer
+        isResizing={isResizing}
+        onResizeStart={handleMouseDown}
+      />
       <NoteSidebarHeader onClose={onClose} />
 
       <div className="flex-1 overflow-y-auto">
-        <NoteSidebarRelatedNotes notes={relatedNotes} onNoteClick={onNoteClick} />
+        <NoteSidebarRelatedNotes
+          notes={relatedNotes}
+          onNoteClick={onNoteClick}
+        />
 
         <div className="px-6 py-6 space-y-6">
           <NoteSidebarOverview note={note} />
@@ -62,13 +67,20 @@ export function NoteSidebar({
           <Separator />
 
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Contenu</h3>
-            <RichTextDisplay content={note.content} />
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+              Contenu
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Contenu non disponible.
+            </p>
           </div>
 
           <Separator />
 
-          <NoteSidebarInfo createdAt={formattedCreatedAt} updatedAt={formattedUpdatedAt} />
+          <NoteSidebarInfo
+            createdAt={formattedCreatedAt}
+            updatedAt={formattedUpdatedAt}
+          />
 
           <FlashcardsSection noteId={note.id} />
         </div>

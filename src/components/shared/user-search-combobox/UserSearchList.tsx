@@ -1,4 +1,4 @@
-import { Check, Search } from "lucide-react"
+import { Check, Search } from 'lucide-react'
 
 import {
   Command,
@@ -7,9 +7,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
-import { cn } from "@/lib/utils"
-import type { User } from "@/features/users/models/user.model"
+} from '@/components/ui/command'
+import { cn } from '@/lib/utils'
+import type { User } from '@/features/users/models/user.model'
 
 type UserSearchListProps = {
   users: User[]
@@ -45,7 +45,7 @@ export function UserSearchList({
         )}
         {!isLoading && users.length === 0 && (
           <CommandEmpty>
-            {searchQuery.length < 2 ? "Type to search users" : "No users found"}
+            {searchQuery.length < 2 ? 'Type to search users' : 'No users found'}
           </CommandEmpty>
         )}
         {users.length > 0 && (
@@ -62,14 +62,12 @@ export function UserSearchList({
               >
                 <Check
                   className={cn(
-                    "mr-2 h-4 w-4",
-                    value === user.id ? "opacity-100" : "opacity-0"
+                    'mr-2 h-4 w-4',
+                    value === user.id ? 'opacity-100' : 'opacity-0'
                   )}
                 />
                 <div className="flex flex-col overflow-hidden">
-                  <span className="truncate font-medium">
-                    {user.displayName || user.username}
-                  </span>
+                  <span className="truncate font-medium">{user.username}</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {user.email}
                   </span>
