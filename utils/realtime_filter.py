@@ -1,3 +1,4 @@
+from flask import request
 from flask_socketio import SocketIO, emit
 from flask_jwt_extended.exceptions import JWTExtendedException
 from pydantic import ValidationError
@@ -42,11 +43,26 @@ def _build_error_payload(error: Exception) -> dict:
     return {"code": 500, "message": GENERIC_MESSAGE, "type": "internal_error"}
 
 
+def _get_event_name() -> str | None:
+    event = getattr(request, "event", None)
+    if isinstance(event, (list, tuple)) and event:
+        return event[0]
+    return None
+
+
 def register_realtime_filter(socketio: SocketIO) -> None:
     logger = get_logger("realtime")
 
     @socketio.on_error("/collaboration")
     def handle_collaboration_error(error: Exception):
+        event_name = _get_event_name()
         error_payload = _build_error_payload(error)
-        emit("error", error_payload)
-        logger.error("Realtime error: %s", error, exc_info=True)
+        emit("error", error_payload, namespace="/collaboration")
+        logger.error(
+            "Realtime error: %s | sid=%s | namespace=%s | event=%s",
+            error,
+            getattr(request, "sid", None),
+            getattr(request, "namespace", None),
+            event_name,
+            exc_info=True,
+        )
