@@ -18,20 +18,19 @@ from controllers.collection_favorite_controller import bp_collection_favorites
 from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards, bp_note_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
+from controllers.realtime_collaboration_controller import register_socketio_handlers
 from controllers.review_controller import bp_reviews
 from controllers.report_controller import bp_reports
 from utils import db
 from utils.jwt import init_jwt
 from utils.filter import register_global_filter
-from utils.logger import init_logger, init_realtime_logger
+from utils.logger import init_logger
 from utils.realtime_filter import register_realtime_filter
 from utils.swagger import init_swagger
 from utils.redis_client import init_redis
 from utils.socketio_service import init_socketio
 from utils.crdt_service import init_crdt_service
-from utils.logger import get_logger
 
-logger = get_logger(__name__)
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -44,7 +43,6 @@ def create_app() -> Flask:
     init_jwt(app)
     init_swagger(app)
     init_logger(app)
-    init_realtime_logger(app)
 
     init_redis(
         host=config.REDIS_HOST,
@@ -52,19 +50,17 @@ def create_app() -> Flask:
         db=config.REDIS_DB
     )
 
-    # Initialiser le service CRDT pour la collaboration temps réel
     init_crdt_service()
 
     socketio = init_socketio(app, cors_allowed_origins="*", async_mode="threading")
     register_realtime_filter(socketio)
 
-    from controllers.realtime_collaboration_controller import register_socketio_handlers
-    register_socketio_handlers()
 
     if config.APP_ENV == "test":
         with app.app_context():
             db.create_all()
-
+            
+    register_socketio_handlers()
     register_global_filter(app)
 
     app.register_blueprint(bp_sessions)
