@@ -1,19 +1,22 @@
-import { useState } from "react"
-import { toast } from "sonner"
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-import { useAuth } from "@/features/auth/hooks/useAuth"
-import { useCreateNoteMutation } from "./useCreateNoteMutation"
-import type { NoteVisibility } from "../models/note.model"
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useCreateNoteMutation } from './useCreateNoteMutation'
+import type { NoteVisibility } from '../models/note.model'
 
 type UseQuickAddNoteArgs = {
   collectionId?: string | null
   onSuccess?: () => void
 }
 
-export function useQuickAddNote({ collectionId, onSuccess }: UseQuickAddNoteArgs) {
+export function useQuickAddNote({
+  collectionId,
+  onSuccess,
+}: UseQuickAddNoteArgs) {
   const [open, setOpen] = useState(false)
-  const [title, setTitle] = useState("")
-  const [visibility, setVisibility] = useState<NoteVisibility>("private")
+  const [title, setTitle] = useState('')
+  const [visibility, setVisibility] = useState<NoteVisibility>('private')
 
   const { user } = useAuth()
   const createMutation = useCreateNoteMutation({
@@ -25,27 +28,27 @@ export function useQuickAddNote({ collectionId, onSuccess }: UseQuickAddNoteArgs
 
   const handleClose = () => {
     setOpen(false)
-    setTitle("")
-    setVisibility("private")
+    setTitle('')
+    setVisibility('private')
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
     if (!title.trim()) {
-      toast.error("Le titre est requis")
+      toast.error('Le titre est requis')
       return
     }
 
     if (!user) {
-      toast.error("Vous devez être connecté")
+      toast.error('Vous devez ï¿½tre connectï¿½')
       return
     }
 
     await createMutation.mutateAsync({
       ownerId: user.id,
       title: title.trim(),
-      content: "",
+      content: '',
       collectionId,
       visibility,
       tags: [],
@@ -64,4 +67,3 @@ export function useQuickAddNote({ collectionId, onSuccess }: UseQuickAddNoteArgs
     handleClose,
   }
 }
-

@@ -8,10 +8,7 @@ import type {
 } from "../types/visualization.type"
 import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
 import { REACT_FLOW_STYLES } from "./visualization.constants"
-import {
-  groupEdgesByConnection,
-  calculateEdgeOffset,
-} from "./layoutEngine"
+import { groupEdgesByConnection, calculateEdgeOffset } from "./layoutEngine"
 import { logger } from "@/lib/logger"
 
 export function transformNodesToReactFlow(
@@ -34,48 +31,25 @@ export function transformNodesToReactFlow(
   })
 }
 
-/**
- * Filtre les arêtes invalides
- *
- * @param edges - Arêtes à filtrer
- * @param validNodeIds - Set des IDs de nœuds valides
- * @returns Arêtes valides
- */
-export function filterValidEdges(
-  edges: GraphEdge[],
-  validNodeIds: Set<string>
-): GraphEdge[] {
+export function filterValidEdges(edges: GraphEdge[], validNodeIds: Set<string>): GraphEdge[] {
   return edges.filter((edge) => {
-    const isValid =
-      validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
+    const isValid = validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
 
     if (!isValid) {
-      logger.warn(
-        `[Visualization] Arête ignorée - nœuds manquants:`,
-        edge
-      )
+      logger.warn(`[Visualization] Arête ignorée - nœuds manquants:`, edge)
     }
 
     return isValid
   })
 }
 
-/**
- * Extrait les positions des nœuds ReactFlow
- *
- * @param nodes - Nœuds ReactFlow
- * @returns Map des positions par ID de nœud
- */
 export function extractNodePositions(
   nodes: ReactFlowNode[]
 ): Record<string, { x: number; y: number }> {
-  return nodes.reduce<Record<string, { x: number; y: number }>>(
-    (acc, node) => {
-      acc[node.id] = node.position
-      return acc
-    },
-    {}
-  )
+  return nodes.reduce<Record<string, { x: number; y: number }>>((acc, node) => {
+    acc[node.id] = node.position
+    return acc
+  }, {})
 }
 
 export function transformEdgesToReactFlow(
@@ -97,6 +71,9 @@ export function transformEdgesToReactFlow(
           ? `e${edge.source}-${edge.target}`
           : `e${edge.source}-${edge.target}-${localIndex}`
 
+      // ✅ on récupère le label si présent
+      const edgeLabel = (edge.label ?? "").trim()
+
       reactFlowEdges.push({
         id: edgeId,
         source: edge.source,
@@ -113,6 +90,14 @@ export function transformEdgesToReactFlow(
             borderRadius: REACT_FLOW_STYLES.EDGE_BORDER_RADIUS,
           },
         },
+
+        // ✅ ReactFlow label
+        label: edgeLabel.length > 0 ? edgeLabel : undefined,
+        labelShowBg: edgeLabel.length > 0,
+        labelBgPadding: [6, 3],
+        labelBgBorderRadius: 6,
+        labelBgStyle: { fill: "white" },
+        labelStyle: { fontSize: 12, fontWeight: 600 },
       })
     })
   })
@@ -120,13 +105,6 @@ export function transformEdgesToReactFlow(
   return reactFlowEdges
 }
 
-/**
- * Récupère la couleur d'un nœud ReactFlow pour la MiniMap
- *
- * @param node - Nœud ReactFlow
- * @param getColorFn - Fonction de calcul de couleur basée sur les connexions
- * @returns Couleur hexadécimale
- */
 export function getNodeColorForMiniMap(
   node: Node,
   getColorFn: (connections: number) => string

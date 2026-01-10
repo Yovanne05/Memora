@@ -1,13 +1,14 @@
-import { useEffect } from "react"
-import { useRouter } from "@tanstack/react-router"
+import { useEffect } from 'react'
+import { useRouter } from '@tanstack/react-router'
 
-import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
-import { useUpdateNoteMutation } from "@/features/notes/hooks/useUpdateNoteMutation"
-import { useDeleteNoteMutation } from "@/features/notes/hooks/useDeleteNoteMutation"
-import { useWorkspaceContext } from "../context"
-import { useWorkspaceNavigation } from "./useWorkspaceNavigation"
-import type { NoteFormValues } from "@/features/notes/types/note-edit-form.types"
-import { logger } from "@/lib/logger"
+import { useNoteQuery } from '@/features/notes/hooks/useNoteQuery'
+import { useUpdateNoteMutation } from '@/features/notes/hooks/useUpdateNoteMutation'
+import { useDeleteNoteMutation } from '@/features/notes/hooks/useDeleteNoteMutation'
+import { useWorkspaceContext } from '../context'
+import { useWorkspaceNavigation } from './useWorkspaceNavigation'
+import type { NoteFormValues } from '@/features/notes/types/note-edit-form.types'
+import { logger } from '@/lib/logger'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 type UseNoteEditViewArgs = {
   noteId: string
@@ -18,6 +19,7 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
   const router = useRouter()
   const { actions } = useWorkspaceContext()
   const { navigateToCollection, navigateToAllNotes } = useWorkspaceNavigation()
+  const { user } = useAuth()
 
   const noteQuery = useNoteQuery(noteId)
   const updateMutation = useUpdateNoteMutation()
@@ -39,7 +41,7 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
         },
       })
     } catch (error) {
-      logger.error("Failed to update note:", error)
+      logger.error('Failed to update note:', error)
     }
   }
 
@@ -52,7 +54,7 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
         navigateToAllNotes()
       }
     } catch (error) {
-      logger.error("Failed to delete note:", error)
+      logger.error('Failed to delete note:', error)
     }
   }
 
@@ -61,8 +63,13 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
   }
 
   const note = noteQuery.data ?? null
-  const isReadOnly = note?.userPermission === "read"
-  const canDelete = note?.userPermission === "owner"
+  const isOwner = Boolean(user && note && note.ownerId === user.id)
+  const isReadOnly = note?.userPermission === 'read' && !isOwner
+  const canDelete =
+    note?.userPermission === 'owner' ||
+    isOwner ||
+    user?.role === 'admin' ||
+    user?.role === 'super_admin'
 
   return {
     noteQuery,
@@ -76,4 +83,3 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
     handleCancel,
   }
 }
-

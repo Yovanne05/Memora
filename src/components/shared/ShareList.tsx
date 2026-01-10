@@ -1,18 +1,13 @@
-import { Users } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShareListItem } from "./ShareListItem";
-import type { SharePermission } from "@/features/notes/dtos/note-share.dto";
-
-interface Share {
-  userId: string;
-  permission: SharePermission;
-  createdAt: Date;
-}
+import { Users } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { ShareListItem } from './ShareListItem'
+import type { Share } from './share-dialog/types'
+import type { SharePermission } from '@/features/notes/dtos/note-share.dto'
 
 interface ShareListProps {
-  shares: Share[];
-  onUpdatePermission: (userId: string, permission: SharePermission) => void;
-  onRemove: (userId: string) => void;
+  shares: Share[]
+  onUpdatePermission: (userId: string, permission: SharePermission) => void
+  onRemove: (userId: string) => void
 }
 
 export function ShareList({
@@ -30,7 +25,7 @@ export function ShareList({
           </p>
         </div>
       </ScrollArea>
-    );
+    )
   }
 
   return (
@@ -40,6 +35,7 @@ export function ShareList({
           <ShareListItem
             key={share.userId}
             userId={share.userId}
+            userLabel={share.userLabel}
             permission={share.permission}
             onUpdatePermission={onUpdatePermission}
             onRemove={onRemove}
@@ -47,5 +43,5 @@ export function ShareList({
         ))}
       </div>
     </ScrollArea>
-  );
+  )
 }

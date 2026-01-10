@@ -1,5 +1,6 @@
-import type { Note } from "@/features/notes/models/note.model"
-export type CollectionVisibility = "private" | "public"
+import type { Note } from '@/features/notes/models/note.model'
+export type CollectionVisibility = 'private' | 'public'
+export type CollectionPermission = 'read' | 'write' | 'owner'
 
 export interface GraphNode {
   id: string
@@ -11,11 +12,13 @@ export interface GraphNode {
   }
 }
 
-export interface GraphEdge {
+export type GraphEdge = {
   id: string
   source: string
   target: string
+  label?: string
 }
+
 
 export interface Collection {
   id: string
@@ -25,8 +28,9 @@ export interface Collection {
   visibility: CollectionVisibility
   tags: string[]
   notes: Note[]
-  isFavorite? : boolean
+  isFavorite?: boolean
   notesCount?: number
+  userPermission?: CollectionPermission | null
   nodes: GraphNode[]
   edges: GraphEdge[]
   createdAt: string

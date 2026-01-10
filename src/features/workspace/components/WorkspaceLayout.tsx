@@ -1,17 +1,21 @@
-import type { ReactNode } from "react"
-import { useRouter } from "@tanstack/react-router"
-import { toast } from "sonner"
-import { WorkspaceSidebar } from "./sidebar/WorkspaceSidebar"
-import { WorkspaceHeader } from "./WorkspaceHeader"
-import { CreateNoteDialog } from "@/features/notes/components/CreateNoteDialog"
-import { CreateCollectionDialog } from "@/features/collections/components/CreateCollectionDialog"
-import { GraphViewDialog } from "./GraphViewDialog"
-import { useWorkspaceContext } from "../context"
-import { useWorkspaceKeyboardShortcuts } from "../hooks/useWorkspaceKeyboardShortcuts"
-import { useCreateNoteMutation } from "@/features/notes/hooks/useCreateNoteMutation"
-import { useAuth } from "@/features/auth/hooks/useAuth"
-import type { NoteVisibility } from "@/features/notes/models/note.model"
-import { logger } from "@/lib/logger"
+import type { ReactNode } from 'react'
+import { useRouter } from '@tanstack/react-router'
+import { toast } from 'sonner'
+import { DndContext, DragOverlay } from '@dnd-kit/core'
+import { WorkspaceSidebar } from './sidebar/WorkspaceSidebar'
+import { WorkspaceHeader } from './WorkspaceHeader'
+import { CreateNoteDialog } from '@/features/notes/components/CreateNoteDialog'
+import { CreateCollectionDialog } from '@/features/collections/components/CreateCollectionDialog'
+import { GraphViewDialog } from './GraphViewDialog'
+import { useWorkspaceContext } from '../context'
+import { useWorkspaceKeyboardShortcuts } from '../hooks/useWorkspaceKeyboardShortcuts'
+import { useCreateNoteMutation } from '@/features/notes/hooks/useCreateNoteMutation'
+import { useUpdateNoteMutation } from '@/features/notes/hooks/useUpdateNoteMutation'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import type { NoteVisibility } from '@/features/notes/models/note.model'
+import { logger } from '@/lib/logger'
+import { useDragAndDropNotes } from '@/features/notes/hooks/useDragAndDropNotes'
+import { NoteCard } from '@/features/notes/components/NoteCard'
 
 interface WorkspaceLayoutProps {
   readonly children: ReactNode
@@ -22,8 +26,37 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
   const router = useRouter()
   const { user } = useAuth()
   const createNoteMutation = useCreateNoteMutation()
+  const updateNoteMutation = useUpdateNoteMutation()
 
   useWorkspaceKeyboardShortcuts()
+
+  const handleNoteDrop = async (
+    noteId: string,
+    targetCollectionId: string | null
+  ) => {
+    try {
+      await updateNoteMutation.mutateAsync({
+        noteId,
+        payload: { collectionId: targetCollectionId },
+      })
+
+      const collectionName = targetCollectionId
+        ? 'la collection'
+        : 'aucune collection'
+      toast.success(`Note déplacée vers ${collectionName}`)
+    } catch (error) {
+      toast.error('Impossible de déplacer la note')
+      logger.error('Error moving note:', error)
+    }
+  }
+
+  const {
+    activeNote,
+    sensors,
+    handleDragStart,
+    handleDragEnd,
+    handleDragCancel,
+  } = useDragAndDropNotes(handleNoteDrop)
 
   const handleCreateNote = async (payload: {
     title: string
@@ -32,7 +65,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     tags: string[]
   }) => {
     if (!user?.id) {
-      toast.error("Vous devez être connecté pour créer une note")
+      toast.error('Vous devez être connecté pour créer une note')
       return
     }
 
@@ -40,13 +73,13 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       const newNote = await createNoteMutation.mutateAsync({
         ownerId: user.id,
         title: payload.title,
-        content: " ",
+        content: ' ',
         collectionId: payload.collectionId,
         visibility: payload.visibility,
         tags: payload.tags,
       })
 
-      toast.success("Note créée avec succès")
+      toast.success('Note créée avec succès')
       actions.closeCreateNote()
 
       // Navigate to edit the new note
@@ -56,21 +89,40 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
       router.navigate({ to: path })
     } catch (error) {
-      toast.error("Impossible de créer la note")
-      logger.error("Error creating note:", error)
+      toast.error('Impossible de créer la note')
+      logger.error('Error creating note:', error)
     }
   }
 
   return (
     <>
-      <div className="flex h-[calc(100vh-4rem)]">
-        <WorkspaceSidebar />
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <div className="flex h-[calc(100vh-4rem)]">
+          <WorkspaceSidebar />
 
-        <main className="flex flex-1 flex-col overflow-hidden">
-          <WorkspaceHeader />
-          <div className="flex-1 overflow-auto p-6">{children}</div>
-        </main>
-      </div>
+          <main className="flex flex-1 flex-col overflow-hidden">
+            <WorkspaceHeader />
+            <div className="flex-1 overflow-auto p-6">{children}</div>
+          </main>
+        </div>
+
+        <DragOverlay>
+          {activeNote ? (
+            <div className="rotate-3 opacity-80">
+              <NoteCard
+                note={activeNote}
+                showQuickActions={false}
+                showFavoriteButton={false}
+              />
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       <CreateNoteDialog
         open={state.createNoteDialogOpen}

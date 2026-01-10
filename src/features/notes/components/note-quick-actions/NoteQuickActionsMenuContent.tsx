@@ -1,13 +1,11 @@
-import { Copy, Trash2, Users } from "lucide-react"
+import { Fragment } from 'react'
 import {
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import type { Note } from "../../models/note.model"
-import type { Collection } from "@/features/collections/models/collection.model"
-import { NoteQuickActionsMoveSubmenu } from "./NoteQuickActionsMoveSubmenu"
-import { NoteQuickActionsVisibilityItem } from "./NoteQuickActionsVisibilityItem"
+} from '@/components/ui/dropdown-menu'
+import type { Note } from '../../models/note.model'
+import type { Collection } from '@/features/collections/models/collection.model'
+import { useNoteQuickActionsMenuItems } from './useNoteQuickActionsMenuItems'
 
 type NoteQuickActionsMenuContentProps = {
   note: Note
@@ -18,6 +16,11 @@ type NoteQuickActionsMenuContentProps = {
   onOpenShare: () => void
   onDuplicate: () => void
   onOpenDelete: () => void
+  canMove: boolean
+  canToggleVisibility: boolean
+  canShare: boolean
+  canDuplicate: boolean
+  canDelete: boolean
 }
 
 export function NoteQuickActionsMenuContent({
@@ -29,51 +32,36 @@ export function NoteQuickActionsMenuContent({
   onOpenShare,
   onDuplicate,
   onOpenDelete,
+  canMove,
+  canToggleVisibility,
+  canShare,
+  canDuplicate,
+  canDelete,
 }: Readonly<NoteQuickActionsMenuContentProps>) {
+  const menuItems = useNoteQuickActionsMenuItems({
+    note,
+    collections,
+    isPending,
+    onToggleVisibility,
+    onMoveToCollection,
+    onOpenShare,
+    onDuplicate,
+    onOpenDelete,
+    canMove,
+    canToggleVisibility,
+    canShare,
+    canDuplicate,
+    canDelete,
+  })
+
   return (
     <DropdownMenuContent align="end" className="w-56">
-      <NoteQuickActionsVisibilityItem
-        note={note}
-        isPending={isPending}
-        onToggleVisibility={onToggleVisibility}
-      />
-
-      <DropdownMenuSeparator />
-
-      <DropdownMenuItem
-        onClick={(event) => {
-          event.preventDefault()
-          event.stopPropagation()
-          onOpenShare()
-        }}
-        disabled={isPending}
-      >
-        <Users className="h-4 w-4" />
-        Partager
-      </DropdownMenuItem>
-
-      <DropdownMenuSeparator />
-
-      <NoteQuickActionsMoveSubmenu
-        note={note}
-        collections={collections}
-        isPending={isPending}
-        onMoveToCollection={onMoveToCollection}
-      />
-
-      <DropdownMenuSeparator />
-
-      <DropdownMenuItem onClick={onDuplicate} disabled={isPending}>
-        <Copy className="h-4 w-4" />
-        Dupliquer
-      </DropdownMenuItem>
-
-      <DropdownMenuSeparator />
-
-      <DropdownMenuItem variant="destructive" onClick={onOpenDelete} disabled={isPending}>
-        <Trash2 className="h-4 w-4" />
-        Supprimer
-      </DropdownMenuItem>
+      {menuItems.map((item, index) => (
+        <Fragment key={item.key}>
+          {index > 0 && <DropdownMenuSeparator />}
+          {item.node}
+        </Fragment>
+      ))}
     </DropdownMenuContent>
   )
 }

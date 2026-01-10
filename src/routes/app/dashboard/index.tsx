@@ -1,7 +1,8 @@
-import DashBoardPage from '@/features/dashboard/pages/DashboardPage'
+import StatisticsPage from '@/features/statistics/pages/StatisticsPage'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/app/dashboard/')({
-  component: DashBoardPage,
+  component: StatisticsPage,
 })
+
 
