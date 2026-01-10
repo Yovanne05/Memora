@@ -6,7 +6,8 @@ export type SharePermission = z.infer<typeof SharePermissionSchema>
 
 export const NoteShareDtoSchema = z.object({
   note_id: z.uuid(),
-  user: userDtoSchema,
+  user: userDtoSchema.optional(),
+  user_id: z.uuid().optional(),
   permission: SharePermissionSchema,
   created_at: z.iso.datetime(),
 })

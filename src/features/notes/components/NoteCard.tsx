@@ -12,12 +12,6 @@ import { buildNoteCardActions } from './note-card/buildNoteCardActions'
 import { NoteCardFavoriteButton } from './note-card/NoteCardFavoriteButton'
 import { NoteCardMeta } from './note-card/NoteCardMeta'
 import type { DraggedNoteData } from '../hooks/useDragAndDropNotes'
-import type { Note } from "../models/note.model"
-import { ResourceCard } from "@/components/shared/ResourceCard"
-import { NoteQuickActions } from "./NoteQuickActions"
-import { buildNoteCardActions } from "./note-card/buildNoteCardActions"
-import { NoteCardFavoriteButton } from "./note-card/NoteCardFavoriteButton"
-import { NoteCardMeta } from "./note-card/NoteCardMeta"
 
 interface NoteCardProps {
   note: Note
