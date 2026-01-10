@@ -11,10 +11,16 @@ import type {
 import { dtoToUser } from '@/features/users/mappers/user.mapper'
 
 export function dtoToNoteShare(dto: NoteShareDto): NoteShare {
+  const userId = dto.user?.id ?? dto.user_id
+
+  if (!userId) {
+    throw new Error('Note share is missing a user id')
+  }
+
   return {
     noteId: dto.note_id,
-    userId: dto.user.id,
-    user: dtoToUser(dto.user),
+    userId,
+    user: dto.user ? dtoToUser(dto.user) : undefined,
     permission: dto.permission,
     createdAt: new Date(dto.created_at),
   }

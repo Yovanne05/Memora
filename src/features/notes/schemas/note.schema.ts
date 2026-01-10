@@ -19,7 +19,7 @@ export const noteCreateFormSchema = z.object({
 })
 
 export const noteEditFormSchema = noteCreateFormSchema.extend({
-  content: z.string(),
+  content: z.string().trim().optional(),
 })
 
 export type NoteCreateFormInput = z.infer<typeof noteCreateFormSchema>

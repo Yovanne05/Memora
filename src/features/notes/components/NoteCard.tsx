@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { FileText } from 'lucide-react'
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 
 import type { Note } from "../models/note.model"
 import { ResourceCard } from "@/components/shared/ResourceCard"
@@ -15,6 +17,7 @@ import { getContentPreview } from '@/lib/html-utils'
 import { buildNoteCardActions } from './note-card/buildNoteCardActions'
 import { NoteCardFavoriteButton } from './note-card/NoteCardFavoriteButton'
 import { NoteCardMeta } from './note-card/NoteCardMeta'
+import type { DraggedNoteData } from '../hooks/useDragAndDropNotes'
 
 interface NoteCardProps {
   note: Note
@@ -40,6 +43,18 @@ export function NoteCard({
     onDelete,
     showQuickActions,
   })
+
+  const dragData: DraggedNoteData = { note }
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `note-${note.id}`,
+      data: dragData,
+    })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+  }
 
   const handleInteractionChange = useCallback((interacting: boolean) => {
     setIsInteracting(interacting)
@@ -75,15 +90,17 @@ export function NoteCard({
   }
 
   return (
-    <ResourceCard
-      id={note.id}
-      title={note.title}
-      description={contentPreview}
-      icon={FileText}
-      actions={actions}
-      headerActions={headerActions}
-      metadata={<NoteCardMeta note={note} />}
-      onClick={handleClick}
-    />
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <ResourceCard
+        id={note.id}
+        title={note.title}
+        description={contentPreview}
+        icon={FileText}
+        actions={actions}
+        headerActions={headerActions}
+        metadata={<NoteCardMeta note={note} />}
+        onClick={handleClick}
+      />
+    </div>
   )
 }
