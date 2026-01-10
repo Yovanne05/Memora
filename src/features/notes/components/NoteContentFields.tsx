@@ -1,5 +1,7 @@
 import type { UseFormReturn } from 'react-hook-form'
+import { Save } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -28,6 +30,8 @@ export function NoteContentFields({
   disabled,
   noteId,
 }: Readonly<NoteContentFieldsProps>) {
+  const isTitleDirty = form.getFieldState('title', form.formState).isDirty
+
   return (
     <Card className="border border-border/70 shadow-sm">
       <CardHeader className="pb-2">
