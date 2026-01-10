@@ -64,7 +64,7 @@ class NoteLinkService(NoteLinkServiceInterface):
         )
         ensure_note_link_does_not_exist(existing_link)
 
-        link_entity = dto_to_note_link(note_id, payload.linked_note_id)
+        link_entity = dto_to_note_link(note_id, payload)
         saved = note_link_repository.add(link_entity)
         return note_link_to_dto(saved, note_id)
 
