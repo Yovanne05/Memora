@@ -1,11 +1,14 @@
-import type { Collection } from "@/features/collections/models/collection.model"
-import { useToggleCollectionFavoriteMutation } from "@/features/collections/hooks/useToggleCollectionFavorite"
-import { useWorkspaceNavigation } from "../../hooks/useWorkspaceNavigation"
-import { CollectionNotesEmpty } from "./collection-tree-item/CollectionNotesEmpty"
-import { CollectionNotesList } from "./collection-tree-item/CollectionNotesList"
-import { CollectionTreeHeader } from "./collection-tree-item/CollectionTreeHeader"
+import { useDroppable } from '@dnd-kit/core'
+import { cn } from '@/lib/utils'
+import type { Collection } from '@/features/collections/models/collection.model'
+import { useToggleCollectionFavoriteMutation } from '@/features/collections/hooks/useToggleCollectionFavorite'
+import { useWorkspaceNavigation } from '../../hooks/useWorkspaceNavigation'
+import { CollectionNotesEmpty } from './collection-tree-item/CollectionNotesEmpty'
+import { CollectionNotesList } from './collection-tree-item/CollectionNotesList'
+import { CollectionTreeHeader } from './collection-tree-item/CollectionTreeHeader'
+import type { DroppableCollectionData } from '@/features/notes/hooks/useDragAndDropNotes'
 
-type WorkspaceMode = "default" | "favorites"
+type WorkspaceMode = 'default' | 'favorites'
 
 interface CollectionTreeItemProps {
   collection: Collection
@@ -24,10 +27,20 @@ export function CollectionTreeItem({
   selectedNoteId,
   onToggle,
   onSelect,
-  mode = "default",
+  mode = 'default',
 }: CollectionTreeItemProps) {
   const { navigateToNote } = useWorkspaceNavigation(mode)
   const toggleFavorite = useToggleCollectionFavoriteMutation()
+
+  const dropData: DroppableCollectionData = {
+    collectionId: collection.id,
+    collectionName: collection.name,
+  }
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: `collection-${collection.id}`,
+    data: dropData,
+  })
 
   const notesCount = collection.notes?.length || 0
   const favorite = collection.isFavorite === true
@@ -39,7 +52,13 @@ export function CollectionTreeItem({
   }
 
   return (
-    <div>
+    <div
+      ref={setNodeRef}
+      className={cn(
+        'transition-colors rounded-md',
+        isOver && 'bg-accent/50 ring-2 ring-primary/50'
+      )}
+    >
       <CollectionTreeHeader
         collection={collection}
         isExpanded={isExpanded}
