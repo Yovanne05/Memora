@@ -15,7 +15,8 @@ from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO, NoteDTO
-from dtos.owner_dto import OwnerDTO
+from dtos.user_access_dto import UserAccessDTO
+from utils.enums import SharePermissionEnum
 from daos.note_dao import Note
 from daos.user_dao import User
 from daos.collection_dao import Collection
@@ -83,7 +84,12 @@ class TestNoteServiceCreate:
             owner_id=user_id,
             owner_username="testuser",
             visibility=VisibilityEnum.PRIVATE,
-            owners=[OwnerDTO(user_id=user_id, username="testuser")],
+            user_access=[
+                UserAccessDTO(
+                    user_id=user_id,
+                    permission=SharePermissionEnum.WRITE,
+                )
+            ],
             collection_id=collection_id,
             tags=[],
             created_at=datetime.now(),
@@ -106,8 +112,8 @@ class TestNoteServiceCreate:
         # Assert
         assert isinstance(result, NoteDTO)
         assert result.title == "Test Note"
-        assert len(result.owners) > 0
-        assert result.owners[0].user_id == user_id
+        assert len(result.user_access) > 0
+        assert result.user_access[0].user_id == user_id
         mock_user_repository.find_one.assert_called_once_with(user_id)
         mock_collection_repository.find_for_owner.assert_called_once_with(collection_id, user_id)
         mock_note_repository.add.assert_called_once()

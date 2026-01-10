@@ -14,7 +14,8 @@ from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
 from dtos.collection_dto import CollectionCreateDTO, CollectionUpdateDTO, CollectionDTO
-from dtos.owner_dto import OwnerDTO
+from dtos.user_access_dto import UserAccessDTO
+from utils.enums import SharePermissionEnum
 from daos.collection_dao import Collection
 from utils.enums import VisibilityEnum
 from exceptions.collection_exception import CollectionNotFound
@@ -78,7 +79,12 @@ class TestCollectionServiceUpdate:
             name="New Name",
             description="New desc",
             visibility=VisibilityEnum.PUBLIC,
-            owners=[OwnerDTO(user_id=user_id, username="testuser")],
+            user_access=[
+                UserAccessDTO(
+                    user_id=user_id,
+                    permission=SharePermissionEnum.WRITE,
+                )
+            ],
             tags=[],
             created_at=datetime.now(),
             updated_at=datetime.now(),

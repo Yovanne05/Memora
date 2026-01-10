@@ -15,7 +15,8 @@ from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO, NoteDTO
-from dtos.owner_dto import OwnerDTO
+from dtos.user_access_dto import UserAccessDTO
+from utils.enums import SharePermissionEnum
 from daos.note_dao import Note
 from daos.user_dao import User
 from daos.collection_dao import Collection
@@ -69,7 +70,12 @@ class TestNoteServiceFindOne:
             owner_username="testuser",
             title="Test Note",
             visibility=VisibilityEnum.PRIVATE,
-            owners=[OwnerDTO(user_id=user_id, username="testuser")],
+            user_access=[
+                UserAccessDTO(
+                    user_id=user_id,
+                    permission=SharePermissionEnum.WRITE,
+                )
+            ],
             tags=[],
             created_at=datetime.now(),
             updated_at=datetime.now()

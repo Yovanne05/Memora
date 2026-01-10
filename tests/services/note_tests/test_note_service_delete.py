@@ -15,7 +15,6 @@ from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
 from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO, NoteDTO
-from dtos.owner_dto import OwnerDTO
 from daos.note_dao import Note
 from daos.user_dao import User
 from daos.collection_dao import Collection
