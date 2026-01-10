@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 interface CollaborationStatusProps {
   isConnected: boolean
   isConnecting: boolean
+  isSynced?: boolean
   activeUsers: { userId: string; username: string }[]
+  typingUsers?: Set<string>
   error: Error | null
   onReconnect: () => void
 }
