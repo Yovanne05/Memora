@@ -2,10 +2,7 @@ from flask import request
 from flask_socketio import emit, join_room, leave_room, disconnect
 from pydantic import ValidationError
 
-from domain_services.socketio_auth_domain_service import (
-    get_current_user_context_from_socket,
-    get_current_user_from_socket,
-)
+from services.impl.realtime.socketio_auth_service_impl import socketio_auth_service
 from dtos.collaboration_dto import (
     CRDTUpdateDTO,
     CRDTSyncRequestDTO,
@@ -15,7 +12,7 @@ from dtos.collaboration_dto import (
 from services.impl.realtime.realtime_collaboration_service_impl import (
     realtime_collaboration_service,
 )
-from utils.socketio_service import get_socketio
+from services.impl.realtime.socketio_service_impl import socketio_service
 from utils.rate_limiter import socketio_rate_limit
 from utils.logger import get_logger
 
@@ -29,11 +26,11 @@ logger = get_logger(__name__)
 
 
 def register_socketio_handlers():
-    socketio = get_socketio()
+    socketio = socketio_service.get_socketio()
 
     @socketio.on("connect", namespace=COLLABORATION_NAMESPACE)
     def handle_connect(auth=None):
-        user_id, _ = get_current_user_context_from_socket(auth)
+        user_id, _ = socketio_auth_service.get_current_user_context_from_socket(auth)
 
         if not user_id:
             disconnect()
@@ -58,7 +55,7 @@ def register_socketio_handlers():
     @socketio.on("join_collaboration", namespace=COLLABORATION_NAMESPACE)
     @socketio_rate_limit(max_requests=20, window_seconds=60)  # 20 joins per minute
     def handle_join_collaboration(data):
-        user_id, user_role = get_current_user_context_from_socket()
+        user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         try:
             join_dto = JoinCollaborationDTO.model_validate(data)
         except ValidationError as exc:
@@ -90,7 +87,7 @@ def register_socketio_handlers():
 
     @socketio.on("leave_collaboration", namespace=COLLABORATION_NAMESPACE)
     def handle_leave_collaboration(data):
-        user_id = get_current_user_from_socket()
+        user_id = socketio_auth_service.get_current_user_from_socket()
         try:
             leave_dto = LeaveCollaborationDTO.model_validate(data)
         except ValidationError as exc:
@@ -121,7 +118,7 @@ def register_socketio_handlers():
     @socketio.on("crdt_update", namespace=COLLABORATION_NAMESPACE)
     @socketio_rate_limit(max_requests=100, window_seconds=60)  # 100 updates per minute
     def handle_crdt_update(data):
-        user_id, user_role = get_current_user_context_from_socket()
+        user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         if not user_id:
             logger.warning(
                 f"CRDT update rejected: No authenticated user (socket={request.sid})"
@@ -154,7 +151,7 @@ def register_socketio_handlers():
     @socketio.on("crdt_sync_request", namespace=COLLABORATION_NAMESPACE)
     @socketio_rate_limit(max_requests=30, window_seconds=60)  # 30 sync requests per minute
     def handle_crdt_sync_request(data):
-        user_id, user_role = get_current_user_context_from_socket()
+        user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         if not user_id:
             logger.warning(
                 f"CRDT sync request rejected: No authenticated user (socket={request.sid})"

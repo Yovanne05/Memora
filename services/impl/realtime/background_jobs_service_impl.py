@@ -7,7 +7,9 @@ from services.interfaces.realtime.background_jobs_service_interface import (
 )
 from services.impl.realtime.crdt.crdt_service_impl import get_crdt_service
 from utils.logger import get_logger
-from utils.redis_client import get_collaboration_store
+from services.impl.infrastructure.collaboration_session_store_impl import (
+    collaboration_session_store,
+)
 
 logger = get_logger(__name__)
 
@@ -34,8 +36,7 @@ class CRDTSnapshotJob:
 
 class CollaborationSessionCleanupJob:
     def run(self) -> int:
-        store = get_collaboration_store()
-        redis_client = store.client
+        redis_client = collaboration_session_store.client
 
         pattern = "collab:note:*:sessions"
         cleaned_count = 0

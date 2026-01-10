@@ -11,7 +11,9 @@ Note : Ce n'est PAS un repository car il ne fait pas d'abstraction DAO,
 """
 from typing import Optional
 
-from utils.redis_client import get_collaboration_store
+from services.impl.infrastructure.collaboration_session_store_impl import (
+    collaboration_session_store,
+)
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -29,7 +31,7 @@ class CollaborationSessionService:
     """
 
     def __init__(self):
-        self._store = get_collaboration_store()
+        self._store = collaboration_session_store
 
     def create_session(
         self, note_id: str, user_id: str, socket_id: str, username: str

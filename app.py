@@ -27,8 +27,8 @@ from utils.filter import register_global_filter
 from utils.logger import init_logger
 from utils.realtime_filter import register_realtime_filter
 from utils.swagger import init_swagger
-from utils.redis_client import init_redis
-from utils.socketio_service import init_socketio
+from services.impl.infrastructure.redis_client_service_impl import redis_client_service
+from services.impl.realtime.socketio_service_impl import socketio_service
 from services.impl.realtime.crdt.crdt_service_impl import init_crdt_service
 from services.impl.realtime.background_jobs_service_impl import init_background_jobs
 
@@ -45,7 +45,7 @@ def create_app() -> Flask:
     init_swagger(app)
     init_logger(app)
 
-    redis_client = init_redis(
+    redis_client = redis_client_service.init_redis(
         host=config.REDIS_HOST,
         port=config.REDIS_PORT,
         db=config.REDIS_DB
@@ -60,7 +60,9 @@ def create_app() -> Flask:
         )
 
 
-    socketio = init_socketio(app, cors_allowed_origins="*", async_mode="threading")
+    socketio = socketio_service.init_socketio(
+        app, cors_allowed_origins="*", async_mode="threading"
+    )
     register_realtime_filter(socketio)
 
 
@@ -94,6 +96,6 @@ def create_app() -> Flask:
     return app
 
 if __name__ == "__main__":
-    from utils.socketio_service import run_socketio
+    from services.impl.realtime.socketio_service_impl import socketio_service
     app = create_app()
-    run_socketio(app, debug=True, host="0.0.0.0", port=5000)
+    socketio_service.run_socketio(app, debug=True, host="0.0.0.0", port=5000)
