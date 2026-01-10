@@ -1,4 +1,5 @@
 import redis
+import config
 from redis.retry import Retry
 from redis.backoff import ExponentialBackoff
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
@@ -9,6 +10,7 @@ _redis_client = None
 
 
 def init_redis(host: str = "localhost", port: int = 6379, db: int = 0) -> redis.Redis:
+    """Initialize and verify the Redis client."""
     global _redis_client
 
     retry = Retry(
@@ -35,17 +37,21 @@ def init_redis(host: str = "localhost", port: int = 6379, db: int = 0) -> redis.
 
 
 def get_redis_client() -> redis.Redis:
+    """Return the initialized Redis client or raise if missing."""
     if _redis_client is None:
         raise RuntimeError("Redis client not initialized. Call init_redis() first.")
     return _redis_client
 
 
 class CollaborationRedisStore:
+    """Redis-backed store for collaboration sessions."""
+
     def __init__(self):
         self.client = get_redis_client()
-        self.session_ttl = 86400  # 24 hours
+        self.session_ttl = config.COLLAB_SESSION_TTL_SECONDS
 
     def _safe_execute(self, operation, default=None):
+        """Execute a Redis operation with error handling."""
         try:
             return operation()
         except (ConnectionError, TimeoutError) as e:
@@ -59,6 +65,7 @@ class CollaborationRedisStore:
             return default
 
     def create_session(self, note_id: str, user_id: str, socket_id: str, username: str) -> None:
+        """Create a collaboration session and index it by note/user."""
         def operation():
             session_key = f"collab:session:{socket_id}"
             session_data = {
@@ -84,6 +91,7 @@ class CollaborationRedisStore:
         self._safe_execute(operation)
 
     def get_session_by_socket(self, socket_id: str) -> dict | None:
+        """Fetch a session by socket id."""
         def operation():
             session_key = f"collab:session:{socket_id}"
             data = self.client.hgetall(session_key)
@@ -92,6 +100,7 @@ class CollaborationRedisStore:
         return self._safe_execute(operation, default=None)
 
     def delete_session(self, socket_id: str) -> None:
+        """Remove a collaboration session and its indexes."""
         session_data = self.get_session_by_socket(socket_id)
         if not session_data:
             return
@@ -118,6 +127,7 @@ class CollaborationRedisStore:
         self._safe_execute(operation)
 
     def list_sessions_by_note(self, note_id: str) -> list[dict]:
+        """List active sessions for a note."""
         def operation():
             note_sessions_key = f"collab:note:{note_id}:sessions"
             socket_ids = self.client.smembers(note_sessions_key)
@@ -139,6 +149,7 @@ _collab_store = None
 
 
 def get_collaboration_store() -> CollaborationRedisStore:
+    """Return the singleton collaboration store."""
     global _collab_store
     if _collab_store is None:
         _collab_store = CollaborationRedisStore()

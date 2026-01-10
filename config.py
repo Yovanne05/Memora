@@ -28,6 +28,9 @@ COLLAB_API_KEY = os.getenv("COLLAB_API_KEY", "change-me")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+COLLAB_SESSION_TTL_SECONDS = int(
+    os.getenv("COLLAB_SESSION_TTL_SECONDS", str(24 * 3600))
+)
 
 STORAGE_DRIVER = os.getenv("STORAGE_DRIVER", "local").lower()
 UPLOAD_LOCAL_ROOT = os.getenv("UPLOAD_LOCAL_ROOT", "uploads")

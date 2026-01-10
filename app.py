@@ -55,8 +55,8 @@ def create_app() -> Flask:
 
     if config.APP_ENV != "test":
         init_background_jobs(
-            crdt_snapshot_interval=5,   # 5 secondes (test)
-            session_cleanup_interval=5, # 5 secondes (test)
+            crdt_snapshot_interval=30,   # 30 secondes
+            session_cleanup_interval=30, # 30 secondes
         )
 
 

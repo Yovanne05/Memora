@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 import base64
 
 from daos.note_dao import Note
@@ -24,6 +23,11 @@ DEFAULT_EMPTY_DOCUMENT = '{"type":"doc","content":[{"type":"paragraph"}]}'
 
 
 class RealtimeCollaborationDomainService:
+    def get_username_by_socket(self, socket_id: str) -> str:
+        session_service = get_collaboration_session_service()
+        session_data = session_service.find_session_by_socket(socket_id)
+        return session_data.get("username") if session_data else "Unknown"
+
     def join_collaboration_session(
         self,
         note_id: str,
@@ -108,7 +112,11 @@ class RealtimeCollaborationDomainService:
         )
 
     def process_crdt_update(
-        self, update_dto: CRDTUpdateDTO, user_id: str, user_role: RoleEnum
+        self,
+        update_dto: CRDTUpdateDTO,
+        user_id: str,
+        user_role: RoleEnum,
+        username: str,
     ) -> CollaborationEventDTO:
         has_permission = permission_domain_service.can_write_note(
             update_dto.note_id, user_id, user_role
@@ -136,7 +144,7 @@ class RealtimeCollaborationDomainService:
         return CollaborationEventDTO(
             event_type="crdt_update",
             user_id=user_id,
-            username="",
+            username=username,
             note_id=update_dto.note_id,
             crdt_update=update_dto.update,
         )
@@ -193,7 +201,6 @@ class RealtimeCollaborationDomainService:
                 user_id=session["user_id"],
                 username=session["username"],
                 socket_id=session["socket_id"],
-                joined_at=datetime.now(timezone.utc),
             )
             for session in sessions
         ]

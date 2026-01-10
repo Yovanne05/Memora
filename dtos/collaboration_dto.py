@@ -9,7 +9,6 @@ class CollaboratorDTO(BaseModel):
     user_id: str
     username: str
     socket_id: str
-    joined_at: datetime
 
 
 class CollaborationSessionDTO(BaseModel):

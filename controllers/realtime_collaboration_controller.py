@@ -11,19 +11,18 @@ from dtos.collaboration_dto import (
     CRDTUpdateDTO,
     CRDTSyncRequestDTO,
 )
-from repositorys import collaboration_repository
 from utils.socketio_service import get_socketio
 from utils.rate_limiter import socketio_rate_limit
 from utils.logger import get_logger
 
 # Constants
 COLLABORATION_NAMESPACE = "/collaboration"
+ROOM_PREFIX = "note_"
+EVENT_COLLABORATION = "collaboration_event"
+EVENT_SESSION = "collaboration_session"
+EVENT_CRDT_SYNC_REPLY = "crdt_sync_reply"
 
 logger = get_logger(__name__)
-
-def _get_username_from_socket(socket_id: str) -> str:
-    session_data = collaboration_repository.find_session_by_socket(socket_id)
-    return session_data.get("username") if session_data else "Unknown"
 
 
 def _validate_join_collaboration_data(data: dict, user_id: str) -> tuple[str | None, str | None]:
@@ -83,9 +82,9 @@ def register_socketio_handlers():
 
         if event:
             emit(
-                "collaboration_event",
+                EVENT_COLLABORATION,
                 event.model_dump(mode="json"),
-                room=f"note_{event.note_id}",
+                room=f"{ROOM_PREFIX}{event.note_id}",
                 skip_sid=socket_id,
                 namespace=COLLABORATION_NAMESPACE,
             )
@@ -95,7 +94,6 @@ def register_socketio_handlers():
     def handle_join_collaboration(data):
         user_id, user_role = get_current_user_context_from_socket()
 
-        # Validate input data
         note_id, initial_content = _validate_join_collaboration_data(data, user_id)
         if note_id is None:
             return
@@ -110,13 +108,13 @@ def register_socketio_handlers():
             initial_content=initial_content,
         )
 
-        join_room(f"note_{note_id}")
-        emit("collaboration_session", session_dto.model_dump(mode="json"), room=request.sid)
+        join_room(f"{ROOM_PREFIX}{note_id}")
+        emit(EVENT_SESSION, session_dto.model_dump(mode="json"), room=request.sid)
 
         emit(
-            "collaboration_event",
+            EVENT_COLLABORATION,
             join_event.model_dump(mode="json"),
-            room=f"note_{note_id}",
+            room=f"{ROOM_PREFIX}{note_id}",
             skip_sid=socket_id,
             namespace=COLLABORATION_NAMESPACE,
         )
@@ -133,12 +131,12 @@ def register_socketio_handlers():
         )
 
         if event:
-            leave_room(f"note_{note_id}")
+            leave_room(f"{ROOM_PREFIX}{note_id}")
 
             emit(
-                "collaboration_event",
+                EVENT_COLLABORATION,
                 event.model_dump(mode="json"),
-                room=f"note_{note_id}",
+                room=f"{ROOM_PREFIX}{note_id}",
                 skip_sid=socket_id,
                 namespace=COLLABORATION_NAMESPACE,
             )
@@ -160,18 +158,18 @@ def register_socketio_handlers():
 
         # Traiter la mise à jour CRDT
         event = realtime_collaboration_domain_service.process_crdt_update(
-            update_dto=crdt_update_dto, user_id=user_id, user_role=user_role
+            update_dto=crdt_update_dto,
+            user_id=user_id,
+            user_role=user_role,
+            username=realtime_collaboration_domain_service.get_username_by_socket(request.sid),
         )
-
-        socket_id = request.sid
-        event.username = _get_username_from_socket(socket_id)
 
         # Diffuser la mise à jour à tous les autres clients
         emit(
-            "collaboration_event",
+            EVENT_COLLABORATION,
             event.model_dump(mode="json"),
-            room=f"note_{crdt_update_dto.note_id}",
-            skip_sid=socket_id,
+            room=f"{ROOM_PREFIX}{crdt_update_dto.note_id}",
+            skip_sid=request.sid,
             namespace=COLLABORATION_NAMESPACE,
         )
 
@@ -197,7 +195,7 @@ def register_socketio_handlers():
 
         # Répondre uniquement au client qui a fait la demande
         emit(
-            "crdt_sync_reply",
+            EVENT_CRDT_SYNC_REPLY,
             {
                 "note_id": sync_request_dto.note_id,
                 "state_vector": state_vector,
