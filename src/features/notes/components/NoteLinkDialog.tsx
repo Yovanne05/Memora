@@ -1,3 +1,6 @@
+import { memo, useState } from "react"
+import { Search } from "lucide-react"
+
 import { memo } from 'react'
 import {
   Dialog,
@@ -42,15 +45,27 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
     onSuccess: () => onOpenChange(false),
   })
 
+  const [linkLabel, setLinkLabel] = useState("")
+
+  const normalizedLabel = linkLabel.trim()
+  const canSubmit =
+    Boolean(selectedNoteId) &&
+    normalizedLabel.length > 0 &&
+    normalizedLabel.length <= 80 &&
+    !isPending
+
   const handleSubmit = async () => {
     if (!selectedNoteId) return
-    const success = await handleCreateLink(selectedNoteId)
+    if (normalizedLabel.length === 0) return
+
+    const success = await handleCreateLink(selectedNoteId, normalizedLabel)
     if (!success) {
-      alert('Impossible de créer le lien')
+      alert("Impossible de créer le lien")
     }
   }
 
   const handleClose = () => {
+    setLinkLabel("")
     resetState()
     onOpenChange(false)
   }
@@ -61,12 +76,33 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
         <DialogHeader>
           <DialogTitle>Lier une note</DialogTitle>
           <DialogDescription>
-            Sélectionnez une note de la même collection à lier
+            Sélectionnez une note de la même collection à lier et donnez un nom au lien
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
-          <NoteLinkSearchInput value={searchQuery} onChange={setSearchQuery} />
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Nom du lien</label>
+            <Input
+              value={linkLabel}
+              onChange={(event) => setLinkLabel(event.target.value)}
+              maxLength={80}
+            />
+            <p className="text-xs text-muted-foreground">
+              {normalizedLabel.length}/80
+            </p>
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher une note..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="pl-9"
+            />
+          </div>
+
           <NoteLinkList
             items={availableNotes}
             isLoading={isLoading}
@@ -76,12 +112,14 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
           />
         </div>
 
-        <NoteLinkDialogFooter
-          isPending={isPending}
-          isDisabled={!selectedNoteId || isPending}
-          onCancel={handleClose}
-          onSubmit={handleSubmit}
-        />
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose}>
+            Annuler
+          </Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit}>
+            {isPending ? "Liaison..." : "Lier la note"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

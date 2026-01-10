@@ -5,6 +5,7 @@ export function dtoToNoteLink(dto: NoteLinkDto): NoteLink {
   return {
     noteId: dto.note_id,
     linkedNoteId: dto.linked_note_id,
+    label: dto.label,
     createdAt: dto.created_at,
   }
 }
@@ -12,5 +13,6 @@ export function dtoToNoteLink(dto: NoteLinkDto): NoteLink {
 export function toCreateNoteLinkDto(payload: CreateNoteLink): CreateNoteLinkDto {
   return {
     linked_note_id: payload.linkedNoteId,
+    label: payload.label,
   }
 }
