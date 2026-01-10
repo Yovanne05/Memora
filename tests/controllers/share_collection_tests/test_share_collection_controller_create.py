@@ -26,7 +26,6 @@ class TestShareCollectionControllerCreate:
             id=user_id,
             email="target@example.com",
             username="target",
-            display_name="Target User",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )

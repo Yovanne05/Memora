@@ -46,7 +46,7 @@ class TestNoteShareServiceCreate:
         mock_note_repository.find_one_unscoped.return_value = note
 
         target_user = User(
-            id=user_id, email="target@example.com", username="target", display_name="Target User",
+            id=user_id, email="target@example.com", username="target",
             password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
         )
         mock_user_repository.find_one.return_value = target_user

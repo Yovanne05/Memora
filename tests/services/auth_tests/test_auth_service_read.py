@@ -37,7 +37,6 @@ class TestAuthServiceLogin:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             password_hash=password_hash,
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
@@ -50,7 +49,6 @@ class TestAuthServiceLogin:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )
@@ -138,7 +136,6 @@ class TestAuthServiceGetMe:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             password_hash="hash",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
@@ -150,7 +147,6 @@ class TestAuthServiceGetMe:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )

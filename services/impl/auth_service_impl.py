@@ -21,7 +21,6 @@ class AuthService(AuthServiceInterface):
             email=register_dto.email,
             password=register_dto.password,
             username=register_dto.username,
-            display_name=register_dto.display_name,
             role=RoleEnum.CLIENT,
         )
         user = user_service.create(user_create)

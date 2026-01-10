@@ -18,14 +18,11 @@ class TestUserRepositoryUpdate:
         # Act
         user = user_repository.find_one(user_id)
         user.email = f"new-{uuid4().hex[:8]}@example.com"
-        user.display_name = "New Display Name"
         result = user_repository.update(user)
 
         # Assert
         assert result.email == user.email
-        assert result.display_name == "New Display Name"
 
         # Vérifier en base
         updated = user_repository.find_one(user_id)
         assert updated.email == user.email
-        assert updated.display_name == "New Display Name"

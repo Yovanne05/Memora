@@ -39,7 +39,7 @@ class TestShareCollectionServiceCreate:
         mock_collection_repository.find_one_unscoped.return_value = collection
         mock_collection_repository.find_one.return_value = collection
 
-        target_user = User(id=user_id, email="target@example.com", username="target", display_name="Target User", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
+        target_user = User(id=user_id, email="target@example.com", username="target", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         mock_user_repository.find_one.return_value = target_user
 
         mock_collection_share_repository.find_one.return_value = None

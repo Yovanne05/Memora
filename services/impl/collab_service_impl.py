@@ -59,7 +59,6 @@ class CollabService:
             raise Forbidden("User not found.")
         return CollabSessionVerifyResponseDTO(
             user_id=payload["user_id"],
-            name=user.display_name,
             scope=payload["scope"],
         )
 

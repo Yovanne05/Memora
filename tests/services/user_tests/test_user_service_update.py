@@ -34,7 +34,6 @@ class TestUserServiceUpdate:
             id=user_id,
             email="old@example.com",
             username="olduser",
-            display_name="Old Name",
             password_hash="hash",
             role=RoleEnum.CLIENT,
             created_at=datetime.now(),
@@ -43,7 +42,6 @@ class TestUserServiceUpdate:
             id=user_id,
             email="new@example.com",
             username="newuser",
-            display_name="New Name",
             password_hash="new_hash",
             role=RoleEnum.CLIENT,
             created_at=datetime.now(),
@@ -59,7 +57,6 @@ class TestUserServiceUpdate:
             id=user_id,
             email="new@example.com",
             username="newuser",
-            display_name="New Name",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )
@@ -69,7 +66,6 @@ class TestUserServiceUpdate:
         dto = UserUpdateDTO(
             email="new@example.com",
             username="newuser",
-            display_name="New Name"
         )
 
         # Act
@@ -78,7 +74,6 @@ class TestUserServiceUpdate:
         # Assert
         assert result.email == "new@example.com"
         assert result.username == "newuser"
-        assert result.display_name == "New Name"
         mock_user_repository.find_one.assert_called_once_with(user_id)
         mock_user_repository.update.assert_called_once()
 

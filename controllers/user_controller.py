@@ -48,7 +48,6 @@ def create():
         email=payload.email,
         password=payload.password,
         username=payload.username,
-        display_name=payload.display_name,
         role=RoleEnum.CLIENT,
     )
     user = user_service.create(user_create)

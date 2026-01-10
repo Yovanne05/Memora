@@ -31,7 +31,6 @@ class TestShareNoteControllerList:
             id=str(uuid4()),
             email="user1@example.com",
             username="user1",
-            display_name="User 1",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )

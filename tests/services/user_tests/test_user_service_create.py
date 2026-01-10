@@ -37,7 +37,6 @@ class TestUserServiceCreate:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             password_hash="hashed_password",
             role=RoleEnum.CLIENT,
             created_at=datetime.now(),
@@ -48,7 +47,6 @@ class TestUserServiceCreate:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )
@@ -59,7 +57,6 @@ class TestUserServiceCreate:
             email="test@example.com",
             password="StrongPass1!",
             username="testuser",
-            display_name="Test User",
             role=RoleEnum.CLIENT
         )
 

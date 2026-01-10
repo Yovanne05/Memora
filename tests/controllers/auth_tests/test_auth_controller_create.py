@@ -21,7 +21,6 @@ class TestAuthRegister:
             id=str(uuid4()),
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             role=RoleEnum.CLIENT,
             created_at=datetime.now()
         )
@@ -30,7 +29,6 @@ class TestAuthRegister:
             "email": "test@example.com",
             "password": "StrongPass1!",
             "username": "testuser",
-            "display_name": "Test User"
         }
 
         # Act

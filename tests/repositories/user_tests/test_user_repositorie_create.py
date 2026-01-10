@@ -20,7 +20,6 @@ class TestUserRepositoryAdd:
             id=str(uuid4()),
             email=f"test-{uuid4().hex[:8]}@example.com",
             username=f"user-{uuid4().hex[:8]}",
-            display_name="Test User",
             password_hash=bcrypt.hashpw("Password1!".encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),
             role=RoleEnum.CLIENT
         )

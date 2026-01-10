@@ -50,7 +50,6 @@ definitions:
         description: User identifier.
       name:
         type: string
-        description: Display name used for awareness.
       scope:
         type: array
         items:

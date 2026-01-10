@@ -8,7 +8,6 @@ class RegisterDTO(BaseModel):
     email: EmailStr
     password: str = Field(min_length=12, max_length=255)
     username: str | None = Field(default=None, min_length=3, max_length=50)
-    display_name: str | None = Field(default=None, min_length=1, max_length=100)
 
     model_config = ConfigDict(extra="forbid")
 

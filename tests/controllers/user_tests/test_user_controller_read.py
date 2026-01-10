@@ -20,7 +20,6 @@ class TestUserControllerGet:
             id=user_id,
             email="test@example.com",
             username="testuser",
-            display_name="Test User",
             role="client",
             created_at=datetime.now()
         )

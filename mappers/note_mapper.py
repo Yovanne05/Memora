@@ -45,7 +45,7 @@ def _safe_owner_username(note: Note) -> str:
     insp = inspect(note)
     if "owner" in insp.unloaded or not note.owner:
         return ""
-    return note.owner.username or note.owner.display_name or ""
+    return note.owner.username or ""
 
 
 def note_to_dto(

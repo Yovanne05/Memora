@@ -21,7 +21,6 @@ class TestUserControllerUpdate:
             id=user_id,
             email="test@example.com",
             username="newusername",
-            display_name="New Display Name",
             role="client",
             created_at=datetime.now()
         )
@@ -29,7 +28,6 @@ class TestUserControllerUpdate:
 
         payload = {
             "username": "newusername",
-            "display_name": "New Display Name"
         }
 
         # Act

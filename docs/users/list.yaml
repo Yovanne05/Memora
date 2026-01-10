@@ -22,11 +22,6 @@ parameters:
     required: false
     description: Recherche partielle dans les alias.
   - in: query
-    name: display_name_contains
-    type: string
-    required: false
-    description: Recherche partielle dans les noms d'affichage.
-  - in: query
     name: role
     type: string
     enum: ["client", "admin", "super_admin"]

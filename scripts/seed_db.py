@@ -70,21 +70,18 @@ def seed() -> None:
         admin = User(
             email="admin@example.com",
             username="admin",
-            display_name="Admin",
             password_hash=_hash_password("AdminPass123!"),
             role=RoleEnum.ADMIN,
         )
         alice = User(
             email="alice@example.com",
             username="alice",
-            display_name="Alice Dupont",
             password_hash=_hash_password("AlicePass123!"),
             role=RoleEnum.CLIENT,
         )
         bob = User(
             email="bob@example.com",
             username="bob",
-            display_name="Bob Martin",
             password_hash=_hash_password("BobPass123!!"),
             role=RoleEnum.CLIENT,
         )

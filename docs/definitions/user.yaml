@@ -18,11 +18,6 @@ definitions:
         nullable: true
         description: Alias public (unique mais facultatif).
         example: "leadu"
-      display_name:
-        type: string
-        nullable: true
-        description: Nom complet ou pseudo long affiche dans l'interface.
-        example: "Lea Dupont"
       role:
         type: string
         enum: ["client", "admin", "super_admin"]
@@ -60,11 +55,6 @@ definitions:
         maxLength: 50
         nullable: true
         description: Alias court a afficher publiquement.
-      display_name:
-        type: string
-        maxLength: 100
-        nullable: true
-        description: Nom complet ou signature.
       role:
         type: string
         enum: ["client", "admin", "super_admin"]
@@ -90,11 +80,6 @@ definitions:
         maxLength: 50
         nullable: true
         description: Nouvel alias public (mettre null pour le retirer).
-      display_name:
-        type: string
-        maxLength: 100
-        nullable: true
-        description: Nouveau nom d'affichage (null pour effacer).
       role:
         type: string
         enum: ["client", "admin", "super_admin"]

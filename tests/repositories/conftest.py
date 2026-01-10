@@ -23,7 +23,6 @@ def sample_user_data():
     return {
         "email": f"user-{uuid4().hex[:8]}@example.com",
         "username": f"user-{uuid4().hex[:6]}",
-        "display_name": "Test User",
         "password": "TestPassword1!"  # NOSONAR
     }
 

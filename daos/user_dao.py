@@ -21,7 +21,6 @@ class User(UUIDMixin, CreatedAtMixin, Base):
     email: Mapped[str] = mapped_column(
         String(255), nullable=False, unique=True)
     username: Mapped[str | None] = mapped_column(String(50), unique=True)
-    display_name: Mapped[str | None] = mapped_column(String(100))
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     role: Mapped[RoleEnum] = mapped_column(
         SAEnum(

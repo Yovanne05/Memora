@@ -44,7 +44,6 @@ CREATE TABLE users (
     id              CHAR(36) PRIMARY KEY,
     email           VARCHAR(255) NOT NULL UNIQUE,
     username        VARCHAR(50) UNIQUE,
-    display_name    VARCHAR(100),
     password_hash   TEXT NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login      TIMESTAMP,

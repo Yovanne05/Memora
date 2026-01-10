@@ -158,7 +158,6 @@ class TestDataFactory:
             email=email,
             password_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),  # NOSONAR
             username=f"user-{label}",
-            display_name=f"User {label}",
             role=role,
         )
 

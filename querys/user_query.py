@@ -11,7 +11,6 @@ class UserFindQuery(BaseModel):
     email: EmailStr | None = None
     username: Optional[str] = None
     username_contains: Optional[str] = Field(default=None)
-    display_name_contains: Optional[str] = Field(default=None)
     role: RoleEnum | None = None
     ids: Optional[list[UUID]] = None
 
@@ -37,7 +36,6 @@ class UserFindQuery(BaseModel):
             email=self.email,
             username=self.username,
             username_contains=self.username_contains,
-            display_name_contains=self.display_name_contains,
             role=self.role,
             ids=[str(item) for item in self.ids] if self.ids else None,
             sort_by=self.sort_by,

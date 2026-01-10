@@ -155,7 +155,6 @@ def mock_current_user():
         id="test-user-id-123",
         email="test@example.com",
         username="testuser",
-        display_name="Test User",
         password_hash="hash",
         role=RoleEnum.CLIENT
     )
