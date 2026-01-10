@@ -15,7 +15,7 @@ from exceptions.collaboration_exception import (
     CollaborationNotAuthorized,
 )
 from domain_services.permission_domain_service import permission_domain_service
-from repositorys import collaboration_repository
+from domain_services.collaboration_session_service import get_collaboration_session_service
 from utils.db import get_db_session
 from utils.enums import RoleEnum
 from utils.crdt_service import get_crdt_service
@@ -55,10 +55,11 @@ class RealtimeCollaborationDomainService:
         crdt_service = get_crdt_service()
         crdt_service.get_or_create_document(note_id, note_content)
 
-        self._cleanup_stale_sessions(note_id, user_id)
-        collaboration_repository.create_session(note_id, user_id, socket_id, username)
+        session_service = get_collaboration_session_service()
+        session_service.cleanup_user_sessions(note_id, user_id)
+        session_service.create_session(note_id, user_id, socket_id, username)
 
-        all_sessions = collaboration_repository.list_sessions_by_note(note_id)
+        all_sessions = session_service.list_sessions_by_note(note_id)
         session_dto = self._build_session_dto(note_id, all_sessions)
 
         join_event = CollaborationEventDTO(
@@ -73,11 +74,12 @@ class RealtimeCollaborationDomainService:
     def leave_collaboration_session(
         self, note_id: str, user_id: str, socket_id: str
     ) -> CollaborationEventDTO | None:
-        session_data = collaboration_repository.find_session_by_socket(socket_id)
+        session_service = get_collaboration_session_service()
+        session_data = session_service.find_session_by_socket(socket_id)
         if not session_data:
             return None
 
-        collaboration_repository.delete_session_by_socket(socket_id)
+        session_service.delete_session_by_socket(socket_id)
 
         return CollaborationEventDTO(
             event_type="user_left",
@@ -87,7 +89,8 @@ class RealtimeCollaborationDomainService:
         )
 
     def handle_disconnect(self, socket_id: str) -> CollaborationEventDTO | None:
-        session_data = collaboration_repository.find_session_by_socket(socket_id)
+        session_service = get_collaboration_session_service()
+        session_data = session_service.find_session_by_socket(socket_id)
         if not session_data:
             return None
 
@@ -95,7 +98,7 @@ class RealtimeCollaborationDomainService:
         user_id = session_data.get("user_id")
         username = session_data.get("username")
 
-        collaboration_repository.delete_session_by_socket(socket_id)
+        session_service.delete_session_by_socket(socket_id)
 
         return CollaborationEventDTO(
             event_type="user_left",
@@ -174,18 +177,13 @@ class RealtimeCollaborationDomainService:
         return state_vector_b64, update_b64
 
     def _cleanup_stale_sessions(self, note_id: str, user_id: str) -> list[str]:
-        existing_sessions = collaboration_repository.list_sessions_by_note(note_id)
-        stale_socket_ids = [
-            session_item.get("socket_id")
-            for session_item in existing_sessions
-            if session_item.get("user_id") == user_id
-        ]
+        """
+        DEPRECATED: Utiliser collaboration_session_service.cleanup_user_sessions() à la place.
 
-        for stale_socket_id in stale_socket_ids:
-            if stale_socket_id:
-                collaboration_repository.delete_session_by_socket(stale_socket_id)
-
-        return stale_socket_ids
+        Cette méthode est conservée pour compatibilité mais délègue au service.
+        """
+        session_service = get_collaboration_session_service()
+        return session_service.cleanup_user_sessions(note_id, user_id)
 
     def _build_session_dto(
         self, note_id: str, sessions: list[dict]

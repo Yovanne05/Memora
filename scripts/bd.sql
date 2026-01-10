@@ -8,6 +8,7 @@
     DROP TABLE IF EXISTS collection_shares CASCADE;
     DROP TABLE IF EXISTS note_favorites CASCADE;
     DROP TABLE IF EXISTS collection_favorites CASCADE;
+    DROP TABLE IF EXISTS crdt_snapshots CASCADE;
     DROP TABLE IF EXISTS notes CASCADE;
     DROP TABLE IF EXISTS collections CASCADE;
     DROP TABLE IF EXISTS users CASCADE;
@@ -300,6 +301,23 @@
 
     CREATE INDEX idx_collection_favorites_user ON collection_favorites (user_id);
 
+    CREATE TABLE crdt_snapshots (
+        id              CHAR(36) PRIMARY KEY,
+        note_id         CHAR(36) NOT NULL UNIQUE,
+        state_vector    BYTEA NOT NULL,
+        document_update BYTEA NOT NULL,
+        version         INT NOT NULL DEFAULT 0,
+        created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_crdt_snapshots_note
+            FOREIGN KEY (note_id) REFERENCES notes(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+    );
+
+    CREATE INDEX idx_crdt_snapshots_note
+        ON crdt_snapshots (note_id);
+
     -- ===== TRIGGERS =====
 
     CREATE OR REPLACE FUNCTION set_updated_at()
@@ -322,5 +340,10 @@
 
     CREATE TRIGGER trg_flashcards_updated_at
     BEFORE UPDATE ON flashcards
+    FOR EACH ROW
+    EXECUTE FUNCTION set_updated_at();
+
+    CREATE TRIGGER trg_crdt_snapshots_updated_at
+    BEFORE UPDATE ON crdt_snapshots
     FOR EACH ROW
     EXECUTE FUNCTION set_updated_at();

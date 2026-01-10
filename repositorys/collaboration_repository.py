@@ -1,4 +1,20 @@
+"""
+DEPRECATED: Ce module est déprécié.
+
+Utiliser domain_services.collaboration_session_service à la place.
+
+Ce fichier est conservé pour compatibilité ascendante mais sera supprimé
+dans une version future.
+"""
+import warnings
 from utils.redis_client import get_collaboration_store
+
+warnings.warn(
+    "collaboration_repository est déprécié. "
+    "Utiliser domain_services.collaboration_session_service à la place.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 
 def create_session(note_id: str, user_id: str, socket_id: str, username: str) -> dict:

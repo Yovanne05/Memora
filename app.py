@@ -30,6 +30,7 @@ from utils.swagger import init_swagger
 from utils.redis_client import init_redis
 from utils.socketio_service import init_socketio
 from utils.crdt_service import init_crdt_service
+from utils.background_jobs import init_background_jobs
 
 
 def create_app() -> Flask:
@@ -44,13 +45,20 @@ def create_app() -> Flask:
     init_swagger(app)
     init_logger(app)
 
-    init_redis(
+    redis_client = init_redis(
         host=config.REDIS_HOST,
         port=config.REDIS_PORT,
         db=config.REDIS_DB
     )
 
-    init_crdt_service()
+    init_crdt_service(redis_client=redis_client)
+
+    if config.APP_ENV != "test":
+        init_background_jobs(
+            crdt_snapshot_interval=5,   # 5 secondes (test)
+            session_cleanup_interval=5, # 5 secondes (test)
+        )
+
 
     socketio = init_socketio(app, cors_allowed_origins="*", async_mode="threading")
     register_realtime_filter(socketio)
