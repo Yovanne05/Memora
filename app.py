@@ -29,8 +29,8 @@ from utils.realtime_filter import register_realtime_filter
 from utils.swagger import init_swagger
 from utils.redis_client import init_redis
 from utils.socketio_service import init_socketio
-from utils.crdt_service import init_crdt_service
-from utils.background_jobs import init_background_jobs
+from services.impl.realtime.crdt.crdt_service_impl import init_crdt_service
+from services.impl.realtime.background_jobs_service_impl import init_background_jobs
 
 
 def create_app() -> Flask:

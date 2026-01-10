@@ -26,7 +26,7 @@ from repositorys import note_repository, user_repository
 from services.interfaces.realtime.realtime_collaboration_service_interface import (
     RealtimeCollaborationServiceInterface,
 )
-from utils.crdt_service import get_crdt_service
+from services.impl.realtime.crdt.crdt_service_impl import get_crdt_service
 from utils.enums import RoleEnum
 
 
@@ -55,7 +55,7 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         note_content = resolve_note_content(note.content, initial_content)
         if note.content != note_content:
             note.content = note_content
-            note_repository.update(note)
+            note_repository.update_content(note_id, note_content)
 
         crdt_service = get_crdt_service()
         crdt_service.get_or_create_document(note_id, note_content)
@@ -123,7 +123,7 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
             raise CollaborationInvalidOperation("Invalid CRDT update") from exc
 
         note.content = crdt_service.get_content_as_text(update_dto.note_id)
-        note_repository.update(note)
+        note_repository.update_content(update_dto.note_id, note.content)
 
         return build_crdt_update_event(
             update_dto.note_id, user_id, username, update_dto.update

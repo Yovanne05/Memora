@@ -152,6 +152,16 @@ def update(note_entity: Note) -> Note:
         return merged
 
 
+def update_content(note_id: str, content: str) -> bool:
+    with get_db_session() as session:
+        entity = session.get(Note, note_id)
+        if not entity:
+            return False
+        entity.content = content
+        session.flush()
+        return True
+
+
 def delete(note_id: str) -> bool:
     with get_db_session() as session:
         entity = session.get(Note, note_id)
