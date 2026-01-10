@@ -39,13 +39,27 @@ class User(UUIDMixin, CreatedAtMixin, Base):
     )
 
     collections: Mapped[list["Collection"]] = relationship(
-        back_populates="owner"
+        back_populates="owner",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
-    notes: Mapped[list["Note"]] = relationship(back_populates="owner")
+    notes: Mapped[list["Note"]] = relationship(
+        back_populates="owner",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     collection_shares: Mapped[list["CollectionShare"]] = relationship(
-        back_populates="user"
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     note_shares: Mapped[list["NoteShare"]] = relationship(
-        back_populates="user"
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
-    reviews: Mapped[list["Review"]] = relationship(back_populates="user")
+    reviews: Mapped[list["Review"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
