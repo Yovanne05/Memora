@@ -9,7 +9,6 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { ProfileSettingsForm } from '../components/ProfileSettingsForm'
 import { PasswordChangeForm } from '../components/PasswordChangeForm'
-import { DataExportSection } from '../components/DataExportSection'
 import { AccountDeletionSection } from '../components/AccountDeletionSection'
 import { User, Lock, Shield, Info } from 'lucide-react'
 import { useEffect } from 'react'
@@ -115,10 +114,6 @@ export default function SettingsPage() {
                       informations dans les sections ci-dessus
                     </li>
                     <li>
-                      <strong>Droit à la portabilité</strong> : Exportez vos
-                      données au format lisible
-                    </li>
-                    <li>
                       <strong>Droit à l'effacement</strong> : Supprimez votre
                       compte et toutes vos données
                     </li>
@@ -130,11 +125,6 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
-
-            <Separator />
-
-            {/* Data Export */}
-            <DataExportSection />
 
             <Separator />
 
