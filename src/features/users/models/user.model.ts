@@ -5,6 +5,7 @@ export interface User {
   email: string
   username: string | null
   displayName: string | null
+  color?: string | null
   role: UserRole
   createdAt: string
   lastLogin?: string | null

@@ -39,7 +39,6 @@ export function NoteEditForm({
           deleteLoading={deleteLoading}
           onCancel={onCancel}
           onDelete={onDelete}
-          readOnly={readOnly}
         />
 
         <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">

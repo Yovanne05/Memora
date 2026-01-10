@@ -9,7 +9,6 @@ export const noteDtoSchema = z.object({
   owner_id: z.uuid(),
   owner_username: z.string(),
   title: z.string().min(1).max(255),
-  content: z.string(),
   tags: z.array(z.string()).default([]),
   is_favorite: z.boolean().optional().default(false),
   visibility: noteVisibilitySchema.default("private"),

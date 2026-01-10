@@ -1,7 +1,6 @@
 import { ChevronRight } from "lucide-react"
 
 import type { Note } from "../../models/note.model"
-import { getContentPreview } from "@/lib/html-utils"
 
 type NoteSidebarRelatedNotesProps = {
   notes: Note[]
@@ -32,7 +31,7 @@ export function NoteSidebarRelatedNotes({
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{relatedNote.title}</p>
               <p className="text-xs text-muted-foreground line-clamp-1">
-                {getContentPreview(relatedNote.content || "", 100)}
+                Contenu non disponible
               </p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground shrink-0" />

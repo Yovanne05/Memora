@@ -1,6 +1,5 @@
 import { Separator } from "@/components/ui/separator"
 import { FlashcardsSection } from "@/features/flashcards/components/FlashcardsSection"
-import { RichTextDisplay } from "@/components/editor/RichTextDisplay"
 import { cn } from "@/lib/utils"
 import { formatLongDateTime } from "@/lib/format.utils"
 import { useResizable } from "@/hooks/useResizable"
@@ -63,7 +62,7 @@ export function NoteSidebar({
 
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground mb-3">Contenu</h3>
-            <RichTextDisplay content={note.content} />
+            <p className="text-sm text-muted-foreground">Contenu non disponible.</p>
           </div>
 
           <Separator />

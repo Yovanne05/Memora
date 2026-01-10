@@ -7,6 +7,7 @@ export const userDtoSchema = z.object({
   email: z.email(),
   username: z.string().min(3).max(50).nullable(),
   display_name: z.string().min(1).max(100).nullable(),
+  color: z.string().nullable().optional(),
   role: userRoleSchema,
   created_at: z.iso.datetime(),
   last_login: z.iso.datetime().nullable().optional(),
