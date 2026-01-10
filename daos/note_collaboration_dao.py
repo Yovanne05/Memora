@@ -12,13 +12,6 @@ if TYPE_CHECKING:
 
 
 class NoteCollaborationHistory(UUIDMixin, CreatedAtMixin, Base):
-    """
-    Stores collaboration operation history for audit purposes (optional).
-
-    Real-time collaboration uses Redis for performance.
-    This table is only for persistent history/audit trail.
-    """
-
     __tablename__ = "note_collaboration_history"
     __table_args__ = (
         Index("idx_collab_history_note", "note_id"),

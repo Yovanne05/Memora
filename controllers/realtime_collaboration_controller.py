@@ -13,15 +13,60 @@ from dtos.collaboration_dto import (
 )
 from repositorys import collaboration_repository
 from utils.socketio_service import get_socketio
+from utils.rate_limiter import socketio_rate_limit
+from utils.logger import get_logger
+
+# Constants
+COLLABORATION_NAMESPACE = "/collaboration"
+
+logger = get_logger(__name__)
 
 def _get_username_from_socket(socket_id: str) -> str:
     session_data = collaboration_repository.find_session_by_socket(socket_id)
     return session_data.get("username") if session_data else "Unknown"
 
+
+def _validate_join_collaboration_data(data: dict, user_id: str) -> tuple[str | None, str | None]:
+    """
+    Validate join_collaboration input data.
+
+    Returns:
+        Tuple of (note_id, initial_content) if valid, (None, None) if invalid
+    """
+    if not isinstance(data, dict):
+        logger.error(f"Invalid join_collaboration data type from user {user_id}: {type(data)}")
+        return None, None
+
+    note_id = data.get("note_id")
+    initial_content = data.get("content")
+
+    # Validate note_id
+    if not note_id or not isinstance(note_id, str):
+        logger.error(f"Missing or invalid note_id from user {user_id}")
+        return None, None
+
+    # Validate note_id length to prevent abuse
+    if len(note_id) > 36:
+        logger.error(f"note_id too long from user {user_id}: {len(note_id)} chars")
+        return None, None
+
+    # Validate initial_content if provided
+    if initial_content is not None:
+        if not isinstance(initial_content, str):
+            logger.error(f"Invalid initial_content type from user {user_id}: {type(initial_content)}")
+            return None, None
+
+        # Limit initial content size to prevent memory issues
+        if len(initial_content) > 10485760:  # 10MB max
+            logger.error(f"initial_content too large from user {user_id}: {len(initial_content)} chars")
+            return None, None
+
+    return note_id, initial_content
+
 def register_socketio_handlers():
     socketio = get_socketio()
 
-    @socketio.on("connect", namespace="/collaboration")
+    @socketio.on("connect", namespace=COLLABORATION_NAMESPACE)
     def handle_connect(auth=None):
         user_id, _ = get_current_user_context_from_socket(auth)
 
@@ -31,7 +76,7 @@ def register_socketio_handlers():
 
         return True
 
-    @socketio.on("disconnect", namespace="/collaboration")
+    @socketio.on("disconnect", namespace=COLLABORATION_NAMESPACE)
     def handle_disconnect():
         socket_id = request.sid
         event = realtime_collaboration_domain_service.handle_disconnect(socket_id)
@@ -42,14 +87,19 @@ def register_socketio_handlers():
                 event.model_dump(mode="json"),
                 room=f"note_{event.note_id}",
                 skip_sid=socket_id,
-                namespace="/collaboration",
+                namespace=COLLABORATION_NAMESPACE,
             )
 
-    @socketio.on("join_collaboration", namespace="/collaboration")
+    @socketio.on("join_collaboration", namespace=COLLABORATION_NAMESPACE)
+    @socketio_rate_limit(max_requests=20, window_seconds=60)  # 20 joins per minute
     def handle_join_collaboration(data):
         user_id, user_role = get_current_user_context_from_socket()
-        note_id = data.get("note_id")
-        initial_content = data.get("content")
+
+        # Validate input data
+        note_id, initial_content = _validate_join_collaboration_data(data, user_id)
+        if note_id is None:
+            return
+
         socket_id = request.sid
 
         session_dto, join_event = realtime_collaboration_domain_service.join_collaboration_session(
@@ -68,10 +118,10 @@ def register_socketio_handlers():
             join_event.model_dump(mode="json"),
             room=f"note_{note_id}",
             skip_sid=socket_id,
-            namespace="/collaboration",
+            namespace=COLLABORATION_NAMESPACE,
         )
 
-    @socketio.on("leave_collaboration", namespace="/collaboration")
+    @socketio.on("leave_collaboration", namespace=COLLABORATION_NAMESPACE)
     def handle_leave_collaboration(data):
         user_id = get_current_user_from_socket()
 
@@ -90,17 +140,23 @@ def register_socketio_handlers():
                 event.model_dump(mode="json"),
                 room=f"note_{note_id}",
                 skip_sid=socket_id,
-                namespace="/collaboration",
+                namespace=COLLABORATION_NAMESPACE,
             )
 
-    @socketio.on("crdt_update", namespace="/collaboration")
+    @socketio.on("crdt_update", namespace=COLLABORATION_NAMESPACE)
+    @socketio_rate_limit(max_requests=100, window_seconds=60)  # 100 updates per minute
     def handle_crdt_update(data):
         """Handles CRDT update from a client."""
         user_id, user_role = get_current_user_context_from_socket()
         if not user_id:
+            logger.warning(f"CRDT update rejected: No authenticated user (socket={request.sid})")
             return
 
-        crdt_update_dto = CRDTUpdateDTO.model_validate(data)
+        try:
+            crdt_update_dto = CRDTUpdateDTO.model_validate(data)
+        except Exception as e:
+            logger.error(f"Invalid CRDT update payload from user {user_id}: {str(e)}")
+            return
 
         # Traiter la mise à jour CRDT
         event = realtime_collaboration_domain_service.process_crdt_update(
@@ -116,17 +172,23 @@ def register_socketio_handlers():
             event.model_dump(mode="json"),
             room=f"note_{crdt_update_dto.note_id}",
             skip_sid=socket_id,
-            namespace="/collaboration",
+            namespace=COLLABORATION_NAMESPACE,
         )
 
-    @socketio.on("crdt_sync_request", namespace="/collaboration")
+    @socketio.on("crdt_sync_request", namespace=COLLABORATION_NAMESPACE)
+    @socketio_rate_limit(max_requests=30, window_seconds=60)  # 30 sync requests per minute
     def handle_crdt_sync_request(data):
         """Handles CRDT synchronization request from a client."""
         user_id, user_role = get_current_user_context_from_socket()
         if not user_id:
+            logger.warning(f"CRDT sync request rejected: No authenticated user (socket={request.sid})")
             return
 
-        sync_request_dto = CRDTSyncRequestDTO.model_validate(data)
+        try:
+            sync_request_dto = CRDTSyncRequestDTO.model_validate(data)
+        except Exception as e:
+            logger.error(f"Invalid CRDT sync request payload from user {user_id}: {str(e)}")
+            return
 
         # Gérer la demande de synchronisation
         state_vector, update = realtime_collaboration_domain_service.handle_crdt_sync_request(
