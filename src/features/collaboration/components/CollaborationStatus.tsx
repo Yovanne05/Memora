@@ -1,8 +1,16 @@
-import { AlertCircle, Users, Wifi, WifiOff, RefreshCw } from 'lucide-react'
+import {
+  AlertCircle,
+  Users,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  CheckCircle2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 interface CollaborationStatusProps {
   isConnected: boolean
   isConnecting: boolean
+  isSynced?: boolean
   activeUsers: { userId: string; username: string }[]
   typingUsers: Set<string>
   error: Error | null
@@ -11,6 +19,7 @@ interface CollaborationStatusProps {
 export function CollaborationStatus({
   isConnected,
   isConnecting,
+  isSynced = true,
   activeUsers,
   typingUsers,
   error,
@@ -37,7 +46,12 @@ export function CollaborationStatus({
           ) : isConnected ? (
             <>
               <Wifi className="h-4 w-4 text-green-600" />
-              <span className="text-sm text-green-600">Connecté</span>
+              <span className="text-sm text-green-600">
+                {isSynced ? 'Synchronisé' : 'Connecté'}
+              </span>
+              {isSynced && (
+                <CheckCircle2 className="h-3 w-3 text-green-600 ml-1" />
+              )}
             </>
           ) : (
             <>

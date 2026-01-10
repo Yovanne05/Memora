@@ -31,7 +31,7 @@ export function useCollaborativeEditor({
   const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([])
   const [cursors, setCursors] = useState<Map<string, number>>(new Map())
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set())
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastContentRef = useRef<string>('')
   const [initialContent, setInitialContent] = useState<string>('')
 

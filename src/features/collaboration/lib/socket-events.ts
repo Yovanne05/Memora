@@ -15,6 +15,10 @@ export const SOCKET_EVENTS = {
   sendOperation: 'send_operation',
   cursorPosition: 'cursor_position',
   typingStatus: 'typing_status',
+  // CRDT events
+  crdtUpdate: 'crdt_update',
+  crdtSyncRequest: 'crdt_sync_request',
+  crdtSyncReply: 'crdt_sync_reply',
 } as const
 
 export type SocketErrorPayload = {

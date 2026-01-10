@@ -3,7 +3,7 @@ import { EditorContent } from '@tiptap/react'
 import { cn } from '@/lib/utils'
 import { MenuBar } from './MenuBar'
 import { useRichTextEditor } from '../../hooks/useRichTextEditor'
-import { useCollaborativeEditor } from '../../hooks/useCollaborativeEditor'
+import { useCollaborativeEditorCRDT } from '../../hooks/useCollaborativeEditorCRDT'
 import { CollaborationStatus } from '@/features/collaboration/components/CollaborationStatus'
 import './editor.css'
 
@@ -33,7 +33,7 @@ export function RichTextEditor({
     editable,
   })
 
-  const collaboration = useCollaborativeEditor({
+  const collaboration = useCollaborativeEditorCRDT({
     editor,
     noteId: noteId || '',
     enabled: enableCollaboration && editable && !!noteId,
@@ -56,6 +56,7 @@ export function RichTextEditor({
         <CollaborationStatus
           isConnected={collaboration.isConnected}
           isConnecting={collaboration.isConnecting}
+          isSynced={collaboration.isSynced}
           activeUsers={collaboration.activeUsers}
           typingUsers={collaboration.typingUsers}
           error={collaboration.error}
