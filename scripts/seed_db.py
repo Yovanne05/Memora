@@ -159,7 +159,13 @@ def seed() -> None:
         print("Notes inserted.")
 
         # Note links
-        session.add(NoteLink(note_id_1=note_archi.id, note_id_2=note_api.id))
+        session.add(
+            NoteLink(
+                note_id_1=note_archi.id,
+                note_id_2=note_api.id,
+                label="related",
+            )
+        )
         print("Note links inserted.")
 
         # Shares
