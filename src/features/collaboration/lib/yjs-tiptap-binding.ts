@@ -3,9 +3,9 @@ import { Editor } from '@tiptap/react'
 import { logger } from '@/lib/logger'
 
 export class YjsTiptapBinding {
-  private doc: Y.Doc
-  private editor: Editor
-  private yText: Y.Text
+  private readonly doc: Y.Doc
+  private readonly editor: Editor
+  private readonly yText: Y.Text
   private isApplyingRemoteChange = false
 
   constructor(doc: Y.Doc, editor: Editor, fieldName = 'content') {
@@ -23,7 +23,7 @@ export class YjsTiptapBinding {
     this.yText.observe(this.handleYjsUpdate)
   }
 
-  private handleTiptapUpdate = () => {
+  private readonly handleTiptapUpdate = () => {
     if (this.isApplyingRemoteChange) {
       return
     }
@@ -36,7 +36,7 @@ export class YjsTiptapBinding {
     })
   }
 
-  private handleYjsUpdate = () => {
+  private readonly handleYjsUpdate = () => {
     if (this.isApplyingRemoteChange) {
       return
     }
