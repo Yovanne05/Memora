@@ -112,7 +112,7 @@ export function useCollaborativeEditorCRDT({
     session,
     error: localError ?? collaborationError,
     activeUsers,
-    cursors: new Map(), // TODO: Implémenter les curseurs si nécessaire
+    cursors: new Map(),
     typingUsers,
     reconnect,
     disconnect,
