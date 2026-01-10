@@ -2,7 +2,36 @@ import base64
 import re
 from datetime import datetime
 from typing import Literal
-from pydantic import BaseModel, Field, field_validator, ValidationError
+from pydantic import BaseModel, Field, field_validator
+
+UUID_PATTERN = re.compile(
+    r"^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+
+
+def _validate_note_id_format(value: str) -> str:
+    if not UUID_PATTERN.match(value):
+        raise ValueError(
+            f"Invalid note_id format. Expected UUID, got: {value[:50]}"
+        )
+    return value
+
+
+def _validate_base64_payload(
+    value: str,
+    max_decoded_size: int,
+    label: str,
+) -> str:
+    try:
+        decoded = base64.b64decode(value, validate=True)
+        if len(decoded) > max_decoded_size:
+            raise ValueError(
+                f"Decoded {label} too large: {len(decoded)} bytes (max {max_decoded_size} bytes)"
+            )
+    except Exception as exc:
+        raise ValueError(f"Invalid base64 encoding in {label}: {exc}")
+    return value
 
 
 class CollaboratorDTO(BaseModel):
@@ -32,6 +61,37 @@ class CollaborationEventDTO(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
+class JoinCollaborationDTO(BaseModel):
+    note_id: str = Field(
+        min_length=1,
+        max_length=36,
+        description="UUID of the note (36 chars max including hyphens)",
+    )
+    content: str | None = Field(
+        default=None,
+        max_length=10485760,  # 10MB max
+        description="Initial document content",
+    )
+
+    @field_validator("note_id")
+    @classmethod
+    def validate_note_id_format(cls, v: str) -> str:
+        return _validate_note_id_format(v)
+
+
+class LeaveCollaborationDTO(BaseModel):
+    note_id: str = Field(
+        min_length=1,
+        max_length=36,
+        description="UUID of the note (36 chars max including hyphens)",
+    )
+
+    @field_validator("note_id")
+    @classmethod
+    def validate_note_id_format(cls, v: str) -> str:
+        return _validate_note_id_format(v)
+
+
 class CRDTUpdateDTO(BaseModel):
     note_id: str = Field(
         min_length=1,
@@ -47,34 +107,12 @@ class CRDTUpdateDTO(BaseModel):
     @field_validator("note_id")
     @classmethod
     def validate_note_id_format(cls, v: str) -> str:
-        uuid_pattern = re.compile(
-            r'^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$',
-            re.IGNORECASE
-        )
-
-        if not uuid_pattern.match(v):
-            raise ValueError(
-                f"Invalid note_id format. Expected UUID, got: {v[:50]}"
-            )
-
-        return v
+        return _validate_note_id_format(v)
 
     @field_validator("update")
     @classmethod
     def validate_base64_format(cls, v: str) -> str:
-        try:
-            decoded = base64.b64decode(v, validate=True)
-            if len(decoded) > 2097152:  # 2MB max decoded size
-                raise ValueError(
-                    f"Decoded CRDT update too large: {len(decoded)} bytes (max 2MB)"
-                )
-
-        except Exception as e:
-            raise ValueError(
-                f"Invalid base64 encoding in CRDT update: {str(e)}"
-            )
-
-        return v
+        return _validate_base64_payload(v, 2097152, "CRDT update")
 
 
 class CRDTSyncRequestDTO(BaseModel):
@@ -92,31 +130,9 @@ class CRDTSyncRequestDTO(BaseModel):
     @field_validator("note_id")
     @classmethod
     def validate_note_id_format(cls, v: str) -> str:
-        uuid_pattern = re.compile(
-            r'^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$',
-            re.IGNORECASE
-        )
-
-        if not uuid_pattern.match(v):
-            raise ValueError(
-                f"Invalid note_id format. Expected UUID, got: {v[:50]}"
-            )
-
-        return v
+        return _validate_note_id_format(v)
 
     @field_validator("state_vector")
     @classmethod
     def validate_state_vector_format(cls, v: str) -> str:
-        try:
-            decoded = base64.b64decode(v, validate=True)
-            if len(decoded) > 131072:  # 128KB max decoded size for state vector
-                raise ValueError(
-                    f"Decoded state vector too large: {len(decoded)} bytes (max 128KB)"
-                )
-
-        except Exception as e:
-            raise ValueError(
-                f"Invalid base64 encoding in state vector: {str(e)}"
-            )
-
-        return v
+        return _validate_base64_payload(v, 131072, "state vector")
