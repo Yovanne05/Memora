@@ -1,22 +1,22 @@
-import { Link } from "@tanstack/react-router"
-import { FileText, FolderClosed, Eye, Lock } from "lucide-react"
+import { Link } from '@tanstack/react-router'
+import { FileText, FolderClosed, Eye, Lock } from 'lucide-react'
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TagList } from "@/components/ui/tag-list"
-import type { Note } from "@/features/notes/models/note.model"
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { TagList } from '@/components/ui/tag-list'
+import type { Note } from '@/features/notes/models/note.model'
 import {
   VISIBILITY_BADGE_CLASSES,
   VISIBILITY_LABELS,
   formatShortDate,
-} from "@/lib/format.utils"
+} from '@/lib/format.utils'
 
 type NoteResultCardProps = {
   note: Note
 }
 
 export function NoteResultCard({ note }: Readonly<NoteResultCardProps>) {
-  const isPublic = note.visibility === "public"
+  const isPublic = note.visibility === 'public'
 
   return (
     <Link
@@ -46,7 +46,11 @@ export function NoteResultCard({ note }: Readonly<NoteResultCardProps>) {
             variant="secondary"
             className={VISIBILITY_BADGE_CLASSES[note.visibility]}
           >
-            {isPublic ? <Eye className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+            {isPublic ? (
+              <Eye className="h-3 w-3" />
+            ) : (
+              <Lock className="h-3 w-3" />
+            )}
             {VISIBILITY_LABELS[note.visibility]}
           </Badge>
         </CardHeader>
@@ -55,7 +59,7 @@ export function NoteResultCard({ note }: Readonly<NoteResultCardProps>) {
           <div className="flex items-center gap-2">
             <FolderClosed className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">
-              {note.collectionName ?? "Sans collection"}
+              {note.collectionName ?? 'Sans collection'}
             </span>
             <span className="text-muted-foreground/50">•</span>
             <span>{formatShortDate(note.createdAt)}</span>

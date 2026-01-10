@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Check, Trash2 } from "lucide-react"
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Check, Trash2 } from 'lucide-react'
 
 interface FormActionsProps {
   savedTime: string | null
@@ -26,7 +26,9 @@ export function FormActions({
           <div className="flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-foreground">
             <Check className="h-4 w-4" />
             <span className="font-medium">
-              {savedTime ? `Enregistree ${savedTime}` : "Pas encore enregistree"}
+              {savedTime
+                ? `Enregistree ${savedTime}`
+                : 'Pas encore enregistree'}
             </span>
           </div>
           {isUpdate && (
@@ -57,7 +59,7 @@ export function FormActions({
               disabled={deleteLoading}
             >
               <Trash2 className="h-4 w-4" />
-              {deleteLoading ? "Suppression..." : "Supprimer"}
+              {deleteLoading ? 'Suppression...' : 'Supprimer'}
             </Button>
           )}
         </div>

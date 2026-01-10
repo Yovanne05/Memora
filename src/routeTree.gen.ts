@@ -147,7 +147,7 @@ const AppWorkspaceFavoritesCollectionsCollectionIdNotesNoteIdIndexRoute =
       id: '/favorites/collections/$collectionId/notes/$noteId/',
       path: '/favorites/collections/$collectionId/notes/$noteId/',
       getParentRoute: () => AppWorkspaceRouteRoute,
-    } as any,
+    } as any
   )
 
 export interface FileRoutesByFullPath {
@@ -503,7 +503,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
-  AppRouteRouteChildren,
+  AppRouteRouteChildren
 )
 
 const rootRouteChildren: RootRouteChildren = {

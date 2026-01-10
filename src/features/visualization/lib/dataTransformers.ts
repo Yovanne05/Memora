@@ -1,15 +1,18 @@
-import type { Node } from "reactflow"
+import type { Node } from 'reactflow'
 import type {
   ReactFlowNode,
   ReactFlowEdge,
   NodeConnectionsMap,
   CustomNodeData,
   NodePosition,
-} from "../types/visualization.type"
-import type { GraphNode, GraphEdge } from "@/features/collections/models/collection.model"
-import { REACT_FLOW_STYLES } from "./visualization.constants"
-import { groupEdgesByConnection, calculateEdgeOffset } from "./layoutEngine"
-import { logger } from "@/lib/logger"
+} from '../types/visualization.type'
+import type {
+  GraphNode,
+  GraphEdge,
+} from '@/features/collections/models/collection.model'
+import { REACT_FLOW_STYLES } from './visualization.constants'
+import { groupEdgesByConnection, calculateEdgeOffset } from './layoutEngine'
+import { logger } from '@/lib/logger'
 
 export function transformNodesToReactFlow(
   nodes: GraphNode[],
@@ -21,7 +24,7 @@ export function transformNodesToReactFlow(
 
     return {
       id: node.id,
-      type: "custom",
+      type: 'custom',
       position,
       data: {
         title: node.data.title,
@@ -31,9 +34,13 @@ export function transformNodesToReactFlow(
   })
 }
 
-export function filterValidEdges(edges: GraphEdge[], validNodeIds: Set<string>): GraphEdge[] {
+export function filterValidEdges(
+  edges: GraphEdge[],
+  validNodeIds: Set<string>
+): GraphEdge[] {
   return edges.filter((edge) => {
-    const isValid = validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
+    const isValid =
+      validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
 
     if (!isValid) {
       logger.warn(`[Visualization] Arête ignorée - nœuds manquants:`, edge)
@@ -72,7 +79,7 @@ export function transformEdgesToReactFlow(
           : `e${edge.source}-${edge.target}-${localIndex}`
 
       // ✅ on récupère le label si présent
-      const edgeLabel = (edge.label ?? "").trim()
+      const edgeLabel = (edge.label ?? '').trim()
 
       reactFlowEdges.push({
         id: edgeId,
@@ -96,7 +103,7 @@ export function transformEdgesToReactFlow(
         labelShowBg: edgeLabel.length > 0,
         labelBgPadding: [6, 3],
         labelBgBorderRadius: 6,
-        labelBgStyle: { fill: "white" },
+        labelBgStyle: { fill: 'white' },
         labelStyle: { fontSize: 12, fontWeight: 600 },
       })
     })
@@ -109,6 +116,7 @@ export function getNodeColorForMiniMap(
   node: Node,
   getColorFn: (connections: number) => string
 ): string {
-  const connections = (node.data as CustomNodeData | undefined)?.connections ?? 0
+  const connections =
+    (node.data as CustomNodeData | undefined)?.connections ?? 0
   return getColorFn(connections)
 }

@@ -1,6 +1,6 @@
-import { ChevronRight } from "lucide-react"
+import { ChevronRight } from 'lucide-react'
 
-import type { Note } from "../../models/note.model"
+import type { Note } from '../../models/note.model'
 
 type NoteSidebarRelatedNotesProps = {
   notes: Note[]
@@ -29,7 +29,9 @@ export function NoteSidebarRelatedNotes({
             className="w-full text-left p-3 rounded-lg border bg-background hover:bg-accent hover:border-accent-foreground/20 transition-colors group flex items-center justify-between gap-2"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{relatedNote.title}</p>
+              <p className="text-sm font-medium truncate">
+                {relatedNote.title}
+              </p>
               <p className="text-xs text-muted-foreground line-clamp-1">
                 Contenu non disponible
               </p>

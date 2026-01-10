@@ -19,7 +19,6 @@ export type GraphEdge = {
   label?: string
 }
 
-
 export interface Collection {
   id: string
   ownerId: string

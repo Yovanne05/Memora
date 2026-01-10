@@ -1,5 +1,5 @@
-import type { CreateNoteLinkDto, NoteLinkDto } from "../dtos/note-link.dto"
-import type { NoteLink, CreateNoteLink } from "../models/note-link.model"
+import type { CreateNoteLinkDto, NoteLinkDto } from '../dtos/note-link.dto'
+import type { NoteLink, CreateNoteLink } from '../models/note-link.model'
 
 export function dtoToNoteLink(dto: NoteLinkDto): NoteLink {
   return {
@@ -10,7 +10,9 @@ export function dtoToNoteLink(dto: NoteLinkDto): NoteLink {
   }
 }
 
-export function toCreateNoteLinkDto(payload: CreateNoteLink): CreateNoteLinkDto {
+export function toCreateNoteLinkDto(
+  payload: CreateNoteLink
+): CreateNoteLinkDto {
   return {
     linked_note_id: payload.linkedNoteId,
     label: payload.label,

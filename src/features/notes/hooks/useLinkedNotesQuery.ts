@@ -1,8 +1,8 @@
-import { useMemo } from "react"
-import { useQueries } from "@tanstack/react-query"
-import type { Note } from "../models/note.model"
-import type { NoteLink } from "../models/note-link.model"
-import { notesService } from "../services/notes.service"
+import { useMemo } from 'react'
+import { useQueries } from '@tanstack/react-query'
+import type { Note } from '../models/note.model'
+import type { NoteLink } from '../models/note-link.model'
+import { notesService } from '../services/notes.service'
 
 export type LinkedNoteView = Note & { linkLabel: string }
 
@@ -22,7 +22,7 @@ export function useLinkedNotesQuery(links: NoteLink[] | undefined) {
 
   const queries = useQueries({
     queries: linkedNoteIds.map((noteId) => ({
-      queryKey: ["note", noteId],
+      queryKey: ['note', noteId],
       queryFn: () => notesService.get(noteId),
       retry: 1,
       staleTime: 5 * 60 * 1000,
@@ -36,7 +36,7 @@ export function useLinkedNotesQuery(links: NoteLink[] | undefined) {
 
     return loadedNotes.map((note) => ({
       ...note,
-      linkLabel: labelByNoteId.get(note.id) ?? "",
+      linkLabel: labelByNoteId.get(note.id) ?? '',
     }))
   }, [queries, labelByNoteId])
 

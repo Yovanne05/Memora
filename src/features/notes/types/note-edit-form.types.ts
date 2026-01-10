@@ -1,4 +1,4 @@
-import type { Note, NoteVisibility } from "../models/note.model"
+import type { Note, NoteVisibility } from '../models/note.model'
 
 export interface NoteFormValues {
   title: string

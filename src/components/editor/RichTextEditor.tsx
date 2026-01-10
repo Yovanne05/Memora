@@ -1,9 +1,11 @@
-import { EditorContent } from "@tiptap/react"
+import { EditorContent } from '@tiptap/react'
 
-import { cn } from "@/lib/utils"
-import { MenuBar } from "./MenuBar"
-import { useRichTextEditor } from "../../hooks/useRichTextEditor"
-import "./editor.css"
+import { cn } from '@/lib/utils'
+import { MenuBar } from './MenuBar'
+import { useRichTextEditor } from '../../hooks/useRichTextEditor'
+import { useCollaborativeEditorCRDT } from '../../hooks/useCollaborativeEditorCRDT'
+import { CollaborationStatus } from '@/features/collaboration/components/CollaborationStatus'
+import './editor.css'
 
 interface RichTextEditorProps {
   content: string
@@ -12,17 +14,19 @@ interface RichTextEditorProps {
   editable?: boolean
   className?: string
   noteId?: string
+  enableCollaboration?: boolean
 }
 
 export function RichTextEditor({
   content,
   onChange,
-  placeholder = "Commencez à écrire...",
+  placeholder = 'Commencez à écrire...',
   editable = true,
   className,
   noteId,
+  enableCollaboration = false,
 }: Readonly<RichTextEditorProps>) {
-  const { editor, collabUsers } = useRichTextEditor({
+  const { editor } = useRichTextEditor({
     content,
     onChange,
     placeholder,
@@ -30,30 +34,36 @@ export function RichTextEditor({
     noteId,
   })
 
+  const collaboration = useCollaborativeEditorCRDT({
+    editor,
+    noteId: noteId || '',
+    enabled: enableCollaboration && editable && !!noteId,
+    onContentChanged: onChange,
+  })
+
   if (!editor) {
     return null
   }
 
   return (
-    <div className={cn("border border-border rounded-lg overflow-hidden", className)}>
-      {!!collabUsers.length && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/40 px-3 py-2 text-xs">
-          <span className="text-muted-foreground">Connectes :</span>
-          {collabUsers.map((userItem, index) => (
-            <span
-              key={`${userItem.id ?? userItem.name}-${index}`}
-              className="inline-flex items-center gap-2 text-xs"
-            >
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: userItem.color ?? "transparent" }}
-              />
-              <span className="max-w-[140px] truncate">{userItem.name}</span>
-            </span>
-          ))}
-        </div>
+    <div
+      className={cn(
+        'border border-border rounded-lg overflow-hidden',
+        className
       )}
+    >
       {editable && <MenuBar editor={editor} noteId={noteId} />}
+      {enableCollaboration && noteId && (
+        <CollaborationStatus
+          isConnected={collaboration.isConnected}
+          isConnecting={collaboration.isConnecting}
+          isSynced={collaboration.isSynced}
+          activeUsers={collaboration.activeUsers}
+          typingUsers={collaboration.typingUsers}
+          error={collaboration.error}
+          onReconnect={collaboration.reconnect}
+        />
+      )}
       <EditorContent editor={editor} />
     </div>
   )

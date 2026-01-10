@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from 'zod'
 
 export const collabSessionPayloadSchema = z.object({
   note_id: z.uuid(),
