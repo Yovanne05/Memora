@@ -12,12 +12,10 @@ class InfoFilter(logging.Filter):
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Gets a logger instance for the given name."""
     return logging.getLogger(name)
 
 
 def init_logger(app: Flask):
-
     log_dir = app.config.get('LOG_DIR', 'logs')
     os.makedirs(log_dir, exist_ok=True)
     app.logger.handlers.clear()
@@ -108,3 +106,43 @@ def init_logger(app: Flask):
             app.logger.error(log_message)
 
         return response
+
+
+def init_realtime_logger(app: Flask) -> logging.Logger:
+    log_dir = app.config.get("LOG_DIR", "logs")
+    os.makedirs(log_dir, exist_ok=True)
+
+    realtime_logger = logging.getLogger("realtime")
+    realtime_logger.handlers.clear()
+    realtime_logger.setLevel(logging.INFO)
+    realtime_logger.propagate = False
+
+    info_handler = RotatingFileHandler(
+        os.path.join(log_dir, "realtime_info.log"),
+        maxBytes=10 * 1024 * 1024,
+        backupCount=5,
+    )
+    info_handler.setLevel(logging.INFO)
+    info_handler.addFilter(InfoFilter())
+    info_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    info_handler.setFormatter(info_formatter)
+
+    error_handler = RotatingFileHandler(
+        os.path.join(log_dir, "realtime_error.log"),
+        maxBytes=10 * 1024 * 1024,
+        backupCount=5,
+    )
+    error_handler.setLevel(logging.ERROR)
+    error_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    error_handler.setFormatter(error_formatter)
+
+    realtime_logger.addHandler(info_handler)
+    realtime_logger.addHandler(error_handler)
+
+    return realtime_logger
