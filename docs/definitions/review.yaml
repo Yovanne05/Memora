@@ -1,0 +1,139 @@
+definitions:
+  ReviewCreatePayload:
+    type: object
+    required: ["flashcard_id", "selected_answer_id", "difficulty"]
+    properties:
+      flashcard_id:
+        type: string
+        format: uuid
+        description: Identifiant de la flashcard révisée.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      selected_answer_id:
+        type: string
+        format: uuid
+        description: Identifiant de la réponse sélectionnée par l'utilisateur.
+        example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      difficulty:
+        type: string
+        enum: ["again", "hard", "good", "easy"]
+        description: >
+          Niveau de difficulté évalué par l'utilisateur après avoir répondu.
+          - again (0): Très difficile, à revoir rapidement
+          - hard (1): Difficile
+          - good (2): Correct
+          - easy (3): Facile
+        example: "good"
+
+  Review:
+    type: object
+    description: >
+      Résultat d'une révision de flashcard avec calcul SM-2 pour la répétition espacée.
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant de l'utilisateur.
+        example: "123e4567-e89b-12d3-a456-426614174000"
+      flashcard_id:
+        type: string
+        format: uuid
+        description: Identifiant de la flashcard.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      selected_answer_id:
+        type: string
+        format: uuid
+        description: Réponse sélectionnée.
+        example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      is_correct:
+        type: boolean
+        description: Indique si la réponse était correcte.
+        example: true
+      correct_answer_id:
+        type: string
+        format: uuid
+        description: Identifiant de la réponse correcte pour cette flashcard.
+        example: "b2c3d4e5-f6a7-8901-2345-678901bcdefg"
+      difficulty:
+        type: string
+        enum: ["again", "hard", "good", "easy"]
+        description: Difficulté évaluée par l'utilisateur.
+        example: "good"
+      e_factor:
+        type: number
+        format: float
+        description: >
+          Facteur d'aisance (Easiness Factor) selon l'algorithme SM-2.
+          Valeur minimale de 1.3.
+        example: 2.5
+      repetitions:
+        type: integer
+        description: Nombre de répétitions consécutives réussies.
+        example: 3
+      interval_days:
+        type: integer
+        description: Intervalle en jours avant la prochaine révision.
+        example: 15
+      next_review_at:
+        type: string
+        format: date-time
+        description: Date et heure de la prochaine révision.
+        example: "2025-06-01T14:30:00Z"
+      reviewed_at:
+        type: string
+        format: date-time
+        description: Date et heure de cette révision.
+        example: "2025-05-17T14:30:00Z"
+    required:
+      - user_id
+      - flashcard_id
+      - selected_answer_id
+      - is_correct
+      - correct_answer_id
+      - difficulty
+      - e_factor
+      - repetitions
+      - interval_days
+      - next_review_at
+      - reviewed_at
+
+  FlashcardWithReview:
+    type: object
+    description: Flashcard avec sa prochaine date de révision.
+    properties:
+      flashcard_id:
+        type: string
+        format: uuid
+        description: Identifiant de la flashcard.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      question:
+        type: string
+        description: Question de la flashcard.
+        example: "Quelle est la capitale de la France ?"
+      next_review_at:
+        type: string
+        format: date-time
+        description: Date et heure de la prochaine révision.
+        example: "2025-05-20T09:00:00Z"
+    required: ["flashcard_id", "question", "next_review_at"]
+
+  UpcomingReviewsGroup:
+    type: object
+    description: Groupe de flashcards à réviser pour une date donnée.
+    properties:
+      date:
+        type: string
+        format: date
+        description: Date de révision (format ISO 8601).
+        example: "2025-05-20"
+      flashcards:
+        type: array
+        description: Liste des flashcards à réviser ce jour-là.
+        items:
+          $ref: "#/definitions/FlashcardWithReview"
+    required: ["date", "flashcards"]
+
+  UpcomingReviewsResponse:
+    type: array
+    description: Liste des révisions à venir, groupées par date.
+    items:
+      $ref: "#/definitions/UpcomingReviewsGroup"

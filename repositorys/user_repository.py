@@ -13,7 +13,6 @@ class UserSearchParams:
     email: Optional[str] = None
     username: Optional[str] = None
     username_contains: Optional[str] = None
-    display_name_contains: Optional[str] = None
     role: Optional[RoleEnum] = None
     ids: Optional[list[str]] = None
 
@@ -36,9 +35,6 @@ def find_many(params: Optional[UserSearchParams] = None) -> Tuple[List[User], in
 
     if p.username_contains:
         filters.append(User.username.ilike(f"%{p.username_contains}%"))
-
-    if p.display_name_contains:
-        filters.append(User.display_name.ilike(f"%{p.display_name_contains}%"))
 
     if p.ids:
         filters.append(User.id.in_(p.ids))

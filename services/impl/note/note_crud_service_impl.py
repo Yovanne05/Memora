@@ -8,11 +8,13 @@ from domain_services.note_domain_service import (
     ensure_owner_exists,
     ensure_unique_title,
 )
+from domain_services.permission_domain_service import permission_domain_service
 from dtos.note_dto import NoteCreateDTO, NoteDTO, NoteUpdateDTO
 from exceptions.note_exception import NoteNotFound
 from mappers.note_mapper import dto_to_note, note_to_dto
 from repositorys import (
     collection_repository,
+    note_favorite_repository,
     note_link_repository,
     note_repository,
     user_repository,
@@ -29,14 +31,34 @@ class NoteCrudService(NoteCrudServiceInterface):
         self, params: Optional[NoteSearchParams] = None
     ) -> Tuple[List[NoteDTO], int]:
         user = get_current_user()
-        entities, total = note_repository.list_for_user(user, params)
-        return [note_to_dto(entity) for entity in entities], total
+        accessible_note_ids = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
+        entities, total = note_repository.list_for_user(
+            user, params, accessible_note_ids=accessible_note_ids
+        )
+        favorite_ids = note_favorite_repository.favorite_note_ids_for_user(user.id)
+        dtos = [
+            note_to_dto(entity, favorite_note_ids=favorite_ids, current_user=user)
+            for entity in entities
+        ]
+        return dtos, total
 
     def find_one(self, note_id: str) -> NoteDTO:
         user = get_current_user()
-        note_entity = note_repository.get_for_user(user, note_id)
+        accessible_note_ids = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
+        note_entity = note_repository.get_for_user(
+            note_id, accessible_note_ids=accessible_note_ids
+        )
         ensure_note_exists(note_entity)
-        return note_to_dto(note_entity)
+        favorite_ids = note_favorite_repository.favorite_note_ids_for_user(user.id)
+        return note_to_dto(
+            note_entity,
+            favorite_note_ids=favorite_ids,
+            current_user=user,
+        )
 
     def create(self, note_create_dto: NoteCreateDTO) -> NoteDTO:
         user_entity = user_repository.find_one(note_create_dto.owner_id)

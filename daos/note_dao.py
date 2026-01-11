@@ -1,11 +1,13 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    CheckConstraint,
     ForeignKey,
     Index,
     String,
     Text,
     UniqueConstraint,
+    text
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -24,6 +26,7 @@ from daos.base_models import (
 if TYPE_CHECKING:
     from daos.collection_dao import Collection
     from daos.user_dao import User
+    from daos.report_dao import Report
 
 
 class Note(
@@ -51,23 +54,41 @@ class Note(
         nullable=True,
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    content: Mapped[str] = mapped_column(Text, nullable=False)
-
+    content: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("''"))
     collection: Mapped["Collection | None"] = relationship(
         back_populates="notes", lazy="selectin"
     )
     owner: Mapped["User"] = relationship(back_populates="notes", lazy="selectin")
-    shares: Mapped[list["NoteShare"]] = relationship(back_populates="note")
+    shares: Mapped[list["NoteShare"]] = relationship(
+        back_populates="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        lazy="selectin",
+    )
+    share_links: Mapped[list["NoteShareLink"]] = relationship(
+        back_populates="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     flashcards: Mapped[list["Flashcard"]] = relationship(
         back_populates="note", passive_deletes=True
     )
     outgoing_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_1],
         back_populates="source_note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     incoming_links: Mapped[list["NoteLink"]] = relationship(
         foreign_keys=lambda: [NoteLink.note_id_2],
         back_populates="target_note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    reports: Mapped[list["Report"]] = relationship(
+        back_populates="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
 
@@ -87,12 +108,16 @@ class NoteShare(SharePermissionMixin, CreatedAtMixin, Base):
     )
 
     note: Mapped["Note"] = relationship(back_populates="shares")
-    user: Mapped["User"] = relationship(back_populates="note_shares")
+    user: Mapped["User"] = relationship(back_populates="note_shares", lazy="selectin")
 
 
 class NoteLink(CreatedAtMixin, Base):
     __tablename__ = "note_links"
     __table_args__ = (
+        CheckConstraint(
+            "length(trim(label)) > 0",
+            name="note_links_label_not_blank",
+        ),
         Index("idx_note_links_note1", "note_id_1"),
         Index("idx_note_links_note2", "note_id_2"),
     )
@@ -107,6 +132,8 @@ class NoteLink(CreatedAtMixin, Base):
         ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"),
         primary_key=True,
     )
+
+    label: Mapped[str] = mapped_column(String(80), nullable=False)
 
     source_note: Mapped["Note"] = relationship(
         foreign_keys=[note_id_1], back_populates="outgoing_links"

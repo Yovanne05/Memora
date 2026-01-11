@@ -1,9 +1,10 @@
 import os
+import mimetypes
 from uuid import uuid4
 from datetime import datetime, timezone
-from typing import List
 from werkzeug.datastructures import FileStorage
 
+import config
 from services.interfaces.note.note_image_service_interface import NoteImageServiceInterface
 from repositorys import note_repository
 from repositorys import note_image_repository
@@ -15,59 +16,70 @@ from exceptions.note_image_exception import (
     FileTooLarge,
     InvalidFileType,
     NoFileProvided,
-    NoteImageNotFound,
 )
 from utils.auth import get_current_user
-from utils.access_scope import can_read_note_image
+from domain_services.permission_domain_service import permission_domain_service
 
 
 class NoteImageService(NoteImageServiceInterface):
-    UPLOAD_FOLDER = "uploads/notes"
     ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
     def __init__(self):
-        os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
-
-    def _allowed_file(self, filename: str) -> bool:
-        return (
-            "." in filename
-            and filename.rsplit(".", 1)[1].lower() in self.ALLOWED_EXTENSIONS
+        self.upload_folder = (
+            getattr(config, "UPLOAD_LOCAL_ROOT", None)
+            or getattr(config, "UPLOAD_FOLDER", "uploads")
         )
 
-    def _validate_file_size(self, file: FileStorage) -> bool:
+    def _ensure_upload_folder(self) -> None:
+        os.makedirs(self.upload_folder, exist_ok=True)
+
+    def _allowed_extension(self, ext: str) -> bool:
+        return ext.lower() in self.ALLOWED_EXTENSIONS
+
+    def _get_file_size(self, file: FileStorage) -> int:
         file.seek(0, os.SEEK_END)
         size = file.tell()
         file.seek(0)
-        return size <= self.MAX_FILE_SIZE
+        return size
 
-    def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
+    def _ensure_note_write_access(self, note_id: str):
         note = note_repository.find_one_unscoped(note_id)
         if not note:
             raise NoteNotFound()
+        user = get_current_user()
+        if not permission_domain_service.can_write_note(note_id, user.id, user.role):
+            raise NoteNotFound()
+        return note
 
-        if not file or file.filename == "":
+    def upload_image(self, note_id: str, file: FileStorage) -> NoteImageDTO:
+        self._ensure_note_write_access(note_id)
+
+        if not file or not file.filename or file.filename.strip() == "":
             raise NoFileProvided()
 
-        if not self._allowed_file(file.filename):
+        ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+        if not self._allowed_extension(ext):
             raise InvalidFileType()
 
-        if not self._validate_file_size(file):
+        file_size = self._get_file_size(file)
+        if file_size > self.MAX_FILE_SIZE:
             raise FileTooLarge()
 
-        ext = file.filename.rsplit(".", 1)[1].lower()
+        self._ensure_upload_folder()
         filename = f"{uuid4()}.{ext}"
-
-        note_folder = os.path.join(self.UPLOAD_FOLDER, note_id)
+        note_folder = os.path.join(self.upload_folder, note_id)
         os.makedirs(note_folder, exist_ok=True)
-
         filepath = os.path.join(note_folder, filename)
 
-        file.seek(0, os.SEEK_END)
-        file_size = file.tell()
         file.seek(0)
-
         file.save(filepath)
+
+        mime_type = file.content_type or f"image/{ext}"
+        if not mime_type:
+            guessed_mime, _ = mimetypes.guess_type(file.filename)
+            if guessed_mime:
+                mime_type = guessed_mime
 
         image_entity = NoteImage(
             id=str(uuid4()),
@@ -75,40 +87,12 @@ class NoteImageService(NoteImageServiceInterface):
             file_name=filename,
             file_path=filepath,
             file_size=file_size,
-            mime_type=file.content_type or f"image/{ext}",
+            mime_type=mime_type,
             uploaded_at=datetime.now(timezone.utc)
         )
 
         saved_entity = note_image_repository.add(image_entity)
-
         return note_image_to_dto(saved_entity)
-
-    def list_images(self, note_id: str) -> List[NoteImageDTO]:
-        user = get_current_user()
-        if not can_read_note_image(user, note_id):
-            raise NoteNotFound()
-
-        images = note_image_repository.find_by_note(note_id)
-        return [note_image_to_dto(img) for img in images]
-
-    def delete_image(self, note_id: str, filename: str) -> None:
-        note = note_repository.find_one_unscoped(note_id)
-        if not note:
-            raise NoteNotFound()
-
-        image = note_image_repository.find_by_note_and_filename(note_id, filename)
-        if not image:
-            raise NoteImageNotFound()
-
-        filepath = image.file_path
-        if os.path.exists(filepath):
-            os.remove(filepath)
-
-        note_image_repository.delete(image.id)
-
-        note_folder = os.path.join(self.UPLOAD_FOLDER, note_id)
-        if os.path.exists(note_folder) and not os.listdir(note_folder):
-            os.rmdir(note_folder)
 
 
 note_image_service = NoteImageService()

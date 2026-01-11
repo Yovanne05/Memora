@@ -7,20 +7,16 @@ from repositorys.flashcard_repository import FlashcardSearchParams
 
 
 class FlashcardFindQuery(BaseModel):
-    note_id: Optional[UUID] = Field(default=None, alias="noteId")
-    question_contains: Optional[str] = Field(
-        default=None, alias="questionContains"
-    )
+    note_id: Optional[UUID] = Field(default=None)
+    question_contains: Optional[str] = Field(default=None)
 
     sort_by: Literal["question", "created_at", "updated_at"] = Field(
-        default="created_at", alias="sortBy"
+        default="created_at"
     )
-    sort_dir: Literal["asc", "desc"] = Field(default="desc", alias="sortDir")
+    sort_dir: Literal["asc", "desc"] = Field(default="desc")
 
     limit: int = Field(default=50, ge=1, le=200)
     offset: int = Field(default=0, ge=0, le=10_000)
-
-    model_config = ConfigDict(populate_by_name=True)
 
     def to_params(self) -> FlashcardSearchParams:
         return FlashcardSearchParams(

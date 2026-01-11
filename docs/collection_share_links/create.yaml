@@ -1,0 +1,27 @@
+tags:
+  - collection-share-links
+summary: Creer un lien public pour une collection
+description: >
+  Genere un lien public permettant l'acces a une collection sans authentification.
+  L'ID du lien sert d'identifiant dans l'URL publique.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la collection a partager.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/CollectionShareLinkCreatePayload"
+responses:
+  201:
+    description: Lien public cree.
+    schema:
+      $ref: "#/definitions/CollectionShareLink"
+  404:
+    description: Collection introuvable.
+  422:
+    description: Donnees invalides.

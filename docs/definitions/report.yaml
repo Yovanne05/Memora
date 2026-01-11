@@ -1,0 +1,122 @@
+definitions:
+  Report:
+    type: object
+    description: Signalement sur une note ou une collection.
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "3b96fa56-6e1d-4d1e-88f5-38c0475a2c9c"
+      target_type:
+        type: string
+        enum: ["note", "collection"]
+        example: "note"
+      note_id:
+        type: string
+        format: uuid
+        nullable: true
+      collection_id:
+        type: string
+        format: uuid
+        nullable: true
+      reason:
+        type: string
+        enum:
+          [
+            "illegal_content",
+            "shocking_or_inappropriate",
+            "harassment_or_abuse",
+            "rights_violation",
+            "spam_or_abuse",
+            "technical_issue",
+            "other",
+          ]
+        example: "illegal_content"
+      status:
+        type: string
+        enum: ["pending", "in_progress", "resolved", "rejected"]
+        example: "pending"
+      description:
+        type: string
+        nullable: true
+        example: "Le contenu semble enfreindre nos règles."
+      reporter_id:
+        type: string
+        format: uuid
+      reporter_email:
+        type: string
+        format: email
+        nullable: true
+      note_title:
+        type: string
+        nullable: true
+      collection_name:
+        type: string
+        nullable: true
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+    required:
+      [
+        "id",
+        "target_type",
+        "reason",
+        "status",
+        "reporter_id",
+        "created_at",
+        "updated_at",
+      ]
+
+  ReportList:
+    type: object
+    properties:
+      total:
+        type: integer
+        format: int32
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Report"
+    required: ["total", "items"]
+
+  ReportCreatePayload:
+    type: object
+    required: ["reason"]
+    properties:
+      reason:
+        type: string
+        enum:
+          [
+            "illegal_content",
+            "shocking_or_inappropriate",
+            "harassment_or_abuse",
+            "rights_violation",
+            "spam_or_abuse",
+            "technical_issue",
+            "other",
+          ]
+      description:
+        type: string
+        maxLength: 2000
+        description: Détails supplémentaires optionnels.
+
+  ReportUpdatePayload:
+    type: object
+    required: ["status"]
+    properties:
+      status:
+        type: string
+        enum: ["pending", "in_progress", "resolved", "rejected"]
+      action:
+        type: string
+        enum: ["delete_target"]
+        description: |
+          Action de modération à appliquer en plus du changement de statut.
+          Si `delete_target` est envoyé, la ressource ciblée est supprimée et le report
+          est automatiquement marqué `resolved` (le statut fourni est ignoré).
+    description: |
+      Payload de mise à jour d'un signalement. L'action `delete_target` supprime la ressource
+      signalée (note ou collection) et marque le report comme résolu.

@@ -4,20 +4,60 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, request, g
 from datetime import datetime
-
+from typing import Optional
+import inspect
 
 class InfoFilter(logging.Filter):
     def filter(self, record):
         return record.levelno < logging.ERROR
 
 
-def init_logger(app: Flask):
+class Logger:
+    def __init__(self):
+        self._loggers: dict[str, logging.Logger] = {}
 
+    def _get_logger(self, name: Optional[str] = None) -> logging.Logger:
+        if name is None:
+            frame = inspect.currentframe()
+            if frame and frame.f_back and frame.f_back.f_back:
+                caller_frame = frame.f_back.f_back
+                name = caller_frame.f_globals.get('__name__', 'root')
+            else:
+                name = 'root'
+
+        if name not in self._loggers:
+            self._loggers[name] = logging.getLogger(name)
+
+        return self._loggers[name]
+
+    def debug(self, message: str, name: Optional[str] = None):
+        self._get_logger(name).debug(message)
+
+    def info(self, message: str, name: Optional[str] = None):
+        self._get_logger(name).info(message)
+
+    def warning(self, message: str, name: Optional[str] = None):
+        self._get_logger(name).warning(message)
+
+    def error(self, message: str, name: Optional[str] = None, exc_info: bool = False):
+        self._get_logger(name).error(message, exc_info=exc_info)
+
+    def critical(self, message: str, name: Optional[str] = None, exc_info: bool = False):
+        self._get_logger(name).critical(message, exc_info=exc_info)
+
+
+logger = Logger()
+
+def init_logger(app: Flask):
     log_dir = app.config.get('LOG_DIR', 'logs')
     os.makedirs(log_dir, exist_ok=True)
     app.logger.handlers.clear()
-
     app.logger.setLevel(logging.INFO)
+    app.logger.propagate = True
+
+    root_logger = logging.getLogger()
+    root_logger.handlers.clear()
+    root_logger.setLevel(logging.INFO)
 
     info_handler = RotatingFileHandler(
         os.path.join(log_dir, 'app_info.log'),
@@ -48,8 +88,8 @@ def init_logger(app: Flask):
 
     error_handler.setFormatter(error_formatter)
 
-    app.logger.addHandler(info_handler)
-    app.logger.addHandler(error_handler)
+    root_logger.addHandler(info_handler)
+    root_logger.addHandler(error_handler)
 
     @app.before_request
     def log_request():
@@ -103,3 +143,5 @@ def init_logger(app: Flask):
             app.logger.error(log_message)
 
         return response
+
+

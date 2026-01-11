@@ -1,0 +1,43 @@
+tags:
+  - reviews
+summary: Soumettre une révision de flashcard
+description: >
+  Enregistre une révision de flashcard avec le niveau de difficulté évalué par l'utilisateur.
+  L'algorithme SM-2 (SuperMemo 2) calcule automatiquement le prochain intervalle de révision
+  en fonction de la performance et de l'historique de l'utilisateur.
+
+  **Workflow :**
+  - L'utilisateur répond à une flashcard en sélectionnant une réponse
+  - Le backend valide automatiquement si la réponse est correcte (calcul côté serveur)
+  - La réponse contient `is_correct: true/false` pour indiquer le résultat
+  - L'utilisateur évalue ensuite la difficulté (again/hard/good/easy)
+
+  **Sécurité :**
+  - Le champ `is_correct` n'est PAS envoyé dans GET /flashcards pour éviter la triche
+  - Il est calculé côté backend et renvoyé uniquement après soumission de la review
+
+  **Niveaux de difficulté (SM-2 standard) :**
+  - `again` (0) : Très difficile, à revoir rapidement (intervalle court)
+  - `hard` (1) : Difficile (intervalle réduit)
+  - `good` (2) : Correct (intervalle normal)
+  - `easy` (3) : Facile (intervalle augmenté)
+parameters:
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/ReviewCreatePayload"
+responses:
+  201:
+    description: >
+      Révision enregistrée avec succès. Retourne les données de la révision
+      incluant le prochain intervalle calculé par l'algorithme SM-2.
+    schema:
+      $ref: "#/definitions/Review"
+  400:
+    description: >
+      Erreur de validation : réponse sélectionnée n'appartient pas à la flashcard.
+  404:
+    description: Flashcard introuvable.
+  422:
+    description: Erreur de validation Pydantic (champs manquants ou invalides).

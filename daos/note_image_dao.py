@@ -1,20 +1,27 @@
-from sqlalchemy import ForeignKey, String, Integer
+from datetime import datetime
+
+from sqlalchemy import ForeignKey, Index, Integer, String, DateTime, text
 from sqlalchemy.orm import Mapped, mapped_column
+
 from utils.db import Base
-from datetime import datetime, timezone
+from daos.base_models import UUIDMixin
 
 
-class NoteImage(Base):
+class NoteImage(UUIDMixin, Base):
     __tablename__ = "note_images"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    note_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("notes.id", ondelete="CASCADE", onupdate="CASCADE")
+    __table_args__ = (
+        Index("idx_note_images_note", "note_id"),
     )
-    file_name: Mapped[str] = mapped_column(String(255))
-    file_path: Mapped[str] = mapped_column(String(500))
-    file_size: Mapped[int] = mapped_column(Integer)
-    mime_type: Mapped[str] = mapped_column(String(100))
+
+    note_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+    )
+    file_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    file_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    file_size: Mapped[int] = mapped_column(Integer, nullable=False)
+    mime_type: Mapped[str] = mapped_column(String(100), nullable=False)
     uploaded_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc), nullable=False
+        DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )

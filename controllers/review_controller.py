@@ -1,0 +1,47 @@
+from http import HTTPStatus
+
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+from flasgger import swag_from
+
+from dtos.review_dto import ReviewCreateDTO
+from services.impl.review_service_impl import review_service
+from utils.auth import get_current_user
+
+bp_reviews = Blueprint("reviews", __name__, url_prefix="/reviews")
+
+
+@bp_reviews.post("")
+@jwt_required()
+@swag_from("../docs/reviews/create.yaml")
+def create_review():
+    user = get_current_user()
+    payload = ReviewCreateDTO.model_validate_json(request.data)
+
+    review_dto = review_service.submit_review(
+        user_id=user.id,
+        flashcard_id=payload.flashcard_id,
+        selected_answer_id=payload.selected_answer_id,
+        difficulty=payload.difficulty.value,
+    )
+
+    return jsonify(review_dto.model_dump()), HTTPStatus.CREATED
+
+
+@bp_reviews.get("")
+@jwt_required()
+@swag_from("../docs/reviews/upcoming.yaml")
+def find_many():
+    status = request.args.get("status")
+    if status not in (None, "upcoming"):
+        return (
+            jsonify({"error": "Unsupported status filter"}),
+            HTTPStatus.BAD_REQUEST,
+        )
+
+    user = get_current_user()
+    upcoming = review_service.get_upcoming_reviews(user.id)
+    return (
+        jsonify([group.model_dump() for group in upcoming]),
+        HTTPStatus.OK,
+    )

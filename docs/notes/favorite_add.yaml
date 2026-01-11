@@ -1,0 +1,18 @@
+tags:
+  - note-favorites
+summary: Ajouter une note aux favoris
+description: Marque la note comme favorite pour l'utilisateur authentifie.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note a ajouter aux favoris.
+responses:
+  201:
+    description: Note ajoutee aux favoris.
+    schema:
+      $ref: "#/definitions/NoteFavorite"
+  404:
+    description: Note introuvable ou non accessible.

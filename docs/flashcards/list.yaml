@@ -1,19 +1,51 @@
 tags:
   - flashcards
-summary: Lister les flashcards d'une note
+summary: Lister les flashcards
 description: >
-  Retourne toutes les flashcards associées à une note donnée.
+  Retourne les flashcards accessibles par l'utilisateur selon ses permissions sur les notes.
+  
+  **Permissions requises:** READ ou WRITE sur la note pour voir ses flashcards.
 parameters:
-  - in: path
+  - in: query
     name: note_id
     type: string
     format: uuid
-    required: true
-    description: Identifiant unique de la note.
+    required: false
+    description: Filtre sur une note spécifique.
+  - in: query
+    name: question_contains
+    type: string
+    required: false
+    description: Recherche par texte dans les questions.
+  - in: query
+    name: sort_by
+    type: string
+    enum: ["question", "created_at", "updated_at"]
+    default: "created_at"
+    description: Champ de tri.
+  - in: query
+    name: sort_dir
+    type: string
+    enum: ["asc", "desc"]
+    default: "desc"
+    description: Direction de tri.
+  - in: query
+    name: limit
+    type: integer
+    format: int32
+    default: 50
+    minimum: 1
+    maximum: 200
+    description: Nombre maximum de résultats.
+  - in: query
+    name: offset
+    type: integer
+    format: int32
+    default: 0
+    minimum: 0
+    description: Décalage pour la pagination.
 responses:
   200:
     description: Liste des flashcards.
     schema:
       $ref: "#/definitions/FlashcardListResponse"
-  404:
-    description: Note introuvable.

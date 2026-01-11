@@ -5,11 +5,7 @@ from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from werkzeug.exceptions import Unauthorized
 
 from repositorys import user_repository
-
-
-class AuthenticatedUserNotFound(Unauthorized):
-    def __init__(self, description: str = "User not found or deactivated."):
-        super().__init__(description=description)
+from exceptions.auth_exception import AuthenticatedUserNotFound
 
 
 def _load_user_from_token():
@@ -25,7 +21,6 @@ def _load_user_from_token():
 
 
 def get_current_user():
-    """Return the authenticated user entity, caching per request."""
     if hasattr(g, "current_user") and g.current_user:
         return g.current_user
 

@@ -9,8 +9,14 @@ from dtos.collection_dto import (
     CollectionCreateDTO,
     CollectionUpdateDTO,
 )
+from dtos.common_dto import ListResponseDTO
 from querys.collection_query import CollectionFindQuery
 from services.impl.collection.collection_service_impl import collection_service
+from utils.permission_decorators import (
+    require_collection_write,
+    require_collection_read,
+    require_owner,
+)
 
 bp_collections = Blueprint(
     "collections", __name__, url_prefix="/collections"
@@ -18,6 +24,7 @@ bp_collections = Blueprint(
 
 
 @bp_collections.get("")
+@jwt_required()
 @swag_from("../docs/collections/list.yaml")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
@@ -25,25 +32,24 @@ def find_many():
     params = query.to_params()
 
     collection_dtos, total = collection_service.find_many(params)
-    return (
-        jsonify(
-            {
-                "items": [dto.model_dump() for dto in collection_dtos],
-                "total": total,
-            }
-        ),
-        HTTPStatus.OK,
+    response = ListResponseDTO(
+        items=[dto.model_dump() for dto in collection_dtos],
+        total=total
     )
+    return jsonify(response.model_dump()), HTTPStatus.OK
 
 
 @bp_collections.get("/<uuid:collection_id>")
+@jwt_required()
 @swag_from("../docs/collections/find_one.yaml")
+@require_collection_read()
 def find_one(collection_id: UUID):
     collection = collection_service.find_one(str(collection_id))
     return jsonify(collection.model_dump()), HTTPStatus.OK
 
 
 @bp_collections.post("")
+@jwt_required()
 @swag_from("../docs/collections/create.yaml")
 def create():
     payload = CollectionCreateDTO.model_validate_json(request.data)
@@ -53,6 +59,7 @@ def create():
 
 @bp_collections.patch("/<uuid:collection_id>")
 @swag_from("../docs/collections/update.yaml")
+@require_collection_write()
 def update(collection_id: UUID):
     payload = CollectionUpdateDTO.model_validate_json(request.data)
     collection = collection_service.update(str(collection_id), payload)
@@ -61,6 +68,7 @@ def update(collection_id: UUID):
 
 @bp_collections.delete("/<uuid:collection_id>")
 @swag_from("../docs/collections/delete.yaml")
+@require_owner("collection", "collection_id")
 def delete(collection_id: UUID):
     collection_service.delete(str(collection_id))
     return "", HTTPStatus.NO_CONTENT

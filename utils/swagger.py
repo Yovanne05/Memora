@@ -6,7 +6,7 @@ import config
 
 
 def load_definitions(defs_dir: Path) -> dict:
-    merged = {"definitions": {}, "parameters": {}}
+    merged = {"definitions": {}, "parameters": {}, "paths": {}}
 
     for path in defs_dir.glob("*.yaml"):
         with path.open(encoding="utf-8") as f:
@@ -17,6 +17,9 @@ def load_definitions(defs_dir: Path) -> dict:
 
         if "parameters" in data:
             merged["parameters"].update(data["parameters"])
+
+        if "paths" in data:
+            merged["paths"].update(data["paths"])
 
     return merged
 
@@ -30,11 +33,24 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
         "info": {"title": title, "version": version},
         "basePath": base_path,
         "tags": [
-            {"name": "auth"},
+            {"name": "sessions"},
             {"name": "users"},
+            {"name": "user-statistics"},
             {"name": "notes"},
+            {"name": "note-relations"},
+            {"name": "note-favorites"},
+            {"name": "note-shares"},
+            {"name": "note-share-links"},
+            {"name": "shared-notes"},
+            {"name": "note-images"},
             {"name": "collections"},
+            {"name": "collection-favorites"},
+            {"name": "collection-shares"},
+            {"name": "collection-share-links"},
+            {"name": "shared-collections"},
             {"name": "flashcards"},
+            {"name": "reviews"},
+            {"name": "reports"}
         ],
         "securityDefinitions": {
             "bearerAuth": {
@@ -54,11 +70,6 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
         "security": [
             {"bearerAuth": []}
         ],
-        "responses": {
-            "UnauthorizedError": {
-                "description": "Access token is missing or invalid"
-            }
-        }
     }
 
     docs_dir = Path(__file__).resolve().parents[1] / "docs" / "definitions"
