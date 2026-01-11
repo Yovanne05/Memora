@@ -8,6 +8,7 @@ UUID_PATTERN = re.compile(
     r"^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$",
     re.IGNORECASE,
 )
+NOTE_ID_DESCRIPTION = "UUID of the note (36 chars max including hyphens)"
 
 
 def _validate_note_id_format(value: str) -> str:
@@ -65,7 +66,7 @@ class JoinCollaborationDTO(BaseModel):
     note_id: str = Field(
         min_length=1,
         max_length=36,
-        description="UUID of the note (36 chars max including hyphens)",
+        description=NOTE_ID_DESCRIPTION,
     )
     content: str | None = Field(
         default=None,
@@ -83,7 +84,7 @@ class LeaveCollaborationDTO(BaseModel):
     note_id: str = Field(
         min_length=1,
         max_length=36,
-        description="UUID of the note (36 chars max including hyphens)",
+        description=NOTE_ID_DESCRIPTION,
     )
 
     @field_validator("note_id")
@@ -96,7 +97,7 @@ class CRDTUpdateDTO(BaseModel):
     note_id: str = Field(
         min_length=1,
         max_length=36,
-        description="UUID of the note (36 chars max including hyphens)"
+        description=NOTE_ID_DESCRIPTION,
     )
     update: str = Field(
         description="Base64-encoded CRDT update",
@@ -119,7 +120,7 @@ class CRDTSyncRequestDTO(BaseModel):
     note_id: str = Field(
         min_length=1,
         max_length=36,
-        description="UUID of the note (36 chars max including hyphens)"
+        description=NOTE_ID_DESCRIPTION,
     )
     state_vector: str = Field(
         description="Base64-encoded state vector",

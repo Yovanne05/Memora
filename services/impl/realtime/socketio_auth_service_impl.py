@@ -6,13 +6,19 @@ from services.interfaces.realtime.socketio_auth_service_interface import (
 )
 from utils.enums import RoleEnum
 
+BEARER_PREFIX = "Bearer "
+
 
 class SocketIOAuthService(SocketIOAuthServiceInterface):
     @staticmethod
     def _strip_bearer(token: str | None) -> str | None:
         if not token:
             return None
-        return token.replace("Bearer ", "", 1) if token.startswith("Bearer ") else token
+        return (
+            token.replace(BEARER_PREFIX, "", 1)
+            if token.startswith(BEARER_PREFIX)
+            else token
+        )
 
     @classmethod
     def _extract_token_from_auth(cls, auth) -> str | None:
@@ -62,8 +68,8 @@ class SocketIOAuthService(SocketIOAuthServiceInterface):
 
         if not token:
             auth_header = request.headers.get("Authorization", "")
-            if auth_header.startswith("Bearer "):
-                token = auth_header.replace("Bearer ", "", 1)
+            if auth_header.startswith(BEARER_PREFIX):
+                token = auth_header.replace(BEARER_PREFIX, "", 1)
 
         if not token:
             return None, None
