@@ -1,6 +1,3 @@
-from domain_services.collaboration_session_service import (
-    collaboration_domain_session_service,
-)
 from domain_services.realtime_collaboration_domain_service import (
     DEFAULT_EMPTY_DOCUMENT,
     build_crdt_update_event,
@@ -11,10 +8,6 @@ from domain_services.realtime_collaboration_domain_service import (
     encode_base64,
     ensure_can_read,
     ensure_can_write,
-    ensure_note_exists,
-    ensure_user_exists,
-    normalize_note_content,
-    resolve_note_content,
 )
 from dtos.collaboration_dto import (
     CollaborationEventDTO,
@@ -23,18 +16,30 @@ from dtos.collaboration_dto import (
     CRDTSyncRequestDTO,
 )
 from exceptions.collaboration_exception import CollaborationInvalidOperation
-from repositorys import note_repository, user_repository
 from services.interfaces.realtime.realtime_collaboration_service_interface import (
     RealtimeCollaborationServiceInterface,
 )
-from services.impl.realtime.crdt.crdt_service_impl import get_crdt_service
+from services.impl.realtime.realtime_collaboration_components import (
+    CRDTDocumentCoordinator,
+    CollaborationDataService,
+    CollaborationSessionManager,
+)
 from utils.enums import RoleEnum
 
 
 class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
+    def __init__(
+        self,
+        data_service: CollaborationDataService | None = None,
+        session_manager: CollaborationSessionManager | None = None,
+        crdt_coordinator: CRDTDocumentCoordinator | None = None,
+    ):
+        self._data_service = data_service or CollaborationDataService()
+        self._session_manager = session_manager or CollaborationSessionManager()
+        self._crdt_coordinator = crdt_coordinator or CRDTDocumentCoordinator()
+
     def get_username_by_socket(self, socket_id: str) -> str:
-        session_data = collaboration_domain_session_service.find_session_by_socket(socket_id)
-        return session_data.get("username") if session_data else "Unknown"
+        return self._session_manager.get_username_by_socket(socket_id)
 
     def join_collaboration_session(
         self,
@@ -44,29 +49,19 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         socket_id: str,
         initial_content: str | None = None,
     ) -> tuple[CollaborationSessionDTO, CollaborationEventDTO]:
-        note = note_repository.find_one_unscoped(note_id)
-        ensure_note_exists(note)
+        note = self._data_service.get_note_or_raise(note_id)
         ensure_can_read(note_id, user_id, user_role)
-
-        user = user_repository.find_one(user_id)
-        ensure_user_exists(user)
+        user = self._data_service.get_user_or_raise(user_id)
         username = user.username
 
-        resolved_content = resolve_note_content(note.content, initial_content)
-        note_content = normalize_note_content(
-            resolved_content, fallback=DEFAULT_EMPTY_DOCUMENT
+        note_content = self._data_service.resolve_and_persist_content(
+            note_id, note, initial_content
         )
-        if note_content and note.content != note_content:
-            note.content = note_content
-            note_repository.update_content(note_id, note_content)
+        self._crdt_coordinator.ensure_document(note_id, note_content)
 
-        crdt_service = get_crdt_service()
-        crdt_service.get_or_create_document(note_id, note_content)
-
-        collaboration_domain_session_service.cleanup_user_sessions(note_id, user_id)
-        collaboration_domain_session_service.create_session(note_id, user_id, socket_id, username)
-
-        all_sessions = collaboration_domain_session_service.list_sessions_by_note(note_id)
+        all_sessions = self._session_manager.register_session(
+            note_id, user_id, socket_id, username
+        )
         session_dto = build_session_dto(note_id, all_sessions)
         join_event = build_join_event(note_id, user_id, username)
 
@@ -75,26 +70,23 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
     def leave_collaboration_session(
         self, note_id: str, user_id: str, socket_id: str
     ) -> CollaborationEventDTO | None:
-        session_data = collaboration_domain_session_service.find_session_by_socket(socket_id)
+        session_data = self._session_manager.pop_session(socket_id)
         if not session_data:
             return None
 
-        collaboration_domain_session_service.delete_session_by_socket(socket_id)
         resolved_note_id = session_data.get("note_id") or note_id
         username = session_data.get("username", "Unknown")
 
         return build_leave_event(resolved_note_id, user_id, username)
 
     def handle_disconnect(self, socket_id: str) -> CollaborationEventDTO | None:
-        session_data = collaboration_domain_session_service.find_session_by_socket(socket_id)
+        session_data = self._session_manager.pop_session(socket_id)
         if not session_data:
             return None
 
         note_id = session_data.get("note_id")
         user_id = session_data.get("user_id")
         username = session_data.get("username", "Unknown")
-
-        collaboration_domain_session_service.delete_session_by_socket(socket_id)
 
         return build_leave_event(note_id, user_id, username)
 
@@ -108,43 +100,30 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
         ensure_can_write(update_dto.note_id, user_id, user_role)
 
         update_bytes = decode_base64(update_dto.update, "update")
-        crdt_service = get_crdt_service()
-
-        note = note_repository.find_one_unscoped(update_dto.note_id)
-        ensure_note_exists(note)
-
-        crdt_service.get_or_create_document(
-            update_dto.note_id, note.content or DEFAULT_EMPTY_DOCUMENT
-        )
+        note = self._data_service.get_note_or_raise(update_dto.note_id)
+        seed_content = note.content or DEFAULT_EMPTY_DOCUMENT
         try:
-            crdt_service.apply_update(update_dto.note_id, update_bytes)
-        except ValueError:
-            crdt_service.get_or_create_document(
-                update_dto.note_id, note.content or DEFAULT_EMPTY_DOCUMENT
+            self._crdt_coordinator.apply_update(
+                update_dto.note_id, update_bytes, seed_content
             )
-            crdt_service.apply_update(update_dto.note_id, update_bytes)
         except Exception as exc:
             raise CollaborationInvalidOperation("Invalid CRDT update") from exc
 
-        try:
-            raw_content = crdt_service.get_content_as_text(update_dto.note_id)
-        except ValueError:
-            crdt_service.get_or_create_document(
-                update_dto.note_id, note.content or DEFAULT_EMPTY_DOCUMENT
-            )
-            raw_content = crdt_service.get_content_as_text(update_dto.note_id)
-        fallback_content = normalize_note_content(
+        raw_content = self._crdt_coordinator.get_text(
+            update_dto.note_id, seed_content
+        )
+        fallback_content = self._data_service.normalize_content(
             note.content, fallback=DEFAULT_EMPTY_DOCUMENT
         )
-        safe_content = normalize_note_content(
+        safe_content = self._data_service.normalize_content(
             raw_content, fallback=fallback_content
         )
-        if safe_content and safe_content != raw_content:
-            crdt_service.delete_document(update_dto.note_id)
-            crdt_service.get_or_create_document(update_dto.note_id, safe_content)
-        if safe_content and safe_content != note.content:
-            note.content = safe_content
-            note_repository.update_content(update_dto.note_id, note.content)
+        self._crdt_coordinator.resync_if_diverged(
+            update_dto.note_id, safe_content, raw_content
+        )
+        self._data_service.update_content_if_changed(
+            update_dto.note_id, note, safe_content
+        )
 
         return build_crdt_update_event(
             update_dto.note_id, user_id, username, update_dto.update
@@ -159,28 +138,14 @@ class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
             sync_request_dto.state_vector, "state vector"
         )
 
-        crdt_service = get_crdt_service()
-        note = note_repository.find_one_unscoped(sync_request_dto.note_id)
-        ensure_note_exists(note)
-
-        seed_content = normalize_note_content(
+        note = self._data_service.get_note_or_raise(sync_request_dto.note_id)
+        seed_content = self._data_service.normalize_content(
             note.content, fallback=DEFAULT_EMPTY_DOCUMENT
         )
-        crdt_service.get_or_create_document(sync_request_dto.note_id, seed_content)
-
         try:
-            update_bytes = crdt_service.get_update_since_state(
-                sync_request_dto.note_id, client_state_vector
+            server_state_vector, update_bytes = self._crdt_coordinator.get_sync_payload(
+                sync_request_dto.note_id, client_state_vector, seed_content
             )
-            server_state_vector = crdt_service.get_state_vector(sync_request_dto.note_id)
-        except ValueError:
-            crdt_service.get_or_create_document(
-                sync_request_dto.note_id, seed_content
-            )
-            update_bytes = crdt_service.get_update_since_state(
-                sync_request_dto.note_id, client_state_vector
-            )
-            server_state_vector = crdt_service.get_state_vector(sync_request_dto.note_id)
         except Exception as exc:
             raise CollaborationInvalidOperation("Invalid state vector") from exc
 

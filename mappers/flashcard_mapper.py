@@ -1,6 +1,7 @@
 from daos.flashcard_dao import Flashcard
 from dtos.flashcard_dto import FlashcardCreateDTO, FlashcardDTO
 from mappers.flashcard_answer_mapper import flashcard_answer_to_dto
+from daos.flashcard_answer_dao import FlashcardAnswer
 
 
 def flashcard_to_dto(flashcard_entity: Flashcard) -> FlashcardDTO:
@@ -15,7 +16,6 @@ def flashcard_to_dto(flashcard_entity: Flashcard) -> FlashcardDTO:
 
 
 def dto_to_flashcard(flashcard_dto: FlashcardCreateDTO, note_id: str) -> Flashcard:
-    from daos.flashcard_answer_dao import FlashcardAnswer
 
     flashcard = Flashcard(
         note_id=note_id,
