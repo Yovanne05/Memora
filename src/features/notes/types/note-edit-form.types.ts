@@ -13,7 +13,6 @@ export interface NoteEditFormProps {
   loading?: boolean
   readOnly?: boolean
   onSubmit: (values: NoteFormValues) => void | Promise<void>
-  onCancel?: () => void
   onDelete?: () => void
   deleteLoading?: boolean
 }

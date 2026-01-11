@@ -1,4 +1,4 @@
-import { LEGEND_COLORS, LEGEND_LABELS } from "../lib/visualization.constants"
+import { LEGEND_COLORS, LEGEND_LABELS } from '../lib/visualization.constants'
 
 interface LegendItem {
   color: string
@@ -13,7 +13,7 @@ const LEGEND_ITEMS: LegendItem[] = [
 
 export function VisualizationLegend() {
   return (
-    <div className="border-t bg-background px-4 py-2">
+    <div className="hidden border-t bg-background px-4 py-2 md:block">
       <div className="flex items-center gap-4 text-xs">
         {LEGEND_ITEMS.map((item) => (
           <div key={item.label} className="flex items-center gap-1.5">

@@ -4,17 +4,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from '@/components/ui/form'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import type { Collection } from "@/features/collections/models/collection.model"
-import type { UseFormReturn } from "react-hook-form"
-import type { NoteFormValues } from "../../types/note-edit-form.types"
+} from '@/components/ui/select'
+import type { Collection } from '@/features/collections/models/collection.model'
+import type { UseFormReturn } from 'react-hook-form'
+import type { NoteFormValues } from '../../types/note-edit-form.types'
 
 type NoteCollectionFieldProps = {
   form: UseFormReturn<NoteFormValues>
@@ -35,17 +35,17 @@ export function NoteCollectionField({
       name="collectionId"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Collection</FormLabel>
+          <FormLabel className="text-sm font-medium">Collection</FormLabel>
           <FormControl>
             <Select
-              value={field.value ?? "none"}
+              value={field.value ?? 'none'}
               onValueChange={(value) =>
-                field.onChange(value === "none" ? null : value)
+                field.onChange(value === 'none' ? null : value)
               }
               disabled={disabled || loadingCollections}
             >
-              <SelectTrigger id="note-collection">
-                <SelectValue placeholder="Choisir une collection" />
+              <SelectTrigger id="note-collection" className="w-full">
+                <SelectValue placeholder="Choisir" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Aucune collection</SelectItem>
@@ -63,6 +63,3 @@ export function NoteCollectionField({
     />
   )
 }
-
-
-

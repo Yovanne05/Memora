@@ -1,10 +1,16 @@
-import type { MouseEvent } from "react"
-import ReactFlow, { Background, Controls, MiniMap, type Edge, type Node } from "reactflow"
-import "reactflow/dist/style.css"
+import type { MouseEvent } from 'react'
+import ReactFlow, {
+  Background,
+  Controls,
+  MiniMap,
+  type Edge,
+  type Node,
+} from 'reactflow'
+import 'reactflow/dist/style.css'
 
-import { CustomNode } from "../CustomNode"
-import { getNodeColorByConnections } from "../../lib/visualization.constants"
-import { getNodeColorForMiniMap } from "../../lib/dataTransformers"
+import { CustomNode } from '../CustomNode'
+import { getNodeColorByConnections } from '../../lib/visualization.constants'
+import { getNodeColorForMiniMap } from '../../lib/dataTransformers'
 
 type CollectionVisualizationCanvasProps = {
   nodes: Node[]
@@ -24,7 +30,7 @@ export function CollectionVisualizationCanvas({
   onPaneClick,
 }: Readonly<CollectionVisualizationCanvasProps>) {
   return (
-    <div className="relative min-h-[400px] flex-1">
+    <div className="relative min-h-[250px] flex-1 sm:min-h-[300px] md:min-h-[400px]">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -39,8 +45,10 @@ export function CollectionVisualizationCanvas({
         <Background gap={16} />
         <Controls className="rounded-lg border shadow-lg" />
         <MiniMap
-          className="rounded-lg border shadow-lg"
-          nodeColor={(node) => getNodeColorForMiniMap(node, getNodeColorByConnections)}
+          className="hidden rounded-lg border shadow-lg md:block"
+          nodeColor={(node) =>
+            getNodeColorForMiniMap(node, getNodeColorByConnections)
+          }
         />
       </ReactFlow>
     </div>

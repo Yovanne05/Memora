@@ -15,7 +15,7 @@ export function NotesGrid({
   showReportButton = true,
 }: Readonly<NotesGridProps>) {
   return (
-    <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <section className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {items.map((note) => (
         <NoteCard
           key={note.id}

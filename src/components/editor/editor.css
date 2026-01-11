@@ -1,6 +1,10 @@
 .ProseMirror {
   outline: none;
   min-height: 200px;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {

@@ -39,52 +39,77 @@ export function NoteSidebar({
   const formattedCreatedAt = formatLongDateTime(note.createdAt)
   const formattedUpdatedAt = formatLongDateTime(note.updatedAt)
 
-  return (
-    <aside
-      ref={resizeRef}
-      style={{ width: `${width}px` }}
-      className={cn(
-        'fixed top-0 right-0 h-full bg-background border-l shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col',
-        open ? 'translate-x-0' : 'translate-x-full',
-        isResizing && 'transition-none'
-      )}
-    >
-      <NoteSidebarResizer
-        isResizing={isResizing}
-        onResizeStart={handleMouseDown}
-      />
-      <NoteSidebarHeader onClose={onClose} />
+  const content = (
+    <>
+      <NoteSidebarRelatedNotes notes={relatedNotes} onNoteClick={onNoteClick} />
 
-      <div className="flex-1 overflow-y-auto">
-        <NoteSidebarRelatedNotes
-          notes={relatedNotes}
-          onNoteClick={onNoteClick}
+      <div className="px-3 py-4 space-y-4 sm:px-6 sm:py-6 sm:space-y-6">
+        <NoteSidebarOverview note={note} />
+
+        <Separator />
+
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-2 sm:mb-3">
+            Contenu
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Contenu non disponible.
+          </p>
+        </div>
+
+        <Separator />
+
+        <NoteSidebarInfo
+          createdAt={formattedCreatedAt}
+          updatedAt={formattedUpdatedAt}
         />
 
-        <div className="px-6 py-6 space-y-6">
-          <NoteSidebarOverview note={note} />
-
-          <Separator />
-
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-              Contenu
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Contenu non disponible.
-            </p>
-          </div>
-
-          <Separator />
-
-          <NoteSidebarInfo
-            createdAt={formattedCreatedAt}
-            updatedAt={formattedUpdatedAt}
-          />
-
-          <FlashcardsSection noteId={note.id} />
-        </div>
+        <FlashcardsSection noteId={note.id} />
       </div>
-    </aside>
+    </>
+  )
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+
+  // Mobile: popup/drawer style au centre de l'écran
+  return (
+    <>
+      {/* Overlay sur mobile */}
+      {open && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 sm:hidden"
+          onClick={onClose}
+          aria-label="Fermer le panneau"
+        />
+      )}
+
+      {/* Contenu */}
+      <aside
+        ref={resizeRef}
+        style={isMobile ? undefined : { width: `${width}px` }}
+        className={cn(
+          'fixed z-50 bg-background transition-all duration-300 ease-in-out flex flex-col',
+          // Mobile: popup centré avec hauteur fixe
+          'bottom-0 left-0 right-0 w-full h-[85vh] rounded-t-2xl border-t shadow-2xl',
+          // Desktop: sidebar à droite pleine hauteur
+          'sm:top-0 sm:bottom-auto sm:left-auto sm:right-0 sm:w-auto sm:h-full sm:rounded-none sm:border-l sm:border-t-0',
+          open
+            ? 'translate-y-0 sm:translate-y-0 sm:translate-x-0'
+            : 'translate-y-full sm:translate-y-0 sm:translate-x-full',
+          isResizing && 'transition-none'
+        )}
+      >
+        <div className="hidden sm:block">
+          <NoteSidebarResizer
+            isResizing={isResizing}
+            onResizeStart={handleMouseDown}
+          />
+        </div>
+        <NoteSidebarHeader onClose={onClose} />
+
+        <div className="flex-1 overflow-y-auto">{content}</div>
+      </aside>
+    </>
   )
 }

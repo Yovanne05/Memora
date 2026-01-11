@@ -25,17 +25,17 @@ export default function RevisionPage() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl mx-auto py-8">
+      <div className="container max-w-full px-4 mx-auto py-4 sm:max-w-2xl sm:py-6 md:max-w-4xl md:py-8">
         <p>Chargement des révisions...</p>
       </div>
     )
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 space-y-6">
+    <div className="container max-w-full px-4 mx-auto py-4 space-y-4 sm:max-w-2xl sm:py-6 sm:space-y-6 md:max-w-4xl md:py-8">
       <div>
-        <h1 className="text-3xl font-bold">Révisions</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-bold sm:text-3xl">Révisions</h1>
+        <p className="text-sm text-muted-foreground sm:text-base">
           Révisez vos flashcards avec la répétition espacée
         </p>
       </div>
@@ -43,8 +43,8 @@ export default function RevisionPage() {
       {totalReviewsCount > 0 ? (
         <>
           <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-2xl font-bold">
                     {totalReviewsCount} flashcard
@@ -56,7 +56,11 @@ export default function RevisionPage() {
                     </p>
                   )}
                 </div>
-                <Button onClick={handleStartSession} size="lg">
+                <Button
+                  onClick={handleStartSession}
+                  size="lg"
+                  className="w-full sm:w-auto"
+                >
                   Commencer la session →
                 </Button>
               </div>

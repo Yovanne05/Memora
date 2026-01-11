@@ -25,10 +25,10 @@ export function useWorkspaceBreadcrumbs({
   return useMemo<BreadcrumbItem[]>(() => {
     const base =
       mode === 'favorites' ? '/app/workspace/favorites' : '/app/workspace'
-    const items: BreadcrumbItem[] = [{ label: 'Workspace', href: base }]
+    const items: BreadcrumbItem[] = []
 
     if (mode === 'favorites') {
-      items.push({ label: 'Favorites', href: base })
+      items.push({ label: 'Mes favoris', href: base })
     }
 
     if (selectedCollectionId && collectionQuery.data) {

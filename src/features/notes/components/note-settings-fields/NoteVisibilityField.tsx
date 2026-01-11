@@ -4,10 +4,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Switch } from "@/components/ui/switch"
-import type { UseFormReturn } from "react-hook-form"
-import type { NoteFormValues } from "../../types/note-edit-form.types"
+} from '@/components/ui/form'
+import { Switch } from '@/components/ui/switch'
+import type { UseFormReturn } from 'react-hook-form'
+import type { NoteFormValues } from '../../types/note-edit-form.types'
 
 type NoteVisibilityFieldProps = {
   form: UseFormReturn<NoteFormValues>
@@ -24,23 +24,18 @@ export function NoteVisibilityField({
       name="visibility"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Visibilité</FormLabel>
-          <div className="flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3">
-            <div className="space-y-0.5">
-              <p className="text-sm font-medium">
-                {field.value === "public" ? "Publique" : "Privée"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Basculer la visibilité de la note.
-              </p>
-            </div>
+          <FormLabel className="text-sm font-medium">Visibilité</FormLabel>
+          <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+            <span className="text-sm">
+              {field.value === 'public' ? 'Publique' : 'Privée'}
+            </span>
             <FormControl>
               <Switch
                 id="note-visibility"
                 aria-label="Basculer la visibilité"
-                checked={field.value === "public"}
+                checked={field.value === 'public'}
                 onCheckedChange={(checked) =>
-                  field.onChange(checked ? "public" : "private")
+                  field.onChange(checked ? 'public' : 'private')
                 }
                 disabled={disabled}
               />
@@ -52,6 +47,3 @@ export function NoteVisibilityField({
     />
   )
 }
-
-
-

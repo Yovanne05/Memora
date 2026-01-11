@@ -16,8 +16,8 @@ export function NoteSidebarRelatedNotes({
   }
 
   return (
-    <div className="px-6 py-4 bg-muted/30">
-      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+    <div className="px-3 py-3 sm:px-6 sm:py-4 bg-muted/30">
+      <h3 className="text-sm font-semibold text-muted-foreground mb-2 sm:mb-3">
         Notes liées ({notes.length})
       </h3>
       <div className="space-y-2">
@@ -26,7 +26,7 @@ export function NoteSidebarRelatedNotes({
             key={relatedNote.id}
             type="button"
             onClick={() => onNoteClick?.(relatedNote.id)}
-            className="w-full text-left p-3 rounded-lg border bg-background hover:bg-accent hover:border-accent-foreground/20 transition-colors group flex items-center justify-between gap-2"
+            className="w-full text-left p-2 sm:p-3 rounded-lg border bg-background hover:bg-accent hover:border-accent-foreground/20 transition-colors group flex items-center justify-between gap-2"
           >
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">

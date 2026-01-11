@@ -34,7 +34,7 @@ export function FlashcardAnswersList({
             onClick={() => onSelect(answer.id)}
             disabled={showResult}
             className={cn(
-              'w-full text-left p-3 rounded-lg border transition-all flex items-center gap-3',
+              'w-full text-left p-2 rounded-lg border transition-all flex items-center gap-2 sm:p-3 sm:gap-3',
               !showResult &&
                 'hover:bg-accent hover:border-accent-foreground/20',
               isSelected && !showResult && 'border-primary bg-primary/5',
@@ -58,7 +58,9 @@ export function FlashcardAnswersList({
               {shouldShowIncorrect && <X className="h-4 w-4" />}
             </div>
 
-            <span className="flex-1 text-sm">{answer.answerText}</span>
+            <span className="flex-1 text-xs sm:text-sm">
+              {answer.answerText}
+            </span>
           </button>
         )
       })}

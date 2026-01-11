@@ -38,6 +38,10 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
         noteId,
         payload: {
           title: values.title,
+          content: values.content,
+          visibility: values.visibility,
+          collectionId: values.collectionId,
+          tags: values.tags,
         },
       })
     } catch (error) {

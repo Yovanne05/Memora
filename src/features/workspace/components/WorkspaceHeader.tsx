@@ -1,3 +1,5 @@
+import { Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useWorkspaceContext } from '../context'
 import { WorkspaceBreadcrumb } from './workspace-header/WorkspaceBreadcrumb'
 import { WorkspaceGraphButton } from './workspace-header/WorkspaceGraphButton'
@@ -12,6 +14,7 @@ export function WorkspaceHeader() {
   const isFavoritesMode = location.pathname.startsWith(
     '/app/workspace/favorites'
   )
+  const isNoteEditPage = location.pathname.includes('/notes/')
   const breadcrumbItems = useWorkspaceBreadcrumbs({
     selectedCollectionId: state.selectedCollectionId,
     selectedNoteId: state.selectedNoteId,
@@ -19,11 +22,29 @@ export function WorkspaceHeader() {
   })
 
   return (
-    <header className="border-b bg-card p-4">
-      <div className="flex items-center justify-between gap-4">
-        <WorkspaceBreadcrumb items={breadcrumbItems} />
-        <div className="flex items-center gap-2">
-          <WorkspaceSearch value={state.search} onChange={actions.setSearch} />
+    <header className="border-b bg-card p-2 sm:p-4">
+      <div className="flex w-full items-center justify-between gap-2 sm:gap-4">
+        {/* Bouton hamburger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={actions.toggleSidebar}
+          aria-label="Toggle sidebar"
+          className="shrink-0"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <div className="min-w-0 flex-1">
+          <WorkspaceBreadcrumb items={breadcrumbItems} />
+        </div>
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {!isNoteEditPage && (
+            <WorkspaceSearch
+              value={state.search}
+              onChange={actions.setSearch}
+            />
+          )}
           {!state.selectedNoteId && (
             <WorkspaceViewToggle view={state.view} onChange={actions.setView} />
           )}
