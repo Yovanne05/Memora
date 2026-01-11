@@ -12,6 +12,7 @@ interface UseCollaborativeEditorCRDTOptions {
   editor: Editor | null
   noteId: string
   enabled?: boolean
+  content?: string | null
   onContentChanged?: (content: string) => void
 }
 
@@ -19,6 +20,7 @@ export function useCollaborativeEditorCRDT({
   editor,
   noteId,
   enabled = true,
+  content = null,
   onContentChanged,
 }: UseCollaborativeEditorCRDTOptions) {
   const [localError, setLocalError] = useState<Error | null>(null)
@@ -66,6 +68,7 @@ export function useCollaborativeEditorCRDT({
   } = useCollaborationCRDT({
     noteId,
     enabled: enabled && !!editor,
+    initialContent: content,
     onUserJoined: handleUserJoined,
     onUserLeft: handleUserLeft,
     onSessionUpdated: (newSession) => {

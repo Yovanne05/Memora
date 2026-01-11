@@ -31,13 +31,13 @@ export function RichTextEditor({
     onChange,
     placeholder,
     editable,
-    noteId,
   })
 
   const collaboration = useCollaborativeEditorCRDT({
     editor,
     noteId: noteId || '',
     enabled: enableCollaboration && editable && !!noteId,
+    content,
     onContentChanged: onChange,
   })
 

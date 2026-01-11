@@ -15,6 +15,7 @@ import type { CollaborationSession } from '../types/collaboration'
 export type UseCollaborationCRDTOptions = {
   noteId: string
   enabled?: boolean
+  initialContent?: string | null
   onSynced?: () => void
   onUserJoined?: (event: { user_id: string; username: string }) => void
   onUserLeft?: (event: { user_id: string; username: string }) => void
@@ -39,6 +40,7 @@ export function useCollaborationCRDT(
   const {
     noteId,
     enabled = true,
+    initialContent = null,
     onSynced,
     onUserJoined,
     onUserLeft,
@@ -64,6 +66,7 @@ export function useCollaborationCRDT(
   const onUserLeftRef = useLatest(onUserLeft)
   const onSessionUpdatedRef = useLatest(onSessionUpdated)
   const onErrorRef = useLatest(onError)
+  const initialContentRef = useLatest(initialContent)
 
   const handleSessionUpdate = useCallback(
     (sessionData: CollaborationSession) => {
@@ -151,6 +154,7 @@ export function useCollaborationCRDT(
         // Rejoindre la session de collaboration
         socket.emit('join_collaboration', {
           note_id: noteId,
+          content: initialContentRef.current ?? undefined,
         })
         hasJoinedRef.current = true
       }
@@ -204,6 +208,7 @@ export function useCollaborationCRDT(
     handleSocketError,
     onSyncedRef,
     onErrorRef,
+    initialContentRef,
   ])
 
   const disconnect = useCallback(() => {

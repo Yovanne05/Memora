@@ -15,7 +15,7 @@ export function createCollabService(
   return {
     async createSession(noteId: string): Promise<CollabSessionDto> {
       const dto = await client.post<CollabSessionDto, CollabSessionPayloadDto>(
-        '/collab/sessions',
+        '/collaboration/sessions',
         { note_id: noteId }
       )
       return collabSessionDtoSchema.parse(dto) as CollabSessionDto
