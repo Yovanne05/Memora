@@ -23,7 +23,6 @@ export default function NoteEditView({
     canDelete,
     handleSubmit,
     handleDelete,
-    handleCancel,
   } = useNoteEditView({ noteId, collectionId })
 
   if (noteQuery.isLoading) {
@@ -42,7 +41,6 @@ export default function NoteEditView({
         loading={updateMutation.isPending}
         deleteLoading={deleteMutation.isPending}
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         onDelete={canDelete ? handleDelete : undefined}
         readOnly={isReadOnly}
       />
