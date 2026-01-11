@@ -1,8 +1,3 @@
-"""
-Permission Domain Models
-Domain-level representation of access control concepts.
-Following DDD principles: entities, value objects, and domain logic.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -42,10 +37,6 @@ class AccessLevel(Enum):
 
 @dataclass(frozen=True)
 class ResourcePermission:
-    """
-    Value object representing a user's permission on a specific resource.
-    Immutable to preserve domain integrity.
-    """
     resource_id: str
     resource_type: str  # 'note', 'collection', 'flashcard'
     user_id: str
@@ -66,10 +57,6 @@ class ResourcePermission:
 
 @dataclass(frozen=True)
 class PermissionContext:
-    """
-    Context information for permission evaluation.
-    Aggregates all data needed to compute permissions.
-    """
     user_id: str
     user_role: RoleEnum
     resource_id: str
@@ -97,17 +84,6 @@ class PermissionContext:
 
 
 def compute_access_level_from_context(context: PermissionContext) -> AccessLevel:
-    """
-    Core domain logic: compute access level from context.
-    This is the single source of truth for permission calculation.
-
-    Priority order:
-    1. Admin access (highest)
-    2. Ownership
-    3. Direct share
-    4. Public visibility
-    5. No access (default)
-    """
     # Admin users have full access
     if context.is_admin():
         return AccessLevel.ADMIN
@@ -129,10 +105,6 @@ def compute_access_level_from_context(context: PermissionContext) -> AccessLevel
 
 
 def _share_permission_to_access_level(permission: Optional[SharePermissionEnum]) -> AccessLevel:
-    """
-    Convert share permission enum to access level.
-    Internal domain mapping function.
-    """
     if permission is None:
         return AccessLevel.NONE
 

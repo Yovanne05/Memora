@@ -18,14 +18,20 @@ from controllers.collection_favorite_controller import bp_collection_favorites
 from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards, bp_note_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
+from controllers.realtime_collaboration_controller import register_socketio_handlers
 from controllers.review_controller import bp_reviews
 from controllers.report_controller import bp_reports
-from controllers.collab_controller import bp_collab
 from utils import db
 from utils.jwt import init_jwt
 from utils.filter import register_global_filter
 from utils.logger import init_logger
+from utils.realtime_filter import register_realtime_filter
 from utils.swagger import init_swagger
+from services.impl.infrastructure.redis_client_service_impl import redis_client_service
+from services.impl.realtime.socketio_service_impl import socketio_service
+from services.impl.realtime.crdt.crdt_service_impl import init_crdt_service
+from services.impl.realtime.background_jobs_service_impl import init_background_jobs
+
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -38,11 +44,33 @@ def create_app() -> Flask:
     init_jwt(app)
     init_swagger(app)
     init_logger(app)
-    
+
+    redis_client = redis_client_service.init_redis(
+        host=config.REDIS_HOST,
+        port=config.REDIS_PORT,
+        db=config.REDIS_DB
+    )
+
+    init_crdt_service(redis_client=redis_client)
+
+    if config.APP_ENV != "test":
+        init_background_jobs(
+            crdt_snapshot_interval=30,   # 30 secondes
+            session_cleanup_interval=30, # 30 secondes
+        )
+
+
+    socketio = socketio_service.init_socketio(
+        app, cors_allowed_origins="*", async_mode="threading"
+    )
+    register_realtime_filter(socketio)
+
+
     if config.APP_ENV == "test":
         with app.app_context():
             db.create_all()
-
+            
+    register_socketio_handlers()
     register_global_filter(app)
 
     app.register_blueprint(bp_sessions)
@@ -64,10 +92,10 @@ def create_app() -> Flask:
     app.register_blueprint(bp_note_favorites)
     app.register_blueprint(bp_collection_favorites)
     app.register_blueprint(bp_reports)
-    app.register_blueprint(bp_collab)
 
     return app
 
 if __name__ == "__main__":
+    from services.impl.realtime.socketio_service_impl import socketio_service
     app = create_app()
-    app.run(debug=True)
+    socketio_service.run_socketio(app, debug=True, host="0.0.0.0", port=5000)

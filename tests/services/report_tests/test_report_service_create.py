@@ -39,7 +39,7 @@ class TestReportServiceReportNote:
         monkeypatch.setattr("domain_services.report_domain_service.permission_domain_service.can_read_note", lambda *args: True)
 
         note = Note(
-            id=note_id, title="Test Note", yjs_snapshot=None, owner_id=str(uuid4()),
+            id=note_id, title="Test Note", owner_id=str(uuid4()),
             collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
             flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
             created_at=datetime.now(), updated_at=datetime.now()

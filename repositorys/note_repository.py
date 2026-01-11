@@ -29,7 +29,6 @@ class NoteSearchParams:
     offset: int = 0
 
 
-
 def _scope_to_user(stmt, user):
     accessible_ids = permission_domain_service.get_accessible_note_ids(
         user.id, user.role
@@ -56,7 +55,6 @@ def list_for_user(
 
     if p.title_contains:
         filters.append(Note.title.ilike(f"%{p.title_contains}%"))
-
 
     if p.ids:
         filters.append(Note.id.in_(p.ids))
@@ -154,18 +152,14 @@ def update(note_entity: Note) -> Note:
         return merged
 
 
-def update_collab_data(
-    note_id: str,
-    yjs_snapshot: str,
-) -> Optional[Note]:
+def update_content(note_id: str, content: str) -> bool:
     with get_db_session() as session:
         entity = session.get(Note, note_id)
         if not entity:
-            return None
-        entity.yjs_snapshot = yjs_snapshot
+            return False
+        entity.content = content
         session.flush()
-        session.refresh(entity)
-        return entity
+        return True
 
 
 def delete(note_id: str) -> bool:

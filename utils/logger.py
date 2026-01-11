@@ -11,8 +11,11 @@ class InfoFilter(logging.Filter):
         return record.levelno < logging.ERROR
 
 
-def init_logger(app: Flask):
+def get_logger(name: str) -> logging.Logger:
+    return logging.getLogger(name)
 
+
+def init_logger(app: Flask):
     log_dir = app.config.get('LOG_DIR', 'logs')
     os.makedirs(log_dir, exist_ok=True)
     app.logger.handlers.clear()
@@ -103,3 +106,5 @@ def init_logger(app: Flask):
             app.logger.error(log_message)
 
         return response
+
+

@@ -38,7 +38,6 @@ class TestNoteServiceUpdate:
         existing_note = Note(
             id=note_id,
             title="Old Title",
-            yjs_snapshot=None,
             owner_id=user_id,
             visibility=VisibilityEnum.PRIVATE,
             tags=[],
@@ -54,7 +53,6 @@ class TestNoteServiceUpdate:
         updated_note = Note(
             id=note_id,
             title="New Title",
-            yjs_snapshot=None,
             owner_id=user_id,
             visibility=VisibilityEnum.PUBLIC,
             tags=[],
@@ -93,7 +91,6 @@ class TestNoteServiceUpdate:
 
         dto = NoteUpdateDTO(
             title="New Title",
-            yjs_snapshot=None,
             visibility=VisibilityEnum.PUBLIC
         )
 

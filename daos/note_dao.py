@@ -6,6 +6,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -52,8 +53,7 @@ class Note(
         nullable=True,
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    yjs_snapshot: Mapped[str | None] = mapped_column(Text, nullable=True)
-
+    content: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("''"))
     collection: Mapped["Collection | None"] = relationship(
         back_populates="notes", lazy="selectin"
     )

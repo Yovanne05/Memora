@@ -1,16 +1,17 @@
-DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS flashcard_answers CASCADE;
-DROP TABLE IF EXISTS flashcards CASCADE;
-DROP TABLE IF EXISTS note_images CASCADE;
-DROP TABLE IF EXISTS note_links CASCADE;
-DROP TABLE IF EXISTS note_shares CASCADE;
-DROP TABLE IF EXISTS reports CASCADE;
-DROP TABLE IF EXISTS collection_shares CASCADE;
-DROP TABLE IF EXISTS note_favorites CASCADE;
-DROP TABLE IF EXISTS collection_favorites CASCADE;
-DROP TABLE IF EXISTS notes CASCADE;
-DROP TABLE IF EXISTS collections CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
+    DROP TABLE IF EXISTS reviews CASCADE;
+    DROP TABLE IF EXISTS flashcard_answers CASCADE;
+    DROP TABLE IF EXISTS flashcards CASCADE;
+    DROP TABLE IF EXISTS note_images CASCADE;
+    DROP TABLE IF EXISTS note_links CASCADE;
+    DROP TABLE IF EXISTS note_shares CASCADE;
+    DROP TABLE IF EXISTS reports CASCADE;
+    DROP TABLE IF EXISTS collection_shares CASCADE;
+    DROP TABLE IF EXISTS note_favorites CASCADE;
+    DROP TABLE IF EXISTS collection_favorites CASCADE;
+    DROP TABLE IF EXISTS crdt_snapshots CASCADE;
+    DROP TABLE IF EXISTS notes CASCADE;
+    DROP TABLE IF EXISTS collections CASCADE;
+    DROP TABLE IF EXISTS users CASCADE;
 
 
 DROP TYPE IF EXISTS visibilityenum;
@@ -68,25 +69,25 @@ CREATE TABLE collections (
 CREATE UNIQUE INDEX uniq_collection_name_per_owner
     ON collections (owner_id, name);
 
-CREATE TABLE notes (
-    id             CHAR(36) PRIMARY KEY,
-    collection_id  CHAR(36),
-    owner_id       CHAR(36) NOT NULL,
-    title          VARCHAR(255) NOT NULL,
-    yjs_snapshot   TEXT,
-    visibility     visibilityenum NOT NULL DEFAULT 'private',
-    tags           TEXT[] NOT NULL DEFAULT '{}',
-    created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_notes_collection
-        FOREIGN KEY (collection_id) REFERENCES collections(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT fk_notes_owner
-        FOREIGN KEY (owner_id) REFERENCES users(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
+    CREATE TABLE notes (
+        id             CHAR(36) PRIMARY KEY,
+        collection_id  CHAR(36),
+        owner_id       CHAR(36) NOT NULL,
+        title          VARCHAR(255) NOT NULL,
+        content        TEXT NOT NULL DEFAULT '',
+        visibility     visibilityenum NOT NULL DEFAULT 'private',
+        tags           TEXT[] NOT NULL DEFAULT '{}',
+        created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_notes_collection
+            FOREIGN KEY (collection_id) REFERENCES collections(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+        CONSTRAINT fk_notes_owner
+            FOREIGN KEY (owner_id) REFERENCES users(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+    );
 
 CREATE UNIQUE INDEX uniq_note_title_per_collection
     ON notes (collection_id, title);
@@ -286,6 +287,24 @@ CREATE TABLE note_favorites (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+    CREATE TABLE crdt_snapshots (
+        id              CHAR(36) PRIMARY KEY,
+        note_id         CHAR(36) NOT NULL UNIQUE,
+        state_vector    BYTEA NOT NULL,
+        document_update BYTEA NOT NULL,
+        version         INT NOT NULL DEFAULT 0,
+        created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_crdt_snapshots_note
+            FOREIGN KEY (note_id) REFERENCES notes(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+    );
+
+    CREATE INDEX idx_crdt_snapshots_note
+        ON crdt_snapshots (note_id);
+
+    -- ===== TRIGGERS =====
 
 CREATE INDEX idx_note_favorites_user ON note_favorites (user_id);
 
@@ -328,5 +347,10 @@ EXECUTE FUNCTION set_updated_at();
 
 CREATE TRIGGER trg_flashcards_updated_at
 BEFORE UPDATE ON flashcards
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_crdt_snapshots_updated_at
+BEFORE UPDATE ON crdt_snapshots
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
