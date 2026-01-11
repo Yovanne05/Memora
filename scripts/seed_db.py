@@ -111,10 +111,16 @@ def seed() -> None:
             password_hash=_hash_password("AdminPass123!"),
             role=RoleEnum.ADMIN,
         )
-        client = User(
-            email="client@example.com",
-            username="client",
-            password_hash=_hash_password("ClientPass123!"),
+        alice = User(
+            email="alice@example.com",
+            username="alice",
+            password_hash=_hash_password("AlicePass123!"),
+            role=RoleEnum.CLIENT,
+        )
+        bob = User(
+            email="bob@example.com",
+            username="bob",
+            password_hash=_hash_password("BobPass123!!"),
             role=RoleEnum.CLIENT,
         )
 
