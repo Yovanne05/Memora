@@ -70,17 +70,15 @@ export function CollectionNotesViewContent({
   onDeleteOpenChange,
   onDeleteConfirm,
 }: Readonly<CollectionNotesViewContentProps>) {
-  const errorComponent = (
-    <ErrorHandling
-      collectionError={collectionError}
-      isCollectionError={isCollectionError}
-      isNotesError={isNotesError}
-      notesError={notesError}
-    />
-  )
-
-  if (errorComponent) {
-    return errorComponent
+  if (isCollectionError || isNotesError) {
+    return (
+      <ErrorHandling
+        collectionError={collectionError}
+        isCollectionError={isCollectionError}
+        isNotesError={isNotesError}
+        notesError={notesError}
+      />
+    )
   }
 
   if (isLoading) {
