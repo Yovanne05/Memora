@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload
-
 from daos.note_dao import NoteShare
-from utils.db import get_db_session
+from repositorys.share_repository_utils import (
+    add_share,
+    delete_share,
+    find_many_shares,
+    find_share,
+    find_shares_by_resource,
+    update_share,
+)
 
 
 @dataclass
@@ -20,85 +24,29 @@ class NoteShareSearchParams:
     offset: int = 0
 
 
-
 def find_many(
     params: Optional[NoteShareSearchParams] = None,
 ) -> Tuple[List[NoteShare], int]:
-    param = params or NoteShareSearchParams()
-
-    filters = []
-    if param.note_id:
-        filters.append(NoteShare.note_id == param.note_id)
-    if param.user_id:
-        filters.append(NoteShare.user_id == param.user_id)
-
-    stmt = select(NoteShare).where(*filters).options(
-        selectinload(NoteShare.user)
+    return find_many_shares(
+        NoteShare, params, NoteShareSearchParams, "note_id"
     )
-
-    sort_map = {
-        "created_at": NoteShare.created_at,
-    }
-    order_column = sort_map[param.sort_by]
-    order_expr = (
-        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
-    )
-
-    with get_db_session() as session:
-        total = session.scalar(
-            select(func.count()).select_from(stmt.subquery())
-        )
-        items = session.scalars(
-            stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
-        ).all()
-
-    return items, total or 0
 
 
 def find_by_note(note_id: str) -> List[NoteShare]:
-    stmt = select(NoteShare).where(NoteShare.note_id == note_id).options(
-        selectinload(NoteShare.user)
-    )
-    with get_db_session() as session:
-        return session.scalars(stmt).all()
+    return find_shares_by_resource(NoteShare, "note_id", note_id)
 
 
 def find_one(note_id: str, user_id: str) -> Optional[NoteShare]:
-    stmt = select(NoteShare).where(
-        NoteShare.note_id == note_id,
-        NoteShare.user_id == user_id,
-    ).options(selectinload(NoteShare.user))
-    with get_db_session() as session:
-        return session.execute(stmt).scalar_one_or_none()
+    return find_share(NoteShare, "note_id", note_id, user_id)
 
 
 def add(share: NoteShare) -> NoteShare:
-    with get_db_session() as session:
-        session.add(share)
-        session.flush()
-        stmt = select(NoteShare).where(
-            NoteShare.note_id == share.note_id,
-            NoteShare.user_id == share.user_id,
-        ).options(selectinload(NoteShare.user))
-        return session.execute(stmt).scalar_one()
+    return add_share(NoteShare, "note_id", share)
 
 
 def update(share: NoteShare) -> NoteShare:
-    with get_db_session() as session:
-        merged: NoteShare = session.merge(share)
-        session.flush()
-        stmt = select(NoteShare).where(
-            NoteShare.note_id == merged.note_id,
-            NoteShare.user_id == merged.user_id,
-        ).options(selectinload(NoteShare.user))
-        return session.execute(stmt).scalar_one()
+    return update_share(NoteShare, "note_id", share)
 
 
 def delete(note_id: str, user_id: str) -> bool:
-    with get_db_session() as session:
-        share = session.get(NoteShare, (note_id, user_id))
-        if not share:
-            return False
-        session.delete(share)
-        session.flush()
-        return True
+    return delete_share(NoteShare, note_id, user_id)

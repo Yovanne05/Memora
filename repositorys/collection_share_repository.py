@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 from typing import List, Literal, Optional, Tuple
 
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload
-
 from daos.collection_dao import CollectionShare
-from utils.db import get_db_session
+from repositorys.share_repository_utils import (
+    add_share,
+    delete_share,
+    find_many_shares,
+    find_share,
+    find_shares_by_resource,
+    update_share,
+)
 
 
 @dataclass
@@ -20,87 +24,36 @@ class CollectionShareSearchParams:
     offset: int = 0
 
 
-
 def find_many(
     params: Optional[CollectionShareSearchParams] = None,
 ) -> Tuple[List[CollectionShare], int]:
-    param = params or CollectionShareSearchParams()
-
-    filters = []
-    if param.collection_id:
-        filters.append(CollectionShare.collection_id == param.collection_id)
-    if param.user_id:
-        filters.append(CollectionShare.user_id == param.user_id)
-
-    stmt = select(CollectionShare).where(*filters).options(
-        selectinload(CollectionShare.user)
+    return find_many_shares(
+        CollectionShare,
+        params,
+        CollectionShareSearchParams,
+        "collection_id",
     )
-
-    sort_map = {
-        "created_at": CollectionShare.created_at,
-    }
-    order_column = sort_map[param.sort_by]
-    order_expr = (
-        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
-    )
-
-    with get_db_session() as session:
-        total = session.scalar(
-            select(func.count()).select_from(stmt.subquery())
-        )
-        items = session.scalars(
-            stmt.order_by(order_expr).limit(param.limit).offset(param.offset)
-        ).all()
-
-    return items, total or 0
 
 
 def find_by_collection(collection_id: str) -> List[CollectionShare]:
-    stmt = select(CollectionShare).where(
-        CollectionShare.collection_id == collection_id
-    ).options(selectinload(CollectionShare.user))
-    with get_db_session() as session:
-        return session.scalars(stmt).all()
+    return find_shares_by_resource(
+        CollectionShare, "collection_id", collection_id
+    )
 
 
 def find_one(
     collection_id: str, user_id: str
 ) -> Optional[CollectionShare]:
-    stmt = select(CollectionShare).where(
-        CollectionShare.collection_id == collection_id,
-        CollectionShare.user_id == user_id,
-    ).options(selectinload(CollectionShare.user))
-    with get_db_session() as session:
-        return session.execute(stmt).scalar_one_or_none()
+    return find_share(CollectionShare, "collection_id", collection_id, user_id)
 
 
 def add(share: CollectionShare) -> CollectionShare:
-    with get_db_session() as session:
-        session.add(share)
-        session.flush()
-        stmt = select(CollectionShare).where(
-            CollectionShare.collection_id == share.collection_id,
-            CollectionShare.user_id == share.user_id,
-        ).options(selectinload(CollectionShare.user))
-        return session.execute(stmt).scalar_one()
+    return add_share(CollectionShare, "collection_id", share)
 
 
 def update(share: CollectionShare) -> CollectionShare:
-    with get_db_session() as session:
-        merged: CollectionShare = session.merge(share)
-        session.flush()
-        stmt = select(CollectionShare).where(
-            CollectionShare.collection_id == merged.collection_id,
-            CollectionShare.user_id == merged.user_id,
-        ).options(selectinload(CollectionShare.user))
-        return session.execute(stmt).scalar_one()
+    return update_share(CollectionShare, "collection_id", share)
 
 
 def delete(collection_id: str, user_id: str) -> bool:
-    with get_db_session() as session:
-        share = session.get(CollectionShare, (collection_id, user_id))
-        if not share:
-            return False
-        session.delete(share)
-        session.flush()
-        return True
+    return delete_share(CollectionShare, collection_id, user_id)

@@ -11,7 +11,6 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
-from datetime import datetime
 from dtos.note_share_link_dto import NoteShareLinkDTO, NoteShareLinkCreateDTO
 from daos.note_share_link_dao import NoteShareLink
 from exceptions.note_share_link_exception import NoteShareLinkNotFound
@@ -20,21 +19,19 @@ from exceptions.note_share_link_exception import NoteShareLinkNotFound
 class TestNoteShareLinkServiceDelete:
     """Tests pour supprimer un lien public"""
 
-    def test_delete_share_link_success(self, mock_note_share_link_repository, mock_note_repository):
+    def test_delete_share_link_success(self, mock_note_share_link_repository, mock_note_repository, make_note):
         """Supprimer un lien public."""
         from services.impl.note.note_share_link_service_impl import note_share_link_service
-        from daos.note_dao import Note
-
         # Arrange
         owner_id = str(uuid4())
         note_id = str(uuid4())
         link_id = str(uuid4())
 
-        note = Note(
-            id=note_id, title="Test Note", owner_id=owner_id,
-            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
-            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
-            created_at=datetime.now(), updated_at=datetime.now()
+        note = make_note(
+            note_id=note_id,
+            owner_id=owner_id,
+            collection_id=str(uuid4()),
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 
@@ -46,21 +43,19 @@ class TestNoteShareLinkServiceDelete:
         # Assert
         mock_note_share_link_repository.delete.assert_called_once_with(link_id)
 
-    def test_delete_nonexistent_link_raises_exception(self, mock_note_share_link_repository, mock_note_repository):
+    def test_delete_nonexistent_link_raises_exception(self, mock_note_share_link_repository, mock_note_repository, make_note):
         """Supprimer un lien inexistant lève NoteShareLinkNotFound."""
         from services.impl.note.note_share_link_service_impl import note_share_link_service
-        from daos.note_dao import Note
-
         # Arrange
         owner_id = str(uuid4())
         note_id = str(uuid4())
         link_id = str(uuid4())
 
-        note = Note(
-            id=note_id, title="Test Note", owner_id=owner_id,
-            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
-            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
-            created_at=datetime.now(), updated_at=datetime.now()
+        note = make_note(
+            note_id=note_id,
+            owner_id=owner_id,
+            collection_id=str(uuid4()),
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 

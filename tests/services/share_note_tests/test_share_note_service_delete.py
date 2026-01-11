@@ -11,7 +11,6 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
-from datetime import datetime
 from dtos.note_share_dto import NoteShareDTO, NoteShareCreateDTO, NoteShareUpdateDTO
 from daos.note_dao import NoteShare
 from exceptions.note_share_exception import NoteShareNotFound
@@ -20,11 +19,9 @@ from exceptions.note_share_exception import NoteShareNotFound
 class TestNoteShareServiceRevoke:
     """Tests pour révoquer un partage"""
 
-    def test_revoke_share_success(self, mock_note_share_repository, mock_note_repository, monkeypatch):
+    def test_revoke_share_success(self, mock_note_share_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Révoquer un partage avec succès."""
         from services.impl.note.note_share_service_impl import note_share_service
-        from daos.note_dao import Note
-        from daos.user_dao import User
         from utils.enums import RoleEnum
 
         # Arrange
@@ -32,17 +29,19 @@ class TestNoteShareServiceRevoke:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(
-            id=owner_id, email="owner@example.com", username="owner",
-            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        current_user = make_user(
+            user_id=owner_id,
+            email="owner@example.com",
+            username="owner",
+            role=RoleEnum.CLIENT,
         )
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(
-            id=note_id, title="Test Note", owner_id=owner_id,
-            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
-            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
-            created_at=datetime.now(), updated_at=datetime.now()
+        note = make_note(
+            note_id=note_id,
+            owner_id=owner_id,
+            collection_id=str(uuid4()),
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 
@@ -56,11 +55,9 @@ class TestNoteShareServiceRevoke:
         # Assert
         mock_note_share_repository.delete.assert_called_once_with(note_id, user_id)
 
-    def test_revoke_nonexistent_share_raises_exception(self, mock_note_share_repository, mock_note_repository, monkeypatch):
+    def test_revoke_nonexistent_share_raises_exception(self, mock_note_share_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Révoquer un partage inexistant lève NoteShareNotFound."""
         from services.impl.note.note_share_service_impl import note_share_service
-        from daos.note_dao import Note
-        from daos.user_dao import User
         from utils.enums import RoleEnum
 
         # Arrange
@@ -68,17 +65,19 @@ class TestNoteShareServiceRevoke:
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(
-            id=owner_id, email="owner@example.com", username="owner",
-            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        current_user = make_user(
+            user_id=owner_id,
+            email="owner@example.com",
+            username="owner",
+            role=RoleEnum.CLIENT,
         )
         monkeypatch.setattr("services.impl.note.note_share_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(
-            id=note_id, title="Test Note", owner_id=owner_id,
-            collection_id=str(uuid4()), tags=[], shares=[], share_links=[],
-            flashcards=[], reports=[], outgoing_links=[], incoming_links=[],
-            created_at=datetime.now(), updated_at=datetime.now()
+        note = make_note(
+            note_id=note_id,
+            owner_id=owner_id,
+            collection_id=str(uuid4()),
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 

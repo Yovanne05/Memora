@@ -5,9 +5,16 @@ Les tests de services utilisent des mocks pour les repositories.
 Cela permet de tester uniquement la logique métier des services
 sans dépendre de la base de données.
 """
-import pytest
 from datetime import datetime
+from uuid import uuid4
 from unittest.mock import Mock, MagicMock
+
+import pytest
+
+from daos.collection_dao import Collection
+from daos.note_dao import Note
+from daos.user_dao import User
+from utils.enums import RoleEnum
 
 
 # =============================================================================
@@ -211,3 +218,79 @@ def sample_collection_id():
 def sample_note_id():
     """ID note de test."""
     return "note-test-789"
+
+
+@pytest.fixture
+def make_user():
+    """Fabrique un utilisateur de test."""
+    def _make_user(
+        user_id: str | None = None,
+        email: str = "test@example.com",
+        username: str = "test",
+        role: RoleEnum = RoleEnum.CLIENT,
+        created_at: datetime | None = None,
+    ) -> User:
+        return User(
+            id=user_id or str(uuid4()),
+            email=email,
+            username=username,
+            password_hash="hash",
+            role=role,
+            created_at=created_at or datetime.now(),
+        )
+
+    return _make_user
+
+
+@pytest.fixture
+def make_collection():
+    """Fabrique une collection de test."""
+    def _make_collection(
+        collection_id: str | None = None,
+        owner_id: str | None = None,
+        name: str = "Test",
+        created_at: datetime | None = None,
+        updated_at: datetime | None = None,
+    ) -> Collection:
+        return Collection(
+            id=collection_id or str(uuid4()),
+            name=name,
+            owner_id=owner_id or str(uuid4()),
+            tags=[],
+            notes=[],
+            shares=[],
+            created_at=created_at or datetime.now(),
+            updated_at=updated_at or datetime.now(),
+        )
+
+    return _make_collection
+
+
+@pytest.fixture
+def make_note():
+    """Fabrique une note de test."""
+    def _make_note(
+        note_id: str | None = None,
+        owner_id: str | None = None,
+        collection_id: str | None = None,
+        title: str = "Test Note",
+        created_at: datetime | None = None,
+        updated_at: datetime | None = None,
+    ) -> Note:
+        return Note(
+            id=note_id or str(uuid4()),
+            title=title,
+            owner_id=owner_id or str(uuid4()),
+            collection_id=collection_id or str(uuid4()),
+            tags=[],
+            shares=[],
+            share_links=[],
+            flashcards=[],
+            reports=[],
+            outgoing_links=[],
+            incoming_links=[],
+            created_at=created_at or datetime.now(),
+            updated_at=updated_at or datetime.now(),
+        )
+
+    return _make_note

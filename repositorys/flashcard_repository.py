@@ -21,6 +21,14 @@ class FlashcardSearchParams:
     offset: int = 0
 
 
+def _select_with_answers():
+    return select(Flashcard).options(selectinload(Flashcard.answers))
+
+
+def _select_by_id(flashcard_id: str):
+    return _select_with_answers().where(Flashcard.id == flashcard_id)
+
+
 def _scope_to_user(stmt, user):
     allowed_note_ids = permission_domain_service.get_accessible_note_ids(
         user.id, user.role
@@ -46,9 +54,7 @@ def list_for_user(
             Flashcard.question.ilike(f"%{param.question_contains}%")
         )
 
-    stmt = select(Flashcard).where(*filters).options(
-        selectinload(Flashcard.answers)
-    )
+    stmt = _select_with_answers().where(*filters)
 
     stmt = _scope_to_user(stmt, user)
 
@@ -74,28 +80,20 @@ def list_for_user(
 
 
 def get_for_user(user, flashcard_id: str) -> Optional[Flashcard]:
-    stmt = select(Flashcard).where(Flashcard.id == flashcard_id).options(
-        selectinload(Flashcard.answers)
-    )
+    stmt = _select_by_id(flashcard_id)
     stmt = _scope_to_user(stmt, user)
     with get_db_session() as session:
         return session.execute(stmt).scalar_one_or_none()
 
 
 def find_one_unscoped(flashcard_id: str) -> Optional[Flashcard]:
-    stmt = select(Flashcard).where(Flashcard.id == flashcard_id).options(
-        selectinload(Flashcard.answers)
-    )
+    stmt = _select_by_id(flashcard_id)
     with get_db_session() as session:
         return session.execute(stmt).scalar_one_or_none()
 
 
 def find_by_note(note_id: str) -> List[Flashcard]:
-    stmt = (
-        select(Flashcard)
-        .where(Flashcard.note_id == note_id)
-        .options(selectinload(Flashcard.answers))
-    )
+    stmt = _select_with_answers().where(Flashcard.note_id == note_id)
     with get_db_session() as session:
         return list(session.scalars(stmt).all())
 
@@ -104,11 +102,7 @@ def add(flashcard: Flashcard) -> Flashcard:
     with get_db_session() as session:
         session.add(flashcard)
         session.flush()
-        stmt = (
-            select(Flashcard)
-            .where(Flashcard.id == flashcard.id)
-            .options(selectinload(Flashcard.answers))
-        )
+        stmt = _select_by_id(flashcard.id)
         return session.execute(stmt).scalar_one()
 
 
@@ -116,11 +110,7 @@ def update(flashcard: Flashcard) -> Flashcard:
     with get_db_session() as session:
         merged = session.merge(flashcard)
         session.flush()
-        stmt = (
-            select(Flashcard)
-            .where(Flashcard.id == merged.id)
-            .options(selectinload(Flashcard.answers))
-        )
+        stmt = _select_by_id(merged.id)
         return session.execute(stmt).scalar_one()
 
 

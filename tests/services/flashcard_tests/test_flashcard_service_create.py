@@ -29,34 +29,28 @@ from exceptions.note_exception import NoteNotFound
 class TestFlashcardServiceCreate:
     """Tests pour créer une flashcard"""
 
-    def test_create_flashcard_success(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
+    def test_create_flashcard_success(self, mock_flashcard_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Créer une flashcard valide."""
         from services.impl.note.flashcard_service_impl import flashcard_service
-        from daos.note_dao import Note
-        from daos.user_dao import User
         from utils.enums import RoleEnum
 
         # Arrange
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
+        current_user = make_user(
+            user_id=user_id,
+            email="test@example.com",
+            username="test",
+            role=RoleEnum.CLIENT,
+        )
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(
-            id=note_id,
-            title="Test Note",
+        note = make_note(
+            note_id=note_id,
             owner_id=user_id,
             collection_id=str(uuid4()),
-            tags=[],
-            shares=[],
-            share_links=[],
-            flashcards=[],
-            reports=[],
-            outgoing_links=[],
-            incoming_links=[],
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 
@@ -86,35 +80,29 @@ class TestFlashcardServiceCreate:
         mock_note_repository.find_one_unscoped.assert_called_once_with(note_id)
         mock_flashcard_repository.add.assert_called_once()
 
-    def test_create_flashcard_no_answers_raises_exception(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
+    def test_create_flashcard_no_answers_raises_exception(self, mock_flashcard_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Créer une flashcard sans réponses lève une ValidationError (validation Pydantic)."""
         from pydantic import ValidationError
         from services.impl.note.flashcard_service_impl import flashcard_service
-        from daos.note_dao import Note
-        from daos.user_dao import User
         from utils.enums import RoleEnum
 
         # Arrange
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
+        current_user = make_user(
+            user_id=user_id,
+            email="test@example.com",
+            username="test",
+            role=RoleEnum.CLIENT,
+        )
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(
-            id=note_id,
-            title="Test Note",
+        note = make_note(
+            note_id=note_id,
             owner_id=user_id,
             collection_id=str(uuid4()),
-            tags=[],
-            shares=[],
-            share_links=[],
-            flashcards=[],
-            reports=[],
-            outgoing_links=[],
-            incoming_links=[],
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 
@@ -124,34 +112,28 @@ class TestFlashcardServiceCreate:
         with pytest.raises(ValidationError):
             FlashcardCreateDTO(question="Question?", answers=[])
 
-    def test_create_flashcard_no_correct_answer_raises_exception(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
+    def test_create_flashcard_no_correct_answer_raises_exception(self, mock_flashcard_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Créer une flashcard sans réponse correcte lève FlashcardMustHaveAtLeastOneCorrectAnswer."""
         from services.impl.note.flashcard_service_impl import flashcard_service
-        from daos.note_dao import Note
-        from daos.user_dao import User
         from utils.enums import RoleEnum
 
         # Arrange
         user_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
+        current_user = make_user(
+            user_id=user_id,
+            email="test@example.com",
+            username="test",
+            role=RoleEnum.CLIENT,
+        )
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
-        note = Note(
-            id=note_id,
-            title="Test Note",
+        note = make_note(
+            note_id=note_id,
             owner_id=user_id,
             collection_id=str(uuid4()),
-            tags=[],
-            shares=[],
-            share_links=[],
-            flashcards=[],
-            reports=[],
-            outgoing_links=[],
-            incoming_links=[],
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 
@@ -170,11 +152,9 @@ class TestFlashcardServiceCreate:
 class TestFlashcardServiceDuplicate:
     """Tests pour dupliquer une flashcard"""
 
-    def test_duplicate_flashcard_success(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
+    def test_duplicate_flashcard_success(self, mock_flashcard_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Dupliquer une flashcard."""
         from services.impl.note.flashcard_service_impl import flashcard_service
-        from daos.note_dao import Note
-        from daos.user_dao import User
         from utils.enums import RoleEnum
 
         # Arrange
@@ -182,7 +162,12 @@ class TestFlashcardServiceDuplicate:
         flashcard_id = str(uuid4())
         note_id = str(uuid4())
 
-        current_user = User(id=user_id, email="test@example.com", username="test", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
+        current_user = make_user(
+            user_id=user_id,
+            email="test@example.com",
+            username="test",
+            role=RoleEnum.CLIENT,
+        )
         monkeypatch.setattr("services.impl.note.flashcard_service_impl.get_current_user", lambda: current_user)
 
         source_flashcard = Flashcard(
@@ -195,20 +180,11 @@ class TestFlashcardServiceDuplicate:
         )
         mock_flashcard_repository.find_one_unscoped.return_value = source_flashcard
 
-        note = Note(
-            id=note_id,
-            title="Test Note",
+        note = make_note(
+            note_id=note_id,
             owner_id=user_id,
             collection_id=str(uuid4()),
-            tags=[],
-            shares=[],
-            share_links=[],
-            flashcards=[],
-            reports=[],
-            outgoing_links=[],
-            incoming_links=[],
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            title="Test Note",
         )
         mock_note_repository.find_one_unscoped.return_value = note
 
