@@ -836,6 +836,19 @@ source venv/bin/activate
 python scripts/seed_db.py
 ```
 
+#### Utilisateurs créés par le seed
+
+Le script crée 4 utilisateurs de test avec les identifiants suivants :
+
+| Email | Username | Password | Rôle |
+|-------|----------|----------|------|
+| `superadmin@example.com` | `superadmin` | `SuperAdminPass123!` | SUPER_ADMIN |
+| `admin@example.com` | `admin` | `AdminPass123!` | ADMIN |
+| `alice@example.com` | `alice` | `AlicePass123!` | CLIENT |
+| `bob@example.com` | `bob` | `BobPass123!!` | CLIENT |
+
+**Note** : Ces comptes sont à usage de développement uniquement. Ne jamais utiliser ces identifiants en production.
+
 ---
 
 ## 15) Tests
