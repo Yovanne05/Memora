@@ -1,6 +1,6 @@
 import type { Report, ReportCreate, ReportUpdate } from '../models/report'
-import type { ReportsFilters } from '../types/report-query'
 import type { PaginatedReports } from '../types/paginated-report'
+import type { ReportsFilters } from '../types/report-query'
 
 export interface IReportsService {
   list(params?: ReportsFilters): Promise<PaginatedReports>

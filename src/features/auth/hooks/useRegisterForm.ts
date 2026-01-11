@@ -28,6 +28,7 @@ export function useRegisterForm(redirectTo: string) {
       email: '',
       username: '',
       password: '',
+      acceptTerms: false,
     },
   })
 

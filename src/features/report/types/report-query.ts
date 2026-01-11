@@ -1,18 +1,17 @@
-export interface ReportsFilters {
-  targetType?: string
-  target_type?: string
-  reporterId?: string
-  reporter_id?: string
-  noteId?: string
-  note_id?: string
-  collectionId?: string
-  collection_id?: string
-  status?: string
-  sortBy?: string
-  sort_by?: string
-  sortDir?: 'asc' | 'desc'
-  sort_dir?: 'asc' | 'desc'
-  offset?: number
-  limit?: number
-  [key: string]: string | number | undefined
-}
+import type { QueryParamValue } from '@/types/query-params'
+import type { PaginationParams } from '@/types/pagination'
+
+export type ReportSortBy = 'created_at' | 'status'
+export type ReportSortDir = 'asc' | 'desc'
+
+export type ReportsFilters = Record<string, QueryParamValue> &
+  PaginationParams & {
+    status?: string
+    reason?: string
+    targetType?: string
+    reporterId?: string
+    noteId?: string
+    collectionId?: string
+    sortBy?: ReportSortBy
+    sortDir?: ReportSortDir
+  }

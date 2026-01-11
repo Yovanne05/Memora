@@ -12,6 +12,9 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, 'Au moins 1 majuscule')
     .regex(/\d/, 'Au moins 1 chiffre')
     .regex(/[^A-Za-z0-9]/, 'Au moins 1 caractère spécial'),
+  acceptTerms: z.boolean().refine((val) => val === true, {
+    message: "Vous devez accepter les Conditions Générales d'Utilisation",
+  }),
 })
 
 export type RegisterValues = z.infer<typeof registerSchema>
