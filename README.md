@@ -36,14 +36,17 @@ Backend Flask pour **Memora**, une application de prise de notes collaborative a
 
 ### Versions requises
 
-- **Python** : `>= 3.11` (recommandé 3.12)
+- **Python** : `>= 3.13`
 - **Base de données** : PostgreSQL `>= 14` (production) ou SQLite (dev/test)
 - **Redis** : `>= 7.0` (obligatoire pour collaboration temps réel)
+- **Docker** : `>= 20.10` (pour SeaweedFS S3)
 
 ### Dépendances système
 
 - **libpq-dev** (pour psycopg2 sur Linux/macOS)
 - **Redis Server** (pour sessions de collaboration et rate limiting)
+- **Docker & Docker Compose** (pour stockage S3 local via SeaweedFS)
+- **compilateur c/c++**
 
 ### Gestion d'environnement virtuel
 
@@ -60,7 +63,7 @@ python -m venv venv
 ### Étapes d'installation
 
 ```bash
-# 1. Cloner le dépôt (si nécessaire)
+# 1. Cloner le dépôt
 cd memora_back
 
 # 2. Créer l'environnement virtuel
@@ -83,6 +86,7 @@ Le `.gitignore` est déjà configuré pour exclure :
 - `venv/`, `__pycache__/`, `.pytest_cache/`
 - `logs/`, `uploads/**`
 - `*.db` (bases SQLite locales)
+- `s3example/data/` (données SeaweedFS)
 
 ---
 
@@ -130,8 +134,8 @@ STORAGE_DRIVER=s3
 STORAGE_S3_BUCKET=memora-uploads
 STORAGE_S3_ENDPOINT_URL=http://localhost:8333
 STORAGE_S3_REGION=eu-west-1
-STORAGE_S3_ACCESS_KEY=seaweedfs
-STORAGE_S3_SECRET_KEY=seaweedfs
+STORAGE_S3_ACCESS_KEY=memora
+STORAGE_S3_SECRET_KEY=memora-secret
 STORAGE_S3_PUBLIC_BASE_URL=http://localhost:8333/memora-uploads
 ```
 
@@ -141,7 +145,245 @@ STORAGE_S3_PUBLIC_BASE_URL=http://localhost:8333/memora-uploads
 
 ---
 
-## 5) Lancement en local
+## 5) Configuration du stockage S3 (SeaweedFS)
+
+### Pourquoi SeaweedFS ?
+
+SeaweedFS est un système de stockage distribué compatible S3, **gratuit et open-source**. Il permet de :
+- Stocker les images uploadées par les utilisateurs
+- Simuler un environnement S3 sans compte AWS
+- Tester le backend en conditions réelles
+
+### Architecture du dossier `s3example/`
+
+```
+s3example/
+├── docker-compose.yaml    # Configuration Docker pour SeaweedFS
+├── s3.json               # Configuration des identités et permissions S3
+└── data/                 # Données persistantes SeaweedFS (créé automatiquement)
+```
+
+### Fichier `s3.json`
+
+Configure les credentials S3 pour l'application :
+
+```json
+{
+    "identities": [
+        {
+            "name": "memora",
+            "credentials": [
+                {
+                    "accessKey": "memora",
+                    "secretKey": "memora-secret"
+                }
+            ],
+            "actions": ["Read", "Write", "List"],
+            "allowed_buckets": ["memora-uploads"]
+        }
+    ]
+}
+```
+
+**Important** : Les valeurs `accessKey` et `secretKey` doivent correspondre aux variables `STORAGE_S3_ACCESS_KEY` et `STORAGE_S3_SECRET_KEY` dans votre `.env`.
+
+### Fichier `docker-compose.yaml`
+
+Lance SeaweedFS avec les ports exposés :
+
+```yaml
+services:
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    container_name: seaweedfs
+    command:
+      - server
+      - -s3
+      - -filer
+      - -dir=/data
+      - -ip=seaweedfs
+      - -ip.bind=0.0.0.0
+      - -s3.config=/etc/seaweedfs/s3.json
+    ports:
+      - "8333:8333"  # S3 API
+      - "8888:8888"  # Filer
+      - "9333:9333"  # Master
+    volumes:
+      - ./data:/data
+      - ./s3.json:/etc/seaweedfs/s3.json:ro
+    restart: unless-stopped
+```
+
+### Lancer SeaweedFS
+
+#### 1. Démarrer le conteneur Docker
+
+```bash
+# creer un dossier s3 avec le même contenu que s3 example
+cp s3exemple s3
+
+# Créer le dossier data avec les bonnes permissions
+mkdir -p data
+sudo chmod 777 data/
+
+# Démarrer SeaweedFS avec docker-compose
+sudo docker-compose -f docker-compose.yaml up -d
+
+# Vérifier que le conteneur tourne
+sudo docker ps | grep seaweedfs
+
+# Vérifier les logs (aucune erreur ne devrait apparaître)
+sudo docker logs seaweedfs
+```
+
+#### 2. Tester l'accès S3
+
+```bash
+# Le port 8333 devrait répondre
+curl http://localhost:8333
+
+# Réponse attendue : Page HTML SeaweedFS
+```
+
+#### 3. Initialiser le bucket S3
+
+Une fois SeaweedFS en marche, **initialisez le bucket** avec le script fourni :
+
+```bash
+# Retourner à la racine du projet backend
+cd ..
+
+# Activer l'environnement virtuel si pas déjà fait
+source venv/bin/activate  # Linux/macOS
+# ou
+venv\Scripts\activate  # Windows
+
+# Exécuter le script d'initialisation S3
+python scripts/init_s3.py
+```
+
+**Sortie attendue** :
+
+```
+Bucket already exists: memora-uploads
+Applying public read policy to bucket: memora-uploads
+Done.
+```
+
+Ou si le bucket n'existait pas :
+
+```
+Creating bucket: memora-uploads
+Applying public read policy to bucket: memora-uploads
+Done.
+```
+
+#### 4. Configurer le backend
+
+Vérifiez que votre `.env` contient :
+
+```env
+STORAGE_DRIVER=s3
+STORAGE_S3_BUCKET=memora-uploads
+STORAGE_S3_ENDPOINT_URL=http://localhost:8333
+STORAGE_S3_REGION=eu-west-1
+STORAGE_S3_ACCESS_KEY=memora
+STORAGE_S3_SECRET_KEY=memora-secret
+STORAGE_S3_PUBLIC_BASE_URL=http://localhost:8333/memora-uploads
+```
+
+### Troubleshooting SeaweedFS
+
+#### Problème : Le conteneur redémarre en boucle
+
+**Symptôme** : `docker ps` montre `Restarting (255)`
+
+**Solution** :
+
+```bash
+# Vérifier les logs pour voir l'erreur
+sudo docker logs seaweedfs
+
+# Si erreur de permissions sur /data :
+cd s3example
+sudo chmod -R 777 data/
+
+# Supprimer et recréer le conteneur
+sudo docker stop seaweedfs
+sudo docker rm seaweedfs
+sudo docker-compose -f docker-compose.yaml up -d
+```
+
+#### Problème : `init_s3.py` échoue avec "Could not connect"
+
+**Symptôme** : `Could not connect to the endpoint URL: "http://localhost:8333/memora-uploads"`
+
+**Cause** : SeaweedFS n'est pas démarré ou pas accessible.
+
+**Solution** :
+
+```bash
+# 1. Vérifier que le conteneur tourne
+sudo docker ps | grep seaweedfs
+
+# 2. Tester l'accès au port 8333
+curl http://localhost:8333
+
+# 3. Si aucune réponse, redémarrer SeaweedFS
+cd s3example
+sudo docker-compose -f docker-compose.yaml restart
+
+# 4. Attendre 10 secondes puis réessayer init_s3.py
+```
+
+#### Problème : Upload d'images retourne 404
+
+**Symptôme** : L'upload réussit (201 CREATED) mais l'image retourne 404 lors de l'accès.
+
+**Causes possibles** :
+
+1. **Le bucket n'existe pas** → Exécuter `python scripts/init_s3.py`
+2. **Mauvaises credentials dans `.env`** → Vérifier que `STORAGE_S3_ACCESS_KEY` et `STORAGE_S3_SECRET_KEY` correspondent à `s3.json`
+3. **SeaweedFS arrêté** → Vérifier `sudo docker ps | grep seaweedfs`
+4. **URL publique incorrecte** → Vérifier `STORAGE_S3_PUBLIC_BASE_URL` dans `.env`
+
+**Solution** :
+
+```bash
+# 1. Vérifier que SeaweedFS tourne
+sudo docker ps | grep seaweedfs
+
+# 2. Réinitialiser le bucket
+python scripts/init_s3.py
+
+# 3. Tester l'upload manuellement avec curl
+curl -X POST http://localhost:8333/memora-uploads \
+  -H "Authorization: AWS memora:memora-secret" \
+  -F "file=@test.jpg"
+
+# 4. Redémarrer le backend Flask
+python app.py
+```
+
+### Utilisation en production
+
+Pour un déploiement production, **remplacez SeaweedFS par** :
+- **AWS S3** (recommandé)
+- **MinIO** (auto-hébergé, compatible S3)
+- **Backblaze B2** (moins cher qu'AWS)
+
+Modifiez simplement les variables d'environnement dans `.env` :
+
+```env
+STORAGE_S3_ENDPOINT_URL=https://s3.eu-west-1.amazonaws.com
+STORAGE_S3_ACCESS_KEY=<votre-clé-aws>
+STORAGE_S3_SECRET_KEY=<votre-secret-aws>
+STORAGE_S3_PUBLIC_BASE_URL=https://memora-uploads.s3.eu-west-1.amazonaws.com
+```
+
+---
+
+## 6) Lancement en local
 
 ### Démarrer le serveur (mode développement)
 
@@ -159,7 +401,7 @@ Le serveur démarre sur **`http://0.0.0.0:5000`** par défaut.
 
 ---
 
-## 6) Architecture du code
+## 7) Architecture du code
 
 ### Organisation par domaine
 
@@ -220,7 +462,14 @@ memora_back/
 │   ├── controllers/
 │   ├── services/
 │   └── repositorys/
-└── scripts/               # Scripts utilitaires (init S3, seeds...)
+├── scripts/               # Scripts utilitaires
+│   ├── init_s3.py         # Initialisation bucket S3
+│   ├── seed_db.py         # Données de démo
+│   └── bd.sql             # Schéma SQL initial
+└── s3example/             # Exemple configuration SeaweedFS
+    ├── docker-compose.yaml
+    ├── s3.json
+    └── data/              # Données persistantes (créé automatiquement)
 ```
 
 ### Patrons d'architecture (SOLID)
@@ -279,7 +528,7 @@ memora_back/
 
 ---
 
-## 7) Modèles & règles métier
+## 8) Modèles & règles métier
 
 ### Modèles SQLAlchemy principaux
 
@@ -342,7 +591,7 @@ class Review(UUIDMixin, CreatedAtMixin, Base):
 
 ---
 
-## 8) DTO & validation
+## 9) DTO & validation
 
 ### DTO Pydantic
 
@@ -391,7 +640,7 @@ class NoteReadDTO(BaseModel):
 
 ---
 
-## 9) Mappers
+## 10) Mappers
 
 ### Localisation
 
@@ -421,7 +670,7 @@ def note_dao_to_read_dto(note: Note) -> NoteReadDTO:
 
 ---
 
-## 10) Repositories (accès données)
+## 11) Repositories (accès données)
 
 ### Fonctionnalités
 
@@ -453,7 +702,7 @@ def find_many(
 
 ---
 
-## 11) Contrôleurs (Flask)
+## 12) Contrôleurs (Flask)
 
 ### Blueprints exposés
 
@@ -489,7 +738,7 @@ Accès à la doc : **`http://localhost:5000/apidocs`**
 
 ---
 
-## 12) Gestion des erreurs
+## 13) Gestion des erreurs
 
 ### Error handler global
 
@@ -537,7 +786,7 @@ class NoteTitleConflict(Conflict):
 
 ---
 
-## 13) Base de données
+## 14) Base de données
 
 ### Moteur utilisé
 
@@ -577,11 +826,19 @@ if config.APP_ENV == "test":
 
 ### Données de démo (seeds)
 
-Non implémentées actuellement. À faire manuellement ou via script custom.
+Un script de seed est disponible dans `scripts/seed_db.py` :
+
+```bash
+# Activer l'environnement virtuel
+source venv/bin/activate
+
+# Exécuter le script de seed
+python scripts/seed_db.py
+```
 
 ---
 
-## 14) Tests
+## 15) Tests
 
 ### Stratégie de tests
 
@@ -625,7 +882,7 @@ python_functions = test_*
 
 ---
 
-## 15) Qualité & style
+## 16) Qualité & style
 
 ### Outils recommandés
 
@@ -652,7 +909,7 @@ pip install black ruff isort mypy
 
 ---
 
-## 16) Sécurité (minimum backend)
+## 17) Sécurité (minimum backend)
 
 ### CORS
 
@@ -673,6 +930,7 @@ else:
 - `.env` (déjà dans `.gitignore`)
 - `logs/` (fichiers de logs)
 - `uploads/` (images uploadées)
+- `s3example/data/` (données SeaweedFS)
 - `*.db` (bases SQLite locales)
 
 ### Politique d'erreurs
@@ -689,12 +947,31 @@ else:
 
 ---
 
-## 17) Commandes utiles (dev)
+## 18) Commandes utiles (dev)
 
 ### Démarrer le serveur
 
 ```bash
-flask run
+python app.py
+```
+
+### Démarrer Redis (si non démarré)
+
+```bash
+# Linux/macOS
+redis-server
+
+# Ou via Docker
+docker run -d -p 6379:6379 redis:alpine
+```
+
+### Démarrer SeaweedFS (stockage S3)
+
+```bash
+cd s3example
+sudo docker-compose -f docker-compose.yaml up -d
+cd ..
+python scripts/init_s3.py
 ```
 
 ### Reset DB (développement uniquement)
@@ -705,6 +982,12 @@ python
 >>> from utils.db import db
 >>> db.drop_all()
 >>> db.create_all()
+```
+
+### Seed DB (données de démo)
+
+```bash
+python scripts/seed_db.py
 ```
 
 ### Lancer tests
@@ -726,15 +1009,9 @@ isort .
 ruff check .
 ```
 
-### Initialiser S3 (SeaweedFS/MinIO)
-
-```bash
-python scripts/init_s3.py
-```
-
 ---
 
-## 18) Déploiement (aperçu backend)
+## 19) Déploiement (aperçu backend)
 
 ### Méthode cible
 
@@ -756,6 +1033,7 @@ STORAGE_S3_BUCKET=memora-uploads
 STORAGE_S3_ENDPOINT_URL=https://s3.amazonaws.com
 STORAGE_S3_ACCESS_KEY=<aws-access-key>
 STORAGE_S3_SECRET_KEY=<aws-secret-key>
+STORAGE_S3_PUBLIC_BASE_URL=https://memora-uploads.s3.amazonaws.com
 ```
 
 ### Docker (exemple)
@@ -771,7 +1049,7 @@ CMD ["gunicorn", "--worker-class=eventlet", "-w", "1", "-b", "0.0.0.0:5000", "ap
 
 ---
 
-## 19) Troubleshooting
+## 20) Troubleshooting
 
 ### Problème : Port 5000 déjà utilisé
 
@@ -823,16 +1101,55 @@ docker run -d -p 6379:6379 redis:alpine
    psql -h localhost -U postgres -d memora
    ```
 
+### Problème : SeaweedFS ne démarre pas
+
+**Symptôme** : Conteneur Docker en état `Restarting (255)`
+
+**Solution** :
+```bash
+cd s3example
+
+# Vérifier les logs
+sudo docker logs seaweedfs
+
+# Fixer les permissions du dossier data
+sudo chmod -R 777 data/
+
+# Supprimer et recréer le conteneur
+sudo docker stop seaweedfs
+sudo docker rm seaweedfs
+sudo docker-compose -f docker-compose.yaml up -d
+```
+
+### Problème : Upload d'images échoue (404)
+
+**Symptôme** : Upload réussit mais image retourne 404
+
+**Solution** :
+```bash
+# 1. Vérifier que SeaweedFS tourne
+sudo docker ps | grep seaweedfs
+
+# 2. Initialiser le bucket S3
+python scripts/init_s3.py
+
+# 3. Vérifier les credentials dans .env
+# STORAGE_S3_ACCESS_KEY et STORAGE_S3_SECRET_KEY doivent correspondre à s3.json
+
+# 4. Tester l'accès S3
+curl http://localhost:8333
+```
+
 ### Diagnostic général
 
 1. **Activer DEBUG** : `APP_ENV=dev` dans `.env`
 2. **Vérifier les logs** : `tail -f logs/app.log`
-3. **Ping health endpoint** : `curl http://localhost:5000/health` (si implémenté)
-4. **Tester Redis** : `redis-cli ping` → `PONG`
+3. **Tester Redis** : `redis-cli ping` → `PONG`
+4. **Tester SeaweedFS** : `curl http://localhost:8333`
 
 ---
 
-## 20) Collaboration temps réel (CRDT)
+## 21) Collaboration temps réel (CRDT)
 
 ### Architecture
 
@@ -872,10 +1189,11 @@ docker run -d -p 6379:6379 redis:alpine
 ## Ressources complémentaires
 
 - **Documentation API** : `http://localhost:5000/apidocs` (si Swagger activé)
+- **SeaweedFS Wiki** : [github.com/seaweedfs/seaweedfs/wiki](https://github.com/seaweedfs/seaweedfs/wiki)
 - **Issues GitHub** : [github.com/memora/issues](https://github.com/memora/issues)
 
 ---
 
 ## Licence
 
-License — Projet étudiant IUT Montreuil (PONNOU Yovanne, FELLAH Arilès Fellah; BOUQSI Karim, AGOGUE Armand)
+License — Projet étudiant IUT Montreuil (PONNOU Yovanne, FELLAH Ariles 🥵, BOUQSI Karim, AGOGUE Armand, SASIKUMAR Vignesh)
