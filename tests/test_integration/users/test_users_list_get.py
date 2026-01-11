@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
 
-def test_users_list_includes_created_user(app_client, auth_context, make_user) :
-    headers = auth_context["headers"]
+def test_users_list_includes_created_user(app_client, admin_context, make_user) :
+    headers = admin_context["headers"]
 
     created_user, _ = make_user()
 
