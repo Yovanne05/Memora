@@ -37,6 +37,7 @@ def create_app() -> Flask:
     app = Flask(__name__)
     CORS(app, origins=config.ALLOWED_ORIGINS)
 
+    app.config["RATELIMIT_HEADERS_ENABLED"] = config.APP_ENV != "prod"
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
     app.config["MAX_CONTENT_LENGTH"] = config.IMAGE_MAX_CONTENT_LENGTH
