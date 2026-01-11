@@ -1,12 +1,15 @@
-import type { NoteImageDto } from "../dtos/note-image.dto"
-import { noteImageDtoSchema } from "../dtos/note-image.dto"
-import { mapNoteImageDtoToModel } from "../mappers/note-image.mapper"
-import type { NoteImage, NoteImageUploadPayload } from "../models/note-image.model"
-import type { INoteImagesService } from "./note-images.service.interface"
-import { config } from "@/lib/config"
-import { applyInterceptors } from "@/lib/interceptors"
-import { ApiError } from "@/lib/errors"
-import { parseError, normalizeError } from "@/lib/error-handler"
+import type { NoteImageDto } from '../dtos/note-image.dto'
+import { noteImageDtoSchema } from '../dtos/note-image.dto'
+import { mapNoteImageDtoToModel } from '../mappers/note-image.mapper'
+import type {
+  NoteImage,
+  NoteImageUploadPayload,
+} from '../models/note-image.model'
+import type { INoteImagesService } from './note-images.service.interface'
+import { config } from '@/lib/config'
+import { applyInterceptors } from '@/lib/interceptors'
+import { ApiError } from '@/lib/errors'
+import { parseError, normalizeError } from '@/lib/error-handler'
 
 const DEFAULT_TIMEOUT = 30000 // 30 seconds for file uploads
 
@@ -15,7 +18,7 @@ async function uploadWithTimeout(
   timeout: number
 ): Promise<Response> {
   const timeoutPromise = new Promise<Response>((_, reject) => {
-    setTimeout(() => reject(new Error("Request timeout")), timeout)
+    setTimeout(() => reject(new Error('Request timeout')), timeout)
   })
 
   return Promise.race([promise, timeoutPromise])
@@ -36,15 +39,18 @@ export function createNoteImagesService(): INoteImagesService {
     async upload(payload: NoteImageUploadPayload): Promise<NoteImage> {
       try {
         const formData = new FormData()
-        formData.append("image", payload.file)
+        formData.append('image', payload.file)
 
         const requestConfig = await applyInterceptors({
-          method: "POST",
+          method: 'POST',
           body: formData,
         })
 
         const response = await uploadWithTimeout(
-          fetch(`${config.apiUrl}/notes/${payload.noteId}/images`, requestConfig),
+          fetch(
+            `${config.apiUrl}/notes/${payload.noteId}/attachments`,
+            requestConfig
+          ),
           DEFAULT_TIMEOUT
         )
 
@@ -69,4 +75,4 @@ export function createNoteImagesService(): INoteImagesService {
 }
 
 export const noteImagesService = createNoteImagesService()
-export type { INoteImagesService as NoteImagesService } from "./note-images.service.interface"
+export type { INoteImagesService as NoteImagesService } from './note-images.service.interface'
