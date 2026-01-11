@@ -520,15 +520,10 @@ Tous les endpoints sont documentés dans Swagger : `http://localhost:5000/api/do
 - Statistics : `/user-statistics`
 - Reports : `/reports`
 
-## Collaboration temps réel - Architecture technique
+## Collaboration temps réel - Architecture technique :
 
-### État actuel
-
-Le backend supporte **deux systèmes de collaboration** :
-
-#### 1. CRDT (Recommandé) ✅
 - **Backend** : Implémenté et prêt
-- **Frontend** : Non utilisé actuellement
+- **Frontend** : Implémenté et prêt
 - **Technologie** : pycrdt (basé sur Yrs/Yjs)
 - **Avantages** :
   - Résolution automatique des conflits
@@ -536,15 +531,7 @@ Le backend supporte **deux systèmes de collaboration** :
   - Pas de gestion de versions
   - Synchronisation efficace avec vecteurs d'état
 
-#### 2. OT - Operational Transformation (Legacy) ⚠️
-- **Backend** : Supporté pour compatibilité
-- **Frontend** : Système actuellement utilisé
-- **Problèmes connus** :
-  - Lent en collaboration rapide
-  - Gestion de versions séquentielles avec risque de conflits
-  - File d'attente d'opérations avec latence
-
-### Flux CRDT (backend prêt)
+### Flux CRDT
 
 ```
 1. Client → join_collaboration → Serveur initialise document CRDT
@@ -552,18 +539,6 @@ Le backend supporte **deux systèmes de collaboration** :
 3. Client → crdt_sync_request → Reçoit delta depuis son état
 4. Fusion automatique sans conflits
 ```
-
-### Migration recommandée
-
-**Frontend doit migrer vers CRDT pour résoudre les problèmes de performance** :
-- Intégrer Yjs avec Tiptap Collaboration extension
-- Remplacer `send_operation` par `crdt_update`
-- Supprimer la file d'attente d'opérations
-
-**Fichiers concernés** :
-- Backend : `utils/crdt_service.py` (déjà implémenté)
-- Backend : `controllers/realtime_collaboration_controller.py` (handlers CRDT prêts)
-- Frontend : `features/collaboration/hooks/useCollaboration.ts` (à migrer)
 
 ## Dépannage
 
@@ -586,12 +561,6 @@ REDIS_URL='redis://localhost:6379/0'
 ```bash
 pytest -v  # Mode verbeux pour voir détails
 ```
-
-### Collaboration lente
-
-**Cause** : Frontend utilise OT legacy au lieu de CRDT
-
-**Solution** : Migrer le frontend vers CRDT (voir section "Collaboration temps réel")
 
 ## Auteurs
 
