@@ -20,8 +20,8 @@ export function NoteSettingsFields({
   loadingCollections,
 }: Readonly<NoteSettingsFieldsProps>) {
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
-      <div className="w-full lg:w-auto">
+    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
+      <div className="flex-1">
         <NoteCollectionField
           form={form}
           disabled={disabled}
@@ -29,10 +29,10 @@ export function NoteSettingsFields({
           loadingCollections={loadingCollections}
         />
       </div>
-      <div className="w-full lg:w-auto">
+      <div className="flex-1">
         <NoteVisibilityField form={form} disabled={disabled} />
       </div>
-      <div className="w-full lg:w-auto">
+      <div className="flex-1">
         <NoteTagsField form={form} disabled={disabled} />
       </div>
     </div>

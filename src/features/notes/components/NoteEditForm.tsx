@@ -13,7 +13,6 @@ export function NoteEditForm({
   loading = false,
   readOnly = false,
   onSubmit,
-  onCancel,
   onDelete,
   deleteLoading = false,
 }: Readonly<NoteEditFormProps>) {
@@ -36,7 +35,6 @@ export function NoteEditForm({
         <FormActions
           loading={isFormDisabled}
           deleteLoading={deleteLoading}
-          onCancel={onCancel}
           onDelete={onDelete}
         >
           <NoteSettingsFields

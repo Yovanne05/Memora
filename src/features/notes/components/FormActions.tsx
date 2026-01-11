@@ -6,7 +6,6 @@ import { Trash2 } from 'lucide-react'
 interface FormActionsProps {
   loading: boolean
   deleteLoading?: boolean
-  onCancel?: () => void
   onDelete?: () => void
   children?: ReactNode
 }
@@ -14,41 +13,30 @@ interface FormActionsProps {
 export function FormActions({
   loading,
   deleteLoading = false,
-  onCancel,
   onDelete,
   children,
 }: Readonly<FormActionsProps>) {
   return (
     <Card className="shrink-0 border border-border/70 shadow-sm">
-      <CardContent className="flex flex-col items-start gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <CardContent className="space-y-4 p-4 lg:p-6">
         {/* Settings fields (Collection, Visibility, Tags) */}
-        <div className="flex flex-1">{children}</div>
+        <div className="w-full">{children}</div>
 
         {/* Action buttons */}
-        <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
-          {onCancel && (
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onCancel}
-              disabled={loading}
-            >
-              Annuler
-            </Button>
-          )}
-          {onDelete && (
+        {onDelete && (
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
               variant="destructive"
               className="gap-2"
               onClick={onDelete}
-              disabled={deleteLoading}
+              disabled={deleteLoading || loading}
             >
               <Trash2 className="h-4 w-4" />
               {deleteLoading ? 'Suppression...' : 'Supprimer'}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
