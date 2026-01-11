@@ -1,6 +1,7 @@
 from flask import request
 from flask_socketio import emit, join_room, leave_room, disconnect
 from pydantic import ValidationError
+from werkzeug.exceptions import HTTPException
 
 from controllers.realtime.realtime_collaboration_constants import (
     COLLABORATION_NAMESPACE,
@@ -54,19 +55,33 @@ def register_collaboration_session_handlers(socketio):
             logger.error(
                 f"Invalid join_collaboration payload from user {user_id}: {exc}"
             )
+            emit("error", {"message": "Invalid payload", "code": "INVALID_PAYLOAD"}, room=request.sid)
             return
 
         socket_id = request.sid
 
-        session_dto, join_event = (
-            realtime_collaboration_service.join_collaboration_session(
-                note_id=join_dto.note_id,
-                user_id=user_id,
-                user_role=user_role,
-                socket_id=socket_id,
-                initial_content=join_dto.content,
+        try:
+            session_dto, join_event = (
+                realtime_collaboration_service.join_collaboration_session(
+                    note_id=join_dto.note_id,
+                    user_id=user_id,
+                    user_role=user_role,
+                    socket_id=socket_id,
+                    initial_content=join_dto.content,
+                )
             )
-        )
+        except HTTPException as exc:
+            logger.warning(
+                f"Failed to join collaboration for user {user_id} on note {join_dto.note_id}: {exc.description}"
+            )
+            emit("error", {"message": exc.description, "code": exc.name}, room=request.sid)
+            return
+        except Exception as exc:
+            logger.error(
+                f"Unexpected error joining collaboration for user {user_id} on note {join_dto.note_id}: {exc}"
+            )
+            emit("error", {"message": "Internal server error", "code": "INTERNAL_ERROR"}, room=request.sid)
+            return
 
         join_room(f"{ROOM_PREFIX}{join_dto.note_id}")
         emit(EVENT_SESSION, session_dto.model_dump(mode="json"), room=request.sid)
