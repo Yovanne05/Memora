@@ -146,7 +146,7 @@ export default function SettingsPage() {
               <p>
                 <strong>Durée de conservation :</strong> Vos données sont
                 conservées tant que votre compte est actif. Après suppression,
-                vos données sont définitivement effacées sous 30 jours.
+                vos données sont définitivement effacées.
               </p>
             </div>
           </CardContent>
