@@ -9,11 +9,19 @@ from exceptions.permission_exception import (
     WritePermissionDenied,
     ManagePermissionDenied,
 )
+from exceptions.user_exception import UserPermissionDenied
 from utils.auth import get_current_user
+from utils.enums import RoleEnum
 
 
 ResourceType = Literal["note", "collection"]
 PermissionLevel = Literal["read", "write", "manage"]
+
+
+def _is_admin(role) -> bool:
+    if isinstance(role, RoleEnum):
+        return role in {RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN}
+    return role in {RoleEnum.ADMIN.value, RoleEnum.SUPER_ADMIN.value}
 
 
 def require_permission(
@@ -106,3 +114,22 @@ def require_collection_manage(resource_id_param: str = "collection_id"):
 
 def require_owner(resource_type: ResourceType, resource_id_param: str = "id"):
     return require_permission(resource_type, "manage", resource_id_param)
+
+
+def require_self_or_admin(user_id_param: str = "user_id"):
+    def decorator(func: Callable):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user_id = kwargs.get(user_id_param)
+            if user_id is None:
+                abort(500, f"Missing route parameter: {user_id_param}")
+
+            user = get_current_user()
+            if str(user_id) != str(user.id) and not _is_admin(user.role):
+                raise UserPermissionDenied()
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

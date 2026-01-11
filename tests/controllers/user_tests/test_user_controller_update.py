@@ -3,7 +3,6 @@ Tests pour PATCH /users/<id> (update).
 
 Le service user_service est MOCKE pour isoler le controller.
 """
-from uuid import uuid4
 from http import HTTPStatus
 from datetime import datetime
 
@@ -16,7 +15,7 @@ class TestUserControllerUpdate:
         from dtos.user_dto import UserDTO
 
         # Arrange
-        user_id = str(uuid4())
+        user_id = authenticated_client.user.id
         updated_user = UserDTO(
             id=user_id,
             email="test@example.com",

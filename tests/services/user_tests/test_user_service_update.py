@@ -16,7 +16,12 @@ from uuid import uuid4
 from unittest.mock import Mock
 from dtos.user_dto import UserCreateDTO, UserUpdateDTO, UserDTO
 from daos.user_dao import User
-from exceptions.user_exception import UserNotFound, UserEmailConflict, UserUsernameConflict
+from exceptions.user_exception import (
+    UserNotFound,
+    UserEmailConflict,
+    UserUsernameConflict,
+    UserPermissionDenied,
+)
 from utils.enums import RoleEnum
 from repositorys.user_repository import UserSearchParams
 
@@ -69,7 +74,7 @@ class TestUserServiceUpdate:
         )
 
         # Act
-        result = user_service.update(user_id, dto)
+        result = user_service.update(user_id, dto, RoleEnum.CLIENT)
 
         # Assert
         assert result.email == "new@example.com"
@@ -89,7 +94,7 @@ class TestUserServiceUpdate:
 
         # Act & Assert
         with pytest.raises(UserNotFound):
-            user_service.update(user_id, dto)
+            user_service.update(user_id, dto, RoleEnum.CLIENT)
 
         mock_user_repository.update.assert_not_called()
 
@@ -125,6 +130,31 @@ class TestUserServiceUpdate:
 
         # Act & Assert
         with pytest.raises(UserEmailConflict):
-            user_service.update(user_id, dto)
+            user_service.update(user_id, dto, RoleEnum.CLIENT)
 
         mock_user_repository.update.assert_not_called()
+
+    def test_update_role_requires_admin(self, mock_user_repository):
+        """Un client ne peut pas changer le role d'un utilisateur."""
+        from services.impl.user_service_impl import user_service
+
+        # Arrange
+        user_id = str(uuid4())
+        existing_entity = User(
+            id=user_id,
+            email="old@example.com",
+            username="olduser",
+            password_hash="hash",
+            role=RoleEnum.CLIENT,
+            created_at=datetime.now(),
+        )
+        mock_user_repository.find_one.return_value = existing_entity
+
+        dto = UserUpdateDTO(role=RoleEnum.ADMIN)
+
+        # Act & Assert
+        with pytest.raises(UserPermissionDenied):
+            user_service.update(user_id, dto, RoleEnum.CLIENT)
+
+        mock_user_repository.update.assert_not_called()
+

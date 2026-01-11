@@ -35,7 +35,11 @@ from services.impl.realtime.background_jobs_service_impl import init_background_
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    CORS(app, origins=config.ALLOWED_ORIGINS)
+    if config.ALLOWED_ORIGINS:
+        origins = config.ALLOWED_ORIGINS.split(',')
+        CORS(app, origins=origins, supports_credentials=True)
+    else:
+        CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 
     app.config["RATELIMIT_HEADERS_ENABLED"] = config.APP_ENV != "prod"
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY

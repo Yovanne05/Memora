@@ -8,11 +8,13 @@ from exceptions.user_exception import (
     UserEmailConflict,
     UserNotFound,
     UserUsernameConflict,
+    UserPermissionDenied,
 )
 from mappers.user_mapper import dto_to_user, user_to_dto
 from repositorys import user_repository
 from repositorys.user_repository import UserSearchParams
 from services.interfaces.user_service_interface import UserServiceInterface
+from utils.enums import RoleEnum
 
 
 class UserService(UserServiceInterface):
@@ -39,11 +41,17 @@ class UserService(UserServiceInterface):
         return user_to_dto(saved)
 
     def update(
-        self, user_id: str, user_update_dto: UserUpdateDTO
+        self,
+        user_id: str,
+        user_update_dto: UserUpdateDTO,
+        actor_role: RoleEnum | str,
     ) -> UserDTO:
         user_entity = user_repository.find_one(user_id)
         if not user_entity:
             raise UserNotFound()
+
+        if user_update_dto.role is not None and not self._is_admin_role(actor_role):
+            raise UserPermissionDenied("Only admins can change roles.")
 
         if user_update_dto.email is not None:
             self._ensure_unique_email(
@@ -88,6 +96,12 @@ class UserService(UserServiceInterface):
         existing = user_repository.find_one_by_username(username)
         if existing and existing.id != exclude_id:
             raise UserUsernameConflict()
+
+    @staticmethod
+    def _is_admin_role(role: RoleEnum | str) -> bool:
+        if isinstance(role, RoleEnum):
+            return role in {RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN}
+        return role in {RoleEnum.ADMIN.value, RoleEnum.SUPER_ADMIN.value}
 
 
 user_service = UserService()

@@ -12,7 +12,9 @@ from dtos.common_dto import ListResponseDTO
 from querys.user_query import UserFindQuery
 from services.impl.auth_service_impl import auth_service
 from services.impl.user_service_impl import user_service
+from utils.auth import get_current_user
 from utils.enums import RoleEnum
+from utils.permission_decorators import require_self_or_admin
 from utils.http_rate_limiter import limiter
 
 bp_users = Blueprint("users", __name__, url_prefix="/users")
@@ -59,15 +61,18 @@ def create():
 
 @bp_users.patch("/<uuid:user_id>")
 @jwt_required()
+@require_self_or_admin("user_id")
 @swag_from("../docs/users/update.yaml")
 def update(user_id: UUID):
     payload = UserUpdateDTO.model_validate_json(request.data)
-    user = user_service.update(str(user_id), payload)
+    current_user = get_current_user()
+    user = user_service.update(str(user_id), payload, current_user.role)
     return jsonify(user.model_dump()), HTTPStatus.OK
 
 
 @bp_users.delete("/<uuid:user_id>")
 @jwt_required()
+@require_self_or_admin("user_id")
 @swag_from("../docs/users/delete.yaml")
 def delete(user_id: UUID):
     user_service.delete(str(user_id))
