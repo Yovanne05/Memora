@@ -15,7 +15,6 @@ import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AppWorkspaceRouteRouteImport } from './routes/app/workspace/route'
 import { Route as AppWorkspaceIndexRouteImport } from './routes/app/workspace/index'
 import { Route as AppVisualizationIndexRouteImport } from './routes/app/visualization/index'
@@ -58,11 +57,6 @@ const AuthRegisterRoute = AuthRegisterRouteImport.update({
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWorkspaceRouteRoute = AppWorkspaceRouteRouteImport.update({
@@ -160,7 +154,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/app/workspace': typeof AppWorkspaceRouteRouteWithChildren
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
@@ -182,7 +175,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app': typeof AppIndexLazyRoute
@@ -207,7 +199,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/app/workspace': typeof AppWorkspaceRouteRouteWithChildren
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/app/': typeof AppIndexLazyRoute
@@ -233,7 +224,6 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/app/workspace'
-    | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/app/'
@@ -255,7 +245,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/app'
@@ -279,7 +268,6 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/app/workspace'
-    | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/app/'
@@ -303,7 +291,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
 }
@@ -343,13 +330,6 @@ declare module '@tanstack/react-router' {
       path: '/auth/login'
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/workspace': {
@@ -529,7 +509,6 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
 }
