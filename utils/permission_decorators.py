@@ -142,3 +142,33 @@ def require_self_or_admin(user_id_param: str = "user_id"):
         return wrapper
 
     return decorator
+
+
+def require_admin():
+    def decorator(func: Callable):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user = get_current_user()
+            if not _is_admin(user.role):
+                raise UserPermissionDenied("Admin access required.")
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def require_super_admin():
+    def decorator(func: Callable):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user = get_current_user()
+            if user.role != RoleEnum.SUPER_ADMIN:
+                raise UserPermissionDenied("Super admin access required.")
+
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

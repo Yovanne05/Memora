@@ -19,7 +19,7 @@ from utils.enums import ReportReasonEnum, ReportStatusEnum, ReportTargetEnum
 class TestReportControllerList:
     """Tests pour GET /reports"""
 
-    def test_list_reports_returns_200(self, authenticated_client, mock_report_service):
+    def test_list_reports_returns_200(self, admin_client, mock_report_service):
         """Le endpoint GET /reports retourne 200."""
         from dtos.report_dto import ReportDTO
 
@@ -40,7 +40,7 @@ class TestReportControllerList:
         mock_report_service.find_many.return_value = (reports, 1)
 
         # Act
-        response = authenticated_client.get("/reports")
+        response = admin_client.get("/reports")
 
         # Assert
         assert response.status_code == HTTPStatus.OK
@@ -53,7 +53,7 @@ class TestReportControllerList:
 class TestReportControllerGet:
     """Tests pour GET /reports/<id>"""
 
-    def test_get_report_returns_200(self, authenticated_client, mock_report_service):
+    def test_get_report_returns_200(self, admin_client, mock_report_service):
         """Le endpoint GET /reports/<id> retourne 200."""
         from dtos.report_dto import ReportDTO
 
@@ -73,7 +73,7 @@ class TestReportControllerGet:
         mock_report_service.find_one.return_value = report
 
         # Act
-        response = authenticated_client.get(f"/reports/{report_id}")
+        response = admin_client.get(f"/reports/{report_id}")
 
         # Assert
         assert response.status_code == HTTPStatus.OK

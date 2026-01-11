@@ -31,8 +31,9 @@ class NoteLinkService(NoteLinkServiceInterface):
 
         links, total = note_link_repository.find_many(params)
 
+        # Include public notes for visualization graph
         accessible_notes = permission_domain_service.get_accessible_note_ids(
-            user.id, user.role
+            user.id, user.role, include_public=True
         )
         if accessible_notes is not None:
             if not accessible_notes:

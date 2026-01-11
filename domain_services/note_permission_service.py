@@ -45,14 +45,15 @@ class NotePermissionService:
             )
 
     def get_accessible_note_ids(
-        self, user_id: str, user_role: RoleEnum
+        self, user_id: str, user_role: RoleEnum, include_public: bool = False
     ) -> Optional[Set[str]]:
         if is_admin_role(user_role):
             return None
 
+        cache_key = f"accessible_note_ids:{user_id}:{include_public}"
         return cached(
-            f"accessible_note_ids:{user_id}",
-            lambda: self._load_accessible_note_ids(user_id),
+            cache_key,
+            lambda: self._load_accessible_note_ids(user_id, include_public),
         )
 
     def can_read_note(self, note_id: str, user_id: str, user_role: RoleEnum) -> bool:
@@ -69,6 +70,8 @@ class NotePermissionService:
                 session, collection_ids
             )
 
-    def _load_accessible_note_ids(self, user_id: str) -> Set[str]:
+    def _load_accessible_note_ids(self, user_id: str, include_public: bool = False) -> Set[str]:
         with get_db_session() as session:
-            return permission_repository.get_accessible_note_ids(session, user_id)
+            return permission_repository.get_accessible_note_ids(
+                session, user_id, include_public=include_public
+            )

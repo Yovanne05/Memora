@@ -14,7 +14,7 @@ from services.impl.auth_service_impl import auth_service
 from services.impl.user_service_impl import user_service
 from utils.auth import get_current_user
 from utils.enums import RoleEnum
-from utils.permission_decorators import require_self_or_admin
+from utils.permission_decorators import require_admin, require_self_or_admin
 from utils.http_rate_limiter import limiter
 
 bp_users = Blueprint("users", __name__, url_prefix="/users")
@@ -22,6 +22,7 @@ bp_users = Blueprint("users", __name__, url_prefix="/users")
 
 @bp_users.get("")
 @jwt_required()
+@require_admin()
 @swag_from("../docs/users/list.yaml")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
@@ -38,6 +39,7 @@ def find_many():
 
 @bp_users.get("/<uuid:user_id>")
 @jwt_required()
+@require_self_or_admin("user_id")
 @swag_from("../docs/users/find_one.yaml")
 def find_one(user_id: UUID):
     user = user_service.find_one(str(user_id))
