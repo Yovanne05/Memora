@@ -9,9 +9,6 @@ class NoteCreateDTO(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(default="")
     owner_id: str = Field(min_length=1, max_length=36)
-
-    yjs_snapshot: str | None = None
-
     collection_id: str | None = Field(default=None, min_length=1, max_length=36)
     visibility: VisibilityEnum = VisibilityEnum.PRIVATE
     tags: List[str] = Field(default_factory=list)
@@ -23,9 +20,6 @@ class NoteUpdateDTO(BaseModel):
     visibility: VisibilityEnum | None = None
     collection_id: str | None = Field(default=None, min_length=1, max_length=36)
     tags: List[str] | None = None
-
-    yjs_snapshot: str | None = None
-
 
 class NoteDTO(BaseModel):
     id: str
@@ -41,6 +35,5 @@ class NoteDTO(BaseModel):
     is_favorite: bool = False
     created_at: datetime
     updated_at: datetime
-    yjs_snapshot: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

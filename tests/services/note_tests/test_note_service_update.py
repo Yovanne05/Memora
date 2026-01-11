@@ -99,7 +99,6 @@ class TestNoteServiceUpdate:
 
         # Assert
         assert result.title == "New Title"
-        # Content removed (now using yjs_snapshot for real-time collaboration)
         mock_note_repository.find_one_unscoped.assert_called_once_with(note_id)
         mock_note_repository.update.assert_called_once()
 

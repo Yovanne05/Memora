@@ -70,7 +70,6 @@ def note_to_dto(
         "updated_at": note.updated_at,
         "collection_name": _safe_collection_name(note),
         "is_favorite": is_favorite,
-        "yjs_snapshot": getattr(note, "yjs_snapshot", None),
     }
 
     return NoteDTO.model_validate(data)
@@ -82,7 +81,5 @@ def dto_to_note(note_create_dto: NoteCreateDTO) -> Note:
         owner_id=note_create_dto.owner_id,
         collection_id=note_create_dto.collection_id,
         visibility=note_create_dto.visibility,
-        tags=note_create_dto.tags,
-
-        yjs_snapshot=note_create_dto.yjs_snapshot,
+        tags=note_create_dto.tags
     )
