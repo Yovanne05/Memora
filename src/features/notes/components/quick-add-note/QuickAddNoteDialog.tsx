@@ -5,18 +5,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import type { NoteVisibility } from "../../models/note.model"
+} from '@/components/ui/select'
+import type { NoteVisibility } from '../../models/note.model'
 
 type QuickAddNoteDialogProps = {
   open: boolean
@@ -48,11 +48,11 @@ export function QuickAddNoteDialog({
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={onSubmit}>
           <DialogHeader>
-            <DialogTitle>Créer une note rapide</DialogTitle>
+            <DialogTitle>CrÃ©er une note rapide</DialogTitle>
             <DialogDescription>
               {collectionId
-                ? "La note sera ajoutée à cette collection"
-                : "Créez une nouvelle note sans collection"}
+                ? 'La note sera ajoutÃ©e Ã  cette collection'
+                : 'CrÃ©ez une nouvelle note sans collection'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -63,33 +63,39 @@ export function QuickAddNoteDialog({
                 placeholder="Titre de la note..."
                 value={title}
                 onChange={(event) => onTitleChange(event.target.value)}
-                autoFocus
                 disabled={isPending}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="note-visibility">Visibilité</Label>
+              <Label htmlFor="note-visibility">VisibilitÃ©</Label>
               <Select
                 value={visibility}
-                onValueChange={(value) => onVisibilityChange(value as NoteVisibility)}
+                onValueChange={(value) =>
+                  onVisibilityChange(value as NoteVisibility)
+                }
                 disabled={isPending}
               >
                 <SelectTrigger id="note-visibility">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="private">Privée</SelectItem>
+                  <SelectItem value="private">PrivÃ©e</SelectItem>
                   <SelectItem value="public">Publique</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isPending}
+            >
               Annuler
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Création..." : "Créer"}
+              {isPending ? 'CrÃ©ation...' : 'CrÃ©er'}
             </Button>
           </DialogFooter>
         </form>
