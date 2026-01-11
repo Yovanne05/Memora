@@ -65,13 +65,7 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
                     "Bearer <token>\n"
                     "```"
                 )
-            },
-            "apiKeyAuth": {
-                "type": "apiKey",
-                "name": "X-API-Key",
-                "in": "header",
-                "description": "API key for collab endpoints.",
-            },
+            }
         },
         "security": [
             {"bearerAuth": []}

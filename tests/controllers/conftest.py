@@ -148,7 +148,7 @@ def mock_note_image_service(monkeypatch):
 
 @pytest.fixture
 def mock_current_user():
-    """Mock user for authenticated requests."""
+    """Mock user for authenticated requests (CLIENT role)."""
     from daos.user_dao import User
     from utils.enums import RoleEnum
     return User(
@@ -161,9 +161,23 @@ def mock_current_user():
 
 
 @pytest.fixture
+def mock_admin_user():
+    """Mock admin user for authenticated requests (ADMIN role)."""
+    from daos.user_dao import User
+    from utils.enums import RoleEnum
+    return User(
+        id="admin-4567-e89b-12d3-a456-426614174000",
+        email="admin@example.com",
+        username="admin",
+        password_hash="hash",
+        role=RoleEnum.ADMIN
+    )
+
+
+@pytest.fixture
 def authenticated_client(app_client, mock_current_user, monkeypatch):
     """
-    Client Flask authentifié avec un utilisateur de test.
+    Client Flask authentifié avec un utilisateur de test (CLIENT role).
     Crée un vrai JWT token et mock get_current_user + permissions.
     """
     from flask_jwt_extended import create_access_token
@@ -221,3 +235,66 @@ def authenticated_client(app_client, mock_current_user, monkeypatch):
             return self.client.application
 
     return AuthenticatedClient(app_client, access_token, mock_current_user)
+
+
+@pytest.fixture
+def admin_client(app_client, mock_admin_user, monkeypatch):
+    """
+    Client Flask authentifié avec un utilisateur admin (ADMIN role).
+    Crée un vrai JWT token et mock get_current_user + permissions.
+    """
+    from flask_jwt_extended import create_access_token
+
+    # Mock get_current_user everywhere it's imported
+    monkeypatch.setattr("utils.auth.get_current_user", lambda: mock_admin_user)
+    monkeypatch.setattr("utils.permission_decorators.get_current_user", lambda: mock_admin_user)
+    monkeypatch.setattr("controllers.user_controller.get_current_user", lambda: mock_admin_user)
+
+    # Mock permission_domain_service to always allow access for admins
+    mock_permission = Mock()
+    mock_permission.can_read_note.return_value = True
+    mock_permission.can_write_note.return_value = True
+    mock_permission.can_read_collection.return_value = True
+    mock_permission.can_write_collection.return_value = True
+    monkeypatch.setattr("utils.permission_decorators.permission_domain_service", mock_permission)
+
+    # Créer un token JWT valide pour les tests
+    with app_client.application.app_context():
+        access_token = create_access_token(identity="admin-4567-e89b-12d3-a456-426614174000")
+
+    # Créer un wrapper qui ajoute automatiquement le token aux headers
+    class AuthenticatedClient:
+        def __init__(self, client, token, user):
+            self.client = client
+            self.token = token
+            self.user = user
+
+        def get(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.get(*args, **kwargs)
+
+        def post(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.post(*args, **kwargs)
+
+        def patch(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.patch(*args, **kwargs)
+
+        def delete(self, *args, **kwargs):
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f'Bearer {self.token}'
+            return self.client.delete(*args, **kwargs)
+
+        @property
+        def application(self):
+            return self.client.application
+
+    return AuthenticatedClient(app_client, access_token, mock_admin_user)

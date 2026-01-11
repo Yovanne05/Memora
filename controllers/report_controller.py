@@ -9,6 +9,7 @@ from dtos.report_dto import ReportCreateDTO, ReportUpdateDTO
 from dtos.common_dto import ListResponseDTO
 from querys.report_query import ReportFindQuery
 from services.impl.report_service_impl import report_service
+from utils.permission_decorators import require_admin
 
 bp_reports = Blueprint("reports", __name__)
 
@@ -33,6 +34,7 @@ def report_collection(collection_id: UUID):
 
 @bp_reports.get("/reports")
 @jwt_required()
+@require_admin()
 @swag_from("../docs/reports/list.yaml")
 def list_reports():
     raw_query = request.args.to_dict(flat=True)
@@ -49,6 +51,7 @@ def list_reports():
 
 @bp_reports.get("/reports/<uuid:report_id>")
 @jwt_required()
+@require_admin()
 @swag_from("../docs/reports/find_one.yaml")
 def get_report(report_id: UUID):
     report = report_service.find_one(str(report_id))
@@ -57,6 +60,7 @@ def get_report(report_id: UUID):
 
 @bp_reports.patch("/reports/<uuid:report_id>")
 @jwt_required()
+@require_admin()
 @swag_from("../docs/reports/update.yaml")
 def update_report(report_id: UUID):
     payload = ReportUpdateDTO.model_validate_json(request.data)

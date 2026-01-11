@@ -234,9 +234,9 @@ Ce script va :
 - Insérer des données de test
 
 **Utilisateurs de test créés :**
+- `superadmin@example.com` / `SuperAdminPass123!` (SUPER_ADMIN)
 - `admin@example.com` / `AdminPass123!` (ADMIN)
-- `alice@example.com` / `AlicePass123!` (CLIENT)
-- `bob@example.com` / `BobPass123!!` (CLIENT)
+- `client@example.com` / `ClientPass123!` (CLIENT)
 
 ### 8. (Optionnel) Initialiser le stockage S3
 
@@ -436,9 +436,73 @@ L'application suit une **architecture en couches** stricte (SOLID) :
 - Gestion administrative
 - Endpoints : `/reports`
 
-### Utilisateurs
+### Utilisateurs et Rôles
 - Gestion de profil utilisateur
+- Système de rôles hiérarchiques (CLIENT, ADMIN, SUPER_ADMIN)
+- Permissions granulaires selon les rôles
 - Endpoints : `/users`
+
+#### Rôles utilisateurs
+
+L'application supporte **trois rôles** avec des permissions différentes :
+
+1. **CLIENT** (rôle par défaut)
+   - Créer, modifier et supprimer ses propres notes et collections
+   - Créer et gérer ses flashcards
+   - Partager ses ressources avec d'autres utilisateurs
+   - Modifier son propre profil utilisateur
+   - Supprimer son propre compte
+
+2. **ADMIN** (administrateur)
+   - Toutes les permissions CLIENT
+   - Accès en lecture/écriture à toutes les ressources (notes, collections)
+   - Modifier et supprimer n'importe quel utilisateur CLIENT
+   - Gérer les reports et la modération
+   - **Ne peut PAS** attribuer ou modifier le rôle ADMIN
+   - **Ne peut PAS** modifier les utilisateurs SUPER_ADMIN
+
+3. **SUPER_ADMIN** (super administrateur)
+   - Toutes les permissions ADMIN
+   - **Seul rôle pouvant attribuer ou modifier le rôle ADMIN**
+   - Gestion complète des administrateurs
+   - Contrôle total sur tous les utilisateurs et ressources
+
+#### Règles de sécurité des rôles
+
+- **Création de compte** : Tous les nouveaux comptes sont créés avec le rôle CLIENT
+- **Changement de rôle** :
+  - CLIENT → ADMIN : Nécessite un SUPER_ADMIN
+  - CLIENT → SUPER_ADMIN : Nécessite un SUPER_ADMIN
+  - ADMIN → CLIENT : Nécessite un SUPER_ADMIN
+  - ADMIN → SUPER_ADMIN : Nécessite un SUPER_ADMIN
+  - Tout changement CLIENT → CLIENT : Nécessite un ADMIN ou SUPER_ADMIN
+- **Modification de profil** :
+  - Un utilisateur peut modifier son propre profil (sauf son rôle)
+  - Les ADMIN peuvent modifier les profils des utilisateurs CLIENT
+  - Les SUPER_ADMIN peuvent modifier tous les profils et tous les rôles
+- **Suppression de compte** :
+  - Un utilisateur peut supprimer son propre compte
+  - Les ADMIN peuvent supprimer les comptes CLIENT
+  - Les SUPER_ADMIN peuvent supprimer tous les comptes
+
+#### Restrictions d'accès aux endpoints
+
+Certains endpoints sont restreints selon les rôles pour des raisons de sécurité :
+
+**Endpoints réservés aux ADMIN et SUPER_ADMIN :**
+- `GET /users` - Lister tous les utilisateurs
+- `GET /reports` - Lister tous les signalements
+- `GET /reports/<id>` - Voir un signalement spécifique
+- `PATCH /reports/<id>` - Modifier un signalement (modération)
+
+**Endpoints avec accès self-or-admin :**
+- `GET /users/<id>` - Voir un utilisateur (soi-même ou admin)
+- `PATCH /users/<id>` - Modifier un utilisateur (soi-même ou admin)
+- `DELETE /users/<id>` - Supprimer un utilisateur (soi-même ou admin)
+
+**Endpoints publics (authentifiés) :**
+- `POST /notes/<id>/reports` - Signaler une note (tout utilisateur authentifié)
+- `POST /collections/<id>/reports` - Signaler une collection (tout utilisateur authentifié)
 
 ## Endpoints API
 

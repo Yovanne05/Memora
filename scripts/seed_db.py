@@ -67,32 +67,32 @@ def seed() -> None:
 
     with get_db_session() as session:
         # Users
+        super_admin = User(
+            email="superadmin@example.com",
+            username="superadmin",
+            password_hash=_hash_password("SuperAdminPass123!"),
+            role=RoleEnum.SUPER_ADMIN,
+        )
         admin = User(
             email="admin@example.com",
             username="admin",
             password_hash=_hash_password("AdminPass123!"),
             role=RoleEnum.ADMIN,
         )
-        alice = User(
-            email="alice@example.com",
-            username="alice",
-            password_hash=_hash_password("AlicePass123!"),
-            role=RoleEnum.CLIENT,
-        )
-        bob = User(
-            email="bob@example.com",
-            username="bob",
-            password_hash=_hash_password("BobPass123!!"),
+        client = User(
+            email="client@example.com",
+            username="client",
+            password_hash=_hash_password("ClientPass123!"),
             role=RoleEnum.CLIENT,
         )
 
-        session.add_all([admin, alice, bob])
+        session.add_all([super_admin, admin, client])
         session.flush()
         print("Users inserted.")
 
         # Collections
         coll_docs = Collection(
-            owner_id=admin.id,
+            owner_id=super_admin.id,
             name="Project Docs",
             description="Notes publiques du projet.",
             visibility=VisibilityEnum.PUBLIC,
@@ -106,7 +106,7 @@ def seed() -> None:
             tags=["templates"],
         )
         coll_courses = Collection(
-            owner_id=alice.id,
+            owner_id=client.id,
             name="Cours S5",
             description="Cours et fiches de revision.",
             visibility=VisibilityEnum.PRIVATE,
@@ -119,14 +119,14 @@ def seed() -> None:
 
         # Notes
         note_archi = Note(
-            owner_id=admin.id,
+            owner_id=super_admin.id,
             collection_id=coll_docs.id,
             title="Architecture generale",
             visibility=VisibilityEnum.PUBLIC,
             tags=["architecture", "overview"],
         )
         note_api = Note(
-            owner_id=admin.id,
+            owner_id=super_admin.id,
             collection_id=coll_docs.id,
             title="API checklist",
             visibility=VisibilityEnum.PUBLIC,
@@ -140,7 +140,7 @@ def seed() -> None:
             tags=["template"],
         )
         note_course = Note(
-            owner_id=alice.id,
+            owner_id=client.id,
             collection_id=coll_courses.id,
             title="Memo Flask",
             visibility=VisibilityEnum.PRIVATE,
@@ -166,12 +166,12 @@ def seed() -> None:
             [
                 CollectionShare(
                     collection_id=coll_docs.id,
-                    user_id=bob.id,
+                    user_id=admin.id,
                     permission=SharePermissionEnum.READ,
                 ),
                 NoteShare(
                     note_id=note_api.id,
-                    user_id=bob.id,
+                    user_id=client.id,
                     permission=SharePermissionEnum.WRITE,
                 ),
             ]
@@ -181,8 +181,8 @@ def seed() -> None:
         # Favorites
         session.add_all(
             [
-                NoteFavorite(user_id=bob.id, note_id=note_archi.id),
-                CollectionFavorite(user_id=alice.id, collection_id=coll_docs.id),
+                NoteFavorite(user_id=admin.id, note_id=note_archi.id),
+                CollectionFavorite(user_id=client.id, collection_id=coll_docs.id),
             ]
         )
         print("Favorites inserted.")
@@ -216,14 +216,14 @@ def seed() -> None:
             [
                 Report(
                     note_id=note_api.id,
-                    reporter_id=bob.id,
+                    reporter_id=client.id,
                     reason=ReportReasonEnum.SPAM_OR_ABUSE,
                     status=ReportStatusEnum.PENDING,
                     description="La note semble contenir trop de pub.",
                 ),
                 Report(
                     collection_id=coll_templates.id,
-                    reporter_id=alice.id,
+                    reporter_id=client.id,
                     reason=ReportReasonEnum.TECHNICAL_ISSUE,
                     status=ReportStatusEnum.IN_PROGRESS,
                     description="Impossible de charger certains templates.",

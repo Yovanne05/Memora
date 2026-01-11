@@ -2,14 +2,15 @@ from typing import List, Optional, Tuple
 
 import bcrypt
 
-from domain_services.user_domain_service import apply_user_update
-from dtos.user_dto import UserCreateDTO, UserDTO, UserUpdateDTO
-from exceptions.user_exception import (
-    UserEmailConflict,
-    UserNotFound,
-    UserUsernameConflict,
-    UserPermissionDenied,
+from domain_services.user_domain_service import (
+    apply_user_update,
+    ensure_unique_email,
+    ensure_unique_username,
+    ensure_user_exists,
+    validate_role_change,
 )
+from dtos.user_dto import UserCreateDTO, UserDTO, UserUpdateDTO
+from exceptions.user_exception import UserNotFound
 from mappers.user_mapper import dto_to_user, user_to_dto
 from repositorys import user_repository
 from repositorys.user_repository import UserSearchParams
@@ -27,14 +28,19 @@ class UserService(UserServiceInterface):
 
     def find_one(self, user_id: str) -> UserDTO:
         user_entity = user_repository.find_one(user_id)
-        if not user_entity:
-            raise UserNotFound()
+        ensure_user_exists(user_entity)
         return user_to_dto(user_entity)
 
     def create(self, user_create_dto: UserCreateDTO) -> UserDTO:
-        self._ensure_unique_email(user_create_dto.email)
+        existing_email = user_repository.find_one_by_email(
+            user_create_dto.email)
+        ensure_unique_email(existing_email)
+
         if user_create_dto.username:
-            self._ensure_unique_username(user_create_dto.username)
+            existing_username = user_repository.find_one_by_username(
+                user_create_dto.username
+            )
+            ensure_unique_username(existing_username)
 
         password_hash = self._hash_password(user_create_dto.password)
         entity = dto_to_user(user_create_dto, password_hash)
@@ -48,40 +54,29 @@ class UserService(UserServiceInterface):
         actor_role: RoleEnum | str,
     ) -> UserDTO:
         user_entity = user_repository.find_one(user_id)
-        if not user_entity:
-            raise UserNotFound()
+        ensure_user_exists(user_entity)
 
-        if user_update_dto.role is not None and not self._is_admin_role(actor_role):
-            raise UserPermissionDenied("Only admins can change roles.")
-
-        if user_update_dto.role is not None and user_update_dto.role != user_entity.role:
-            logger.info(
-                "Role change target_id=%s from=%s to=%s",
-                user_entity.id,
-                user_entity.role,
-                user_update_dto.role,
-            )
+        validate_role_change(user_update_dto, user_entity, actor_role)
 
         if user_update_dto.email is not None:
-            self._ensure_unique_email(
-                user_update_dto.email, exclude_id=user_entity.id
-            )
+            existing_email = user_repository.find_one_by_email(
+                user_update_dto.email)
+            ensure_unique_email(existing_email, exclude_id=user_entity.id)
 
         if (
             "username" in user_update_dto.model_fields_set
             and user_update_dto.username
         ):
-            self._ensure_unique_username(
-                user_update_dto.username, exclude_id=user_entity.id
+            existing_username = user_repository.find_one_by_username(
+                user_update_dto.username
             )
+            ensure_unique_username(
+                existing_username, exclude_id=user_entity.id)
 
         updated_entity = apply_user_update(user_entity, user_update_dto)
 
         if user_update_dto.password is not None:
-            logger.info(
-                "Password change target_id=%s",
-                user_entity.id,
-            )
+            logger.info(f"Password change target_id={user_entity.id}")
             updated_entity.password_hash = self._hash_password(
                 user_update_dto.password
             )
@@ -97,24 +92,6 @@ class UserService(UserServiceInterface):
     def _hash_password(self, raw_password: str) -> str:
         hashed = bcrypt.hashpw(raw_password.encode("utf-8"), bcrypt.gensalt())
         return hashed.decode("utf-8")
-
-    def _ensure_unique_email(self, email: str, exclude_id: str | None = None) -> None:
-        existing = user_repository.find_one_by_email(email)
-        if existing and existing.id != exclude_id:
-            raise UserEmailConflict()
-
-    def _ensure_unique_username(
-        self, username: str, exclude_id: str | None = None
-    ) -> None:
-        existing = user_repository.find_one_by_username(username)
-        if existing and existing.id != exclude_id:
-            raise UserUsernameConflict()
-
-    @staticmethod
-    def _is_admin_role(role: RoleEnum | str) -> bool:
-        if isinstance(role, RoleEnum):
-            return role in {RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN}
-        return role in {RoleEnum.ADMIN.value, RoleEnum.SUPER_ADMIN.value}
 
 
 user_service = UserService()
