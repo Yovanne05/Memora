@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { logger } from '@/lib/logger'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -39,7 +40,7 @@ export function DeleteUserDialog({
         resource: 'user',
       })
       toast.error(message)
-      console.error('Delete user error:', error)
+      logger.error('Delete user error', error)
     }
   }
 

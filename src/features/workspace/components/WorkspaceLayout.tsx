@@ -1,13 +1,9 @@
 import type { ReactNode } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { getContextualErrorMessage } from '@/lib/error-context'
 import { WorkspaceSidebar } from './sidebar/WorkspaceSidebar'
 import { WorkspaceHeader } from './WorkspaceHeader'
-import { CreateNoteDialog } from '@/features/notes/components/CreateNoteDialog'
-import { CreateCollectionDialog } from '@/features/collections/components/CreateCollectionDialog'
-import { GraphViewDialog } from './GraphViewDialog'
 import { useWorkspaceContext } from '../context'
 import { useWorkspaceKeyboardShortcuts } from '../hooks/useWorkspaceKeyboardShortcuts'
 import { useCreateNoteMutation } from '@/features/notes/hooks/useCreateNoteMutation'
@@ -16,7 +12,8 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import type { NoteVisibility } from '@/features/notes/models/note.model'
 import { logger } from '@/lib/logger'
 import { useDragAndDropNotes } from '@/features/notes/hooks/useDragAndDropNotes'
-import { NoteCard } from '@/features/notes/components/NoteCard'
+import { WorkspaceDragAndDrop } from './workspace-layout/WorkspaceDragAndDrop'
+import { WorkspaceDialogs } from './workspace-layout/WorkspaceDialogs'
 
 interface WorkspaceLayoutProps {
   readonly children: ReactNode
@@ -98,7 +95,8 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
   return (
     <>
-      <DndContext
+      <WorkspaceDragAndDrop
+        activeNote={activeNote}
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
@@ -114,37 +112,20 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
             </div>
           </main>
         </div>
+      </WorkspaceDragAndDrop>
 
-        <DragOverlay>
-          {activeNote ? (
-            <div className="rotate-3 opacity-80">
-              <NoteCard
-                note={activeNote}
-                showQuickActions={false}
-                showFavoriteButton={false}
-              />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-
-      <CreateNoteDialog
-        open={state.createNoteDialogOpen}
-        onOpenChange={(open) => {
+      <WorkspaceDialogs
+        createNoteOpen={state.createNoteDialogOpen}
+        createCollectionOpen={state.createCollectionDialogOpen}
+        onCreateNoteChange={(open) => {
           if (!open) actions.closeCreateNote()
         }}
-        onSubmit={handleCreateNote}
-        submitting={createNoteMutation.isPending}
-      />
-
-      <CreateCollectionDialog
-        open={state.createCollectionDialogOpen}
-        onOpenChange={(open) => {
+        onCreateCollectionChange={(open) => {
           if (!open) actions.closeCreateCollection()
         }}
+        onCreateNote={handleCreateNote}
+        submitting={createNoteMutation.isPending}
       />
-
-      <GraphViewDialog />
     </>
   )
 }

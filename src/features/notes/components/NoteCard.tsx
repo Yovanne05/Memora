@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { FileText } from 'lucide-react'
 import { useDraggable } from '@dnd-kit/core'
@@ -23,7 +23,7 @@ interface NoteCardProps {
   showReportButton?: boolean
 }
 
-export function NoteCard({
+export const NoteCard = memo(function NoteCard({
   note,
   onEdit,
   onDelete,
@@ -124,4 +124,4 @@ export function NoteCard({
       />
     </>
   )
-}
+})

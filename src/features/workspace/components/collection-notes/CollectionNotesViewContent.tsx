@@ -1,12 +1,11 @@
 import type { Note } from '@/features/notes/models/note.model'
 import type { CollectionFormValues } from '@/features/collections/types/collection-form.types'
 import type { Collection } from '@/features/collections/models/collection.model'
-import { CollectionNotesError } from './CollectionNotesError'
 import { CollectionNotesLoading } from './CollectionNotesLoading'
 import { CollectionNotesHeader } from './CollectionNotesHeader'
 import { CollectionNotesContent } from './CollectionNotesContent'
 import { CollectionNotesDialogs } from './CollectionNotesDialogs'
-import { ApiError } from '@/lib/errors'
+import { ErrorHandling } from './ErrorHandling'
 
 type CollectionNotesViewContentProps = {
   collection: Collection | null
@@ -71,47 +70,21 @@ export function CollectionNotesViewContent({
   onDeleteOpenChange,
   onDeleteConfirm,
 }: Readonly<CollectionNotesViewContentProps>) {
-  const collectionErrorMessage =
-    collectionError instanceof Error ? collectionError.message : ''
-  const normalizedMessage = collectionErrorMessage.toLowerCase()
-  const hasPermissionHint =
-    normalizedMessage.includes('permission') ||
-    normalizedMessage.includes('acces')
-  const isPermissionError =
-    (collectionError instanceof ApiError &&
-      (collectionError.status === 403 ||
-        collectionError.status === 500 ||
-        hasPermissionHint)) ||
-    (collectionError instanceof Error && hasPermissionHint)
+  const errorComponent = (
+    <ErrorHandling
+      collectionError={collectionError}
+      isCollectionError={isCollectionError}
+      isNotesError={isNotesError}
+      notesError={notesError}
+    />
+  )
 
-  if (collectionError && isPermissionError) {
-    return (
-      <CollectionNotesError
-        title="Acces refuse"
-        message="Vous n'avez pas acces aux donnees de cette collection."
-      />
-    )
-  }
-
-  if (isCollectionError) {
-    return <CollectionNotesError title="Collection introuvable" />
+  if (errorComponent) {
+    return errorComponent
   }
 
   if (isLoading) {
     return <CollectionNotesLoading />
-  }
-
-  if (isNotesError) {
-    return (
-      <CollectionNotesError
-        title="Erreur lors du chargement des notes"
-        message={
-          notesError instanceof Error
-            ? notesError.message
-            : 'Une erreur est survenue'
-        }
-      />
-    )
   }
 
   return (

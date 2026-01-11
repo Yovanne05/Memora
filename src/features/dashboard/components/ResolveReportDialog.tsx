@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { logger } from '@/lib/logger'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -40,7 +41,7 @@ export function ResolveReportDialog({
         resource: 'report',
       })
       toast.error(message)
-      console.error('Resolve report error:', error)
+      logger.error('Resolve report error', error)
     }
   }
 

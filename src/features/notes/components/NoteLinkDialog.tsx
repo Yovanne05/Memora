@@ -1,5 +1,4 @@
 import { memo, useState } from 'react'
-import { Search } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -9,11 +8,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { useLinkNotes } from '../hooks/useLinkNotes'
 import type { Note } from '../models/note.model'
 import type { NoteLink } from '../models/note-link.model'
 import { NoteLinkList } from './note-link-dialog/NoteLinkList'
+import { NoteLinkFormFields } from './note-link-dialog/NoteLinkFormFields'
 
 interface NoteLinkDialogProps {
   readonly note: Note
@@ -81,30 +80,12 @@ export const NoteLinkDialog = memo(function NoteLinkDialog({
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
-          <div className="space-y-2">
-            <label htmlFor="note-link-label" className="text-sm font-medium">
-              Nom du lien
-            </label>
-            <Input
-              id="note-link-label"
-              value={linkLabel}
-              onChange={(event) => setLinkLabel(event.target.value)}
-              maxLength={80}
-            />
-            <p className="text-xs text-muted-foreground">
-              {normalizedLabel.length}/80
-            </p>
-          </div>
-
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher une note..."
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              className="pl-9"
-            />
-          </div>
+          <NoteLinkFormFields
+            linkLabel={linkLabel}
+            searchQuery={searchQuery}
+            onLinkLabelChange={setLinkLabel}
+            onSearchQueryChange={setSearchQuery}
+          />
 
           <NoteLinkList
             items={availableNotes}

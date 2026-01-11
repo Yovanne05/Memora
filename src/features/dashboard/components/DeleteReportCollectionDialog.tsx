@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { logger } from '@/lib/logger'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -51,7 +52,7 @@ export function DeleteReportCollectionDialog({
         resource: 'collection',
       })
       toast.error(message)
-      console.error('Report delete collection error:', error)
+      logger.error('Report delete collection error', error)
     }
   }
 
