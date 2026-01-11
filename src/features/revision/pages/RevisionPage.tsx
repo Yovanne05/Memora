@@ -47,7 +47,7 @@ export default function RevisionPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold">
-                    📚 {totalReviewsCount} flashcard
+                    {totalReviewsCount} flashcard
                     {totalReviewsCount > 1 ? 's' : ''} à réviser
                   </h2>
                   {todayCount > 0 && (
@@ -76,7 +76,7 @@ export default function RevisionPage() {
       ) : (
         <Card>
           <CardContent className="pt-6 text-center space-y-4">
-            <div className="text-6xl">🎉</div>
+            <div className="text-6xl"></div>
             <h2 className="text-2xl font-bold">Tout est à jour !</h2>
             <p className="text-muted-foreground">
               Aucune révision planifiée. Créez des flashcards pour commencer à
