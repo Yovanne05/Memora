@@ -3,6 +3,7 @@ import time
 from typing import Callable
 from flask import request
 from flask_socketio import disconnect
+import config
 from services.impl.infrastructure.redis_client_service_impl import redis_client_service
 
 class RateLimitExceeded(Exception):
@@ -45,6 +46,10 @@ class RedisRateLimiter:
 
 
 def socketio_rate_limit(max_requests: int, window_seconds: int, disconnect_on_exceed: bool = True):
+    if config.APP_ENV != "prod":
+        def decorator(func: Callable) -> Callable:
+            return func
+        return decorator
     limiter = RedisRateLimiter(max_requests, window_seconds)
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
