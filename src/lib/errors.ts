@@ -3,6 +3,7 @@ export type ErrorType =
   | 'AUTH_ERROR'
   | 'FORBIDDEN'
   | 'NOT_FOUND'
+  | 'CONFLICT'
   | 'VALIDATION_ERROR'
   | 'SERVER_ERROR'
   | 'RATE_LIMIT_ERROR'
@@ -112,6 +113,18 @@ export class ErrorHandler {
           type: 'NOT_FOUND',
           message: 'La ressource demandée est introuvable.',
           status: 404,
+        }
+      case 409:
+        return {
+          type: 'CONFLICT',
+          message: error.message || 'Cette ressource existe déjà',
+          status: 409,
+        }
+      case 422:
+        return {
+          type: 'VALIDATION_ERROR',
+          message: error.message || 'Les données fournies sont invalides',
+          status: 422,
         }
       case 429:
         return {
