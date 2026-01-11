@@ -50,8 +50,7 @@ def _safe_owner_username(note: Note) -> str:
 
 def note_to_dto(
     note: Note,
-    favorite_note_ids: set[str] | None = None,
-    current_user=None,
+    favorite_note_ids: set[str] | None = None
 ) -> NoteDTO:
     is_favorite = False
     if favorite_note_ids is not None:

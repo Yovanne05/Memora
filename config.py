@@ -29,6 +29,14 @@ ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI")
+RATE_LIMIT_DEFAULTS = [
+    limit.strip()
+    for limit in os.getenv("RATE_LIMIT_DEFAULTS", "200 per day;50 per hour").split(";")
+    if limit.strip()
+]
+RATE_LIMIT_LOGIN = os.getenv("RATE_LIMIT_LOGIN", "5 per minute")
+RATE_LIMIT_REGISTER = os.getenv("RATE_LIMIT_REGISTER", "3 per hour")
 COLLAB_SESSION_TTL_SECONDS = int(
     os.getenv("COLLAB_SESSION_TTL_SECONDS", str(24 * 3600))
 )

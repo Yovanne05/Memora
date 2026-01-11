@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from uuid import UUID
 
+import config
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from flasgger import swag_from
@@ -12,6 +13,7 @@ from querys.user_query import UserFindQuery
 from services.impl.auth_service_impl import auth_service
 from services.impl.user_service_impl import user_service
 from utils.enums import RoleEnum
+from utils.http_rate_limiter import limiter
 
 bp_users = Blueprint("users", __name__, url_prefix="/users")
 
@@ -41,6 +43,7 @@ def find_one(user_id: UUID):
 
 
 @bp_users.post("")
+@limiter.limit(config.RATE_LIMIT_REGISTER)
 @swag_from("../docs/users/create.yaml")
 def create():
     payload = RegisterDTO.model_validate_json(request.data)

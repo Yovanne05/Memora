@@ -4,7 +4,6 @@ from dtos.note_image_dto import NoteImageDTO
 
 def note_image_to_dto(image: NoteImage) -> NoteImageDTO:
     """Convertit une entité NoteImage en DTO"""
-    # Construction de l'URL publique RESTful
     url = f"/notes/{image.note_id}/attachments/{image.file_name}"
 
     return NoteImageDTO(url=url)

@@ -23,6 +23,7 @@ from controllers.review_controller import bp_reviews
 from controllers.report_controller import bp_reports
 from utils import db
 from utils.jwt import init_jwt
+from utils.http_rate_limiter import init_http_rate_limiter
 from utils.filter import register_global_filter
 from utils.logger import init_logger
 from utils.swagger import init_swagger
@@ -43,6 +44,7 @@ def create_app() -> Flask:
     init_jwt(app)
     init_swagger(app)
     init_logger(app)
+    init_http_rate_limiter(app)
 
     redis_client = redis_client_service.init_redis(
         host=config.REDIS_HOST,
