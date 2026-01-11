@@ -15,6 +15,9 @@ from repositorys import user_repository
 from repositorys.user_repository import UserSearchParams
 from services.interfaces.user_service_interface import UserServiceInterface
 from utils.enums import RoleEnum
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class UserService(UserServiceInterface):
@@ -53,6 +56,14 @@ class UserService(UserServiceInterface):
         if user_update_dto.role is not None and not self._is_admin_role(actor_role):
             raise UserPermissionDenied("Only admins can change roles.")
 
+        if user_update_dto.role is not None and user_update_dto.role != user_entity.role:
+            logger.info(
+                "Role change target_id=%s from=%s to=%s",
+                user_entity.id,
+                user_entity.role,
+                user_update_dto.role,
+            )
+
         if user_update_dto.email is not None:
             self._ensure_unique_email(
                 user_update_dto.email, exclude_id=user_entity.id
@@ -69,6 +80,10 @@ class UserService(UserServiceInterface):
         updated_entity = apply_user_update(user_entity, user_update_dto)
 
         if user_update_dto.password is not None:
+            logger.info(
+                "Password change target_id=%s",
+                user_entity.id,
+            )
             updated_entity.password_hash = self._hash_password(
                 user_update_dto.password
             )

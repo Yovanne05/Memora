@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Tuple
 
+from flask import has_request_context, request
 from flask_jwt_extended import create_access_token
 
 from dtos.auth_dto import LoginDTO, RegisterDTO
@@ -12,7 +13,10 @@ from repositorys import user_repository
 from services.impl.user_service_impl import user_service
 from services.interfaces.auth_service_interface import AuthServiceInterface
 from utils.enums import RoleEnum
+from utils.logger import get_logger
 from utils.security import verify_password
+
+logger = get_logger(__name__)
 
 
 class AuthService(AuthServiceInterface):
@@ -32,15 +36,30 @@ class AuthService(AuthServiceInterface):
             login_dto.identifier
         )
         if not user_entity:
+            ip_addr = request.remote_addr if has_request_context() else "unknown"
+            logger.warning(
+                "Failed login attempt identifier=%s ip=%s",
+                login_dto.identifier,
+                ip_addr,
+            )
             raise InvalidCredentials()
 
         if not verify_password(login_dto.password, user_entity.password_hash):
+            ip_addr = request.remote_addr if has_request_context() else "unknown"
+            logger.warning(
+                "Failed login attempt identifier=%s ip=%s",
+                login_dto.identifier,
+                ip_addr,
+            )
             raise InvalidCredentials()
 
         user_entity.last_login = datetime.now(timezone.utc)
         saved = user_repository.update(user_entity)
         user_dto = user_to_dto(saved)
         token = self._create_token(saved.id, saved.role.value, saved.email)
+        logger.info(
+            "Successful login user_id=%s email=%s", saved.id, saved.email
+        )
         return user_dto, token
 
     def get_me(self, user_id: str) -> UserDTO:

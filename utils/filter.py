@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from flask import jsonify
+from flask import jsonify, request, g
 from flask_jwt_extended.exceptions import JWTExtendedException
 from flask_limiter.errors import RateLimitExceeded
 from werkzeug.exceptions import HTTPException
@@ -33,4 +33,13 @@ def register_global_filter(app):
             status_code = int(HTTPStatus.INTERNAL_SERVER_ERROR)
             message = GENERIC_MESSAGE
             app.logger.error(f"Unhandled exception: {str(error)}", exc_info=True)
+        if status_code == int(HTTPStatus.FORBIDDEN):
+            current_user = getattr(g, "current_user", None)
+            user_id = getattr(current_user, "id", None)
+            app.logger.warning(
+                "Access denied user_id=%s method=%s path=%s",
+                user_id or "unknown",
+                request.method,
+                request.path,
+            )
         return jsonify({"code": status_code, "message": message}), status_code
