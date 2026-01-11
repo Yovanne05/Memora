@@ -83,14 +83,6 @@ export function LoginForm({
               showPassword={showPassword}
               onToggle={onTogglePassword}
             />
-            <div className="text-right">
-              <Link
-                to="/auth/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Mot de passe oublié ?
-              </Link>
-            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoggingIn}>
