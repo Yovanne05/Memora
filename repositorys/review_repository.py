@@ -12,7 +12,7 @@ from utils.enums import ReviewDifficultyEnum
 
 
 class ReviewStatistics(NamedTuple):
-    """Statistiques agrégées des reviews"""
+    """Aggregated review statistics."""
     total_reviews: int
     reviews_last_7_days: int
     reviews_last_30_days: int
@@ -99,7 +99,7 @@ def get_upcoming_reviews(user_id: str) -> dict[str, list[tuple[str, str, datetim
 
 
 def get_review_statistics(user_id: str) -> ReviewStatistics:
-    """Récupère les statistiques de review pour un utilisateur."""
+    """Fetch review statistics for a user."""
     now = datetime.now(timezone.utc)
     seven_days_ago = now - timedelta(days=7)
     thirty_days_ago = now - timedelta(days=30)

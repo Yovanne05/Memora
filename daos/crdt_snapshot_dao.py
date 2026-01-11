@@ -7,12 +7,12 @@ from daos.base_models import UUIDMixin, TimestampMixin
 
 class CRDTSnapshot(UUIDMixin, TimestampMixin, Base):
     """
-    Stocke les snapshots CRDT des notes pour persistance et récupération.
+    Stores CRDT snapshots for notes to support persistence and recovery.
 
-    Permet de :
-    - Récupérer l'état CRDT après redémarrage serveur
-    - Supporter le scaling horizontal (plusieurs instances)
-    - Éviter la perte de données en cas de crash
+    Enables:
+    - Restoring CRDT state after a server restart
+    - Supporting horizontal scaling (multiple instances)
+    - Avoiding data loss in case of a crash
     """
     __tablename__ = "crdt_snapshots"
     __table_args__ = (
@@ -24,23 +24,23 @@ class CRDTSnapshot(UUIDMixin, TimestampMixin, Base):
         ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
-        comment="ID de la note associée"
+        comment="Associated note ID"
     )
 
     state_vector: Mapped[bytes] = mapped_column(
         LargeBinary,
         nullable=False,
-        comment="Vecteur d'état CRDT (binaire)"
+        comment="CRDT state vector (binary)"
     )
 
     document_update: Mapped[bytes] = mapped_column(
         LargeBinary,
         nullable=False,
-        comment="Mise à jour complète du document CRDT (binaire)"
+        comment="Full CRDT document update (binary)"
     )
 
     version: Mapped[int] = mapped_column(
         nullable=False,
         server_default=text("0"),
-        comment="Version du snapshot pour gestion de conflits"
+        comment="Snapshot version for conflict handling"
     )

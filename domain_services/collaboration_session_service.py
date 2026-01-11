@@ -10,13 +10,13 @@ logger = get_logger(__name__)
 
 class CollaborationSessionService:
     """
-    Service de gestion des sessions de collaboration.
+    Collaboration session management service.
 
-    Responsabilités :
-    - Créer des sessions de collaboration (note + user + socket)
-    - Récupérer les sessions par socket_id ou note_id
-    - Supprimer les sessions (déconnexion, timeout)
-    - Nettoyer les sessions stale d'un utilisateur
+    Responsibilities:
+    - Create collaboration sessions (note + user + socket)
+    - Retrieve sessions by socket_id or note_id
+    - Delete sessions (disconnect, timeout)
+    - Clean up stale sessions for a user
     """
 
     def __init__(self):

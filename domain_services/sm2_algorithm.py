@@ -1,7 +1,7 @@
 """
-Algorithme SM-2 (SuperMemo 2) pour la répétition espacée.
+SM-2 (SuperMemo 2) algorithm for spaced repetition.
 
-L'algorithme calcule le prochain intervalle de révision basé sur la performance de l'utilisateur.
+The algorithm computes the next review interval based on user performance.
 """
 
 from datetime import datetime, timedelta, timezone
@@ -12,7 +12,7 @@ from utils.enums import ReviewDifficultyEnum
 
 
 class SM2Result(NamedTuple):
-    """Résultat du calcul SM-2"""
+    """Result of the SM-2 calculation"""
     e_factor: Decimal
     repetitions: int
     interval_days: int
@@ -26,18 +26,18 @@ def calculate_next_review(
     current_interval_days: int,
 ) -> SM2Result:
     """
-    Calcule le prochain intervalle de révision selon l'algorithme SM-2.
+    Compute the next review interval using the SM-2 algorithm.
 
     Args:
-        difficulty: Difficulté perçue (again, hard, good, easy)
-        current_e_factor: Facteur de facilité actuel (>=1.3)
-        current_repetitions: Nombre de répétitions consécutives réussies
-        current_interval_days: Intervalle actuel en jours
+        difficulty: Perceived difficulty (again, hard, good, easy)
+        current_e_factor: Current ease factor (>=1.3)
+        current_repetitions: Number of consecutive successful repetitions
+        current_interval_days: Current interval in days
 
     Returns:
-        SM2Result avec les nouvelles valeurs
+        SM2Result with updated values
 
-    Référence : https://www.supermemo.com/en/blog/application-of-a-computer-to-improve-the-results-obtained-in-working-with-the-supermemo-method
+    Reference: https://www.supermemo.com/en/blog/application-of-a-computer-to-improve-the-results-obtained-in-working-with-the-supermemo-method
     """
     quality_map = {
         ReviewDifficultyEnum.AGAIN: 0,

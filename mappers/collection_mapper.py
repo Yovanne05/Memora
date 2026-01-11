@@ -61,7 +61,7 @@ def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
     seen_edges: set[tuple[str, str]] = set()
 
     for note in notes:
-        # liens sortants
+        # outgoing links
         for link in note.outgoing_links:
             if link.note_id_2 in note_ids:
                 _add_edge_if_new(
@@ -72,7 +72,7 @@ def _build_graph_edges(notes: List[Note], note_ids: Set[str]) -> List[dict]:
                     label=link.label,
                 )
 
-        # liens entrants
+        # incoming links
         for link in note.incoming_links:
             if link.note_id_1 in note_ids:
                 _add_edge_if_new(
