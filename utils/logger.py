@@ -19,8 +19,12 @@ def init_logger(app: Flask):
     log_dir = app.config.get('LOG_DIR', 'logs')
     os.makedirs(log_dir, exist_ok=True)
     app.logger.handlers.clear()
-
     app.logger.setLevel(logging.INFO)
+    app.logger.propagate = True
+
+    root_logger = logging.getLogger()
+    root_logger.handlers.clear()
+    root_logger.setLevel(logging.INFO)
 
     info_handler = RotatingFileHandler(
         os.path.join(log_dir, 'app_info.log'),
@@ -51,8 +55,8 @@ def init_logger(app: Flask):
 
     error_handler.setFormatter(error_formatter)
 
-    app.logger.addHandler(info_handler)
-    app.logger.addHandler(error_handler)
+    root_logger.addHandler(info_handler)
+    root_logger.addHandler(error_handler)
 
     @app.before_request
     def log_request():
