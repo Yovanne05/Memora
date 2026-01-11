@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { useUpdateReportMutation } from '@/features/report/hooks/useUpdateReportMutation'
 
 type ResolveReportDialogProps = {
@@ -34,7 +35,11 @@ export function ResolveReportDialog({
       toast.success('Signalement résolu')
       setOpen(false)
     } catch (error) {
-      toast.error('Impossible de résoudre le signalement')
+      const message = getContextualErrorMessage(error, {
+        operation: 'update',
+        resource: 'report',
+      })
+      toast.error(message)
       console.error('Resolve report error:', error)
     }
   }

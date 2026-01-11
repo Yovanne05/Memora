@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { reviewsService } from '../services/reviews.service'
 import type { ReviewCreateRequest } from '../models/review'
 import { REVIEWS_QUERY_KEYS } from './useUpcomingReviewsQuery'
@@ -37,7 +38,12 @@ export function useReviewMutation() {
     },
 
     onError: (error) => {
-      toast.error('Échec de la soumission de la révision. Veuillez réessayer.')
+      const message = getContextualErrorMessage(error, {
+        operation: 'create',
+        resource: 'flashcard',
+        fallback: 'Échec de la soumission de la révision. Veuillez réessayer.',
+      })
+      toast.error(message)
       logger.error('Failed to submit review', error)
     },
   })

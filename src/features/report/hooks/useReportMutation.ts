@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { reportsService } from '../services/report.service'
 import type { ReportCreate } from '../models/report'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 
 export function useReportNoteMutation(noteId: string) {
   return useMutation({
@@ -14,12 +15,12 @@ export function useReportNoteMutation(noteId: string) {
       })
     },
     onError: (error) => {
-      toast.error('Erreur lors du signalement', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Une erreur est survenue. Veuillez réessayer.',
+      const message = getContextualErrorMessage(error, {
+        operation: 'create',
+        resource: 'report',
+        fallback: "Impossible d'envoyer le signalement",
       })
+      toast.error(message)
     },
   })
 }
@@ -35,12 +36,12 @@ export function useReportCollectionMutation(collectionId: string) {
       })
     },
     onError: (error) => {
-      toast.error('Erreur lors du signalement', {
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Une erreur est survenue. Veuillez réessayer.',
+      const message = getContextualErrorMessage(error, {
+        operation: 'create',
+        resource: 'report',
+        fallback: "Impossible d'envoyer le signalement",
       })
+      toast.error(message)
     },
   })
 }

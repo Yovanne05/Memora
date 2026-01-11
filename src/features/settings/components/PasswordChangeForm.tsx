@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import type { User } from '@/features/users/models/user.model'
 import { useUpdateUserMutation } from '@/features/users/hooks/useUserMutation'
 
@@ -56,8 +57,12 @@ export function PasswordChangeForm({ user }: PasswordChangeFormProps) {
       })
       toast.success('Mot de passe modifié avec succès')
       reset()
-    } catch {
-      toast.error('Erreur lors de la modification du mot de passe')
+    } catch (error) {
+      const message = getContextualErrorMessage(error, {
+        operation: 'update',
+        resource: 'user',
+      })
+      toast.error(message)
     }
   }
 

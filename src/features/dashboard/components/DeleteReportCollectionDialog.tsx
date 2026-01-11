@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { collectionsService } from '@/features/collections/services/collections.service'
 import { useUpdateReportMutation } from '@/features/report/hooks/useUpdateReportMutation'
 import { Trash2 } from 'lucide-react'
@@ -45,7 +46,11 @@ export function DeleteReportCollectionDialog({
       toast.success('Collection supprimée et signalement résolu')
       setOpen(false)
     } catch (error) {
-      toast.error('Impossible de supprimer la collection')
+      const message = getContextualErrorMessage(error, {
+        operation: 'delete',
+        resource: 'collection',
+      })
+      toast.error(message)
       console.error('Report delete collection error:', error)
     }
   }

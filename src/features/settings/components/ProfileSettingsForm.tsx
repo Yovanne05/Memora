@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import type { User } from '@/features/users/models/user.model'
 import { useUpdateUserMutation } from '@/features/users/hooks/useUserMutation'
 
@@ -46,8 +47,12 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
         username: data.username || null,
       })
       toast.success('Profil mis à jour avec succès')
-    } catch {
-      toast.error('Erreur lors de la mise à jour du profil')
+    } catch (error) {
+      const message = getContextualErrorMessage(error, {
+        operation: 'update',
+        resource: 'user',
+      })
+      toast.error(message)
     }
   }
 

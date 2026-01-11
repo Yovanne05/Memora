@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { useDeleteUserMutation } from '@/features/users/hooks/useUserMutation'
 
 type DeleteUserDialogProps = {
@@ -33,7 +34,11 @@ export function DeleteUserDialog({
       toast.success('Compte utilisateur supprimé')
       setOpen(false)
     } catch (error) {
-      toast.error('Impossible de supprimer le compte')
+      const message = getContextualErrorMessage(error, {
+        operation: 'delete',
+        resource: 'user',
+      })
+      toast.error(message)
       console.error('Delete user error:', error)
     }
   }

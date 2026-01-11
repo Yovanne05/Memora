@@ -1,25 +1,33 @@
-import { useMemo, useState } from "react"
-import { BookOpenCheck, Folder, StickyNote } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import { useMemo, useState } from 'react'
+import { BookOpenCheck, Folder, StickyNote } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
+import { getContextualErrorMessage } from '@/lib/error-context'
 
-
-import type { StatisticsMetric, StatisticsRangeDays } from "../types/statistics-types"
-import { useUserStatisticsQuery } from "../hooks/useUserStatisticsQuery"
-import { useUserStatisticsTimeseriesQuery } from "../hooks/useUserStatisticsTimeSeriesQuery"
-import { StatisticsLoading } from "../components/states/StatisticsLoading"
-import { StatisticsError } from "../components/states/StatisticsError"
-import { StatisticsHeader } from "../components/layout/StatisticsHeader"
-import { SummaryCard } from "../components/summary/SummaryCard"
-import { SummaryGrid } from "../components/summary/SummaryGrid"
-import { TimeseriesChartCard } from "../components/charts/TimeSeriesChartCard"
+import type {
+  StatisticsMetric,
+  StatisticsRangeDays,
+} from '../types/statistics-types'
+import { useUserStatisticsQuery } from '../hooks/useUserStatisticsQuery'
+import { useUserStatisticsTimeseriesQuery } from '../hooks/useUserStatisticsTimeSeriesQuery'
+import { StatisticsLoading } from '../components/states/StatisticsLoading'
+import { StatisticsError } from '../components/states/StatisticsError'
+import { StatisticsHeader } from '../components/layout/StatisticsHeader'
+import { SummaryCard } from '../components/summary/SummaryCard'
+import { SummaryGrid } from '../components/summary/SummaryGrid'
+import { TimeseriesChartCard } from '../components/charts/TimeSeriesChartCard'
 
 export default function StatisticsPage() {
   const statsQuery = useUserStatisticsQuery()
 
-  const [selectedMetric, setSelectedMetric] = useState<StatisticsMetric>("notes")
+  const [selectedMetric, setSelectedMetric] =
+    useState<StatisticsMetric>('notes')
   const [days, setDays] = useState<StatisticsRangeDays>(30)
 
-  const chartQuery = useUserStatisticsTimeseriesQuery(selectedMetric, days, true)
+  const chartQuery = useUserStatisticsTimeseriesQuery(
+    selectedMetric,
+    days,
+    true
+  )
 
   const totals = useMemo(() => {
     const c = statsQuery.data?.contentStatistics
@@ -34,7 +42,11 @@ export default function StatisticsPage() {
   if (statsQuery.isError) {
     return (
       <StatisticsError
-        message={statsQuery.error instanceof Error ? statsQuery.error.message : undefined}
+        message={getContextualErrorMessage(statsQuery.error, {
+          operation: 'fetch',
+          resource: 'user',
+          fallback: undefined,
+        })}
         onRetry={() => statsQuery.refetch()}
       />
     )
@@ -54,8 +66,8 @@ export default function StatisticsPage() {
             title="Notes totales"
             value={totals.notes}
             icon={<StickyNote className="h-4 w-4" />}
-            active={selectedMetric === "notes"}
-            onSelectChart={() => setSelectedMetric("notes")}
+            active={selectedMetric === 'notes'}
+            onSelectChart={() => setSelectedMetric('notes')}
             chartLabel="Afficher le graphique des notes"
           />
 
@@ -63,8 +75,8 @@ export default function StatisticsPage() {
             title="Collections totales"
             value={totals.collections}
             icon={<Folder className="h-4 w-4" />}
-            active={selectedMetric === "collections"}
-            onSelectChart={() => setSelectedMetric("collections")}
+            active={selectedMetric === 'collections'}
+            onSelectChart={() => setSelectedMetric('collections')}
             chartLabel="Afficher le graphique des collections"
           />
 
@@ -72,8 +84,8 @@ export default function StatisticsPage() {
             title="Révisions totales"
             value={statsQuery.data?.reviewStatistics?.totalReviews ?? 0}
             icon={<BookOpenCheck className="h-4 w-4" />}
-            active={selectedMetric === "reviews"}
-            onSelectChart={() => setSelectedMetric("reviews")}
+            active={selectedMetric === 'reviews'}
+            onSelectChart={() => setSelectedMetric('reviews')}
             chartLabel="Afficher le graphique des révisions"
           />
         </SummaryGrid>

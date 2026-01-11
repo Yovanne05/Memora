@@ -1,9 +1,10 @@
-import { Loader2 } from "lucide-react"
-import { NotesGrid } from "@/features/notes/components/NotesGrid"
-import { NotesPagination } from "@/features/notes/components/NotesPagination"
-import { useWorkspaceNotes } from "../hooks/useWorkspaceNotes"
-import { useWorkspaceContext } from "../context"
-import { useMemo } from "react"
+import { Loader2 } from 'lucide-react'
+import { NotesGrid } from '@/features/notes/components/NotesGrid'
+import { NotesPagination } from '@/features/notes/components/NotesPagination'
+import { useWorkspaceNotes } from '../hooks/useWorkspaceNotes'
+import { useWorkspaceContext } from '../context'
+import { useMemo } from 'react'
+import { getContextualErrorMessage } from '@/lib/error-context'
 
 export default function NotesListView() {
   const { notes, total, limit, isLoading, isError, error } = useWorkspaceNotes()
@@ -24,11 +25,13 @@ export default function NotesListView() {
   if (isError) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-4">
-        <p className="text-destructive">
-          Erreur lors du chargement des notes
-        </p>
+        <p className="text-destructive">Erreur lors du chargement des notes</p>
         <p className="text-sm text-muted-foreground">
-          {error instanceof Error ? error.message : "Une erreur est survenue"}
+          {getContextualErrorMessage(error, {
+            operation: 'fetch',
+            resource: 'note',
+            fallback: 'Une erreur est survenue',
+          })}
         </p>
       </div>
     )

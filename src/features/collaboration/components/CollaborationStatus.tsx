@@ -1,5 +1,6 @@
 import { AlertCircle, Users, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { getContextualErrorMessage } from '@/lib/error-context'
 
 interface CollaborationStatusProps {
   isConnected: boolean
@@ -48,7 +49,13 @@ export function CollaborationStatus({
         {error && (
           <div className="flex items-center gap-2 text-destructive">
             <AlertCircle className="h-4 w-4" />
-            <span className="text-sm">{error.message}</span>
+            <span className="text-sm">
+              {getContextualErrorMessage(error, {
+                operation: 'fetch',
+                resource: 'note',
+                fallback: 'Erreur de connexion',
+              })}
+            </span>
           </div>
         )}
         {!isConnected && !isConnecting && (
