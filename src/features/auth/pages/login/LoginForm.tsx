@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router"
-import type { UseFormReturn } from "react-hook-form"
+import { Link } from '@tanstack/react-router'
+import type { UseFormReturn } from 'react-hook-form'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Form,
   FormControl,
@@ -10,11 +10,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { AuthFormCard } from "@/features/auth/components/AuthFormCard"
-import { AuthFormError } from "@/features/auth/components/AuthFormError"
-import { AuthPasswordField } from "@/features/auth/components/AuthPasswordField"
-import type { LoginValues } from "@/features/auth/schemas/login.schema"
+} from '@/components/ui/form'
+import { AuthFormCard } from '@/features/auth/components/AuthFormCard'
+import { AuthFormError } from '@/features/auth/components/AuthFormError'
+import { AuthPasswordField } from '@/features/auth/components/AuthPasswordField'
+import type { LoginValues } from '@/features/auth/schemas/login.schema'
 
 type LoginFormProps = {
   form: UseFormReturn<LoginValues>
@@ -62,29 +62,34 @@ export function LoginForm({
               <FormItem>
                 <FormLabel>Email ou nom d'utilisateur</FormLabel>
                 <FormControl>
-                  <Input placeholder="jane.doe@example.com" autoComplete="username" {...field} />
+                  <Input
+                    placeholder="jane.doe@example.com"
+                    autoComplete="username"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <AuthPasswordField
-            control={form.control}
-            name="password"
-            label="Mot de passe"
-            placeholder="********"
-            autoComplete="current-password"
-            showPassword={showPassword}
-            onToggle={onTogglePassword}
-          />
+          <div className="space-y-2">
+            <AuthPasswordField
+              control={form.control}
+              name="password"
+              label="Mot de passe"
+              placeholder="********"
+              autoComplete="current-password"
+              showPassword={showPassword}
+              onToggle={onTogglePassword}
+            />
+          </div>
 
           <Button type="submit" className="w-full" disabled={isLoggingIn}>
-            {isLoggingIn ? "Connexion en cours..." : "Se connecter"}
+            {isLoggingIn ? 'Connexion en cours...' : 'Se connecter'}
           </Button>
         </form>
       </Form>
     </AuthFormCard>
   )
 }
-
