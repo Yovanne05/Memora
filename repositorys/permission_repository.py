@@ -91,7 +91,12 @@ class PermissionRepository:
         )
 
     @staticmethod
-    def get_accessible_note_ids(session: Session, user_id: str) -> Set[str]:
+    def get_accessible_note_ids(
+        session: Session, user_id: str, include_public: bool = False
+    ) -> Set[str]:
+        visibility_filter = (
+            [Note.visibility == VisibilityEnum.PUBLIC] if include_public else []
+        )
         stmt = (
             select(Note.id)
             .outerjoin(NoteShare, NoteShare.note_id == Note.id)
@@ -106,14 +111,21 @@ class PermissionRepository:
                     NoteShare.user_id == user_id,
                     CollectionShare.user_id == user_id,
                     Collection.owner_id == user_id,
-                    Note.visibility == VisibilityEnum.PUBLIC,
+                    *visibility_filter,
                 )
             )
         )
         return set(session.scalars(stmt).all())
 
     @staticmethod
-    def get_accessible_collection_ids(session: Session, user_id: str) -> Set[str]:
+    def get_accessible_collection_ids(
+        session: Session, user_id: str, include_public: bool = False
+    ) -> Set[str]:
+        visibility_filter = (
+            [Collection.visibility == VisibilityEnum.PUBLIC]
+            if include_public
+            else []
+        )
         stmt = (
             select(Collection.id)
             .outerjoin(
@@ -124,7 +136,7 @@ class PermissionRepository:
                 or_(
                     Collection.owner_id == user_id,
                     CollectionShare.user_id == user_id,
-                    Collection.visibility == VisibilityEnum.PUBLIC,
+                    *visibility_filter,
                 )
             )
         )

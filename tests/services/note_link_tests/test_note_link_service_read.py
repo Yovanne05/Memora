@@ -41,7 +41,7 @@ class TestNoteLinkServiceList:
         mock_note_link_repository.find_many.return_value = (links, 1)
 
         monkeypatch.setattr("services.impl.note.note_link_service_impl.permission_domain_service.can_read_note", lambda *args: True)
-        monkeypatch.setattr("services.impl.note.note_link_service_impl.permission_domain_service.get_accessible_note_ids", lambda *args: None)
+        monkeypatch.setattr("services.impl.note.note_link_service_impl.permission_domain_service.get_accessible_note_ids", lambda *args, **kwargs: None)
 
         params = NoteLinkSearchParams(note_id=note_id)
 

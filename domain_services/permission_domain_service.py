@@ -24,15 +24,17 @@ class PermissionDomainService:
         )
 
     def get_accessible_note_ids(
-        self, user_id: str, user_role: RoleEnum
+        self, user_id: str, user_role: RoleEnum, include_public: bool = False
     ) -> Optional[Set[str]]:
-        return self._note_permissions.get_accessible_note_ids(user_id, user_role)
+        return self._note_permissions.get_accessible_note_ids(
+            user_id, user_role, include_public=include_public
+        )
 
     def get_accessible_collection_ids(
-        self, user_id: str, user_role: RoleEnum
+        self, user_id: str, user_role: RoleEnum, include_public: bool = False
     ) -> Optional[Set[str]]:
         return self._collection_permissions.get_accessible_collection_ids(
-            user_id, user_role
+            user_id, user_role, include_public=include_public
         )
 
     def can_read_note(
