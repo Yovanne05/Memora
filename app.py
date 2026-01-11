@@ -25,7 +25,6 @@ from utils import db
 from utils.jwt import init_jwt
 from utils.filter import register_global_filter
 from utils.logger import init_logger
-from utils.realtime_filter import register_realtime_filter
 from utils.swagger import init_swagger
 from services.impl.infrastructure.redis_client_service_impl import redis_client_service
 from services.impl.realtime.socketio_service_impl import socketio_service
@@ -60,10 +59,9 @@ def create_app() -> Flask:
         )
 
 
-    socketio = socketio_service.init_socketio(
+    socketio_service.init_socketio(
         app, cors_allowed_origins="*", async_mode="threading"
     )
-    register_realtime_filter(socketio)
 
 
     if config.APP_ENV == "test":
