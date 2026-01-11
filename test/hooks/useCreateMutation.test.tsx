@@ -23,6 +23,11 @@ const createWrapper = (client: QueryClient) => {
   )
 }
 
+interface TestItem {
+  id: string
+  title?: string
+}
+
 describe('useCreateMutation', () => {
   test('should update both list and detail queries', async () => {
     const queryClient = new QueryClient({
@@ -31,15 +36,16 @@ describe('useCreateMutation', () => {
         mutations: { retry: false },
       },
     })
-    const mutationFn = vi.fn().mockResolvedValue({ id: '1', title: 'New' })
+    const mutationFn = vi
+      .fn()
+      .mockResolvedValue({ id: '1', title: 'New' } as TestItem)
 
     const { result } = renderHook(
       () =>
-        useCreateMutation(
+        useCreateMutation<TestItem, undefined, TestItem[]>(
           {
             mutationFn,
             listQueryKey: ['items'],
-            // @ts-expect-error - Test mock
             detailQueryKey: (data) => ['items', data.id],
           },
           { silent: true }
@@ -64,17 +70,21 @@ describe('useCreateMutation', () => {
         mutations: { retry: false },
       },
     })
-    queryClient.setQueryData(['items'], [{ id: '0' }])
+    queryClient.setQueryData(['items'], [{ id: '0' }] as TestItem[])
 
-    const mutationFn = vi.fn().mockResolvedValue({ id: '1', title: 'New' })
-    const optimisticUpdate = vi.fn((old: unknown[], newItem: unknown) => [
-      ...(old || []),
-      newItem,
-    ])
+    const mutationFn = vi
+      .fn()
+      .mockResolvedValue({ id: '1', title: 'New' } as TestItem)
+    const optimisticUpdate = vi.fn(
+      (old: TestItem[] | undefined, newItem: TestItem): TestItem[] => [
+        ...(old || []),
+        newItem,
+      ]
+    )
 
     const { result } = renderHook(
       () =>
-        useCreateMutation(
+        useCreateMutation<TestItem, undefined, TestItem[]>(
           {
             mutationFn,
             listQueryKey: ['items'],
