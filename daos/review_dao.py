@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
-from datetime import datetime, timezone
+from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Enum as SAEnum, ForeignKey, Index, Integer, DECIMAL, String, TIMESTAMP
+from sqlalchemy import Boolean, Enum as SAEnum, ForeignKey, Index, Integer, DECIMAL, String, TIMESTAMP, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from utils.db import Base
@@ -48,11 +48,19 @@ class Review(Base):
         ),
         nullable=False,
     )
-    e_factor: Mapped[Decimal] = mapped_column(DECIMAL(4, 2), nullable=False, default=Decimal("2.5"))
-    repetitions: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    interval_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    e_factor: Mapped[Decimal] = mapped_column(
+        DECIMAL(4, 2), nullable=False, server_default=text("2.5")
+    )
+    repetitions: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default=text("0")
+    )
+    interval_days: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default=text("0")
+    )
     next_review_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False)
-    reviewed_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False, default=lambda: datetime.now(timezone.utc))
+    reviewed_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
 
     user: Mapped["User"] = relationship(back_populates="reviews")
     flashcard: Mapped["Flashcard"] = relationship()

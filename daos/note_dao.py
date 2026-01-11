@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
+    CheckConstraint,
     ForeignKey,
     Index,
     String,
@@ -113,6 +114,10 @@ class NoteShare(SharePermissionMixin, CreatedAtMixin, Base):
 class NoteLink(CreatedAtMixin, Base):
     __tablename__ = "note_links"
     __table_args__ = (
+        CheckConstraint(
+            "length(trim(label)) > 0",
+            name="note_links_label_not_blank",
+        ),
         Index("idx_note_links_note1", "note_id_1"),
         Index("idx_note_links_note2", "note_id_2"),
     )
@@ -128,7 +133,7 @@ class NoteLink(CreatedAtMixin, Base):
         primary_key=True,
     )
 
-    label: Mapped[str] = mapped_column(String(255), nullable=False)
+    label: Mapped[str] = mapped_column(String(80), nullable=False)
 
     source_note: Mapped["Note"] = relationship(
         foreign_keys=[note_id_1], back_populates="outgoing_links"

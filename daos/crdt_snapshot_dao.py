@@ -1,4 +1,4 @@
-from sqlalchemy import String, LargeBinary, Index
+from sqlalchemy import ForeignKey, String, LargeBinary, Index, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from utils.db import Base
@@ -21,6 +21,7 @@ class CRDTSnapshot(UUIDMixin, TimestampMixin, Base):
 
     note_id: Mapped[str] = mapped_column(
         String(36),
+        ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         unique=True,
         comment="ID de la note associée"
@@ -40,6 +41,6 @@ class CRDTSnapshot(UUIDMixin, TimestampMixin, Base):
 
     version: Mapped[int] = mapped_column(
         nullable=False,
-        default=0,
+        server_default=text("0"),
         comment="Version du snapshot pour gestion de conflits"
     )

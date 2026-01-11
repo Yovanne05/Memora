@@ -1,3 +1,4 @@
+from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -14,9 +15,17 @@ limiter = Limiter(
     key_func=get_remote_address,
     default_limits=config.RATE_LIMIT_DEFAULTS,
     storage_uri=_build_storage_uri(),
+    enabled=config.APP_ENV == "prod",
 )
 
 
+@limiter.request_filter
+def _skip_options_requests() -> bool:
+    return request.method == "OPTIONS"
+
+
 def init_http_rate_limiter(app):
+    if config.APP_ENV != "prod":
+        app.config["RATELIMIT_ENABLED"] = False
     limiter.init_app(app)
     return limiter
