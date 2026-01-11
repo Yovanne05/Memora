@@ -1,6 +1,7 @@
 from flask import request
 from flask_socketio import emit
 from pydantic import ValidationError
+from werkzeug.exceptions import HTTPException
 
 from controllers.realtime.realtime_collaboration_constants import (
     COLLABORATION_NAMESPACE,
@@ -27,6 +28,7 @@ def register_collaboration_crdt_handlers(socketio):
             logger.warning(
                 f"CRDT update rejected: No authenticated user (socket={request.sid})"
             )
+            emit("error", {"message": "Not authenticated", "code": "UNAUTHORIZED"}, room=request.sid)
             return
 
         try:
@@ -34,15 +36,29 @@ def register_collaboration_crdt_handlers(socketio):
         except ValidationError as exc:
             logger.error(
                 f"Invalid CRDT update payload from user {user_id}: {exc}")
+            emit("error", {"message": "Invalid payload", "code": "INVALID_PAYLOAD"}, room=request.sid)
             return
 
-        event = realtime_collaboration_service.process_crdt_update(
-            update_dto=crdt_update_dto,
-            user_id=user_id,
-            user_role=user_role,
-            username=realtime_collaboration_service.get_username_by_socket(
-                request.sid),
-        )
+        try:
+            event = realtime_collaboration_service.process_crdt_update(
+                update_dto=crdt_update_dto,
+                user_id=user_id,
+                user_role=user_role,
+                username=realtime_collaboration_service.get_username_by_socket(
+                    request.sid),
+            )
+        except HTTPException as exc:
+            logger.warning(
+                f"Failed CRDT update for user {user_id} on note {crdt_update_dto.note_id}: {exc.description}"
+            )
+            emit("error", {"message": exc.description, "code": exc.name}, room=request.sid)
+            return
+        except Exception as exc:
+            logger.error(
+                f"Unexpected error in CRDT update for user {user_id} on note {crdt_update_dto.note_id}: {exc}"
+            )
+            emit("error", {"message": "Internal server error", "code": "INTERNAL_ERROR"}, room=request.sid)
+            return
 
         emit(
             EVENT_COLLABORATION,
@@ -61,6 +77,7 @@ def register_collaboration_crdt_handlers(socketio):
             logger.warning(
                 f"CRDT sync request rejected: No authenticated user (socket={request.sid})"
             )
+            emit("error", {"message": "Not authenticated", "code": "UNAUTHORIZED"}, room=request.sid)
             return
 
         try:
@@ -69,13 +86,27 @@ def register_collaboration_crdt_handlers(socketio):
             logger.error(
                 f"Invalid CRDT sync request payload from user {user_id}: {exc}"
             )
+            emit("error", {"message": "Invalid payload", "code": "INVALID_PAYLOAD"}, room=request.sid)
             return
 
-        state_vector, update = realtime_collaboration_service.handle_crdt_sync_request(
-            sync_request_dto=sync_request_dto,
-            user_id=user_id,
-            user_role=user_role,
-        )
+        try:
+            state_vector, update = realtime_collaboration_service.handle_crdt_sync_request(
+                sync_request_dto=sync_request_dto,
+                user_id=user_id,
+                user_role=user_role,
+            )
+        except HTTPException as exc:
+            logger.warning(
+                f"Failed CRDT sync request for user {user_id} on note {sync_request_dto.note_id}: {exc.description}"
+            )
+            emit("error", {"message": exc.description, "code": exc.name}, room=request.sid)
+            return
+        except Exception as exc:
+            logger.error(
+                f"Unexpected error in CRDT sync request for user {user_id} on note {sync_request_dto.note_id}: {exc}"
+            )
+            emit("error", {"message": "Internal server error", "code": "INTERNAL_ERROR"}, room=request.sid)
+            return
 
         emit(
             EVENT_CRDT_SYNC_REPLY,

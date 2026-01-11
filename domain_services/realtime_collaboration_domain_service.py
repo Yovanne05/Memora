@@ -10,6 +10,8 @@ from exceptions.collaboration_exception import (
     CollaborationInvalidOperation,
     CollaborationNotAuthorized,
 )
+from exceptions.note_exception import NoteNotFound
+from exceptions.user_exception import UserNotFound
 from domain_services.permission_domain_service import permission_domain_service
 from utils.enums import RoleEnum
 
@@ -18,12 +20,12 @@ DEFAULT_EMPTY_DOCUMENT = '{"type":"doc","content":[{"type":"paragraph"}]}'
 
 def ensure_note_exists(note) -> None:
     if not note:
-        raise ValueError("Note not found")
+        raise NoteNotFound()
 
 
 def ensure_user_exists(user) -> None:
     if not user:
-        raise ValueError("User not found")
+        raise UserNotFound()
 
 
 def ensure_can_read(note_id: str, user_id: str, user_role: RoleEnum) -> None:
