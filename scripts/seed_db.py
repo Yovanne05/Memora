@@ -47,7 +47,7 @@ def _hash_password(raw_password: str) -> str:
 
 def _reset_database() -> None:
     """Drop and recreate all tables."""
-    db_uri = config.get_database_uri()
+    db_uri = config.SQLALCHEMY_DATABASE_URI
     print(f"Resetting database at {db_uri}")
 
     # For SQLite, ensure the file exists before recreating tables

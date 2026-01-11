@@ -5,7 +5,6 @@ pipeline {
         APP_ENV = 'test'
         SWAGGER_ENABLED = '0'
         SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-        SQLALCHEMY_TEST_DATABASE_URI = 'sqlite:///:memory:'
     }
 
     stages {

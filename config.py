@@ -6,7 +6,6 @@ load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV", "dev")
 SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
-SQLALCHEMY_TEST_DATABASE_URI = os.getenv("SQLALCHEMY_TEST_DATABASE_URI")
 if APP_ENV == "prod":
     SWAGGER_ENABLED = False
 else:
@@ -66,12 +65,3 @@ STORAGE_S3_REGION = os.getenv("STORAGE_S3_REGION", "eu-west-1")
 STORAGE_S3_ACCESS_KEY = os.getenv("STORAGE_S3_ACCESS_KEY")
 STORAGE_S3_SECRET_KEY = os.getenv("STORAGE_S3_SECRET_KEY")
 STORAGE_S3_PUBLIC_BASE_URL = os.getenv("STORAGE_S3_PUBLIC_BASE_URL")
-
-
-def get_database_uri() -> str:
-    env = APP_ENV
-    if env == "test":
-        uri = SQLALCHEMY_TEST_DATABASE_URI
-    else:
-        uri = SQLALCHEMY_DATABASE_URI
-    return uri

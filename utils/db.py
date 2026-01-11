@@ -2,10 +2,10 @@ from contextlib import contextmanager
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, Session
 from sqlalchemy import create_engine
 from typing import Generator
-from config import get_database_uri
+from config import SQLALCHEMY_DATABASE_URI
 
 engine = create_engine(
-    get_database_uri(),
+    SQLALCHEMY_DATABASE_URI,
     echo=False,
     future=True,
     pool_pre_ping=True,

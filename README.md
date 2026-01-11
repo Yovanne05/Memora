@@ -104,7 +104,6 @@ sudo -u postgres psql
 # Dans psql, exécuter :
 ALTER USER postgres WITH PASSWORD 'root';
 CREATE DATABASE memora;
-CREATE DATABASE memora_test;
 \q
 ```
 
@@ -118,7 +117,6 @@ CREATE DATABASE memora_test;
 
 ```sql
 CREATE DATABASE memora;
-CREATE DATABASE memora_test;
 ```
 
 ### 5. Configurer les variables d'environnement
@@ -128,7 +126,6 @@ Créer un fichier `.env` à la racine du projet :
 ```bash
 APP_ENV=dev
 SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora'
-SQLALCHEMY_TEST_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora_test'
 SWAGGER_ENABLED='1'
 ```
 
