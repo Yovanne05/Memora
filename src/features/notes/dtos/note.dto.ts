@@ -9,7 +9,6 @@ export const noteDtoSchema = z.object({
   owner_id: z.uuid(),
   owner_username: z.string(),
   title: z.string().min(1).max(255),
-  yjs_snapshot: z.string().nullable().optional(),
   tags: z.array(z.string()).default([]),
   is_favorite: z.boolean().optional().default(false),
   visibility: noteVisibilitySchema.default('private'),
@@ -30,7 +29,6 @@ export const noteCreateDtoSchema = z.object({
   collection_id: z.uuid().nullable().optional(),
   owner_id: z.uuid(),
   title: z.string().min(1).max(255),
-  yjs_snapshot: z.string().nullable().optional(),
   tags: z.array(z.string()).optional(),
   visibility: noteVisibilitySchema.optional(),
 })
@@ -38,7 +36,6 @@ export const noteCreateDtoSchema = z.object({
 export const noteUpdateDtoSchema = z.object({
   collection_id: z.uuid().nullable().optional(),
   title: z.string().min(1).max(255).optional(),
-  yjs_snapshot: z.string().nullable().optional(),
   tags: z.array(z.string()).optional(),
   visibility: noteVisibilitySchema.optional(),
 })
