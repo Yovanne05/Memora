@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 import sys
 
 import bcrypt
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine.url import make_url
 
 # Ensure project root is on the import path
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
@@ -39,6 +41,32 @@ from daos.review_dao import Review
 from daos.report_dao import Report
 
 
+def _ensure_postgres_database(db_uri: str) -> None:
+    url = make_url(db_uri)
+    if not url.database:
+        return
+
+    admin_url = url.set(database="postgres")
+    engine = create_engine(
+        admin_url,
+        isolation_level="AUTOCOMMIT",
+        future=True,
+        pool_pre_ping=True,
+    )
+    db_name = url.database.replace('"', '""')
+    try:
+        with engine.connect() as conn:
+            exists = conn.execute(
+                text("SELECT 1 FROM pg_database WHERE datname = :name"),
+                {"name": url.database},
+            ).scalar()
+            if not exists:
+                conn.execute(text(f'CREATE DATABASE "{db_name}"'))
+                print(f"Created database: {url.database}")
+    finally:
+        engine.dispose()
+
+
 def _hash_password(raw_password: str) -> str:
     return bcrypt.hashpw(raw_password.encode("utf-8"), bcrypt.gensalt()).decode(
         "utf-8"
@@ -56,6 +84,10 @@ def _reset_database() -> None:
         if db_path.exists():
             db_path.unlink()
             print(f"Removed existing SQLite file: {db_path}")
+    else:
+        url = make_url(db_uri)
+        if url.drivername.startswith("postgresql"):
+            _ensure_postgres_database(db_uri)
 
     drop_all()
     create_all()

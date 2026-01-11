@@ -12,7 +12,7 @@ from utils.enums import ReportReasonEnum, ReportStatusEnum, ReportTargetEnum
 class TestReportControllerUpdate:
     """Tests pour PATCH /reports/<id>"""
 
-    def test_update_report_returns_200(self, authenticated_client, mock_report_service):
+    def test_update_report_returns_200(self, admin_client, mock_report_service):
         """Le endpoint PATCH /reports/<id> retourne 200."""
         from dtos.report_dto import ReportDTO
 
@@ -36,7 +36,7 @@ class TestReportControllerUpdate:
         }
 
         # Act
-        response = authenticated_client.patch(f"/reports/{report_id}", json=payload)
+        response = admin_client.patch(f"/reports/{report_id}", json=payload)
 
         # Assert
         assert response.status_code == HTTPStatus.OK
