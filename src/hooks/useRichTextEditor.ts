@@ -88,6 +88,10 @@ export function useRichTextEditor({
             'prose-img:rounded-lg prose-img:shadow-md prose-img:my-4'
           ),
         },
+        handleKeyDown: !editable ? () => true : undefined,
+        handleTextInput: !editable ? () => true : undefined,
+        handlePaste: !editable ? () => true : undefined,
+        handleDrop: !editable ? () => true : undefined,
       },
     },
     [editable, extensions]

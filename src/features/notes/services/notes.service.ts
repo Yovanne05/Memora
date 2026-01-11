@@ -5,7 +5,7 @@ import type {
   NotesListDto,
 } from '../dtos/note.dto'
 import {
-  dtoToNote,
+  dtoToNoteWithoutUser,
   toNoteCreateDto,
   toNoteUpdateDto,
 } from '../mappers/note.mapper'
@@ -29,7 +29,7 @@ export function createNotesService(
         : (data?.total ?? items.length)
 
       return {
-        items: items.map(dtoToNote),
+        items: items.map(dtoToNoteWithoutUser),
         total,
         offset:
           params?.offset && params?.limit
@@ -41,7 +41,7 @@ export function createNotesService(
 
     async get(id: string) {
       const dto = await client.get<NoteDto>(`/notes/${id}`)
-      return dtoToNote(dto)
+      return dtoToNoteWithoutUser(dto)
     },
 
     async create(payload: NoteCreate) {
@@ -49,7 +49,7 @@ export function createNotesService(
         '/notes',
         toNoteCreateDto(payload)
       )
-      return dtoToNote(dto)
+      return dtoToNoteWithoutUser(dto)
     },
 
     async update(id: string, payload: NoteUpdate) {
@@ -57,7 +57,7 @@ export function createNotesService(
         `/notes/${id}`,
         toNoteUpdateDto(payload)
       )
-      return dtoToNote(dto)
+      return dtoToNoteWithoutUser(dto)
     },
 
     async remove(id: string) {

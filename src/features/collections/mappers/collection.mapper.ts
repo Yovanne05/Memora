@@ -8,7 +8,7 @@ import type {
   CollectionCreateDto,
   CollectionUpdateDto,
 } from '../dtos/collection.dto'
-import { dtoToNote } from '@/features/notes/mappers/note.mapper'
+import { dtoToNoteWithoutUser } from '@/features/notes/mappers/note.mapper'
 
 export function dtoToCollection(dto: CollectionDto): Collection {
   return {
@@ -19,7 +19,7 @@ export function dtoToCollection(dto: CollectionDto): Collection {
     visibility: dto.visibility ?? 'private',
     isFavorite: dto.is_favorite ?? false,
     tags: dto.tags ?? [],
-    notes: dto.notes.map(dtoToNote),
+    notes: dto.notes.map(dtoToNoteWithoutUser),
     nodes: dto.nodes ?? [],
     edges: dto.edges ?? [],
     userPermission: dto.user_permission ?? null,

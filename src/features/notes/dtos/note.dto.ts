@@ -2,6 +2,11 @@ import { z } from 'zod'
 
 export const noteVisibilitySchema = z.enum(['private', 'public'])
 
+export const noteUserAccessSchema = z.object({
+  user_id: z.uuid(),
+  permission: z.enum(['read', 'write', 'owner']),
+})
+
 export const noteDtoSchema = z.object({
   id: z.uuid(),
   collection_id: z.uuid().nullable(),
@@ -9,10 +14,12 @@ export const noteDtoSchema = z.object({
   owner_id: z.uuid(),
   owner_username: z.string(),
   title: z.string().min(1).max(255),
+  content: z.string().nullable().optional(),
   tags: z.array(z.string()).default([]),
   is_favorite: z.boolean().optional().default(false),
   visibility: noteVisibilitySchema.default('private'),
   user_permission: z.enum(['read', 'write', 'owner']).nullable().optional(),
+  user_access: z.array(noteUserAccessSchema).optional(),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
 })

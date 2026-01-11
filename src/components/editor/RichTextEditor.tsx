@@ -36,7 +36,7 @@ export function RichTextEditor({
   const collaboration = useCollaborativeEditorCRDT({
     editor,
     noteId: noteId || '',
-    enabled: enableCollaboration && editable && !!noteId,
+    enabled: enableCollaboration && !!noteId,
     content,
     onContentChanged: onChange,
   })
@@ -54,7 +54,7 @@ export function RichTextEditor({
       )}
     >
       {editable && <MenuBar editor={editor} noteId={noteId} />}
-      {enableCollaboration && noteId && (
+      {enableCollaboration && noteId && editable && (
         <CollaborationStatus
           isConnected={collaboration.isConnected}
           isConnecting={collaboration.isConnecting}
@@ -67,10 +67,7 @@ export function RichTextEditor({
       )}
       <EditorContent
         editor={editor}
-        className={cn(
-          'min-h-[800px]',
-          !editable && 'cursor-not-allowed opacity-60'
-        )}
+        className={cn('min-h-[800px]', !editable && 'cursor-not-allowed')}
       />
     </div>
   )
