@@ -1,11 +1,29 @@
 # Mémora - Backend API
 
-API REST Flask pour **Mémora**, une application web de prise de notes collaborative avec système de révision par flashcards.
+API REST Flask pour **Mémora**, une application web de prise de notes collaborative avec système de révision par flashcards et collaboration temps réel.
+
+## Table des matières
+
+- [Description](#description)
+- [Technologies](#technologies)
+- [Commandes rapides](#commandes-rapides)
+- [Prérequis](#prérequis)
+- [Installation](#installation)
+- [Lancer l'application](#lancer-lapplication)
+- [Documentation de l'API (Swagger)](#documentation-de-lapi-swagger)
+- [Tests](#tests)
+- [Structure du projet](#structure-du-projet)
+- [Architecture](#architecture)
+- [Fonctionnalités principales](#fonctionnalités-principales)
+- [Endpoints API](#endpoints-api)
+- [Collaboration temps réel - Architecture technique](#collaboration-temps-réel---architecture-technique)
+- [Dépannage](#dépannage)
 
 ## Description
 
 Mémora est un projet étudiant (SAE S5) qui permet aux utilisateurs de :
 - **Créer et organiser des notes** en markdown avec support d'images
+- **Collaborer en temps réel** sur les notes avec d'autres utilisateurs (WebSocket + CRDT)
 - **Organiser les notes en collections** thématiques
 - **Créer des flashcards** pour la révision avec système de répétition espacée
 - **Partager des notes et collections** avec d'autres utilisateurs (permissions READ/WRITE)
@@ -16,19 +34,48 @@ Mémora est un projet étudiant (SAE S5) qui permet aux utilisateurs de :
 
 ## Technologies
 
-- **Flask** - Framework web Python
-- **PostgreSQL** - Base de données relationnelle
-- **SQLAlchemy** - ORM Python
-- **JWT** - Authentification par tokens
-- **Swagger/OpenAPI** - Documentation interactive de l'API
+- **Flask 3.0** - Framework web Python
+- **PostgreSQL / MySQL** - Base de données relationnelle
+- **SQLAlchemy 2.0** - ORM Python
+- **Pydantic 2.12** - Validation de données
+- **Flask-JWT-Extended** - Authentification par tokens JWT
+- **Flask-SocketIO** - Communication WebSocket bidirectionnelle
+- **pycrdt** - CRDT (Conflict-free Replicated Data Types) pour la collaboration temps réel
+- **Redis** - Gestion des sessions et synchronisation temps réel
+- **Flasgger** - Documentation Swagger/OpenAPI
 - **bcrypt** - Hachage des mots de passe
 - **SeaweedFS** - Stockage d'images (S3-compatible)
+- **Pytest** - Tests unitaires et d'intégration
+
+## Commandes rapides
+
+```bash
+# Installation
+pip install -r requirements.txt
+
+# Démarrer l'application
+python app.py  # http://localhost:5000
+
+# Tests
+pytest                    # Tous les tests
+pytest -v                 # Mode verbeux
+pytest tests/test_*.py    # Test spécifique
+
+# Git hooks
+git config core.hooksPath .githooks  # Active pytest pre-push
+
+# Scripts utilitaires
+python scripts/seed_db.py    # Initialise la base de données
+python scripts/init_s3.py    # Initialise S3 (optionnel)
+```
 
 ## Prérequis
 
 - Python 3.10 ou supérieur
-- PostgreSQL 12 ou supérieur
+- PostgreSQL 12+ ou MySQL 8+
+- Redis (pour la collaboration temps réel)
 - pip et venv
+- (Optionnel) SeaweedFS pour le stockage d'images
 
 ## Installation
 
@@ -119,17 +166,64 @@ CREATE DATABASE memora;
 CREATE DATABASE memora;
 ```
 
-### 5. Configurer les variables d'environnement
+### 5. Installer et configurer Redis
 
-Créer un fichier `.env` à la racine du projet :
+Redis est nécessaire pour la collaboration temps réel.
+
+#### Sur Linux (Ubuntu/Debian)
 
 ```bash
-APP_ENV=dev
-SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora'
-SWAGGER_ENABLED='1'
+sudo apt update
+sudo apt install redis-server
+sudo systemctl start redis
+sudo systemctl enable redis
 ```
 
-### 6. Initialiser la base de données
+#### Sur Windows
+
+1. Télécharger Redis depuis [github.com/microsoftarchive/redis/releases](https://github.com/microsoftarchive/redis/releases)
+2. Installer et démarrer le service Redis
+
+#### Vérifier que Redis fonctionne
+
+```bash
+redis-cli ping
+# Doit retourner: PONG
+```
+
+### 6. Configurer les variables d'environnement
+
+Créer un fichier `.env` à la racine du projet (voir `env.example` pour un exemple complet) :
+
+```bash
+# Environnement
+APP_ENV=dev
+
+# Base de données (PostgreSQL)
+SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora'
+
+# Base de données de test
+SQLALCHEMY_TEST_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora_test'
+
+# JWT
+SECRET_KEY='votre_secret_key_ici'
+JWT_SECRET_KEY='votre_jwt_secret_key_ici'
+
+# Redis (pour la collaboration temps réel)
+REDIS_URL='redis://localhost:6379/0'
+
+# Swagger
+SWAGGER_ENABLED='1'
+
+# Stockage (optionnel - local par défaut)
+STORAGE_TYPE='local'  # ou 's3' pour SeaweedFS
+# S3_ENDPOINT_URL='http://localhost:8333'
+# S3_ACCESS_KEY='your_access_key'
+# S3_SECRET_KEY='your_secret_key'
+# S3_BUCKET_NAME='memora'
+```
+
+### 7. Initialiser la base de données
 
 ```bash
 python scripts/seed_db.py
@@ -144,7 +238,7 @@ Ce script va :
 - `alice@example.com` / `AlicePass123!` (CLIENT)
 - `bob@example.com` / `BobPass123!!` (CLIENT)
 
-### 7. (Optionnel) Initialiser le stockage S3
+### 8. (Optionnel) Initialiser le stockage S3
 
 Si vous utilisez SeaweedFS pour le stockage d'images :
 
@@ -164,6 +258,10 @@ python app.py
 
 L'API sera accessible sur `http://localhost:5000`
 
+> **Note:** L'environnement est déterminé par `APP_ENV` dans `.env` :
+> - `APP_ENV=test` → utilise `SQLALCHEMY_TEST_DATABASE_URI` et crée automatiquement les tables
+> - Autres environnements → utilise `SQLALCHEMY_DATABASE_URI`
+
 
 ## Documentation de l'API (Swagger)
 
@@ -181,39 +279,93 @@ La documentation Swagger vous permet de :
 
 ## Tests
 
+L'application utilise **pytest** pour les tests unitaires et d'intégration.
+
 ### Lancer tous les tests
 
 ```bash
 pytest
 ```
 
+### Lancer les tests en mode verbeux
+
+```bash
+pytest -v
+```
+
+### Lancer un fichier de test spécifique
+
+```bash
+pytest tests/test_note.py
+```
+
+### Lancer les tests en mode silencieux (utilisé par le hook pre-push)
+
+```bash
+pytest -q
+```
+
+### Git hooks automatiques
+
+Pour activer les hooks pytest avant chaque push :
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Le hook `.githooks/pre-push` exécutera automatiquement `pytest -q` avant chaque push et bloquera le push si les tests échouent.
+
 ## Structure du projet
 
 ```
-.
-├── app.py                  # Point d'entrée de l'application
-├── config.py               # Configuration
-├── controllers/            # Endpoints API (routes)
-├── services/              # Logique métier
-├── repositorys/           # Accès aux données
-├── daos/                  # Modèles SQLAlchemy (ORM)
-├── dtos/                  # Data Transfer Objects
-├── mappers/               # Conversion DAO ↔ DTO
-├── querys/                # Requêtes SQL complexes
-├── utils/                 # Utilitaires (JWT, DB, logger, etc.)
-├── exceptions/            # Exceptions personnalisées
-├── tests/                 # Tests unitaires et d'intégration
-└── scripts/               # Scripts d'initialisation
+memora_back/
+├── app.py                      # Point d'entrée Flask (factory pattern)
+├── config.py                   # Configuration (DB, JWT, S3, Redis, etc.)
+├── conftest.py                 # Configuration pytest
+├── controllers/                # HTTP endpoints (Flask Blueprints)
+│   ├── auth_controller.py
+│   ├── note_controller.py
+│   ├── collection_controller.py
+│   ├── flashcard_controller.py
+│   ├── realtime_collaboration_controller.py  # WebSocket handlers
+│   └── ...
+├── domain_services/            # Logique métier
+├── repositorys/                # Accès base de données
+├── daos/                       # Data Access Objects (requêtes DB)
+├── querys/                     # Requêtes SQL complexes isolées
+├── dtos/                       # Data Transfer Objects (Pydantic)
+├── mappers/                    # Conversion DTO ↔ Entity/Domain
+├── exceptions/                 # Exceptions métier
+├── utils/                      # Helpers
+│   ├── db.py                  # Gestion base de données
+│   ├── jwt_utils.py           # Gestion JWT
+│   ├── logger.py              # Logger centralisé
+│   ├── swagger.py             # Configuration Swagger
+│   ├── crdt_service.py        # Service CRDT pour collaboration temps réel
+│   └── ...
+├── tests/                      # Tests pytest
+│   ├── conftest.py
+│   ├── test_note.py
+│   └── ...
+├── scripts/                    # Scripts utilitaires
+│   ├── seed_db.py             # Initialisation base de données
+│   └── init_s3.py             # Initialisation S3
+├── .githooks/                  # Git hooks (pre-push avec pytest)
+├── requirements.txt            # Dépendances Python
+└── env.example                 # Exemple de configuration .env
 ```
 
 ## Architecture
 
-L'application suit une architecture en couches :
+L'application suit une **architecture en couches** stricte (SOLID) :
 
-1. **Controllers** : Gèrent les requêtes HTTP et les réponses
-2. **Services** : Contiennent la logique métier
+1. **Controllers** : Gèrent uniquement HTTP (request/response), appellent les domain_services
+2. **Domain Services** : Contiennent la logique métier, indépendants de Flask
 3. **Repositories** : Abstraient l'accès aux données
-4. **DAOs** : Modèles de base de données SQLAlchemy
+4. **DAOs** : Data Access Objects - requêtes base de données
+5. **DTOs** : Transport de données uniquement (Pydantic pour validation)
+6. **Mappers** : Conversion DTO ↔ Entity/Domain
+7. **Exceptions** : Exceptions métier explicites avec gestion centralisée
 
 ## Fonctionnalités principales
 
@@ -221,40 +373,161 @@ L'application suit une architecture en couches :
 - Inscription et connexion avec JWT
 - Gestion des sessions
 - Hash sécurisé des mots de passe (bcrypt)
+- Endpoints : `/sessions`
 
 ### Notes
 - CRUD complet sur les notes
-- Support du markdown
+- Support du markdown avec éditeur Tiptap
 - Images attachées aux notes
 - Visibilité PUBLIC/PRIVATE
 - Tags et recherche
-- Liens entre notes
+- Liens entre notes (relations)
+- **Collaboration temps réel** avec WebSocket + CRDT
+- Endpoints : `/notes`, `/notes/<id>/relations`, `/notes/<id>/images`
+
+### Collaboration temps réel (WebSocket)
+- Namespace `/collaboration` avec Flask-SocketIO
+- **CRDT (pycrdt)** pour résolution automatique des conflits
+- Support OT (Operational Transformation) legacy
+- Synchronisation multi-utilisateurs en temps réel
+- Gestion de curseurs et statut de frappe
+- Handlers :
+  - `join_collaboration` / `leave_collaboration`
+  - `crdt_update` / `crdt_sync_request` (CRDT - recommandé)
+  - `send_operation` (OT - legacy)
+  - `cursor_position` / `typing_status`
 
 ### Collections
 - Regroupement de notes
 - Partage de collections entières
 - Statistiques par collection
+- Endpoints : `/collections`
 
 ### Flashcards
 - Création de flashcards depuis les notes
 - QCM et réponses multiples
 - Système de révision
+- Endpoints : `/flashcards`, `/notes/<id>/flashcards`
 
 ### Reviews
 - Système de répétition espacée
 - Suivi de la progression
 - Statistiques de révision
+- Endpoints : `/reviews`
 
 ### Partage
 - Partage de notes individuelles
 - Partage de collections
 - Permissions READ/WRITE
 - Liens de partage publics
+- Endpoints : `/note-shares`, `/collection-shares`, `/note-share-links`, `/collection-share-links`
+
+### Favoris
+- Marquer notes et collections en favoris
+- Endpoints : `/note-favorites`, `/collection-favorites`
+
+### Statistiques
+- Statistiques utilisateur (révisions, progression)
+- Endpoints : `/user-statistics`
 
 ### Modération
 - Signalement de contenu
 - Système de reports avec raisons
 - Gestion administrative
+- Endpoints : `/reports`
+
+### Utilisateurs
+- Gestion de profil utilisateur
+- Endpoints : `/users`
+
+## Endpoints API
+
+Tous les endpoints sont documentés dans Swagger : `http://localhost:5000/api/docs`
+
+**Registre des Blueprints (dans app.py)** :
+- Auth : `/sessions`
+- Users : `/users`
+- Notes : `/notes`, `/notes/<id>/relations`, `/notes/<id>/images`
+- Collections : `/collections`
+- Sharing : `/note-shares`, `/collection-shares`, `/note-share-links`, `/collection-share-links`
+- Favorites : `/note-favorites`, `/collection-favorites`
+- Flashcards : `/flashcards`, `/notes/<id>/flashcards`
+- Reviews : `/reviews`
+- Statistics : `/user-statistics`
+- Reports : `/reports`
+
+## Collaboration temps réel - Architecture technique
+
+### État actuel
+
+Le backend supporte **deux systèmes de collaboration** :
+
+#### 1. CRDT (Recommandé) ✅
+- **Backend** : Implémenté et prêt
+- **Frontend** : Non utilisé actuellement
+- **Technologie** : pycrdt (basé sur Yrs/Yjs)
+- **Avantages** :
+  - Résolution automatique des conflits
+  - Latence minimale
+  - Pas de gestion de versions
+  - Synchronisation efficace avec vecteurs d'état
+
+#### 2. OT - Operational Transformation (Legacy) ⚠️
+- **Backend** : Supporté pour compatibilité
+- **Frontend** : Système actuellement utilisé
+- **Problèmes connus** :
+  - Lent en collaboration rapide
+  - Gestion de versions séquentielles avec risque de conflits
+  - File d'attente d'opérations avec latence
+
+### Flux CRDT (backend prêt)
+
+```
+1. Client → join_collaboration → Serveur initialise document CRDT
+2. Client → crdt_update → Modifications propagées aux autres
+3. Client → crdt_sync_request → Reçoit delta depuis son état
+4. Fusion automatique sans conflits
+```
+
+### Migration recommandée
+
+**Frontend doit migrer vers CRDT pour résoudre les problèmes de performance** :
+- Intégrer Yjs avec Tiptap Collaboration extension
+- Remplacer `send_operation` par `crdt_update`
+- Supprimer la file d'attente d'opérations
+
+**Fichiers concernés** :
+- Backend : `utils/crdt_service.py` (déjà implémenté)
+- Backend : `controllers/realtime_collaboration_controller.py` (handlers CRDT prêts)
+- Frontend : `features/collaboration/hooks/useCollaboration.ts` (à migrer)
+
+## Dépannage
+
+### Redis non disponible
+
+**Symptômes** : Erreurs de connexion Redis, sessions de collaboration ne persistent pas
+
+**Solution** :
+```bash
+# Vérifier Redis
+redis-cli ping  # Doit retourner PONG
+
+# Vérifier configuration dans .env
+REDIS_URL='redis://localhost:6379/0'
+```
+
+### Tests échouent avant push
+
+**Solution** :
+```bash
+pytest -v  # Mode verbeux pour voir détails
+```
+
+### Collaboration lente
+
+**Cause** : Frontend utilise OT legacy au lieu de CRDT
+
+**Solution** : Migrer le frontend vers CRDT (voir section "Collaboration temps réel")
 
 ## Auteurs
 
