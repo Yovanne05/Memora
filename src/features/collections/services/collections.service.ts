@@ -5,7 +5,7 @@ import type {
   CollectionUpdateDto,
 } from '../dtos/collection.dto'
 import {
-  dtoToCollection,
+  dtoToCollectionWithoutUser,
   toCollectionCreateDto,
   toCollectionUpdateDto,
 } from '../mappers/collection.mapper'
@@ -31,7 +31,7 @@ export function createCollectionsService(
         : (data?.total ?? items.length)
 
       return {
-        items: items.map(dtoToCollection),
+        items: items.map(dtoToCollectionWithoutUser),
         total,
         offset: params?.offset ?? 0,
         limit: params?.limit ?? 10,
@@ -39,21 +39,21 @@ export function createCollectionsService(
     },
     async get(id: string) {
       const dto = await client.get<CollectionDto>(`/collections/${id}`)
-      return dtoToCollection(dto)
+      return dtoToCollectionWithoutUser(dto)
     },
     async create(payload: CollectionCreate) {
       const dto = await client.post<CollectionDto, CollectionCreateDto>(
         '/collections',
         toCollectionCreateDto(payload)
       )
-      return dtoToCollection(dto)
+      return dtoToCollectionWithoutUser(dto)
     },
     async update(id: string, payload: CollectionUpdate) {
       const dto = await client.patch<CollectionDto, CollectionUpdateDto>(
         `/collections/${id}`,
         toCollectionUpdateDto(payload)
       )
-      return dtoToCollection(dto)
+      return dtoToCollectionWithoutUser(dto)
     },
     async remove(id: string) {
       await client.delete<void>(`/collections/${id}`)

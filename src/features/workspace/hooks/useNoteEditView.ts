@@ -68,7 +68,12 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
 
   const note = noteQuery.data ?? null
   const isOwner = Boolean(user && note && note.ownerId === user.id)
+
+  // L'utilisateur est en lecture seule si :
+  // - Il a la permission 'read' (explicite ou héritée de la collection)
+  // - ET il n'est pas le propriétaire de la note
   const isReadOnly = note?.userPermission === 'read' && !isOwner
+
   const canDelete =
     note?.userPermission === 'owner' ||
     isOwner ||

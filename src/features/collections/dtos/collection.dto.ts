@@ -3,6 +3,11 @@ import { z } from 'zod'
 
 export const collectionVisibilitySchema = z.enum(['private', 'public'])
 
+export const collectionUserAccessSchema = z.object({
+  user_id: z.uuid(),
+  permission: z.enum(['read', 'write', 'owner']),
+})
+
 export const graphNodeDtoSchema = z.object({
   id: z.string(),
   data: z.object({
@@ -29,6 +34,7 @@ export const collectionDtoSchema = z.object({
   notes: z.array(noteDtoSchema),
   is_favorite: z.boolean().optional().default(false),
   user_permission: z.enum(['read', 'write', 'owner']).nullable().optional(),
+  user_access: z.array(collectionUserAccessSchema).optional(),
   nodes: z.array(graphNodeDtoSchema).default([]),
   edges: z.array(graphEdgeDtoSchema).default([]),
   created_at: z.iso.datetime(),

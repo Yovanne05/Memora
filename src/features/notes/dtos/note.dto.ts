@@ -11,6 +11,10 @@ export const noteDtoSchema = z.object({
   id: z.uuid(),
   collection_id: z.uuid().nullable(),
   collection_name: z.string().nullable().optional(),
+  collection_permission: z
+    .enum(['read', 'write', 'owner'])
+    .nullable()
+    .optional(),
   owner_id: z.uuid(),
   owner_username: z.string(),
   title: z.string().min(1).max(255),

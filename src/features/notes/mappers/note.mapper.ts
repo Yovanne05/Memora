@@ -10,17 +10,24 @@ function getCurrentUserPermission(
   dto: NoteDto,
   currentUserId?: string
 ): NotePermission | null {
-  // Si user_permission existe déjà, l'utiliser
+  // 1. Si user_permission existe, l'utiliser (droit explicite sur la note)
   if (dto.user_permission) {
     return dto.user_permission
   }
 
-  // Sinon, chercher dans user_access
+  // 2. Sinon, chercher dans user_access (droit explicite sur la note)
   if (dto.user_access && currentUserId) {
     const userAccess = dto.user_access.find(
       (access) => access.user_id === currentUserId
     )
-    return userAccess?.permission ?? null
+    if (userAccess) {
+      return userAccess.permission
+    }
+  }
+
+  // 3. Si pas de droit explicite sur la note, hériter des droits de la collection
+  if (dto.collection_permission) {
+    return dto.collection_permission
   }
 
   return null
