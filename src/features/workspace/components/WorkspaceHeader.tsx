@@ -1,3 +1,5 @@
+import { Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useWorkspaceContext } from '../context'
 import { WorkspaceBreadcrumb } from './workspace-header/WorkspaceBreadcrumb'
 import { WorkspaceGraphButton } from './workspace-header/WorkspaceGraphButton'
@@ -21,6 +23,16 @@ export function WorkspaceHeader() {
   return (
     <header className="border-b bg-card p-4">
       <div className="flex items-center justify-between gap-4">
+        {/* Bouton hamburger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={actions.toggleSidebar}
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
         <WorkspaceBreadcrumb items={breadcrumbItems} />
         <div className="flex items-center gap-2">
           <WorkspaceSearch value={state.search} onChange={actions.setSearch} />

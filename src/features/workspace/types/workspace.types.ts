@@ -1,16 +1,17 @@
-export type WorkspaceView = "grid" | "list"
+export type WorkspaceView = 'grid' | 'list'
 
-export type NotesSort = "recent" | "oldest" | "title-asc" | "title-desc"
+export type NotesSort = 'recent' | 'oldest' | 'title-asc' | 'title-desc'
 
 export interface WorkspaceState {
   // Navigation
   selectedNoteId: string | null
   selectedCollectionId: string | null
 
-  mode : WorkspaceMode
+  mode: WorkspaceMode
   // UI State
   view: WorkspaceView
   sidebarExpanded: Set<string> // IDs des collections dépliées
+  sidebarOpen: boolean // Sidebar ouverte/fermée sur mobile
 
   // Filters
   search: string
@@ -33,7 +34,10 @@ export interface WorkspaceActions {
   toggleCollection: (id: string) => void
   expandCollection: (id: string) => void
   collapseCollection: (id: string) => void
-  setMode : (mode : WorkspaceMode) => void
+  setMode: (mode: WorkspaceMode) => void
+  toggleSidebar: () => void
+  openSidebar: () => void
+  closeSidebar: () => void
 
   // UI
   setView: (view: WorkspaceView) => void
@@ -50,4 +54,4 @@ export interface WorkspaceActions {
   closeGraphView: () => void
 }
 
-export type WorkspaceMode = "notes" | "favorites" | "collection"
+export type WorkspaceMode = 'notes' | 'favorites' | 'collection'

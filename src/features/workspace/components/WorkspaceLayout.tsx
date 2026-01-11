@@ -109,7 +109,9 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
           <main className="flex flex-1 flex-col overflow-hidden">
             <WorkspaceHeader />
-            <div className="flex-1 overflow-auto p-6">{children}</div>
+            <div className="flex-1 overflow-auto p-2 sm:p-4 md:p-6">
+              {children}
+            </div>
           </main>
         </div>
 

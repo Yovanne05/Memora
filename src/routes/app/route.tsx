@@ -1,8 +1,14 @@
-import { createFileRoute, Outlet, Navigate, redirect, useLocation } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Outlet,
+  Navigate,
+  redirect,
+  useLocation,
+} from '@tanstack/react-router'
 import { useEffect } from 'react'
 
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
 import { AppHeader } from '@/components/app-header'
 import { getAccessToken } from '@/features/auth/lib/token-storage'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -13,7 +19,7 @@ export const Route = createFileRoute('/app')({
     const token = getAccessToken()
     if (!token) {
       throw redirect({
-        to: "/auth/login",
+        to: '/auth/login',
         search: { redirect: location.href ?? location.pathname },
       })
     }
@@ -40,15 +46,20 @@ function RouteComponent() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" search={{ redirect: location.href ?? location.pathname }} />
+    return (
+      <Navigate
+        to="/auth/login"
+        search={{ redirect: location.href ?? location.pathname }}
+      />
+    )
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <main className="flex flex-col flex-1">
         <AppHeader />
-        <div className="mx-4 my-4" >
+        <div className="mx-4 my-4">
           <Outlet />
         </div>
       </main>

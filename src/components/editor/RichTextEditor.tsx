@@ -48,7 +48,7 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        'border border-border rounded-lg overflow-hidden',
+        'w-full max-w-full border border-border rounded-lg overflow-hidden',
         className
       )}
     >

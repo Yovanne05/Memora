@@ -78,8 +78,10 @@ export function FlashcardViewer({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border bg-card p-4">
-        <h3 className="text-base font-semibold mb-4">{flashcard.question}</h3>
+      <div className="rounded-lg border bg-card p-3 sm:p-4">
+        <h3 className="text-sm font-semibold mb-3 sm:text-base sm:mb-4">
+          {flashcard.question}
+        </h3>
 
         <FlashcardAnswersList
           answers={flashcard.answers}

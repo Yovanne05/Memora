@@ -43,7 +43,7 @@ export function NoteEditForm({
           onDelete={onDelete}
         />
 
-        <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[2fr_1fr]">
           <NoteContentFields
             form={form}
             disabled={isFormDisabled}
