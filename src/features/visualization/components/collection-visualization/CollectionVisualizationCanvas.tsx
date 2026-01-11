@@ -45,7 +45,7 @@ export function CollectionVisualizationCanvas({
         <Background gap={16} />
         <Controls className="rounded-lg border shadow-lg" />
         <MiniMap
-          className="rounded-lg border shadow-lg"
+          className="hidden rounded-lg border shadow-lg md:block"
           nodeColor={(node) =>
             getNodeColorForMiniMap(node, getNodeColorByConnections)
           }

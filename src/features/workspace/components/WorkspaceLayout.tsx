@@ -104,13 +104,13 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex h-[calc(100vh-4rem)]">
+        <div className="flex h-[calc(100vh-4rem)] w-full">
           <WorkspaceSidebar />
 
-          <main className="flex flex-1 flex-col overflow-hidden">
-            <WorkspaceHeader />
-            <div className="flex-1 overflow-auto p-2 sm:p-4 md:p-6">
-              {children}
+          <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto">
+              <WorkspaceHeader />
+              <div className="px-2 py-2 sm:px-4 sm:py-4">{children}</div>
             </div>
           </main>
         </div>

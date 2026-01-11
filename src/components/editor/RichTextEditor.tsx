@@ -48,7 +48,7 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        'w-full max-w-full border border-border rounded-lg overflow-hidden',
+        'w-full max-w-full overflow-hidden rounded-lg border border-border',
         className
       )}
     >
@@ -64,7 +64,7 @@ export function RichTextEditor({
           onReconnect={collaboration.reconnect}
         />
       )}
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} className="min-h-[400px]" />
     </div>
   )
 }

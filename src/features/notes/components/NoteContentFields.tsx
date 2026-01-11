@@ -33,27 +33,27 @@ export function NoteContentFields({
   const isTitleDirty = form.getFieldState('title', form.formState).isDirty
 
   return (
-    <Card className="border border-border/70 shadow-sm">
-      <CardHeader className="pb-2">
+    <Card className="w-full border-0 shadow-none sm:border sm:border-border/70 sm:shadow-sm">
+      <CardHeader className="hidden pb-2 sm:block">
         <CardTitle className="text-xl">Contenu de la note</CardTitle>
         <CardDescription>
           Retouchez le titre et le corps de votre note.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="w-full space-y-4 p-0 sm:p-6">
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Titre</FormLabel>
+              <FormLabel className="sr-only sm:not-sr-only">Titre</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     {...field}
                     id="note-title"
                     placeholder="Titre de la note"
-                    className="h-12 pr-11 text-lg"
+                    className="h-14 w-full border-0 pr-11 text-xl font-semibold shadow-none focus-visible:ring-0 sm:h-12 sm:border sm:text-lg sm:font-normal sm:shadow-sm sm:focus-visible:ring-2"
                     disabled={disabled}
                   />
                   {isTitleDirty && !disabled && (
@@ -79,7 +79,7 @@ export function NoteContentFields({
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contenu</FormLabel>
+              <FormLabel className="sr-only">Contenu</FormLabel>
               <FormControl>
                 <RichTextEditor
                   content={field.value || ''}

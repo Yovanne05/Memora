@@ -49,7 +49,7 @@ export default function NotesListView() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       <NotesGrid items={notes} showQuickActions showFavoriteButton />
 
       {total > limit && (

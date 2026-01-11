@@ -12,12 +12,12 @@ export function GraphViewDialog() {
 
   return (
     <Dialog open={state.graphViewOpen} onOpenChange={actions.closeGraphView}>
-      <DialogContent className="h-[90vh] w-full max-w-[calc(100%-1rem)] p-4 sm:h-[95vh] sm:max-w-[95vw] sm:p-6">
-        <DialogHeader>
+      <DialogContent className="flex h-[90vh] w-full max-w-[calc(100%-1rem)] flex-col gap-2 p-3 sm:h-[95vh] sm:max-w-[95vw] sm:gap-4 sm:p-6">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Graphe de connaissances</DialogTitle>
         </DialogHeader>
 
-        <div className="flex h-full w-full flex-1 overflow-hidden">
+        <div className="flex min-h-0 flex-1 overflow-hidden">
           {state.selectedCollectionId ? (
             <CollectionVisualizationView
               collectionId={state.selectedCollectionId}

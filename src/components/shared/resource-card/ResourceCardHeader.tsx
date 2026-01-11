@@ -1,10 +1,10 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from 'react'
 
-import { CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import type { ResourceCardAction } from "./types"
-import { ResourceCardActions } from "./ResourceCardActions"
-import type { LucideIcon } from "lucide-react"
+import { CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import type { ResourceCardAction } from './types'
+import { ResourceCardActions } from './ResourceCardActions'
+import type { LucideIcon } from 'lucide-react'
 
 type ResourceCardHeaderProps = {
   id: string
@@ -40,7 +40,7 @@ export function ResourceCardHeader({
   return (
     <CardHeader
       className={`flex flex-row items-start justify-between gap-3 ${
-        compact ? "pb-1" : "pb-2"
+        compact ? 'pb-1' : 'pb-2'
       }`}
     >
       <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -50,30 +50,32 @@ export function ResourceCardHeader({
               checked={isSelected}
               onCheckedChange={() => onToggleSelection?.(id)}
               onClick={stopPropagation}
-              aria-label={isSelected ? "Désélectionner" : "Sélectionner"}
+              aria-label={isSelected ? 'Désélectionner' : 'Sélectionner'}
             />
           </div>
         )}
 
         <div
           className={`flex items-center justify-center rounded-lg border border-border bg-muted shrink-0 ${
-            compact ? "h-8 w-8" : "h-10 w-10"
+            compact ? 'h-8 w-8' : 'h-10 w-10'
           }`}
         >
           <Icon
-            className={`text-muted-foreground ${compact ? "h-4 w-4" : "h-5 w-5"}`}
+            className={`text-muted-foreground ${compact ? 'h-4 w-4' : 'h-5 w-5'}`}
             aria-hidden="true"
           />
         </div>
 
-        <div className="space-y-1 flex-1 min-w-0">
-          <CardTitle className={compact ? "text-sm" : "text-base"}>
+        <div className="flex-1 min-w-0 space-y-1">
+          <CardTitle
+            className={`break-words ${compact ? 'text-sm' : 'text-base'}`}
+          >
             {title}
           </CardTitle>
           {description && (
             <p
-              className={`line-clamp-2 text-muted-foreground ${
-                compact ? "text-xs" : "text-sm"
+              className={`line-clamp-2 break-words text-muted-foreground ${
+                compact ? 'text-xs' : 'text-sm'
               }`}
             >
               {description}

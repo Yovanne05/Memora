@@ -21,7 +21,6 @@ export function NoteEditForm({
     form,
     collections,
     loadingCollections,
-    savedTime,
     isFormDisabled,
     handleFormSubmit,
   } = useNoteEditForm({ note, loading, readOnly, onSubmit })
@@ -29,33 +28,30 @@ export function NoteEditForm({
   return (
     <Form {...form} key={note?.id}>
       <form
-        className="space-y-6"
+        className="w-full space-y-4 sm:space-y-6"
         onSubmit={
           readOnly ? (event) => event.preventDefault() : handleFormSubmit
         }
       >
         <FormActions
-          savedTime={savedTime}
-          isUpdate={!!note}
           loading={isFormDisabled}
           deleteLoading={deleteLoading}
           onCancel={onCancel}
           onDelete={onDelete}
-        />
-
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[2fr_1fr]">
-          <NoteContentFields
-            form={form}
-            disabled={isFormDisabled}
-            noteId={note?.id}
-          />
+        >
           <NoteSettingsFields
             form={form}
             disabled={isFormDisabled}
             collections={collections}
             loadingCollections={loadingCollections}
           />
-        </div>
+        </FormActions>
+
+        <NoteContentFields
+          form={form}
+          disabled={isFormDisabled}
+          noteId={note?.id}
+        />
       </form>
     </Form>
   )
