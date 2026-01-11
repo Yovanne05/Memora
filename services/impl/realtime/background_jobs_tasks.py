@@ -1,4 +1,4 @@
-from services.impl.realtime.crdt.crdt_service_impl import get_crdt_service
+from services.impl.realtime.crdt.crdt_service_provider import get_crdt_service
 from services.impl.infrastructure.collaboration_session_store_impl import (
     collaboration_session_store,
 )

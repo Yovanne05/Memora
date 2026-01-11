@@ -10,8 +10,9 @@ from sqlalchemy.orm import selectinload, Session
 from daos.collection_dao import Collection
 from daos.note_dao import Note
 from domain_services.permission_domain_service import permission_domain_service
-from repositorys.collection_favorite_repository import (
-    favorite_collection_ids_for_user,
+from repositorys.collection_repository_filters import (
+    build_collection_filters,
+    build_collection_order,
 )
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
@@ -116,49 +117,14 @@ def list_for_user(
     user, params: Optional[CollectionSearchParams] = None
 ) -> Tuple[List[Collection], int]:
     param = params or CollectionSearchParams()
+    filter_result = build_collection_filters(user, param)
+    if filter_result.force_empty:
+        return [], 0
 
-    filters = []
-    favorite_ids: set[str] | None = None
-
-    if param.visibility:
-        filters.append(Collection.visibility == param.visibility)
-
-    if param.title_contains:
-        filters.append(Collection.name.ilike(f"%{param.title_contains}%"))
-
-    if param.ids:
-        filters.append(Collection.id.in_(param.ids))
-
-    if param.tags:
-        for tag in param.tags:
-            filters.append(Collection.tags.contains([tag]))
-
-    stmt = select(Collection)
-
-    if param.only_with_notes:
-        note_exists = (
-            select(1).where(Note.collection_id == Collection.id).exists()
-        )
-        filters.append(note_exists)
-
-    if param.is_favorite:
-        favorite_ids = favorite_collection_ids_for_user(user.id)
-        if not favorite_ids:
-            return [], 0
-        filters.append(Collection.id.in_(favorite_ids))
-
-    stmt = stmt.where(*filters)
+    stmt = select(Collection).where(*filter_result.filters)
     stmt = _scope_to_user(stmt, user)
 
-    sort_map = {
-        "title": Collection.name,
-        "created_at": Collection.created_at,
-        "updated_at": Collection.updated_at,
-    }
-    order_column = sort_map[param.sort_by]
-    order_expr = (
-        order_column.desc() if param.sort_dir == "desc" else order_column.asc()
-    )
+    order_expr = build_collection_order(param)
 
     stmt = _apply_eager_loading(stmt)
 

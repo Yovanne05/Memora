@@ -19,10 +19,23 @@ from exceptions.collaboration_exception import CollaborationInvalidOperation
 from services.interfaces.realtime.realtime_collaboration_service_interface import (
     RealtimeCollaborationServiceInterface,
 )
-from services.impl.realtime.realtime_collaboration_components import (
-    CRDTDocumentCoordinator,
+from services.impl.realtime.collaboration_data_service import (
     CollaborationDataService,
+)
+from services.impl.realtime.collaboration_session_manager import (
     CollaborationSessionManager,
+)
+from services.impl.realtime.crdt_document_coordinator import (
+    CRDTDocumentCoordinator,
+)
+from services.interfaces.realtime.collaboration_data_service_interface import (
+    CollaborationDataServiceInterface,
+)
+from services.interfaces.realtime.collaboration_session_manager_interface import (
+    CollaborationSessionManagerInterface,
+)
+from services.interfaces.realtime.crdt_document_coordinator_interface import (
+    CRDTDocumentCoordinatorInterface,
 )
 from utils.enums import RoleEnum
 
@@ -30,9 +43,9 @@ from utils.enums import RoleEnum
 class RealtimeCollaborationService(RealtimeCollaborationServiceInterface):
     def __init__(
         self,
-        data_service: CollaborationDataService | None = None,
-        session_manager: CollaborationSessionManager | None = None,
-        crdt_coordinator: CRDTDocumentCoordinator | None = None,
+        data_service: CollaborationDataServiceInterface | None = None,
+        session_manager: CollaborationSessionManagerInterface | None = None,
+        crdt_coordinator: CRDTDocumentCoordinatorInterface | None = None,
     ):
         self._data_service = data_service or CollaborationDataService()
         self._session_manager = session_manager or CollaborationSessionManager()

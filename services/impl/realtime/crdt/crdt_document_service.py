@@ -2,8 +2,11 @@ from typing import Optional
 
 from pycrdt import Doc, Text
 
+from services.interfaces.realtime.crdt_document_service_interface import (
+    CRDTDocumentServiceInterface,
+)
 
-class CRDTDocumentService:
+class CRDTDocumentService(CRDTDocumentServiceInterface):
     def build_document(self, initial_content: Optional[str]) -> Doc:
         doc = Doc()
         text = Text()

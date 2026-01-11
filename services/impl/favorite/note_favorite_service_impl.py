@@ -33,7 +33,12 @@ class NoteFavoriteService(NoteFavoriteServiceInterface):
 
     def add_favorite(self, note_id: str) -> NoteFavoriteDTO:
         user = get_current_user()
-        note_entity = note_repository.get_for_user(user, note_id)
+        accessible_note_ids = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
+        note_entity = note_repository.get_for_user(
+            user, note_id, accessible_note_ids=accessible_note_ids
+        )
         ensure_note_exists(note_entity)
 
         existing = note_favorite_repository.find_one(user.id, note_id)
@@ -46,7 +51,12 @@ class NoteFavoriteService(NoteFavoriteServiceInterface):
 
     def remove_favorite(self, note_id: str) -> None:
         user = get_current_user()
-        note_entity = note_repository.get_for_user(user, note_id)
+        accessible_note_ids = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
+        note_entity = note_repository.get_for_user(
+            user, note_id, accessible_note_ids=accessible_note_ids
+        )
         ensure_note_exists(note_entity)
 
         deleted = note_favorite_repository.delete(user.id, note_id)

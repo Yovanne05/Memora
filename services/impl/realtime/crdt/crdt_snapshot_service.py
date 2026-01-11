@@ -4,12 +4,15 @@ from pycrdt import Doc
 
 from repositorys import crdt_snapshot_repository
 from services.impl.realtime.crdt.crdt_document_service import CRDTDocumentService
+from services.interfaces.realtime.crdt_snapshot_service_interface import (
+    CRDTSnapshotServiceInterface,
+)
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-class CRDTSnapshotService:
+class CRDTSnapshotService(CRDTSnapshotServiceInterface):
     def __init__(
         self,
         repository=crdt_snapshot_repository,

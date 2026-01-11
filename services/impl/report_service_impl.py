@@ -3,6 +3,7 @@ from typing import Tuple
 from daos.report_dao import Report
 from domain_services.collection_domain_service import ensure_collection_exists
 from domain_services.note_domain_service import ensure_note_exists
+from domain_services.permission_domain_service import permission_domain_service
 from domain_services.report_domain_service import (
     ensure_admin_user,
     ensure_can_report_collection,
@@ -25,7 +26,12 @@ from utils.enums import ReportStatusEnum, ReportActionEnum
 class ReportService(ReportServiceInterface):
     def report_note(self, note_id: str, report_dto: ReportCreateDTO) -> ReportDTO:
         user = get_current_user()
-        note_entity = note_repository.get_for_user(user, note_id)
+        accessible_note_ids = permission_domain_service.get_accessible_note_ids(
+            user.id, user.role
+        )
+        note_entity = note_repository.get_for_user(
+            user, note_id, accessible_note_ids=accessible_note_ids
+        )
         ensure_note_exists(note_entity)
         ensure_can_report_note(user, note_entity)
 

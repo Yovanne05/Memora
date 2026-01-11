@@ -18,7 +18,9 @@ from controllers.collection_favorite_controller import bp_collection_favorites
 from controllers.image_note_controller import bp_note_images
 from controllers.flashcard_controller import bp_flashcards, bp_note_flashcards
 from controllers.user_statistics_controller import bp_user_statistics
-from controllers.realtime_collaboration_controller import register_socketio_handlers
+from controllers.realtime.realtime_collaboration_controller import (
+    register_socketio_handlers,
+)
 from controllers.review_controller import bp_reviews
 from controllers.report_controller import bp_reports
 from utils import db
@@ -29,7 +31,7 @@ from utils.logger import init_logger
 from utils.swagger import init_swagger
 from services.impl.infrastructure.redis_client_service_impl import redis_client_service
 from services.impl.realtime.socketio_service_impl import socketio_service
-from services.impl.realtime.crdt.crdt_service_impl import init_crdt_service
+from services.impl.realtime.crdt.crdt_service_provider import init_crdt_service
 from services.impl.realtime.background_jobs_service_impl import init_background_jobs
 
 

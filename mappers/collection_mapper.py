@@ -1,38 +1,12 @@
 from typing import List, Set
-from sqlalchemy import inspect
 
 from daos.collection_dao import Collection
 from daos.note_dao import Note
 
 from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from dtos.note_dto import NoteDTO
-from dtos.user_access_dto import UserAccessDTO
 from mappers.note_mapper import note_to_dto
-from utils.enums import SharePermissionEnum
-
-
-def _get_user_access(collection: Collection) -> List[UserAccessDTO]:
-    access_list: list[UserAccessDTO] = []
-
-    insp = inspect(collection)
-    if "owner" not in insp.unloaded and collection.owner:
-        access_list.append(
-            UserAccessDTO(
-                user_id=collection.owner_id,
-                permission=SharePermissionEnum.WRITE,
-            )
-        )
-
-    if "shares" not in insp.unloaded:
-        for share in collection.shares:
-            access_list.append(
-                UserAccessDTO(
-                    user_id=share.user_id,
-                    permission=share.permission,
-                )
-            )
-
-    return access_list
+from mappers.base_mapper import BaseResourceMapper
 
 
 def _build_note_dtos(
@@ -121,27 +95,27 @@ def collection_to_dto(
     notes = collection_entity.notes
     note_ids = {note.id for note in notes}
 
-    is_favorite = False
-    if collection_favorite_ids is not None:
-        is_favorite = collection_entity.id in collection_favorite_ids
+    data = {
+        "id": collection_entity.id,
+        "owner_id": collection_entity.owner_id,
+        "name": collection_entity.name,
+        "description": collection_entity.description,
+        "visibility": collection_entity.visibility,
+        "tags": collection_entity.tags,
+        "created_at": collection_entity.created_at,
+        "updated_at": collection_entity.updated_at,
+        "notes": _build_note_dtos(notes, note_favorite_ids),
+        "nodes": _build_graph_nodes(notes),
+        "edges": _build_graph_edges(notes, note_ids),
+    }
 
-    return CollectionDTO.model_validate(
-        {
-            "id": collection_entity.id,
-            "owner_id": collection_entity.owner_id,
-            "name": collection_entity.name,
-            "description": collection_entity.description,
-            "visibility": collection_entity.visibility,
-            "user_access": _get_user_access(collection_entity),
-            "tags": collection_entity.tags,
-            "is_favorite": is_favorite,
-            "created_at": collection_entity.created_at,
-            "updated_at": collection_entity.updated_at,
-            "notes": _build_note_dtos(notes, note_favorite_ids),
-            "nodes": _build_graph_nodes(notes),
-            "edges": _build_graph_edges(notes, note_ids),
-        }
+    BaseResourceMapper.add_user_context(
+        data,
+        collection_entity,
+        favorite_ids=collection_favorite_ids,
+        current_user=current_user,
     )
+    return CollectionDTO.model_validate(data)
 
 
 def dto_to_collection(collection_create_dto: CollectionCreateDTO) -> Collection:

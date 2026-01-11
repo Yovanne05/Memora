@@ -5,12 +5,15 @@ from typing import Optional
 from pycrdt import Doc
 
 from services.impl.realtime.crdt.crdt_document_service import CRDTDocumentService
+from services.interfaces.realtime.crdt_cache_service_interface import (
+    CRDTCacheServiceInterface,
+)
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-class CRDTCacheService:
+class CRDTCacheService(CRDTCacheServiceInterface):
     def __init__(
         self,
         redis_client=None,

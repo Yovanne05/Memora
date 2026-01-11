@@ -1,35 +1,10 @@
-from typing import Optional, List
+from typing import Optional
 
 from sqlalchemy import inspect
 
 from daos.note_dao import Note
 from dtos.note_dto import NoteCreateDTO, NoteDTO
-from dtos.user_access_dto import UserAccessDTO
-from utils.enums import SharePermissionEnum
-
-
-def _get_user_access(note: Note) -> List[UserAccessDTO]:
-    access_list: list[UserAccessDTO] = []
-
-    insp = inspect(note)
-    if "owner" not in insp.unloaded and note.owner:
-        access_list.append(
-            UserAccessDTO(
-                user_id=note.owner_id,
-                permission=SharePermissionEnum.WRITE,
-            )
-        )
-
-    if "shares" not in insp.unloaded:
-        for share in note.shares:
-            access_list.append(
-                UserAccessDTO(
-                    user_id=share.user_id,
-                    permission=share.permission,
-                )
-            )
-
-    return access_list
+from mappers.base_mapper import BaseResourceMapper
 
 
 def _safe_collection_name(note: Note) -> Optional[str]:
@@ -50,27 +25,28 @@ def _safe_owner_username(note: Note) -> str:
 
 def note_to_dto(
     note: Note,
-    favorite_note_ids: set[str] | None = None
+    favorite_note_ids: set[str] | None = None,
+    current_user=None,
 ) -> NoteDTO:
-    is_favorite = False
-    if favorite_note_ids is not None:
-        is_favorite = note.id in favorite_note_ids
-
     data = {
         "id": note.id,
         "owner_id": note.owner_id,
         "owner_username": _safe_owner_username(note),
         "title": note.title,
         "visibility": note.visibility,
-        "user_access": _get_user_access(note),
         "collection_id": note.collection_id,
         "tags": note.tags,
         "created_at": note.created_at,
         "updated_at": note.updated_at,
         "collection_name": _safe_collection_name(note),
-        "is_favorite": is_favorite,
     }
 
+    BaseResourceMapper.add_user_context(
+        data,
+        note,
+        favorite_ids=favorite_note_ids,
+        current_user=current_user,
+    )
     return NoteDTO.model_validate(data)
 
 

@@ -1,12 +1,14 @@
 from dataclasses import dataclass
-from typing import List, Literal, Optional, Tuple
+from typing import Collection, List, Literal, Optional, Tuple
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from daos.note_dao import Note
-from domain_services.permission_domain_service import permission_domain_service
-from repositorys.note_favorite_repository import favorite_note_ids_for_user
+from repositorys.note_repository_filters import (
+    build_note_filters,
+    build_note_order,
+)
 from utils.db import get_db_session
 from utils.enums import VisibilityEnum
 
@@ -29,62 +31,34 @@ class NoteSearchParams:
     offset: int = 0
 
 
-def _scope_to_user(stmt, user):
-    accessible_ids = permission_domain_service.get_accessible_note_ids(
-        user.id, user.role
-    )
-    if accessible_ids is None:
+def _scope_to_accessible_ids(
+    stmt, accessible_note_ids: Optional[Collection[str]]
+):
+    if accessible_note_ids is None:
         return stmt
-    if not accessible_ids:
+    if not accessible_note_ids:
         return stmt.where(Note.id.is_(None))
-    return stmt.where(Note.id.in_(accessible_ids))
+    return stmt.where(Note.id.in_(accessible_note_ids))
 
 
 def list_for_user(
-    user, params: Optional[NoteSearchParams] = None
+    user,
+    params: Optional[NoteSearchParams] = None,
+    accessible_note_ids: Optional[Collection[str]] = None,
 ) -> Tuple[List[Note], int]:
     p = params or NoteSearchParams()
-    filters = []
-    favorite_ids: set[str] | None = None
-
-    if p.collection_id:
-        filters.append(Note.collection_id == p.collection_id)
-
-    if p.visibility:
-        filters.append(Note.visibility == p.visibility)
-
-    if p.title_contains:
-        filters.append(Note.title.ilike(f"%{p.title_contains}%"))
-
-    if p.ids:
-        filters.append(Note.id.in_(p.ids))
-
-    if p.tags:
-        for tag in p.tags:
-            filters.append(Note.tags.contains([tag]))
-
-    if p.is_favorite:
-        favorite_ids = favorite_note_ids_for_user(user.id)
-        if not favorite_ids:
-            return [], 0
-        filters.append(Note.id.in_(favorite_ids))
+    filter_result = build_note_filters(user, p)
+    if filter_result.force_empty:
+        return [], 0
 
     stmt = select(Note).options(
         joinedload(Note.collection), joinedload(Note.owner)
     )
 
-    stmt = stmt.where(*filters)
-    stmt = _scope_to_user(stmt, user)
+    stmt = stmt.where(*filter_result.filters)
+    stmt = _scope_to_accessible_ids(stmt, accessible_note_ids)
 
-    sort_map = {
-        "title": Note.title,
-        "created_at": Note.created_at,
-        "updated_at": Note.updated_at,
-    }
-    order_column = sort_map[p.sort_by]
-    order_expr = (
-        order_column.desc() if p.sort_dir == "desc" else order_column.asc()
-    )
+    order_expr = build_note_order(p)
 
     with get_db_session() as session:
         total = session.scalar(
@@ -97,13 +71,17 @@ def list_for_user(
     return items, total or 0
 
 
-def get_for_user(user, note_id: str) -> Optional[Note]:
+def get_for_user(
+    user,
+    note_id: str,
+    accessible_note_ids: Optional[Collection[str]] = None,
+) -> Optional[Note]:
     stmt = (
         select(Note)
         .options(joinedload(Note.collection), joinedload(Note.owner))
         .where(Note.id == note_id)
     )
-    stmt = _scope_to_user(stmt, user)
+    stmt = _scope_to_accessible_ids(stmt, accessible_note_ids)
     with get_db_session() as session:
         return session.execute(stmt).scalar_one_or_none()
 

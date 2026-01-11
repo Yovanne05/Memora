@@ -14,6 +14,23 @@ from unittest.mock import Mock, MagicMock
 # FIXTURES POUR MOCKER LES REPOSITORIES
 # =============================================================================
 
+@pytest.fixture(autouse=True)
+def mock_permission_domain_service_access(monkeypatch):
+    """Evite les acces permission dans les tests de services."""
+    monkeypatch.setattr(
+        "services.impl.note.note_crud_service_impl.permission_domain_service.get_accessible_note_ids",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        "services.impl.favorite.note_favorite_service_impl.permission_domain_service.get_accessible_note_ids",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        "services.impl.report_service_impl.permission_domain_service.get_accessible_note_ids",
+        lambda *args, **kwargs: None,
+    )
+
+
 @pytest.fixture
 def mock_user_repository(monkeypatch):
     """Mock du repository utilisateur."""
