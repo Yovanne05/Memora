@@ -79,7 +79,7 @@ export function useNoteQuickActions({
   }
 
   const handleDelete = async () => {
-    await deleteMutation.mutateAsync(note.id)
+    await deleteMutation.mutateAsync({ id: note.id })
     setDeleteDialogOpen(false)
   }
 

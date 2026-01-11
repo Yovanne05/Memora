@@ -1,19 +1,19 @@
-import { renderHook, act } from "@testing-library/react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import type { ReactNode } from "react"
-import { vi } from "vitest"
-import { useResourceMutation } from "@/hooks/useResourceMutation"
+import { renderHook, act } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import type { ReactNode } from 'react'
+import { vi } from 'vitest'
+import { useResourceMutation } from '@/hooks/useResourceMutation'
 
 const mockToast = vi.hoisted(() => ({
   success: vi.fn(),
   error: vi.fn(),
 }))
 
-vi.mock("sonner", () => ({
+vi.mock('sonner', () => ({
   toast: mockToast,
 }))
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     error: vi.fn(),
   },
@@ -25,15 +25,15 @@ const createWrapper = (client: QueryClient) => {
   )
 }
 
-describe("useResourceMutation", () => {
-  test("sets cache data and calls onSuccess", async () => {
+describe('useResourceMutation', () => {
+  test('sets cache data and calls onSuccess', async () => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
         mutations: { retry: false },
       },
     })
-    const mutationFn = vi.fn().mockResolvedValue("OK")
+    const mutationFn = vi.fn().mockResolvedValue('OK')
     const onSuccess = vi.fn()
 
     const { result } = renderHook(
@@ -41,8 +41,8 @@ describe("useResourceMutation", () => {
         useResourceMutation<string, { value: string }>(
           {
             mutationFn,
-            queryKey: ["resource"],
-            successMessage: "done",
+            queryKey: ['resource'],
+            successMessage: 'done',
           },
           { onSuccess, silent: true }
         ),
@@ -50,25 +50,25 @@ describe("useResourceMutation", () => {
     )
 
     await act(async () => {
-      await result.current.mutateAsync({ value: "payload" })
+      await result.current.mutateAsync({ value: 'payload' })
     })
 
     expect(mutationFn).toHaveBeenCalledWith(
-      { value: "payload" },
+      { value: 'payload' },
       expect.objectContaining({ client: expect.any(Object) })
     )
-    expect(queryClient.getQueryData(["resource"])).toBe("OK")
-    expect(onSuccess).toHaveBeenCalledWith("OK")
+    expect(queryClient.getQueryData(['resource'])).toBe('OK')
+    expect(onSuccess).toHaveBeenCalledWith('OK')
   })
 
-  test("calls onError when mutation fails", async () => {
+  test('calls onError when mutation fails', async () => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
         mutations: { retry: false },
       },
     })
-    const error = new Error("boom")
+    const error = new Error('boom')
     const mutationFn = vi.fn().mockRejectedValue(error)
     const onError = vi.fn()
 
@@ -77,8 +77,12 @@ describe("useResourceMutation", () => {
         useResourceMutation<string, void>(
           {
             mutationFn,
-            queryKey: ["resource"],
-            errorMessage: "failed",
+            queryKey: ['resource'],
+            errorContext: {
+              operation: 'create',
+              resource: 'note',
+              fallback: 'failed',
+            },
           },
           { onError, silent: true }
         ),
@@ -94,6 +98,6 @@ describe("useResourceMutation", () => {
     })
 
     expect(onError).toHaveBeenCalledWith(error)
-    expect(queryClient.getQueryData(["resource"])).toBeUndefined()
+    expect(queryClient.getQueryData(['resource'])).toBeUndefined()
   })
 })

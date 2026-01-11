@@ -17,8 +17,11 @@ export function useCreateCollectionMutation(
       listQueryKey: COLLECTIONS_QUERY_KEYS.lists(),
       detailQueryKey: (data: Collection) =>
         COLLECTIONS_QUERY_KEYS.detail(data.id),
-      successMessage: 'Collection créée avec succès.',
-      errorMessage: 'La création de la collection a échoué.',
+      successMessage: 'Collection créée avec succès',
+      errorContext: {
+        operation: 'create',
+        resource: 'collection',
+      },
       optimisticUpdate: (
         old: PaginatedCollections | undefined,
         newCollection: Collection
