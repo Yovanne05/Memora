@@ -30,7 +30,7 @@ class ReportService(ReportServiceInterface):
             user.id, user.role
         )
         note_entity = note_repository.get_for_user(
-            user, note_id, accessible_note_ids=accessible_note_ids
+            note_id, accessible_note_ids=accessible_note_ids
         )
         ensure_note_exists(note_entity)
         ensure_can_report_note(user, note_entity)

@@ -72,7 +72,6 @@ def list_for_user(
 
 
 def get_for_user(
-    user,
     note_id: str,
     accessible_note_ids: Optional[Collection[str]] = None,
 ) -> Optional[Note]:
