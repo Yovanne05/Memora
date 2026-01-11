@@ -60,7 +60,7 @@ export function dtoToCollection(
 }
 
 export function dtoToCollectionWithoutUser(dto: CollectionDto): Collection {
-  return dtoToCollection(dto, undefined)
+  return dtoToCollection(dto)
 }
 
 export function toCollectionCreateDto(

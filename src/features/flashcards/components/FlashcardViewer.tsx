@@ -44,23 +44,27 @@ export function FlashcardViewer({
   const shouldShowResult = reviewMode ? !!reviewResult : showResult
   const shouldShowDifficulty = reviewMode && !!selectedAnswerId && !reviewResult
 
-  const handleAnswerClick = (answerId: string) => {
-    if (reviewMode) {
-      setSelection({
-        flashcardId: flashcard.id,
-        selectedAnswerId: answerId,
-        showResult: false,
-      })
-    } else {
-      if (!showResult) {
-        setSelection({
-          flashcardId: flashcard.id,
-          selectedAnswerId: answerId,
-          showResult: true,
-        })
-      }
-    }
+  const handleReviewAnswerClick = (answerId: string) => {
+    setSelection({
+      flashcardId: flashcard.id,
+      selectedAnswerId: answerId,
+      showResult: false,
+    })
   }
+
+  const handlePracticeAnswerClick = (answerId: string) => {
+    if (showResult) return
+
+    setSelection({
+      flashcardId: flashcard.id,
+      selectedAnswerId: answerId,
+      showResult: true,
+    })
+  }
+
+  const handleAnswerClick = reviewMode
+    ? handleReviewAnswerClick
+    : handlePracticeAnswerClick
 
   const handleReset = () => {
     setSelection({

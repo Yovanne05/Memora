@@ -40,8 +40,8 @@ export function UserSearchCombobox({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           aria-expanded={open}
+          aria-haspopup="listbox"
           disabled={disabled}
           className="justify-between"
         >

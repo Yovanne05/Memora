@@ -22,10 +22,7 @@ function getCurrentUserPermission(
   })
 }
 
-export function dtoToNote(
-  dto: NoteDto,
-  currentUserId?: string | undefined
-): Note {
+export function dtoToNote(dto: NoteDto, currentUserId?: string): Note {
   return {
     id: dto.id,
     collectionId: dto.collection_id,
@@ -44,7 +41,7 @@ export function dtoToNote(
 }
 
 export function dtoToNoteWithoutUser(dto: NoteDto): Note {
-  return dtoToNote(dto, undefined)
+  return dtoToNote(dto)
 }
 
 export function toNoteCreateDto(payload: NoteCreate): NoteCreateDto {

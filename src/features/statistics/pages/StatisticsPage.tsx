@@ -47,7 +47,9 @@ export default function StatisticsPage() {
           resource: 'user',
           fallback: undefined,
         })}
-        onRetry={() => statsQuery.refetch()}
+        onRetry={() => {
+          void statsQuery.refetch()
+        }}
       />
     )
   }
@@ -101,7 +103,9 @@ export default function StatisticsPage() {
             isError: chartQuery.isError,
             error: chartQuery.error,
             data: chartQuery.data,
-            refetch: () => chartQuery.refetch(),
+            refetch: () => {
+              void chartQuery.refetch()
+            },
           }}
         />
       </div>

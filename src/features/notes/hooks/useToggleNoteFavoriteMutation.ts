@@ -1,19 +1,30 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { notesService } from "../services/notes.service"
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { notesService } from '../services/notes.service'
 
-type Args = { noteId: string; next: boolean }
-
-export function useToggleNoteFavoriteMutation() {
+export function useAddNoteFavoriteMutation() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ noteId, next }: Args) => {
-      if (next) await notesService.addFavorite(noteId)
-      else await notesService.removeFavorite(noteId)
+    mutationFn: async (noteId: string) => {
+      await notesService.addFavorite(noteId)
     },
     onSettled: async () => {
-      await qc.invalidateQueries({ queryKey: ["notes"] })
-      await qc.invalidateQueries({ queryKey: ["note"] })
+      await qc.invalidateQueries({ queryKey: ['notes'] })
+      await qc.invalidateQueries({ queryKey: ['note'] })
+    },
+  })
+}
+
+export function useRemoveNoteFavoriteMutation() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (noteId: string) => {
+      await notesService.removeFavorite(noteId)
+    },
+    onSettled: async () => {
+      await qc.invalidateQueries({ queryKey: ['notes'] })
+      await qc.invalidateQueries({ queryKey: ['note'] })
     },
   })
 }

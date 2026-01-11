@@ -7,19 +7,12 @@ export function SessionProgress({
   current,
   total,
 }: Readonly<SessionProgressProps>) {
-  const progress = ((current + 1) / total) * 100
-
   return (
-    <div className="w-full bg-muted rounded-full h-2.5">
-      <div
-        className="bg-primary h-2.5 rounded-full transition-all"
-        style={{ width: `${progress}%` }}
-        role="progressbar"
-        aria-valuenow={progress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`Progression: ${current + 1} sur ${total}`}
-      />
-    </div>
+    <progress
+      className="w-full h-2.5 [&::-webkit-progress-bar]:rounded-full [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-primary [&::-webkit-progress-value]:transition-all [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-primary"
+      value={current + 1}
+      max={total}
+      aria-label={`Progression: ${current + 1} sur ${total}`}
+    />
   )
 }

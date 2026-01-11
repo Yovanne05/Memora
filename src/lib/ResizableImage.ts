@@ -62,7 +62,9 @@ export const ResizableImage = Image.extend({
         default: null,
         parseHTML: (element) => {
           const height = element.getAttribute('height') || element.style.height
-          return height === 'auto' ? 'auto' : height ? Number.parseInt(height) : null
+          if (!height) return null
+          if (height === 'auto') return 'auto'
+          return Number.parseInt(height)
         },
         renderHTML: (attributes) => {
           if (!attributes.height || attributes.height === 'auto') {
@@ -104,14 +106,20 @@ export const ResizableImage = Image.extend({
 
       // Set dimensions
       if (node.attrs.width) {
-        const width = typeof node.attrs.width === 'number' ? `${node.attrs.width}px` : node.attrs.width
+        const width =
+          typeof node.attrs.width === 'number'
+            ? `${node.attrs.width}px`
+            : node.attrs.width
         img.style.width = width
       } else {
         img.style.maxWidth = '100%'
       }
 
       if (node.attrs.height && node.attrs.height !== 'auto') {
-        const height = typeof node.attrs.height === 'number' ? `${node.attrs.height}px` : node.attrs.height
+        const height =
+          typeof node.attrs.height === 'number'
+            ? `${node.attrs.height}px`
+            : node.attrs.height
         img.style.height = height
       } else {
         img.style.height = 'auto'
@@ -120,12 +128,18 @@ export const ResizableImage = Image.extend({
       container.appendChild(img)
 
       const resizeHandleRight = document.createElement('div')
-      resizeHandleRight.classList.add('image-resizer-handle', 'image-resizer-handle-right')
+      resizeHandleRight.classList.add(
+        'image-resizer-handle',
+        'image-resizer-handle-right'
+      )
       resizeHandleRight.setAttribute('contenteditable', 'false')
       container.appendChild(resizeHandleRight)
 
       const resizeHandleLeft = document.createElement('div')
-      resizeHandleLeft.classList.add('image-resizer-handle', 'image-resizer-handle-left')
+      resizeHandleLeft.classList.add(
+        'image-resizer-handle',
+        'image-resizer-handle-left'
+      )
       resizeHandleLeft.setAttribute('contenteditable', 'false')
       container.appendChild(resizeHandleLeft)
 
@@ -183,7 +197,8 @@ export const ResizableImage = Image.extend({
         // Update the node attributes
         const pos = getPos()
         if (typeof pos === 'number') {
-          editor.chain()
+          editor
+            .chain()
             .focus()
             .setNodeSelection(pos)
             .updateAttributes('image', {
@@ -194,8 +209,12 @@ export const ResizableImage = Image.extend({
         }
       }
 
-      resizeHandleRight.addEventListener('mousedown', (e) => handleMouseDown(e, 'right'))
-      resizeHandleLeft.addEventListener('mousedown', (e) => handleMouseDown(e, 'left'))
+      resizeHandleRight.addEventListener('mousedown', (e) =>
+        handleMouseDown(e, 'right')
+      )
+      resizeHandleLeft.addEventListener('mousedown', (e) =>
+        handleMouseDown(e, 'left')
+      )
 
       container.addEventListener('click', () => {
         if (!editor.isEditable) return
@@ -224,22 +243,27 @@ export const ResizableImage = Image.extend({
           }
 
           // Update src
-          if (updatedNode.attrs.src && updatedNode.attrs.src !== node.attrs.src) {
+          if (
+            updatedNode.attrs.src &&
+            updatedNode.attrs.src !== node.attrs.src
+          ) {
             img.src = updatedNode.attrs.src
           }
 
           // Update dimensions
           if (updatedNode.attrs.width) {
-            const width = typeof updatedNode.attrs.width === 'number'
-              ? `${updatedNode.attrs.width}px`
-              : updatedNode.attrs.width
+            const width =
+              typeof updatedNode.attrs.width === 'number'
+                ? `${updatedNode.attrs.width}px`
+                : updatedNode.attrs.width
             img.style.width = width
           }
 
           if (updatedNode.attrs.height && updatedNode.attrs.height !== 'auto') {
-            const height = typeof updatedNode.attrs.height === 'number'
-              ? `${updatedNode.attrs.height}px`
-              : updatedNode.attrs.height
+            const height =
+              typeof updatedNode.attrs.height === 'number'
+                ? `${updatedNode.attrs.height}px`
+                : updatedNode.attrs.height
             img.style.height = height
           } else {
             img.style.height = 'auto'

@@ -26,7 +26,7 @@ export function useCreateCollectionMutation(
         old: PaginatedCollections | undefined,
         newCollection: Collection
       ) => {
-        if (!old || !old.items) {
+        if (!old?.items) {
           return {
             items: [newCollection],
             total: 1,

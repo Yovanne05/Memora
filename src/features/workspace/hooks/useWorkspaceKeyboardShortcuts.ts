@@ -1,69 +1,93 @@
-import { useEffect } from "react"
-import { useWorkspaceContext } from "../context"
+import { useEffect } from 'react'
+import { useWorkspaceContext } from '../context'
+
+function isEditableElement(element: HTMLElement): boolean {
+  return (
+    element.tagName === 'INPUT' ||
+    element.tagName === 'TEXTAREA' ||
+    element.isContentEditable
+  )
+}
+
+function isSearchInput(element: HTMLElement): boolean {
+  return (
+    element.tagName === 'INPUT' && element.getAttribute('type') === 'search'
+  )
+}
+
+function focusSearchInput(): void {
+  const searchInput = document.querySelector(
+    'input[type="search"]'
+  ) as HTMLInputElement
+  if (searchInput) {
+    searchInput.focus()
+  }
+}
+
+function focusAndSelectSearchInput(): void {
+  const searchInput = document.querySelector(
+    'input[type="search"]'
+  ) as HTMLInputElement
+  if (searchInput) {
+    searchInput.focus()
+    searchInput.select()
+  }
+}
+
+function getModifierKey(isMac: boolean, event: KeyboardEvent): boolean {
+  return isMac ? event.metaKey : event.ctrlKey
+}
 
 export function useWorkspaceKeyboardShortcuts() {
   const { actions } = useWorkspaceContext()
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      // Don't trigger if typing in input/textarea
       const target = e.target as HTMLElement
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
-        // Allow Escape to clear search
-        if (e.key === "Escape" && target.tagName === "INPUT" && target.getAttribute("type") === "search") {
+
+      if (isEditableElement(target)) {
+        if (e.key === 'Escape' && isSearchInput(target)) {
           e.preventDefault()
-          actions.setSearch("")
+          actions.setSearch('')
           target.blur()
         }
         return
       }
 
-      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0
-      const modifier = isMac ? e.metaKey : e.ctrlKey
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const modifier = getModifierKey(isMac, e)
 
-      // Ctrl/Cmd + N: New note
-      if (modifier && e.key === "n" && !e.shiftKey) {
+      if (modifier && e.key === 'n' && !e.shiftKey) {
         e.preventDefault()
         actions.openCreateNote()
+        return
       }
 
-      // Ctrl/Cmd + Shift + N: New collection
-      if (modifier && e.shiftKey && e.key === "N") {
+      if (modifier && e.shiftKey && e.key === 'N') {
         e.preventDefault()
         actions.openCreateCollection()
+        return
       }
 
-      // Ctrl/Cmd + K: Focus search (or toggle if already focused)
-      if (modifier && e.key === "k") {
+      if (modifier && e.key === 'k') {
         e.preventDefault()
-        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement
-        if (searchInput) {
-          searchInput.focus()
-          searchInput.select()
-        }
+        focusAndSelectSearchInput()
+        return
       }
 
-      // / : Focus search
-      if (e.key === "/") {
+      if (e.key === '/') {
         e.preventDefault()
-        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement
-        if (searchInput) {
-          searchInput.focus()
-        }
+        focusSearchInput()
+        return
       }
 
-      // Ctrl/Cmd + G: Open graph view
-      if (modifier && e.key === "g") {
+      if (modifier && e.key === 'g') {
         e.preventDefault()
         actions.openGraphView()
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [actions])
 }

@@ -30,7 +30,7 @@ export function AccountDeletionSection({ user }: AccountDeletionSectionProps) {
     try {
       await deleteMutation.mutateAsync(user.id)
       toast.success('Votre compte a été supprimé')
-      await logout()
+      logout()
       window.location.href = '/auth/login'
     } catch (error) {
       const message = getContextualErrorMessage(error, {

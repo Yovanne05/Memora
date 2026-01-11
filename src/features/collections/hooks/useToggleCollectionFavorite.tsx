@@ -1,22 +1,30 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { collectionsService } from "../services/collections.service"
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { collectionsService } from '../services/collections.service'
 
-type Args = {
-  collectionId: string
-  next: boolean
-}
-
-export function useToggleCollectionFavoriteMutation() {
+export function useAddCollectionFavoriteMutation() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ collectionId, next }: Args) => {
-      if (next) await collectionsService.addFavorite(collectionId)
-      else await collectionsService.removeFavorite(collectionId)
+    mutationFn: async (collectionId: string) => {
+      await collectionsService.addFavorite(collectionId)
     },
     onSettled: async () => {
-      await qc.invalidateQueries({ queryKey: ["collections"] })
-      await qc.invalidateQueries({ queryKey: ["collection"] })
+      await qc.invalidateQueries({ queryKey: ['collections'] })
+      await qc.invalidateQueries({ queryKey: ['collection'] })
+    },
+  })
+}
+
+export function useRemoveCollectionFavoriteMutation() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (collectionId: string) => {
+      await collectionsService.removeFavorite(collectionId)
+    },
+    onSettled: async () => {
+      await qc.invalidateQueries({ queryKey: ['collections'] })
+      await qc.invalidateQueries({ queryKey: ['collection'] })
     },
   })
 }

@@ -17,10 +17,10 @@ export function LogoutSection() {
   const { logout } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setIsLoggingOut(true)
     try {
-      await logout()
+      logout()
       toast.success('Déconnexion effectuée.')
       router.navigate({
         to: '/auth/login',
