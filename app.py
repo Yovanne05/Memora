@@ -103,6 +103,5 @@ def create_app() -> Flask:
     return app
 
 if __name__ == "__main__":
-    from services.impl.realtime.socketio_service_impl import socketio_service
     app = create_app()
     socketio_service.run_socketio(app, debug=True, host="0.0.0.0", port=5000)
