@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { DndContext, DragOverlay } from '@dnd-kit/core'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { WorkspaceSidebar } from './sidebar/WorkspaceSidebar'
 import { WorkspaceHeader } from './WorkspaceHeader'
 import { CreateNoteDialog } from '@/features/notes/components/CreateNoteDialog'
@@ -45,7 +46,11 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         : 'aucune collection'
       toast.success(`Note déplacée vers ${collectionName}`)
     } catch (error) {
-      toast.error('Impossible de déplacer la note')
+      const message = getContextualErrorMessage(error, {
+        operation: 'update',
+        resource: 'note',
+      })
+      toast.error(message)
       logger.error('Error moving note:', error)
     }
   }
@@ -79,17 +84,14 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         tags: payload.tags,
       })
 
-      toast.success('Note créée avec succès')
       actions.closeCreateNote()
 
-      // Navigate to edit the new note
       const path = payload.collectionId
         ? `/app/workspace/collections/${payload.collectionId}/notes/${newNote.id}`
         : `/app/workspace/notes/${newNote.id}`
 
       router.navigate({ to: path })
     } catch (error) {
-      toast.error('Impossible de créer la note')
       logger.error('Error creating note:', error)
     }
   }

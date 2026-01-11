@@ -2,12 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { MutationCallbacks } from '@/lib/mutation-callbacks'
 import { logger } from '@/lib/logger'
+import {
+  getContextualErrorMessage,
+  type ErrorContext,
+} from '@/lib/error-context'
 
 export interface ResourceMutationConfig<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>
   queryKey: readonly unknown[]
   successMessage?: string
-  errorMessage?: string
+  errorContext?: ErrorContext
   onSuccessInvalidate?: readonly (readonly unknown[])[]
   onSuccessUpdate?: (
     data: TData,
@@ -29,7 +33,7 @@ export function useResourceMutation<TData = unknown, TVariables = unknown>(
     mutationFn,
     queryKey,
     successMessage,
-    errorMessage,
+    errorContext,
     onSuccessInvalidate,
     onSuccessUpdate,
   } = config
@@ -57,19 +61,9 @@ export function useResourceMutation<TData = unknown, TVariables = unknown>(
     },
     onError: (error: Error) => {
       if (!callbacks?.silent) {
-        let message = errorMessage || 'Une erreur est survenue'
-
-        if (error instanceof Error) {
-          if (error.message.includes('uniq_collection_name_per_owner')) {
-            message =
-              'Une collection avec ce nom existe déjà. Veuillez choisir un autre nom.'
-          } else if (error.message.includes('uniq_note_title_per_owner')) {
-            message =
-              'Une note avec ce titre existe déjà. Veuillez choisir un autre titre.'
-          } else {
-            message = error.message
-          }
-        }
+        const message = errorContext
+          ? getContextualErrorMessage(error, errorContext)
+          : 'Une erreur est survenue'
 
         toast.error(message)
       }

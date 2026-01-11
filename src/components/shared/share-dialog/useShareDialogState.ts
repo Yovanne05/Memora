@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 
 import type { SharePermission } from '@/features/notes/dtos/note-share.dto'
 import type { User } from '@/features/users/models/user.model'
@@ -38,8 +39,13 @@ export function useShareDialogState({
       setSelectedUser(null)
       setPermission('read')
       toast.success('Utilisateur ajouté avec succès')
-    } catch {
-      toast.error("Échec de l'ajout de l'utilisateur")
+    } catch (error) {
+      const message = getContextualErrorMessage(error, {
+        operation: 'create',
+        resource: 'note',
+        fallback: "Échec de l'ajout de l'utilisateur",
+      })
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -52,8 +58,13 @@ export function useShareDialogState({
     try {
       await onUpdateShare(userId, newPermission)
       toast.success('Permission mise à jour')
-    } catch {
-      toast.error('Échec de la mise à jour de la permission')
+    } catch (error) {
+      const message = getContextualErrorMessage(error, {
+        operation: 'update',
+        resource: 'note',
+        fallback: 'Échec de la mise à jour de la permission',
+      })
+      toast.error(message)
     }
   }
 
@@ -61,8 +72,13 @@ export function useShareDialogState({
     try {
       await onRemoveShare(userId)
       toast.success('Utilisateur retiré')
-    } catch {
-      toast.error("Échec du retrait de l'utilisateur")
+    } catch (error) {
+      const message = getContextualErrorMessage(error, {
+        operation: 'delete',
+        resource: 'note',
+        fallback: "Échec du retrait de l'utilisateur",
+      })
+      toast.error(message)
     }
   }
 

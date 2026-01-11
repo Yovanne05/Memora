@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { notesService } from '@/features/notes/services/notes.service'
 import { useUpdateReportMutation } from '@/features/report/hooks/useUpdateReportMutation'
 import { Trash2 } from 'lucide-react'
@@ -45,7 +46,11 @@ export function DeleteReportNoteDialog({
       toast.success('Note supprimée et signalement résolu')
       setOpen(false)
     } catch (error) {
-      toast.error('Impossible de supprimer la note')
+      const message = getContextualErrorMessage(error, {
+        operation: 'delete',
+        resource: 'note',
+      })
+      toast.error(message)
       console.error('Report delete note error:', error)
     }
   }

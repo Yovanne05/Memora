@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Trash2, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { useDeleteUserMutation } from '@/features/users/hooks/useUserMutation'
 import type { User } from '@/features/users/models/user.model'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -41,7 +42,11 @@ export function AccountDeletionSection({ user }: AccountDeletionSectionProps) {
       await logout()
       window.location.href = '/auth/login'
     } catch (error) {
-      toast.error('Erreur lors de la suppression du compte')
+      const message = getContextualErrorMessage(error, {
+        operation: 'delete',
+        resource: 'user',
+      })
+      toast.error(message)
       console.error('Deletion error:', error)
     }
   }

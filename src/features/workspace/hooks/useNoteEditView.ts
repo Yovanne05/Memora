@@ -47,7 +47,7 @@ export function useNoteEditView({ noteId, collectionId }: UseNoteEditViewArgs) {
 
   const handleDelete = async () => {
     try {
-      await deleteMutation.mutateAsync(noteId)
+      await deleteMutation.mutateAsync({ id: noteId })
       if (collectionId) {
         navigateToCollection(collectionId)
       } else {

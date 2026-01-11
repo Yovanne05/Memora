@@ -4,13 +4,17 @@ import { Image as ImageIcon, Loader2 } from 'lucide-react'
 import { Toggle } from '@/components/ui/toggle'
 import { useUploadNoteImageMutation } from '@/features/notes/hooks/useUploadNoteImageMutation'
 import { toast } from 'sonner'
+import { getContextualErrorMessage } from '@/lib/error-context'
 
 interface ImageUploadButtonProps {
   editor: Editor
   noteId?: string
 }
 
-export function ImageUploadButton({ editor, noteId }: Readonly<ImageUploadButtonProps>) {
+export function ImageUploadButton({
+  editor,
+  noteId,
+}: Readonly<ImageUploadButtonProps>) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const uploadImageMutation = useUploadNoteImageMutation({
@@ -20,25 +24,36 @@ export function ImageUploadButton({ editor, noteId }: Readonly<ImageUploadButton
       toast.success('Image uploadée avec succès')
     },
     onError: (error) => {
-      toast.error(error.message || "L'upload de l'image a échoué")
+      const message = getContextualErrorMessage(error, {
+        operation: 'create',
+        resource: 'note',
+        fallback: "L'upload de l'image a échoué",
+      })
+      toast.error(message)
     },
   })
 
   const handleImageClick = () => {
     if (!noteId) {
-      toast.error("Veuillez d'abord enregistrer la note avant d'ajouter des images")
+      toast.error(
+        "Veuillez d'abord enregistrer la note avant d'ajouter des images"
+      )
       return
     }
     fileInputRef.current?.click()
   }
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0]
     if (!file || !noteId) return
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Type de fichier non autorisé. Utilisez JPG, PNG, GIF ou WebP.')
+      toast.error(
+        'Type de fichier non autorisé. Utilisez JPG, PNG, GIF ou WebP.'
+      )
       return
     }
 

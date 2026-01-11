@@ -1,13 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { MutationCallbacks } from '@/lib/mutation-callbacks'
+import { getContextualErrorMessage } from '@/lib/error-context'
 import { collectionsService } from '@/features/collections/services/collections.service'
-import type { Collection, CollectionUpdate } from '@/features/collections/models/collection.model'
+import type {
+  Collection,
+  CollectionUpdate,
+} from '@/features/collections/models/collection.model'
 import type { PaginatedCollections } from '../types/paginated-collection'
 import { COLLECTIONS_QUERY_KEYS } from './collections.keys'
-import { logger } from "@/lib/logger"
+import { logger } from '@/lib/logger'
 
-export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collection>) {
+export function useUpdateCollectionMutation(
+  callbacks?: MutationCallbacks<Collection>
+) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -15,7 +21,7 @@ export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collec
       collectionsService.update(id, data),
     onSuccess: (updated) => {
       if (!callbacks?.silent) {
-        toast.success('Collection mise à jour.')
+        toast.success('Collection mise à jour')
       }
 
       queryClient.setQueryData<PaginatedCollections>(
@@ -45,7 +51,10 @@ export function useUpdateCollectionMutation(callbacks?: MutationCallbacks<Collec
     },
     onError: (error: Error) => {
       if (!callbacks?.silent) {
-        const message = error instanceof Error ? error.message : 'La mise à jour de la collection a échoué.'
+        const message = getContextualErrorMessage(error, {
+          operation: 'update',
+          resource: 'collection',
+        })
         toast.error(message)
       }
       logger.error('Failed to update collection:', error)
