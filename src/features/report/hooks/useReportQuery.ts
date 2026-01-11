@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import type { ReportsFilters } from '../types/report-query'
-import { REPORTS_QUERY_KEYS } from './reports.key'
+import { REPORTS_QUERY_KEYS } from '../constants/reports.key'
 import { reportsService } from '../services/report.service'
 
 export function useReportsQuery(params: ReportsFilters) {

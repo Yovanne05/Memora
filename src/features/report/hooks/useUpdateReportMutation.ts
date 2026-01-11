@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReportUpdate } from '../models/report'
 import { reportsService } from '../services/report.service'
-import { REPORTS_QUERY_KEYS } from './reports.key'
+import { REPORTS_QUERY_KEYS } from '../constants/reports.key'
 
 type UpdateReportParams = {
   reportId: string
