@@ -33,7 +33,7 @@ class TestShareCollectionServiceCreate:
 
         current_user = User(id=owner_id, email="owner@example.com", username="owner", password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now())
         monkeypatch.setattr("services.impl.collection.collection_share_service_impl.get_current_user", lambda: current_user)
-        monkeypatch.setattr("services.impl.collection.collection_share_service_impl.permission_domain_service.can_manage_collection", lambda *args: True)
+        monkeypatch.setattr("services.impl.collection.collection_share_service_impl.permission_domain_service.can_write_collection", lambda *args: True)
 
         collection = Collection(id=collection_id, name="Test", owner_id=owner_id, tags=[], notes=[], shares=[], created_at=datetime.now(), updated_at=datetime.now())
         mock_collection_repository.find_one_unscoped.return_value = collection

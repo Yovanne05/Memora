@@ -5,7 +5,7 @@ description: >
   Crée une nouvelle flashcard avec sa question et ses réponses possibles.
   Au moins une réponse doit être marquée comme correcte.
   
-  **Permissions requises:** WRITE ou OWNER sur la note.
+  **Permissions requises:** WRITE sur la note.
 parameters:
   - in: path
     name: note_id

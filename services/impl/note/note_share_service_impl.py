@@ -50,7 +50,7 @@ class NoteShareService(NoteShareServiceInterface):
         note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
-        self._ensure_can_manage_note(note_id, current_user)
+        self._ensure_can_write_note(note_id, current_user)
 
         user_entity = user_repository.find_one(share_dto.user_id)
         ensure_share_target_exists(user_entity)
@@ -77,7 +77,7 @@ class NoteShareService(NoteShareServiceInterface):
         note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
-        self._ensure_can_manage_note(note_id, current_user)
+        self._ensure_can_write_note(note_id, current_user)
 
         share_entity = note_share_repository.find_one(note_id, user_id)
         if not share_entity:
@@ -93,14 +93,14 @@ class NoteShareService(NoteShareServiceInterface):
         note_entity = note_repository.find_one_unscoped(note_id)
         ensure_note_exists(note_entity)
 
-        self._ensure_can_manage_note(note_id, current_user)
+        self._ensure_can_write_note(note_id, current_user)
 
         deleted = note_share_repository.delete(note_id, user_id)
         if not deleted:
             raise NoteShareNotFound()
 
-    def _ensure_can_manage_note(self, note_id: str, user) -> None:
-        if not permission_domain_service.can_manage_note(
+    def _ensure_can_write_note(self, note_id: str, user) -> None:
+        if not permission_domain_service.can_write_note(
             note_id, user.id, user.role
         ):
             raise NoteSharePermissionDenied()

@@ -9,7 +9,11 @@ from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO
 from dtos.common_dto import ListResponseDTO
 from querys.note_query import NoteFindQuery
 from services.impl.note.note_crud_service_impl import note_crud_service
-from utils.permission_decorators import require_note_read, require_note_write, require_note_manage
+from utils.permission_decorators import (
+    require_note_read,
+    require_note_write,
+    require_owner,
+)
 
 
 bp_notes = Blueprint("notes", __name__, url_prefix="/notes")
@@ -62,9 +66,7 @@ def update(note_id: UUID):
 @bp_notes.delete("/<uuid:note_id>")
 @jwt_required()
 @swag_from("../docs/notes/delete.yaml")
-@require_note_manage()
+@require_owner("note", "note_id")
 def delete(note_id: UUID):
     note_crud_service.delete(str(note_id))
     return "", HTTPStatus.NO_CONTENT
-
-

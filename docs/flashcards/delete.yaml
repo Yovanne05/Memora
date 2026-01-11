@@ -4,7 +4,7 @@ summary: Supprimer une flashcard
 description: >
   Supprime définitivement une flashcard et toutes ses réponses associées.
   
-  **Permissions requises:** OWNER sur la note parente.
+  **Permissions requises:** WRITE sur la note parente.
 parameters:
   - in: path
     name: flashcard_id

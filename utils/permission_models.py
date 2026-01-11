@@ -15,8 +15,6 @@ class AccessLevel(Enum):
     NONE = 0
     READ = auto()
     WRITE = auto()
-    OWNER = auto()
-    ADMIN = auto()
 
     def can_read(self) -> bool:
         """Check if this access level allows read operations."""
@@ -25,14 +23,6 @@ class AccessLevel(Enum):
     def can_write(self) -> bool:
         """Check if this access level allows write operations."""
         return self.value >= AccessLevel.WRITE.value
-
-    def can_manage(self) -> bool:
-        """Check if this access level allows ownership operations (delete, share)."""
-        return self.value >= AccessLevel.OWNER.value
-
-    def is_admin(self) -> bool:
-        """Check if this is admin-level access."""
-        return self == AccessLevel.ADMIN
 
 
 @dataclass(frozen=True)
@@ -49,10 +39,6 @@ class ResourcePermission:
     def can_write(self) -> bool:
         """Domain rule: can the user write to this resource?"""
         return self.access_level.can_write()
-
-    def can_manage(self) -> bool:
-        """Domain rule: can the user manage this resource (delete, share)?"""
-        return self.access_level.can_manage()
 
 
 @dataclass(frozen=True)
@@ -86,11 +72,11 @@ class PermissionContext:
 def compute_access_level_from_context(context: PermissionContext) -> AccessLevel:
     # Admin users have full access
     if context.is_admin():
-        return AccessLevel.ADMIN
+        return AccessLevel.WRITE
 
     # Owner has full control
     if context.is_owner():
-        return AccessLevel.OWNER
+        return AccessLevel.WRITE
 
     # Direct share permissions
     if context.has_direct_share():

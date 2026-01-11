@@ -13,9 +13,9 @@ from dtos.common_dto import ListResponseDTO
 from querys.collection_query import CollectionFindQuery
 from services.impl.collection.collection_service_impl import collection_service
 from utils.permission_decorators import (
-    require_collection_manage,
     require_collection_write,
     require_collection_read,
+    require_owner,
 )
 
 bp_collections = Blueprint(
@@ -68,9 +68,7 @@ def update(collection_id: UUID):
 
 @bp_collections.delete("/<uuid:collection_id>")
 @swag_from("../docs/collections/delete.yaml")
-@require_collection_manage()
+@require_owner("collection", "collection_id")
 def delete(collection_id: UUID):
     collection_service.delete(str(collection_id))
     return "", HTTPStatus.NO_CONTENT
-
-

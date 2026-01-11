@@ -28,11 +28,6 @@ class WritePermissionDenied(InsufficientPermissionException):
         super().__init__(resource_type, resource_id, "write")
 
 
-class ManagePermissionDenied(InsufficientPermissionException):
-    def __init__(self, resource_type: str = "resource", resource_id: str = ""):
-        super().__init__(resource_type, resource_id, "manage")
-
-
 class ResourceNotFoundException(PermissionException):
     def __init__(self, resource_type: str = "resource", resource_id: str = ""):
         self.resource_type = resource_type

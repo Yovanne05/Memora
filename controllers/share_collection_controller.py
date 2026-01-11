@@ -14,7 +14,10 @@ from querys.collection_share_query import CollectionShareFindQuery
 from services.impl.collection.collection_share_service_impl import (
     collection_share_service,
 )
-from utils.permission_decorators import require_collection_manage, require_collection_read
+from utils.permission_decorators import (
+    require_collection_read,
+    require_collection_write,
+)
 
 bp_collection_shares = Blueprint(
     "collection_shares",
@@ -44,7 +47,7 @@ def find_many(collection_id: UUID):
 @bp_collection_shares.post("")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_create.yaml")
-@require_collection_manage()
+@require_collection_write()
 def create(collection_id: UUID):
     payload = CollectionShareCreateDTO.model_validate_json(request.data)
     share_dto = collection_share_service.share_collection(
@@ -56,7 +59,7 @@ def create(collection_id: UUID):
 @bp_collection_shares.patch("/<uuid:user_id>")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_update.yaml")
-@require_collection_manage()
+@require_collection_write()
 def update(collection_id: UUID, user_id: UUID):
     payload = CollectionShareUpdateDTO.model_validate_json(request.data)
     share_dto = collection_share_service.update_share(
@@ -68,7 +71,7 @@ def update(collection_id: UUID, user_id: UUID):
 @bp_collection_shares.delete("/<uuid:user_id>")
 @jwt_required()
 @swag_from("../docs/shares_collections/share_delete.yaml")
-@require_collection_manage()
+@require_collection_write()
 def delete(collection_id: UUID, user_id: UUID):
     collection_share_service.revoke_share(str(collection_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT

@@ -61,7 +61,7 @@ class CollectionShareService(CollectionShareServiceInterface):
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
-        self._ensure_can_manage_collection(collection_id, current_user)
+        self._ensure_can_write_collection(collection_id, current_user)
 
         user_entity = user_repository.find_one(share_dto.user_id)
         ensure_user_exists(user_entity)
@@ -93,7 +93,7 @@ class CollectionShareService(CollectionShareServiceInterface):
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
-        self._ensure_can_manage_collection(collection_id, current_user)
+        self._ensure_can_write_collection(collection_id, current_user)
 
         share_entity = collection_share_repository.find_one(
             collection_id, user_id
@@ -111,14 +111,14 @@ class CollectionShareService(CollectionShareServiceInterface):
         collection_entity = collection_repository.find_one_unscoped(collection_id)
         ensure_collection_exists(collection_entity)
 
-        self._ensure_can_manage_collection(collection_id, current_user)
+        self._ensure_can_write_collection(collection_id, current_user)
 
         deleted = collection_share_repository.delete(collection_id, user_id)
         if not deleted:
             raise CollectionShareNotFound()
 
-    def _ensure_can_manage_collection(self, collection_id: str, user) -> None:
-        if not permission_domain_service.can_manage_collection(
+    def _ensure_can_write_collection(self, collection_id: str, user) -> None:
+        if not permission_domain_service.can_write_collection(
             collection_id, user.id, user.role
         ):
             raise CollectionSharePermissionDenied()

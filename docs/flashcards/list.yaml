@@ -4,7 +4,7 @@ summary: Lister les flashcards
 description: >
   Retourne les flashcards accessibles par l'utilisateur selon ses permissions sur les notes.
   
-  **Permissions requises:** READ, WRITE ou OWNER sur la note pour voir ses flashcards.
+  **Permissions requises:** READ ou WRITE sur la note pour voir ses flashcards.
 parameters:
   - in: query
     name: note_id

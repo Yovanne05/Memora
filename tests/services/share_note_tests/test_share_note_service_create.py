@@ -62,7 +62,7 @@ class TestNoteShareServiceCreate:
         share.user = target_user  # Attach the user relation
         mock_note_share_repository.add.return_value = share
 
-        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
+        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_write_note", lambda *args: True)
 
         payload = NoteShareCreateDTO(user_id=user_id, permission=SharePermissionEnum.READ)
 

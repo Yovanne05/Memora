@@ -6,7 +6,7 @@ definitions:
 
       **Propriétaires multiples:** Une note peut avoir plusieurs propriétaires :
       - Le créateur original de la note
-      - Tous les utilisateurs ayant reçu la permission OWNER via NoteShare
+      - Tous les utilisateurs ayant reçu la permission WRITE via NoteShare
 
       Tous les propriétaires ont exactement les mêmes droits et sont indistinguables.
     properties:
@@ -23,7 +23,7 @@ definitions:
         type: array
         description: >
           Liste de tous les propriétaires de la note.
-          Inclut le créateur original ET tous les utilisateurs avec permission OWNER.
+          Inclut le créateur original ET tous les utilisateurs avec permission WRITE.
         items:
           $ref: "#/definitions/Owner"
         example:
@@ -182,7 +182,7 @@ definitions:
         $ref: "#/definitions/User"
       permission:
         type: string
-        enum: ["read", "write", "owner"]
+        enum: ["read", "write"]
         description: Niveau d'accès partagé.
       created_at:
         type: string
@@ -200,7 +200,7 @@ definitions:
         description: Identifiant de l'utilisateur cible.
       permission:
         type: string
-        enum: ["read", "write", "owner"]
+        enum: ["read", "write"]
         description: Niveau d'accès souhaité.
 
   NoteShareUpdatePayload:
@@ -209,7 +209,7 @@ definitions:
     properties:
       permission:
         type: string
-        enum: ["read", "write", "owner"]
+        enum: ["read", "write"]
         description: Nouveau niveau d'accès.
 
   NoteShareListResponse:
@@ -241,7 +241,7 @@ definitions:
         description: Identifiant de la note partagée.
       permission:
         type: string
-        enum: ["read", "write", "owner"]
+        enum: ["read", "write"]
         description: Niveau d'accès accordé via ce lien.
       created_at:
         type: string
@@ -254,7 +254,7 @@ definitions:
     properties:
       permission:
         type: string
-        enum: ["read", "write", "owner"]
+        enum: ["read", "write"]
         default: "read"
         description: Niveau d'accès à accorder via le lien.
 

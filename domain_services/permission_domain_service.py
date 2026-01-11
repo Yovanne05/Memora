@@ -22,7 +22,7 @@ class PermissionDomainService:
                 resource_id=note_id,
                 resource_type="note",
                 user_id=user_id,
-                access_level=AccessLevel.ADMIN,
+                access_level=AccessLevel.WRITE,
             )
 
         with get_db_session() as session:
@@ -54,7 +54,7 @@ class PermissionDomainService:
                 resource_id=collection_id,
                 resource_type="collection",
                 user_id=user_id,
-                access_level=AccessLevel.ADMIN,
+                access_level=AccessLevel.WRITE,
             )
 
         with get_db_session() as session:
@@ -112,12 +112,6 @@ class PermissionDomainService:
         permission = self.get_note_permission(note_id, user_id, user_role)
         return permission.can_write()
 
-    def can_manage_note(
-        self, note_id: str, user_id: str, user_role: RoleEnum
-    ) -> bool:
-        permission = self.get_note_permission(note_id, user_id, user_role)
-        return permission.can_manage()
-
     def can_read_collection(
         self, collection_id: str, user_id: str, user_role: RoleEnum
     ) -> bool:
@@ -129,12 +123,6 @@ class PermissionDomainService:
     ) -> bool:
         permission = self.get_collection_permission(collection_id, user_id, user_role)
         return permission.can_write()
-
-    def can_manage_collection(
-        self, collection_id: str, user_id: str, user_role: RoleEnum
-    ) -> bool:
-        permission = self.get_collection_permission(collection_id, user_id, user_role)
-        return permission.can_manage()
 
     def can_read_flashcard(
         self, note_id: str, user_id: str, user_role: RoleEnum

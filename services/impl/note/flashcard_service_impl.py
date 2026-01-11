@@ -77,7 +77,7 @@ class FlashcardService(FlashcardServiceInterface):
         if not flashcard:
             raise FlashcardNotFound()
 
-        self._ensure_can_manage_note(flashcard.note_id, user)
+        self._ensure_can_write_note(flashcard.note_id, user)
 
         flashcard_repository.delete(flashcard_id)
 
@@ -107,12 +107,6 @@ class FlashcardService(FlashcardServiceInterface):
             note_id, user.id, user.role
         ):
             raise exc()
-
-    def _ensure_can_manage_note(self, note_id: str, user) -> None:
-        if not permission_domain_service.can_manage_note(
-            note_id, user.id, user.role
-        ):
-            raise FlashcardNotFound()
 
     @staticmethod
     def _validate_answers(answers: list[FlashcardAnswerCreateDTO]) -> None:

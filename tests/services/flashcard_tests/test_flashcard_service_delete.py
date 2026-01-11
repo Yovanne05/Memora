@@ -50,7 +50,7 @@ class TestFlashcardServiceDelete:
         mock_flashcard_repository.find_one_unscoped.return_value = flashcard
         mock_flashcard_repository.delete.return_value = None
 
-        monkeypatch.setattr("services.impl.note.flashcard_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
+        monkeypatch.setattr("services.impl.note.flashcard_service_impl.permission_domain_service.can_write_note", lambda *args: True)
 
         # Act
         flashcard_service.delete(flashcard_id)

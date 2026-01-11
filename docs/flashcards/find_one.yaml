@@ -4,7 +4,7 @@ summary: Obtenir une flashcard
 description: >
   Récupère les détails d'une flashcard spécifique.
   
-  **Permissions requises:** READ, WRITE ou OWNER sur la note parente.
+  **Permissions requises:** READ ou WRITE sur la note parente.
 parameters:
   - in: path
     name: flashcard_id

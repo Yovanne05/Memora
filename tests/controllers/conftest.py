@@ -176,10 +176,8 @@ def authenticated_client(app_client, mock_current_user, monkeypatch):
     mock_permission = Mock()
     mock_permission.can_read_note.return_value = True
     mock_permission.can_write_note.return_value = True
-    mock_permission.can_manage_note.return_value = True
     mock_permission.can_read_collection.return_value = True
     mock_permission.can_write_collection.return_value = True
-    mock_permission.can_manage_collection.return_value = True
     monkeypatch.setattr("utils.permission_decorators.permission_domain_service", mock_permission)
 
     # Créer un token JWT valide pour les tests

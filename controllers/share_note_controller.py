@@ -9,7 +9,7 @@ from dtos.note_share_dto import NoteShareCreateDTO, NoteShareUpdateDTO
 from dtos.common_dto import ListResponseDTO
 from querys.note_share_query import NoteShareFindQuery
 from services.impl.note.note_share_service_impl import note_share_service
-from utils.permission_decorators import require_note_manage
+from utils.permission_decorators import require_note_write
 
 bp_note_shares = Blueprint(
     "note_shares", __name__, url_prefix="/notes/<uuid:note_id>/shares"
@@ -36,7 +36,7 @@ def find_many(note_id: UUID):
 @bp_note_shares.post("")
 @jwt_required()
 @swag_from("../docs/share_notes/share_create.yaml")
-@require_note_manage()
+@require_note_write()
 def create(note_id: UUID):
     payload = NoteShareCreateDTO.model_validate_json(request.data)
     share_dto = note_share_service.share_note(str(note_id), payload)
@@ -46,7 +46,7 @@ def create(note_id: UUID):
 @bp_note_shares.patch("/<uuid:user_id>")
 @jwt_required()
 @swag_from("../docs/share_notes/share_update.yaml")
-@require_note_manage()
+@require_note_write()
 def update(note_id: UUID, user_id: UUID):
     payload = NoteShareUpdateDTO.model_validate_json(request.data)
     share_dto = note_share_service.update_share(
@@ -58,7 +58,7 @@ def update(note_id: UUID, user_id: UUID):
 @bp_note_shares.delete("/<uuid:user_id>")
 @jwt_required()
 @swag_from("../docs/share_notes/share_delete.yaml")
-@require_note_manage()
+@require_note_write()
 def delete(note_id: UUID, user_id: UUID):
     note_share_service.revoke_share(str(note_id), str(user_id))
     return "", HTTPStatus.NO_CONTENT

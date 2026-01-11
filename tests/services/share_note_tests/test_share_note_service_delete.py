@@ -48,7 +48,7 @@ class TestNoteShareServiceRevoke:
 
         mock_note_share_repository.delete.return_value = True
 
-        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
+        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_write_note", lambda *args: True)
 
         # Act
         note_share_service.revoke_share(note_id, user_id)
@@ -84,7 +84,7 @@ class TestNoteShareServiceRevoke:
 
         mock_note_share_repository.delete.return_value = False
 
-        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
+        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_write_note", lambda *args: True)
 
         # Act & Assert
         with pytest.raises(NoteShareNotFound):

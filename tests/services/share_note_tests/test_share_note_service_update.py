@@ -60,7 +60,7 @@ class TestNoteShareServiceUpdate:
         mock_note_share_repository.find_one.return_value = share
         mock_note_share_repository.update.return_value = share
 
-        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_manage_note", lambda *args: True)
+        monkeypatch.setattr("services.impl.note.note_share_service_impl.permission_domain_service.can_write_note", lambda *args: True)
 
         payload = NoteShareUpdateDTO(permission=SharePermissionEnum.WRITE)
 
