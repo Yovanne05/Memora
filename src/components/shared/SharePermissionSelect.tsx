@@ -23,7 +23,6 @@ interface SharePermissionSelectProps {
 const PERMISSIONS = [
   { value: 'read' as const, label: 'Peut voir' },
   { value: 'write' as const, label: 'Peut modifier' },
-  { value: 'owner' as const, label: 'Accès complet' },
 ]
 
 export function SharePermissionSelect({

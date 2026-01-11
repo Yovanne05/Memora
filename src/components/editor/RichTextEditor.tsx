@@ -49,6 +49,7 @@ export function RichTextEditor({
     <div
       className={cn(
         'w-full max-w-full overflow-hidden rounded-lg border border-border',
+        !editable && 'bg-muted/50',
         className
       )}
     >
@@ -64,7 +65,13 @@ export function RichTextEditor({
           onReconnect={collaboration.reconnect}
         />
       )}
-      <EditorContent editor={editor} className="min-h-[800px]" />
+      <EditorContent
+        editor={editor}
+        className={cn(
+          'min-h-[800px]',
+          !editable && 'cursor-not-allowed opacity-60'
+        )}
+      />
     </div>
   )
 }
