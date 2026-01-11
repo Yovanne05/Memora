@@ -64,7 +64,7 @@ export function RichTextEditor({
           onReconnect={collaboration.reconnect}
         />
       )}
-      <EditorContent editor={editor} className="min-h-[400px]" />
+      <EditorContent editor={editor} className="min-h-[800px]" />
     </div>
   )
 }
