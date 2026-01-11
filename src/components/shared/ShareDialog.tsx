@@ -46,7 +46,7 @@ export function ShareDialog({
   const { usersById } = useUsersByIds(missingUserIds)
   const sharesWithUsers = shares.map((share) => {
     const user = share.user ?? usersById.get(share.userId)
-    const userLabel = user?.username || share.userId
+    const userLabel = user?.username ?? share.userId
     return { ...share, userLabel }
   })
 

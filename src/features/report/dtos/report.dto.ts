@@ -9,7 +9,7 @@ export const ReportDtoSchema = z.object({
   status: z.string(),
   description: z.string().nullable().optional(),
   reporter_id: z.uuid(),
-  reporter_email: z.string().email().nullable().optional(),
+  reporter_email: z.email().nullable().optional(),
   note_title: z.string().nullable().optional(),
   collection_name: z.string().nullable().optional(),
   created_at: z.iso.datetime(),

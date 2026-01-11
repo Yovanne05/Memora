@@ -29,9 +29,9 @@ export function CreateCollectionDialog({
       const newCollection = await createMutation.mutateAsync({
         ownerId: user.id,
         name: values.name,
-        description: values.description || null,
+        description: values.description ?? null,
         visibility: values.visibility,
-        tags: values.tags || [],
+        tags: values.tags ?? [],
       })
 
       onOpenChange(false)

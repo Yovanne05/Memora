@@ -59,7 +59,7 @@ export function createNoteImagesService(): INoteImagesService {
         }
 
         const data = await response.json()
-        const dto = noteImageDtoSchema.parse(data) as NoteImageDto
+        const dto = noteImageDtoSchema.parse(data)
 
         const normalizedDto: NoteImageDto = {
           ...dto,

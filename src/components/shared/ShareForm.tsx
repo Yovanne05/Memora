@@ -1,17 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { UserSearchCombobox } from "./UserSearchCombobox";
-import { SharePermissionSelect } from "./SharePermissionSelect";
-import type { User } from "@/features/users/models/user.model";
-import type { SharePermission } from "@/features/notes/dtos/note-share.dto";
+import { Button } from '@/components/ui/button'
+import { UserSearchCombobox } from './UserSearchCombobox'
+import { SharePermissionSelect } from './SharePermissionSelect'
+import type { User } from '@/features/users/models/user.model'
+import type { SharePermission } from '@/features/notes/dtos/note-share.dto'
 
 interface ShareFormProps {
-  selectedUser: User | null;
-  permission: SharePermission;
-  excludedUserIds: string[];
-  isLoading: boolean;
-  onUserChange: (user: User | null) => void;
-  onPermissionChange: (permission: SharePermission) => void;
-  onSubmit: () => void;
+  selectedUser: User | null
+  permission: SharePermission
+  excludedUserIds: string[]
+  isLoading: boolean
+  onUserChange: (user: User | null) => void
+  onPermissionChange: (permission: SharePermission) => void
+  onSubmit: () => void
 }
 
 export function ShareForm({
@@ -22,7 +22,7 @@ export function ShareForm({
   onUserChange,
   onPermissionChange,
   onSubmit,
-}: ShareFormProps) {
+}: Readonly<ShareFormProps>) {
   return (
     <div className="flex gap-2">
       <UserSearchCombobox
@@ -36,9 +36,13 @@ export function ShareForm({
         onChange={onPermissionChange}
         disabled={isLoading}
       />
-      <Button onClick={onSubmit} disabled={!selectedUser || isLoading} size="sm">
+      <Button
+        onClick={onSubmit}
+        disabled={!selectedUser || isLoading}
+        size="sm"
+      >
         Add
       </Button>
     </div>
-  );
+  )
 }

@@ -1,14 +1,14 @@
-import { useMemo } from "react"
-import { useNotesQuery } from "@/features/notes/hooks/useNotesQuery"
-import type { NotesFilters } from "@/features/notes/types/note-query"
-import { useWorkspaceContext } from "../context"
-import { useWorkspaceAccessScope } from "./useWorkspaceAccessScope"
+import { useMemo } from 'react'
+import { useNotesQuery } from '@/features/notes/hooks/useNotesQuery'
+import type { NotesFilters } from '@/features/notes/types/note-query'
+import { useWorkspaceContext } from '../context'
+import { useWorkspaceAccessScope } from './useWorkspaceAccessScope'
 
 const SORT_MAP = {
-  recent: { sortBy: "updated_at" as const, sortDir: "desc" as const },
-  oldest: { sortBy: "updated_at" as const, sortDir: "asc" as const },
-  "title-asc": { sortBy: "title" as const, sortDir: "asc" as const },
-  "title-desc": { sortBy: "title" as const, sortDir: "desc" as const },
+  recent: { sortBy: 'updated_at' as const, sortDir: 'desc' as const },
+  oldest: { sortBy: 'updated_at' as const, sortDir: 'asc' as const },
+  'title-asc': { sortBy: 'title' as const, sortDir: 'asc' as const },
+  'title-desc': { sortBy: 'title' as const, sortDir: 'desc' as const },
 }
 const FETCH_LIMIT = 200
 
@@ -68,7 +68,7 @@ export function useWorkspaceNotes(options: UseWorkspaceNotesOptions = {}) {
 
   return {
     notes: pagedNotes,
-    total: userId ? scopedNotes.length : notesQuery.data?.total || 0,
+    total: userId ? scopedNotes.length : (notesQuery.data?.total ?? 0),
     offset: state.page * state.limit,
     limit: state.limit,
     isLoading: notesQuery.isLoading || isAccessLoading,

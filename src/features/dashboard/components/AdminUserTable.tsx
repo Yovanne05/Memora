@@ -51,7 +51,7 @@ function UserRow({ user }: { user: User }) {
       <td className="px-3 py-3 text-right">
         <DeleteUserDialog
           userId={user.id}
-          userLabel={user.username || user.email}
+          userLabel={user.username ?? user.email}
         />
       </td>
     </tr>

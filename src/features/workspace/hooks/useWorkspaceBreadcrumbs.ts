@@ -19,8 +19,8 @@ export function useWorkspaceBreadcrumbs({
   selectedNoteId,
   mode = 'default',
 }: UseWorkspaceBreadcrumbsArgs) {
-  const collectionQuery = useCollectionQuery(selectedCollectionId || '')
-  const noteQuery = useNoteQuery(selectedNoteId || '')
+  const collectionQuery = useCollectionQuery(selectedCollectionId ?? '')
+  const noteQuery = useNoteQuery(selectedNoteId ?? '')
 
   return useMemo<BreadcrumbItem[]>(() => {
     const base =
@@ -40,7 +40,7 @@ export function useWorkspaceBreadcrumbs({
 
     if (selectedNoteId && noteQuery.data) {
       items.push({
-        label: noteQuery.data.title || 'Sans titre',
+        label: noteQuery.data.title ?? 'Sans titre',
       })
     }
 

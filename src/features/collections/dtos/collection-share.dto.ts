@@ -5,16 +5,16 @@ export const SharePermissionSchema = z.enum(['read', 'write', 'owner'])
 export type SharePermission = z.infer<typeof SharePermissionSchema>
 
 export const CollectionShareDtoSchema = z.object({
-  collection_id: z.string().uuid(),
+  collection_id: z.uuid(),
   user: userDtoSchema,
   permission: SharePermissionSchema,
-  created_at: z.string().datetime(),
+  created_at: z.iso.datetime(),
 })
 
 export type CollectionShareDto = z.infer<typeof CollectionShareDtoSchema>
 
 export const CollectionShareCreateDtoSchema = z.object({
-  user_id: z.string().uuid(),
+  user_id: z.uuid(),
   permission: SharePermissionSchema.default('read'),
 })
 

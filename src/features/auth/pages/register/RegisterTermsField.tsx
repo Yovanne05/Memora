@@ -18,7 +18,7 @@ interface RegisterTermsFieldProps {
 export function RegisterTermsField({
   control,
   errors,
-}: RegisterTermsFieldProps) {
+}: Readonly<RegisterTermsFieldProps>) {
   const [termsDialogOpen, setTermsDialogOpen] = useState(false)
 
   return (

@@ -13,7 +13,7 @@ export function getContextualErrorMessage(
   const { operation, resource, fallback } = context
 
   if (!(error instanceof ApiError)) {
-    return fallback || 'Une erreur est survenue'
+    return fallback ?? 'Une erreur est survenue'
   }
 
   const status = error.status
@@ -38,7 +38,7 @@ export function getContextualErrorMessage(
     case 503:
       return 'Le serveur rencontre des difficultés. Veuillez réessayer plus tard'
     default:
-      return fallback || 'Une erreur est survenue'
+      return fallback ?? 'Une erreur est survenue'
   }
 }
 

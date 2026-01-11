@@ -26,7 +26,7 @@ export function useReportSubmit({
     try {
       const payload = {
         reason: values.reason,
-        description: values.description?.trim() || undefined,
+        description: values.description?.trim() ?? undefined,
       }
 
       if (targetType === 'note') {

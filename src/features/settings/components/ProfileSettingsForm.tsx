@@ -10,7 +10,7 @@ import type { User } from '@/features/users/models/user.model'
 import { useUpdateUserMutation } from '@/features/users/hooks/useUserMutation'
 
 const profileFormSchema = z.object({
-  email: z.string().email('Email invalide'),
+  email: z.email('Email invalide'),
   username: z
     .string()
     .min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères")
@@ -25,7 +25,9 @@ interface ProfileSettingsFormProps {
   user: User
 }
 
-export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
+export function ProfileSettingsForm({
+  user,
+}: Readonly<ProfileSettingsFormProps>) {
   const updateMutation = useUpdateUserMutation(user.id)
 
   const {
@@ -36,7 +38,7 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       email: user.email,
-      username: user.username || '',
+      username: user.username ?? '',
     },
   })
 
@@ -44,7 +46,7 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
     try {
       await updateMutation.mutateAsync({
         email: data.email,
-        username: data.username || null,
+        username: data.username ?? null,
       })
       toast.success('Profil mis à jour avec succès')
     } catch (error) {

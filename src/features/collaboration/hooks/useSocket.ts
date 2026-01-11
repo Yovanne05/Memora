@@ -99,7 +99,7 @@ export function useSocket(options: UseSocketOptions): UseSocketReturn {
     })
     isDisconnectingRef.current = false
 
-    const apiUrl = config.apiUrl || 'http://localhost:5000'
+    const apiUrl = config.apiUrl ?? 'http://localhost:5000'
     const baseUrl = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl
     const socketUrl = `${baseUrl}${SOCKET_PATH}`
 

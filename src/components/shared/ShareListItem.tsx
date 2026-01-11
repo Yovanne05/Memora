@@ -17,7 +17,7 @@ export function ShareListItem({
   permission,
   onUpdatePermission,
   onRemove,
-}: ShareListItemProps) {
+}: Readonly<ShareListItemProps>) {
   const label = userLabel ?? userId
 
   return (

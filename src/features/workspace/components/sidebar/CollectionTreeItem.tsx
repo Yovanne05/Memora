@@ -30,7 +30,7 @@ export function CollectionTreeItem({
   onToggle,
   onSelect,
   mode = 'default',
-}: CollectionTreeItemProps) {
+}: Readonly<CollectionTreeItemProps>) {
   const { navigateToNote } = useWorkspaceNavigation(mode)
   const toggleFavorite = useToggleCollectionFavoriteMutation()
   const [reportDialogOpen, setReportDialogOpen] = useState(false)

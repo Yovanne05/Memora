@@ -16,7 +16,7 @@ export function NoteShareDialog({
   open,
   onOpenChange,
   trigger,
-}: NoteShareDialogProps) {
+}: Readonly<NoteShareDialogProps>) {
   const { user } = useAuth()
   const { shares, isLoading, addShare, updateShare, removeShare } =
     useNoteSharing(noteId)

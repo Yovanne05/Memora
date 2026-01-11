@@ -30,11 +30,9 @@ export const ReportTableRow = memo(function ReportTableRow({
         </Badge>
       </td>
       <td className="px-3 py-3 font-medium">
-        {report.noteTitle || report.collectionName || 'Sans titre'}
+        {report.noteTitle ?? report.collectionName ?? 'Sans titre'}
       </td>
-      <td className="px-3 py-3">
-        {report.reporterEmail || report.reporterId}
-      </td>
+      <td className="px-3 py-3">{report.reporterEmail ?? report.reporterId}</td>
       <td className="px-3 py-3">{formatReason(report.reason)}</td>
       <td className="px-3 py-3">
         <ReportStatusSelect report={report} />

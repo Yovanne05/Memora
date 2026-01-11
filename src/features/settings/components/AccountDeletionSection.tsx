@@ -15,7 +15,9 @@ interface AccountDeletionSectionProps {
   user: User
 }
 
-export function AccountDeletionSection({ user }: AccountDeletionSectionProps) {
+export function AccountDeletionSection({
+  user,
+}: Readonly<AccountDeletionSectionProps>) {
   const [confirmText, setConfirmText] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const deleteMutation = useDeleteUserMutation()
@@ -31,7 +33,7 @@ export function AccountDeletionSection({ user }: AccountDeletionSectionProps) {
       await deleteMutation.mutateAsync(user.id)
       toast.success('Votre compte a été supprimé')
       logout()
-      window.location.href = '/auth/login'
+      globalThis.window.location.href = '/auth/login'
     } catch (error) {
       const message = getContextualErrorMessage(error, {
         operation: 'delete',

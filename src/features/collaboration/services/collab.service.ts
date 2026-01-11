@@ -18,7 +18,7 @@ export function createCollabService(
         '/collaboration/sessions',
         { note_id: noteId }
       )
-      return collabSessionDtoSchema.parse(dto) as CollabSessionDto
+      return collabSessionDtoSchema.parse(dto)
     },
   }
 }

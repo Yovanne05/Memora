@@ -24,7 +24,7 @@ export function TermsOfServiceDialog({
   trigger,
   open,
   onOpenChange,
-}: TermsOfServiceDialogProps) {
+}: Readonly<TermsOfServiceDialogProps>) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}

@@ -88,7 +88,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const rateLimiter = getRateLimiter()
     await rateLimiter.waitForSlot()
 
-    const requestConfig = await applyInterceptors(init || {})
+    const requestConfig = await applyInterceptors(init ?? {})
     const response = await requestWithTimeout(
       fetch(`${config.apiUrl}${path}`, requestConfig),
       DEFAULT_TIMEOUT
@@ -120,7 +120,7 @@ async function requestWithRetry<T>(
   try {
     return await request<T>(path, init)
   } catch (error) {
-    const method = init?.method || 'GET'
+    const method = init?.method ?? 'GET'
 
     if (retries > 0 && isRetryable(error, method, retries)) {
       const backoffDelay = getRetryDelay(

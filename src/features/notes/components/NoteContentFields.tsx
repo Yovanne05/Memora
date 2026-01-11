@@ -84,7 +84,7 @@ export function NoteContentFields({
               <FormLabel className="sr-only">Contenu</FormLabel>
               <FormControl>
                 <RichTextEditor
-                  content={field.value || ''}
+                  content={field.value ?? ''}
                   onChange={field.onChange}
                   placeholder="Commencez à rédiger votre note..."
                   editable={!disabled}

@@ -14,7 +14,7 @@ export function ShareList({
   shares,
   onUpdatePermission,
   onRemove,
-}: ShareListProps) {
+}: Readonly<ShareListProps>) {
   if (shares.length === 0) {
     return (
       <ScrollArea className="h-[300px]">

@@ -11,7 +11,7 @@ interface AllNotesDroppableProps {
 export function AllNotesDroppable({
   isActive,
   onClick,
-}: AllNotesDroppableProps) {
+}: Readonly<AllNotesDroppableProps>) {
   const dropData: DroppableCollectionData = {
     collectionId: null,
     collectionName: null,

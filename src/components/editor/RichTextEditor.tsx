@@ -35,7 +35,7 @@ export function RichTextEditor({
 
   const collaboration = useCollaborativeEditorCRDT({
     editor,
-    noteId: noteId || '',
+    noteId: noteId ?? '',
     enabled: enableCollaboration && !!noteId,
     content,
     onContentChanged: onChange,

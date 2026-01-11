@@ -7,16 +7,15 @@ import {
   type ErrorContext,
 } from '@/lib/error-context'
 
+type QueryClient = ReturnType<typeof useQueryClient>
+
 export interface ResourceMutationConfig<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>
   queryKey: readonly unknown[]
   successMessage?: string
   errorContext?: ErrorContext
   onSuccessInvalidate?: readonly (readonly unknown[])[]
-  onSuccessUpdate?: (
-    data: TData,
-    queryClient: ReturnType<typeof useQueryClient>
-  ) => void
+  onSuccessUpdate?: (data: TData, queryClient: QueryClient) => void
 }
 
 /**

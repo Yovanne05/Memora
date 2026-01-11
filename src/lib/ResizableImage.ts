@@ -45,7 +45,7 @@ export const ResizableImage = Image.extend({
       width: {
         default: null,
         parseHTML: (element) => {
-          const width = element.getAttribute('width') || element.style.width
+          const width = element.getAttribute('width') ?? element.style.width
           return width ? Number.parseInt(width) : null
         },
         renderHTML: (attributes) => {
@@ -61,7 +61,7 @@ export const ResizableImage = Image.extend({
       height: {
         default: null,
         parseHTML: (element) => {
-          const height = element.getAttribute('height') || element.style.height
+          const height = element.getAttribute('height') ?? element.style.height
           if (!height) return null
           if (height === 'auto') return 'auto'
           return Number.parseInt(height)

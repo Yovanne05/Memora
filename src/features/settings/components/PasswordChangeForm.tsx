@@ -16,7 +16,7 @@ const passwordFormSchema = z
       .min(12, 'Le mot de passe doit contenir au moins 12 caractères')
       .regex(/[A-Z]/, 'Le mot de passe doit contenir au moins une majuscule')
       .regex(/[a-z]/, 'Le mot de passe doit contenir au moins une minuscule')
-      .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre')
+      .regex(/\d/, 'Le mot de passe doit contenir au moins un chiffre')
       .regex(
         /[^A-Za-z0-9]/,
         'Le mot de passe doit contenir au moins un caractère spécial'
@@ -34,7 +34,9 @@ interface PasswordChangeFormProps {
   user: User
 }
 
-export function PasswordChangeForm({ user }: PasswordChangeFormProps) {
+export function PasswordChangeForm({
+  user,
+}: Readonly<PasswordChangeFormProps>) {
   const updateMutation = useUpdateUserMutation(user.id)
 
   const {

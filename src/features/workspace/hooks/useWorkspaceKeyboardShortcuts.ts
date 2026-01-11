@@ -54,7 +54,7 @@ export function useWorkspaceKeyboardShortcuts() {
         return
       }
 
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const isMac = navigator.userAgent.toUpperCase().includes('MAC')
       const modifier = getModifierKey(isMac, e)
 
       if (modifier && e.key === 'n' && !e.shiftKey) {
