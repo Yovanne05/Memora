@@ -28,3 +28,21 @@ export function useRemoveNoteFavoriteMutation() {
     },
   })
 }
+
+export function useToggleNoteFavoriteMutation() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ noteId, next }: { noteId: string; next: boolean }) => {
+      if (next) {
+        await notesService.addFavorite(noteId)
+      } else {
+        await notesService.removeFavorite(noteId)
+      }
+    },
+    onSettled: async () => {
+      await qc.invalidateQueries({ queryKey: ['notes'] })
+      await qc.invalidateQueries({ queryKey: ['note'] })
+    },
+  })
+}

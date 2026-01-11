@@ -28,3 +28,27 @@ export function useRemoveCollectionFavoriteMutation() {
     },
   })
 }
+
+export function useToggleCollectionFavoriteMutation() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      collectionId,
+      next,
+    }: {
+      collectionId: string
+      next: boolean
+    }) => {
+      if (next) {
+        await collectionsService.addFavorite(collectionId)
+      } else {
+        await collectionsService.removeFavorite(collectionId)
+      }
+    },
+    onSettled: async () => {
+      await qc.invalidateQueries({ queryKey: ['collections'] })
+      await qc.invalidateQueries({ queryKey: ['collection'] })
+    },
+  })
+}

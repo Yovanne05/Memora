@@ -37,3 +37,31 @@ export function useRemoveCollectionFavoriteMutation() {
     },
   })
 }
+
+export function useToggleCollectionFavoriteMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      collectionId,
+      next,
+    }: {
+      collectionId: string
+      next: boolean
+    }) => {
+      if (next) {
+        await collectionsService.addFavorite(collectionId)
+      } else {
+        await collectionsService.removeFavorite(collectionId)
+      }
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: COLLECTIONS_QUERY_KEYS.lists(),
+      })
+      await queryClient.invalidateQueries({
+        queryKey: COLLECTIONS_QUERY_KEYS.all,
+      })
+    },
+  })
+}
