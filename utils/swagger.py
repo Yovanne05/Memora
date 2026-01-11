@@ -6,7 +6,7 @@ import config
 
 
 def load_definitions(defs_dir: Path) -> dict:
-    merged = {"definitions": {}, "parameters": {}}
+    merged = {"definitions": {}, "parameters": {}, "paths": {}}
 
     for path in defs_dir.glob("*.yaml"):
         with path.open(encoding="utf-8") as f:
@@ -17,6 +17,9 @@ def load_definitions(defs_dir: Path) -> dict:
 
         if "parameters" in data:
             merged["parameters"].update(data["parameters"])
+
+        if "paths" in data:
+            merged["paths"].update(data["paths"])
 
     return merged
 
@@ -47,8 +50,7 @@ def init_swagger(app, *, title: str = "MEMORA", version: str = "1.0.0", base_pat
             {"name": "shared-collections"},
             {"name": "flashcards"},
             {"name": "reviews"},
-            {"name": "reports"},
-            {"name": "collab"},
+            {"name": "reports"}
         ],
         "securityDefinitions": {
             "bearerAuth": {

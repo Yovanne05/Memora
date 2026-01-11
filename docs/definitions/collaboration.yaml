@@ -1,0 +1,160 @@
+definitions:
+  CollaborationJoin:
+    type: object
+    required: ["note_id"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note UUID to join.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+      content:
+        type: string
+        nullable: true
+        description: Initial document content (optional).
+        example: "Initial content"
+
+  CollaborationLeave:
+    type: object
+    required: ["note_id"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note UUID to leave.
+        example: "8e1b9a52-6564-4d60-9aa0-4b1052b73141"
+
+  CRDTUpdate:
+    type: object
+    required: ["note_id", "update"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note UUID to update.
+      update:
+        type: string
+        description: Base64-encoded CRDT update payload.
+        example: "AAECAwQF..."
+
+  CRDTSyncRequest:
+    type: object
+    required: ["note_id", "state_vector"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+        description: Note UUID to sync.
+      state_vector:
+        type: string
+        description: Base64-encoded CRDT state vector.
+        example: "AAECAwQF..."
+
+  CRDTSyncReply:
+    type: object
+    required: ["note_id", "state_vector", "update"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+      state_vector:
+        type: string
+        description: Base64-encoded CRDT state vector.
+      update:
+        type: string
+        description: Base64-encoded CRDT update payload.
+
+  Collaborator:
+    type: object
+    required: ["user_id", "username", "socket_id"]
+    properties:
+      user_id:
+        type: string
+        format: uuid
+      username:
+        type: string
+      socket_id:
+        type: string
+
+  CollaborationSession:
+    type: object
+    required: ["note_id", "collaborators", "active_users_count"]
+    properties:
+      note_id:
+        type: string
+        format: uuid
+      collaborators:
+        type: array
+        items:
+          $ref: "#/definitions/Collaborator"
+      active_users_count:
+        type: integer
+        format: int32
+
+  CollaborationEvent:
+    type: object
+    required: ["event_type", "user_id", "username", "note_id", "timestamp"]
+    properties:
+      event_type:
+        type: string
+        enum: ["user_joined", "user_left", "crdt_update"]
+      user_id:
+        type: string
+        format: uuid
+      username:
+        type: string
+      note_id:
+        type: string
+        format: uuid
+      crdt_update:
+        type: string
+        nullable: true
+        description: Base64-encoded CRDT update payload (for crdt_update events).
+      timestamp:
+        type: string
+        format: date-time
+
+paths:
+  /socket.io/:
+    get:
+      tags:
+        - collab
+      summary: Socket.IO handshake (collaboration)
+      description: |
+        Socket.IO endpoint for real-time collaboration using namespace `/collaboration`.
+
+        Provide JWT in the Socket.IO auth payload (`token` or `access_token`) or as an
+        `Authorization: Bearer <token>` header.
+
+        Client -> Server events:
+        - join_collaboration: #/definitions/CollaborationJoin
+        - leave_collaboration: #/definitions/CollaborationLeave
+        - crdt_update: #/definitions/CRDTUpdate
+        - crdt_sync_request: #/definitions/CRDTSyncRequest
+
+        Server -> Client events:
+        - collaboration_session: #/definitions/CollaborationSession
+        - collaboration_event: #/definitions/CollaborationEvent
+        - crdt_sync_reply: #/definitions/CRDTSyncReply
+      parameters:
+        - name: EIO
+          in: query
+          type: integer
+          required: false
+          description: Socket.IO protocol version (ex: 4).
+        - name: transport
+          in: query
+          type: string
+          required: false
+          enum: ["polling", "websocket"]
+          description: Socket.IO transport.
+        - name: sid
+          in: query
+          type: string
+          required: false
+          description: Socket.IO session id (after handshake).
+      responses:
+        101:
+          description: Switching Protocols (WebSocket).
+        401:
+          description: Unauthorized (missing or invalid token).
