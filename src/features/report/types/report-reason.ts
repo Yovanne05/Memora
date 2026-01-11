@@ -1,9 +1,10 @@
 export const REPORT_REASONS = {
   illegal_content: 'Contenu illégal',
-  spam: 'Spam ou publicité',
-  harassment: 'Harcèlement',
-  inappropriate: 'Contenu inapproprié',
-  copyright: "Violation de droits d'auteur",
+  shocking_or_inappropriate: 'Contenu choquant ou inapproprié',
+  harassment_or_abuse: 'Harcèlement ou abus',
+  rights_violation: 'Violation de droits',
+  spam_or_abuse: 'Spam ou abus',
+  technical_issue: 'Problème technique',
   other: 'Autre',
 } as const
 

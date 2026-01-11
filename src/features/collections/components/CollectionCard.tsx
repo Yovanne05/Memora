@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { FileText } from 'lucide-react'
 import { useRouter } from '@tanstack/react-router'
 
@@ -9,6 +9,7 @@ import { CollectionCardBadges } from './collection-card/CollectionCardBadges'
 import { CollectionCardFavoriteButton } from './collection-card/CollectionCardFavoriteButton'
 import { CollectionCardFooter } from './collection-card/CollectionCardFooter'
 import { useAuth } from '@/features/auth/hooks/useAuth'
+import { ReportDialog } from '@/features/report/components/ReportDialog'
 
 interface CollectionCardProps {
   readonly collection: Collection
@@ -21,6 +22,7 @@ interface CollectionCardProps {
   readonly selectionMode?: boolean
   readonly compact?: boolean
   readonly readOnly?: boolean
+  readonly showReportButton?: boolean
 }
 
 export const CollectionCard = memo(function CollectionCard({
@@ -34,9 +36,11 @@ export const CollectionCard = memo(function CollectionCard({
   selectionMode = false,
   compact = false,
   readOnly = false,
+  showReportButton = false,
 }: Readonly<CollectionCardProps>) {
   const router = useRouter()
   const { user } = useAuth()
+  const [reportDialogOpen, setReportDialogOpen] = useState(false)
   const favorite = collection.isFavorite === true
   const isOwner = Boolean(user && collection.ownerId === user.id)
   const canManage =
@@ -61,36 +65,51 @@ export const CollectionCard = memo(function CollectionCard({
     handleNavigate()
   }, [collection, handleNavigate, onCardClick])
 
+  const handleReport = useCallback(() => {
+    setReportDialogOpen(true)
+  }, [])
+
   const actions = buildCollectionCardActions({
     collection,
     onEdit: canWrite ? onEdit : undefined,
     onShare: canManage ? onShare : undefined,
     onDelete: canManage ? onDelete : undefined,
+    onReport: showReportButton ? handleReport : undefined,
   })
 
   return (
-    <ResourceCard
-      id={collection.id}
-      title={collection.name}
-      description={collection.description}
-      icon={FileText}
-      onClick={handleCardClick}
-      onToggleSelection={onToggleSelection}
-      actions={actions}
-      headerActions={
-        <CollectionCardFavoriteButton
-          collectionId={collection.id}
-          favorite={favorite}
-        />
-      }
-      isSelected={isSelected}
-      selectionMode={selectionMode}
-      compact={compact}
-      readOnly={readOnly}
-      badges={<CollectionCardBadges collection={collection} />}
-      footer={
-        <CollectionCardFooter collection={collection} compact={compact} />
-      }
-    />
+    <>
+      <ResourceCard
+        id={collection.id}
+        title={collection.name}
+        description={collection.description}
+        icon={FileText}
+        onClick={handleCardClick}
+        onToggleSelection={onToggleSelection}
+        actions={actions}
+        headerActions={
+          <CollectionCardFavoriteButton
+            collectionId={collection.id}
+            favorite={favorite}
+          />
+        }
+        isSelected={isSelected}
+        selectionMode={selectionMode}
+        compact={compact}
+        readOnly={readOnly}
+        badges={<CollectionCardBadges collection={collection} />}
+        footer={
+          <CollectionCardFooter collection={collection} compact={compact} />
+        }
+      />
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={setReportDialogOpen}
+        targetType="collection"
+        targetId={collection.id}
+        targetTitle={collection.name}
+      />
+    </>
   )
 })

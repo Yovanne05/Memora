@@ -6,6 +6,7 @@ type BuildActionsArgs = {
   onEdit?: (collection: Collection) => void
   onShare?: (collection: Collection) => void
   onDelete?: (collection: Collection) => void
+  onReport?: (collection: Collection) => void
 }
 
 export function buildCollectionCardActions({
@@ -13,6 +14,7 @@ export function buildCollectionCardActions({
   onEdit,
   onShare,
   onDelete,
+  onReport,
 }: BuildActionsArgs) {
   const actions: ResourceCardAction[] = []
 
@@ -43,6 +45,16 @@ export function buildCollectionCardActions({
       onClick: (event) => {
         event.stopPropagation()
         onDelete(collection)
+      },
+    })
+  }
+
+  if (onReport) {
+    actions.push({
+      label: 'Signaler',
+      onClick: (event) => {
+        event.stopPropagation()
+        onReport(collection)
       },
     })
   }

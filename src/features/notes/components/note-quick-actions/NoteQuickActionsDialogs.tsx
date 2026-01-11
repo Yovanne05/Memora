@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { NoteShareDialog } from '../NoteShareDialog'
 import type { Note } from '../../models/note.model'
+import { ReportDialog } from '@/features/report/components/ReportDialog'
 
 type NoteQuickActionsDialogsProps = {
   note: Note
@@ -17,6 +18,8 @@ type NoteQuickActionsDialogsProps = {
   onShareDialogChange: (open: boolean) => void
   deleteDialogOpen: boolean
   onDeleteDialogChange: (open: boolean) => void
+  reportDialogOpen: boolean
+  onReportDialogChange: (open: boolean) => void
   onConfirmDelete: () => void
   isDeleting: boolean
   canShare: boolean
@@ -29,6 +32,8 @@ export function NoteQuickActionsDialogs({
   onShareDialogChange,
   deleteDialogOpen,
   onDeleteDialogChange,
+  reportDialogOpen,
+  onReportDialogChange,
   onConfirmDelete,
   isDeleting,
   canShare,
@@ -71,6 +76,14 @@ export function NoteQuickActionsDialogs({
           </AlertDialogContent>
         </AlertDialog>
       )}
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={onReportDialogChange}
+        targetType="note"
+        targetId={note.id}
+        targetTitle={note.title}
+      />
     </>
   )
 }

@@ -1,16 +1,18 @@
-import type { Note } from "../models/note.model"
-import { NoteCard } from "./NoteCard"
+import type { Note } from '../models/note.model'
+import { NoteCard } from './NoteCard'
 
 interface NotesGridProps {
   items: Note[]
   showQuickActions?: boolean
   showFavoriteButton?: boolean
+  showReportButton?: boolean
 }
 
 export function NotesGrid({
   items,
   showQuickActions = false,
-  showFavoriteButton = false
+  showFavoriteButton = false,
+  showReportButton = true,
 }: Readonly<NotesGridProps>) {
   return (
     <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -20,9 +22,9 @@ export function NotesGrid({
           note={note}
           showQuickActions={showQuickActions}
           showFavoriteButton={showFavoriteButton}
+          showReportButton={showReportButton}
         />
       ))}
     </section>
   )
 }
-

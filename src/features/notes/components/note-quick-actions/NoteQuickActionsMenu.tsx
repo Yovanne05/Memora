@@ -19,6 +19,7 @@ type NoteQuickActionsMenuProps = {
   onOpenShare: () => void
   onDuplicate: () => void
   onOpenDelete: () => void
+  onOpenReport: () => void
   triggerVariant: 'ghost' | 'outline' | 'default'
   showLabel: boolean
   canMove: boolean
@@ -39,6 +40,7 @@ export function NoteQuickActionsMenu({
   onOpenShare,
   onDuplicate,
   onOpenDelete,
+  onOpenReport,
   triggerVariant,
   showLabel,
   canMove,
@@ -73,6 +75,7 @@ export function NoteQuickActionsMenu({
         onOpenShare={onOpenShare}
         onDuplicate={onDuplicate}
         onOpenDelete={onOpenDelete}
+        onOpenReport={onOpenReport}
         canMove={canMove}
         canToggleVisibility={canToggleVisibility}
         canShare={canShare}

@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import type { MutationCallbacks } from "@/lib/mutation-callbacks"
-import { logger } from "@/lib/logger"
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import type { MutationCallbacks } from '@/lib/mutation-callbacks'
+import { logger } from '@/lib/logger'
 
 export interface ResourceMutationConfig<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>
@@ -9,7 +9,10 @@ export interface ResourceMutationConfig<TData, TVariables> {
   successMessage?: string
   errorMessage?: string
   onSuccessInvalidate?: readonly (readonly unknown[])[]
-  onSuccessUpdate?: (data: TData, queryClient: ReturnType<typeof useQueryClient>) => void
+  onSuccessUpdate?: (
+    data: TData,
+    queryClient: ReturnType<typeof useQueryClient>
+  ) => void
 }
 
 /**
@@ -54,27 +57,43 @@ export function useResourceMutation<TData = unknown, TVariables = unknown>(
     },
     onError: (error: Error) => {
       if (!callbacks?.silent) {
-        const message = error instanceof Error ? error.message : errorMessage || "Une erreur est survenue"
+        let message = errorMessage || 'Une erreur est survenue'
+
+        if (error instanceof Error) {
+          if (error.message.includes('uniq_collection_name_per_owner')) {
+            message =
+              'Une collection avec ce nom existe déjà. Veuillez choisir un autre nom.'
+          } else if (error.message.includes('uniq_note_title_per_owner')) {
+            message =
+              'Une note avec ce titre existe déjà. Veuillez choisir un autre titre.'
+          } else {
+            message = error.message
+          }
+        }
+
         toast.error(message)
       }
 
-      logger.error("Mutation error:", error)
+      logger.error('Mutation error:', error)
 
       callbacks?.onError?.(error)
     },
   })
 }
 
-
 export function useCreateMutation<TData, TVariables, TListData = unknown>(
-  config: Omit<ResourceMutationConfig<TData, TVariables>, 'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'> & {
+  config: Omit<
+    ResourceMutationConfig<TData, TVariables>,
+    'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'
+  > & {
     listQueryKey: readonly unknown[]
     detailQueryKey: (data: TData) => readonly unknown[]
     optimisticUpdate?: (old: TListData | undefined, newItem: TData) => TListData
   },
   callbacks?: MutationCallbacks<TData>
 ) {
-  const { listQueryKey, detailQueryKey, optimisticUpdate, ...restConfig } = config
+  const { listQueryKey, detailQueryKey, optimisticUpdate, ...restConfig } =
+    config
 
   return useResourceMutation<TData, TVariables>(
     {
@@ -85,7 +104,9 @@ export function useCreateMutation<TData, TVariables, TListData = unknown>(
         queryClient.setQueryData(detailQueryKey(data), data)
 
         if (optimisticUpdate) {
-          queryClient.setQueryData(listQueryKey, (old: TListData | undefined) => optimisticUpdate(old, data))
+          queryClient.setQueryData(listQueryKey, (old: TListData | undefined) =>
+            optimisticUpdate(old, data)
+          )
         }
       },
     },
@@ -96,8 +117,14 @@ export function useCreateMutation<TData, TVariables, TListData = unknown>(
 /**
  * Helper pour créer une mutation de mise à jour
  */
-export function useUpdateMutation<TData extends { id: string }, TVariables extends { id: string }>(
-  config: Omit<ResourceMutationConfig<TData, TVariables>, 'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'> & {
+export function useUpdateMutation<
+  TData extends { id: string },
+  TVariables extends { id: string },
+>(
+  config: Omit<
+    ResourceMutationConfig<TData, TVariables>,
+    'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'
+  > & {
     listQueryKey: readonly unknown[]
     detailQueryKey: (id: string) => readonly unknown[]
   },
@@ -125,7 +152,10 @@ export function useUpdateMutation<TData extends { id: string }, TVariables exten
  * Helper pour créer une mutation de suppression
  */
 export function useDeleteMutation<TVariables extends { id: string }>(
-  config: Omit<ResourceMutationConfig<void, TVariables>, 'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'> & {
+  config: Omit<
+    ResourceMutationConfig<void, TVariables>,
+    'queryKey' | 'onSuccessUpdate' | 'onSuccessInvalidate'
+  > & {
     listQueryKey: readonly unknown[]
   },
   callbacks?: MutationCallbacks<void>

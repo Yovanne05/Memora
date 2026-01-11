@@ -16,6 +16,7 @@ type NoteQuickActionsMenuContentProps = {
   onOpenShare: () => void
   onDuplicate: () => void
   onOpenDelete: () => void
+  onOpenReport: () => void
   canMove: boolean
   canToggleVisibility: boolean
   canShare: boolean
@@ -32,6 +33,7 @@ export function NoteQuickActionsMenuContent({
   onOpenShare,
   onDuplicate,
   onOpenDelete,
+  onOpenReport,
   canMove,
   canToggleVisibility,
   canShare,
@@ -47,6 +49,7 @@ export function NoteQuickActionsMenuContent({
     onOpenShare,
     onDuplicate,
     onOpenDelete,
+    onOpenReport,
     canMove,
     canToggleVisibility,
     canShare,

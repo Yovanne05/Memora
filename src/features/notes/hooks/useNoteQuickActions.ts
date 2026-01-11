@@ -20,6 +20,7 @@ export function useNoteQuickActions({
 }: UseNoteQuickActionsArgs) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [reportDialogOpen, setReportDialogOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const { user } = useAuth()
@@ -99,6 +100,8 @@ export function useNoteQuickActions({
     setDeleteDialogOpen,
     shareDialogOpen,
     setShareDialogOpen,
+    reportDialogOpen,
+    setReportDialogOpen,
     isDropdownOpen,
     setIsDropdownOpen,
     handleToggleVisibility,
