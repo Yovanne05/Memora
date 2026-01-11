@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { ApiError } from "@/lib/errors"
-import { clearAccessToken, getAccessToken, setAccessToken } from "../lib/token-storage"
-import type { LoginPayload, RegisterPayload } from "../models/auth.model"
-import { authService } from "../services/auth.service"
-import { logger } from "@/lib/logger"
+import { ApiError } from '@/lib/errors'
+import {
+  clearAccessToken,
+  getAccessToken,
+  setAccessToken,
+} from '../lib/token-storage'
+import type { LoginPayload, RegisterPayload } from '../models/auth.model'
+import { authService } from '../services/auth.service'
 
-const AUTH_USER_QUERY_KEY = ["auth", "user"] as const
+const AUTH_USER_QUERY_KEY = ['auth', 'user'] as const
 
 export function useAuth() {
   const queryClient = useQueryClient()
@@ -24,8 +27,8 @@ export function useAuth() {
 
   useEffect(() => {
     const handleStorage = () => setToken(getAccessToken())
-    globalThis.window.addEventListener("storage", handleStorage)
-    return () => globalThis.window.removeEventListener("storage", handleStorage)
+    globalThis.window.addEventListener('storage', handleStorage)
+    return () => globalThis.window.removeEventListener('storage', handleStorage)
   }, [])
 
   useEffect(() => {
@@ -38,14 +41,14 @@ export function useAuth() {
     queryKey: AUTH_USER_QUERY_KEY,
     queryFn: () => authService.getProfile(),
     enabled: Boolean(token),
-    retry: false,
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 401) {
+        syncToken(null)
+        return false
+      }
+      return failureCount < 3
+    },
   })
-
-  useEffect(() => {
-    if (userQuery.error instanceof ApiError && userQuery.error.status === 401) {
-      syncToken(null)
-    }
-  }, [userQuery.error, syncToken])
 
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
@@ -59,18 +62,10 @@ export function useAuth() {
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
   })
 
-  const logout = useCallback(async () => {
-    try {
-      if (token) {
-        await authService.logout()
-      }
-    } catch (error) {
-      logger.warn("Logout request failed, cleaning up client-side token only.", error)
-    } finally {
-      syncToken(null)
-      queryClient.removeQueries({ queryKey: AUTH_USER_QUERY_KEY })
-    }
-  }, [queryClient, syncToken, token])
+  const logout = useCallback(() => {
+    syncToken(null)
+    queryClient.removeQueries({ queryKey: AUTH_USER_QUERY_KEY })
+  }, [queryClient, syncToken])
 
   const authError = useMemo(
     () => userQuery.error ?? loginMutation.error ?? registerMutation.error,
