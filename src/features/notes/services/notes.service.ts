@@ -14,6 +14,7 @@ import type { NotesFilters } from '../types/note-query'
 import type { PaginatedNotes } from '../types/paginated-note'
 import type { INotesService } from './notes.service.interface'
 import { httpClient, type HttpClient } from '@/lib/http-client'
+import { transformFilterKeys } from '@/lib/services/resource-service-utils'
 
 export function createNotesService(
   client: HttpClient = httpClient
@@ -21,7 +22,12 @@ export function createNotesService(
   return {
     async list(params?: NotesFilters): Promise<PaginatedNotes> {
       const data = await client.get<NotesListDto>('/notes', {
-        params: mapNotesFilters(params),
+        params: params
+          ? (transformFilterKeys(params) as Record<
+              string,
+              string | number | boolean | string[]
+            >)
+          : undefined,
       })
       const items = Array.isArray(data) ? data : (data?.items ?? [])
       const total = Array.isArray(data)
@@ -79,34 +85,3 @@ export function createNotesService(
 
 export const notesService = createNotesService()
 export type { INotesService as NotesService } from './notes.service.interface'
-
-function mapNotesFilters(params?: NotesFilters): NotesFilters | undefined {
-  if (!params) return params
-
-  const {
-    ownerId,
-    collectionId,
-    sharedWithUserId,
-    titleContains,
-    contentContains,
-    isFavorite,
-    sortBy,
-    sortDir,
-    tagIds,
-    ...rest
-  } = params
-
-  const mapped: NotesFilters = { ...rest }
-
-  if (ownerId) mapped.owner_id = ownerId
-  if (collectionId) mapped.collection_id = collectionId
-  if (sharedWithUserId) mapped.shared_with_user_id = sharedWithUserId
-  if (titleContains) mapped.title_contains = titleContains
-  if (contentContains) mapped.content_contains = contentContains
-  if (typeof isFavorite === 'boolean') mapped.is_favorite = isFavorite
-  if (sortBy) mapped.sort_by = sortBy
-  if (sortDir) mapped.sort_dir = sortDir
-  if (tagIds) mapped.tags = tagIds
-
-  return mapped
-}

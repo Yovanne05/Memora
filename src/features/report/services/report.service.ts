@@ -1,4 +1,5 @@
 import { httpClient, type HttpClient } from '@/lib/http-client'
+import { transformFilterKeys } from '@/lib/services/resource-service-utils'
 import type {
   ReportCreateDto,
   ReportDto,
@@ -21,7 +22,12 @@ export function createReportsService(
   return {
     async list(params?: ReportsFilters): Promise<PaginatedReports> {
       const data = await client.get<ReportListDto>('/reports', {
-        params: mapReportsFilters(params),
+        params: params
+          ? (transformFilterKeys(params) as Record<
+              string,
+              string | number | boolean | string[]
+            >)
+          : undefined,
       })
       const items = data?.items ?? []
 
@@ -66,30 +72,3 @@ export function createReportsService(
 
 export const reportsService = createReportsService()
 export type { IReportsService as ReportsService } from './report.service.interface'
-
-function mapReportsFilters(
-  params?: ReportsFilters
-): ReportsFilters | undefined {
-  if (!params) return params
-
-  const {
-    targetType,
-    reporterId,
-    noteId,
-    collectionId,
-    sortBy,
-    sortDir,
-    ...rest
-  } = params
-
-  const mapped: ReportsFilters = { ...rest }
-
-  if (targetType) mapped.target_type = targetType
-  if (reporterId) mapped.reporter_id = reporterId
-  if (noteId) mapped.note_id = noteId
-  if (collectionId) mapped.collection_id = collectionId
-  if (sortBy) mapped.sort_by = sortBy
-  if (sortDir) mapped.sort_dir = sortDir
-
-  return mapped
-}

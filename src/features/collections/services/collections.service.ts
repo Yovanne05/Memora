@@ -11,6 +11,7 @@ import {
 } from '../mappers/collection.mapper'
 import { httpClient, type HttpClient } from '@/lib/http-client'
 import type { ICollectionsService } from './collections.service.interface'
+import { transformFilterKeys } from '@/lib/services/resource-service-utils'
 import type {
   CollectionCreate,
   CollectionUpdate,
@@ -23,7 +24,12 @@ export function createCollectionsService(
   return {
     async list(params?: CollectionsFilters) {
       const data = await client.get<CollectionsListDto>('/collections', {
-        params: mapCollectionsFilters(params),
+        params: params
+          ? (transformFilterKeys(params) as Record<
+              string,
+              string | number | boolean | string[]
+            >)
+          : undefined,
       })
       const items = Array.isArray(data) ? data : (data?.items ?? [])
       const total = Array.isArray(data)
@@ -73,34 +79,3 @@ export function createCollectionsService(
 
 export const collectionsService = createCollectionsService()
 export type { ICollectionsService as CollectionsService } from './collections.service.interface'
-
-function mapCollectionsFilters(
-  params?: CollectionsFilters
-): CollectionsFilters | undefined {
-  if (!params) return params
-
-  const {
-    ownerId,
-    sharedWithUserId,
-    titleContains,
-    tagIds,
-    onlyWithNotes,
-    isFavorite,
-    sortBy,
-    sortDir,
-    ...rest
-  } = params
-
-  const mapped: CollectionsFilters = { ...rest }
-
-  if (ownerId) mapped.owner_id = ownerId
-  if (sharedWithUserId) mapped.shared_with_user_id = sharedWithUserId
-  if (titleContains) mapped.title_contains = titleContains
-  if (tagIds) mapped.tags = tagIds
-  if (typeof onlyWithNotes === 'boolean') mapped.only_with_notes = onlyWithNotes
-  if (typeof isFavorite === 'boolean') mapped.is_favorite = isFavorite
-  if (sortBy) mapped.sort_by = sortBy
-  if (sortDir) mapped.sort_dir = sortDir
-
-  return mapped
-}
