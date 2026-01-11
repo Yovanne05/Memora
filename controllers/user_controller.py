@@ -22,7 +22,6 @@ bp_users = Blueprint("users", __name__, url_prefix="/users")
 
 @bp_users.get("")
 @jwt_required()
-@require_admin()
 @swag_from("../docs/users/list.yaml")
 def find_many():
     raw_query = request.args.to_dict(flat=True)
