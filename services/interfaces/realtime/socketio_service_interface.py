@@ -8,7 +8,7 @@ class SocketIOServiceInterface(Protocol):
     def init_socketio(
         self,
         app: Flask,
-        cors_allowed_origins: str = "*",
+        cors_allowed_origins: list[str] | str = "*",
         async_mode: str = "threading",
     ) -> SocketIO:
         ...

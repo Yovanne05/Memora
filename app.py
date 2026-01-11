@@ -34,7 +34,7 @@ from services.impl.realtime.background_jobs_service_impl import init_background_
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, origins=config.ALLOWED_ORIGINS)
 
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
@@ -60,7 +60,7 @@ def create_app() -> Flask:
 
 
     socketio_service.init_socketio(
-        app, cors_allowed_origins="*", async_mode="threading"
+        app, cors_allowed_origins=config.ALLOWED_ORIGINS, async_mode="threading"
     )
 
 

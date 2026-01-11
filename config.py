@@ -24,6 +24,7 @@ COLLAB_JWT_EXPIRES_SECONDS = int(
     os.getenv("COLLAB_JWT_EXPIRES_SECONDS", "300")
 )
 COLLAB_API_KEY = os.getenv("COLLAB_API_KEY", "change-me")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
