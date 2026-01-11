@@ -1,37 +1,37 @@
-import { Check, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, ChevronDown } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import type { SharePermission } from "@/features/notes/dtos/note-share.dto";
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
+import type { SharePermission } from '@/features/notes/dtos/note-share.dto'
 
 interface SharePermissionSelectProps {
-  value: SharePermission;
-  onChange: (value: SharePermission) => void;
-  disabled?: boolean;
+  value: SharePermission
+  onChange: (value: SharePermission) => void
+  disabled?: boolean
 }
 
 const PERMISSIONS = [
-  { value: "read" as const, label: "Can view" },
-  { value: "write" as const, label: "Can edit" },
-  { value: "owner" as const, label: "Full access" },
-];
+  { value: 'read' as const, label: 'Peut voir' },
+  { value: 'write' as const, label: 'Peut modifier' },
+  { value: 'owner' as const, label: 'Accès complet' },
+]
 
 export function SharePermissionSelect({
   value,
   onChange,
   disabled,
 }: Readonly<SharePermissionSelectProps>) {
-  const selected = PERMISSIONS.find((p) => p.value === value);
+  const selected = PERMISSIONS.find((p) => p.value === value)
 
   return (
     <Popover>
@@ -59,8 +59,8 @@ export function SharePermissionSelect({
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      value === permission.value ? "opacity-100" : "opacity-0"
+                      'mr-2 h-4 w-4',
+                      value === permission.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                   {permission.label}
@@ -71,5 +71,5 @@ export function SharePermissionSelect({
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

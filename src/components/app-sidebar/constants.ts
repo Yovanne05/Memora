@@ -7,19 +7,23 @@ import {
   GraduationCap,
   History,
   Settings as SettingsIcon,
-} from "lucide-react"
+} from 'lucide-react'
 
 export const navigationItems = [
-  { title: "Tableau de bord", icon: LayoutDashboard, url: "/app/dashboard" },
-  { title: "Workspace", icon: LayoutGrid, url: "/app/workspace" },
-  { title: "Graphe de connaissances", icon: Network, url: "/app/visualization" },
-  { title: "Recherche", icon: Search, url: "/app/search" },
-  { title: "Révision", icon: GraduationCap, url: "/app/revision" },
-  { title: "Statistiques", icon: History, url: "/app/statistics" },
+  { title: 'Tableau de bord', icon: LayoutDashboard, url: '/app/dashboard' },
+  { title: 'Espace de travail', icon: LayoutGrid, url: '/app/workspace' },
+  {
+    title: 'Graphe de connaissances',
+    icon: Network,
+    url: '/app/visualization',
+  },
+  { title: 'Recherche', icon: Search, url: '/app/search' },
+  { title: 'Révision', icon: GraduationCap, url: '/app/revision' },
+  { title: 'Statistiques', icon: History, url: '/app/statistics' },
 ]
 
 export const accountItems = [
-  { title: "Paramètres", icon: SettingsIcon, url: "/app/settings" },
+  { title: 'Paramètres', icon: SettingsIcon, url: '/app/settings' },
 ]
 
 export const brandIcon = BookOpen

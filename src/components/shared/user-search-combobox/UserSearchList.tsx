@@ -33,7 +33,7 @@ export function UserSearchList({
   return (
     <Command shouldFilter={false}>
       <CommandInput
-        placeholder="Search by name or email..."
+        placeholder="Rechercher par nom ou email..."
         value={searchQuery}
         onValueChange={onSearchChange}
       />
@@ -45,7 +45,9 @@ export function UserSearchList({
         )}
         {!isLoading && users.length === 0 && (
           <CommandEmpty>
-            {searchQuery.length < 2 ? 'Type to search users' : 'No users found'}
+            {searchQuery.length < 2
+              ? 'Tapez pour rechercher des utilisateurs'
+              : 'Aucun utilisateur trouvé'}
           </CommandEmpty>
         )}
         {users.length > 0 && (

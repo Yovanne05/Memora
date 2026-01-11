@@ -25,8 +25,8 @@ export function CollectionShareDialog({
 
   return (
     <ShareDialog
-      title={`Share "${collectionName}"`}
-      description="Share this collection with other users"
+      title={`Partager "${collectionName}"`}
+      description="Partager cette collection avec d'autres utilisateurs"
       shares={shares}
       currentUserId={user.id}
       onAddShare={addShare}

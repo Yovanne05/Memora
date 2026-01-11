@@ -1,12 +1,12 @@
-export type ErrorType = 
-  | 'AUTH_REQUIRED' 
+export type ErrorType =
+  | 'AUTH_REQUIRED'
   | 'AUTH_ERROR'
-  | 'FORBIDDEN' 
-  | 'NOT_FOUND' 
-  | 'VALIDATION_ERROR' 
-  | 'SERVER_ERROR' 
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'SERVER_ERROR'
   | 'RATE_LIMIT_ERROR'
-  | 'NETWORK_ERROR' 
+  | 'NETWORK_ERROR'
   | 'TIMEOUT_ERROR'
   | 'UNKNOWN'
 
@@ -22,7 +22,12 @@ export class ApiError extends Error {
   type: ErrorType
   originalError?: unknown
 
-  constructor(message: string, status: number, type: ErrorType = 'UNKNOWN', originalError?: unknown) {
+  constructor(
+    message: string,
+    status: number,
+    type: ErrorType = 'UNKNOWN',
+    originalError?: unknown
+  ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
@@ -48,37 +53,37 @@ export class NetworkError extends Error {
   }
 }
 
-
 export class ErrorHandler {
   static handle(error: unknown): ErrorResponse {
     if (error instanceof ApiError) {
       return this.handleApiError(error)
     }
-    
+
     if (error instanceof TimeoutError) {
       return {
         type: 'TIMEOUT_ERROR',
-        message: 'Request timed out. Please check your connection and try again.',
+        message:
+          'La requête a expiré. Veuillez vérifier votre connexion et réessayer.',
       }
     }
-    
+
     if (error instanceof NetworkError) {
       return {
         type: 'NETWORK_ERROR',
-        message: 'Network error. Please check your internet connection.',
+        message: 'Erreur réseau. Veuillez vérifier votre connexion internet.',
       }
     }
-    
+
     if (error instanceof Error) {
       return {
         type: 'UNKNOWN',
-        message: error.message || 'An unexpected error occurred',
+        message: error.message || 'Une erreur inattendue est survenue',
       }
     }
-    
+
     return {
       type: 'UNKNOWN',
-      message: 'An unexpected error occurred',
+      message: 'Une erreur inattendue est survenue',
     }
   }
 
@@ -87,31 +92,31 @@ export class ErrorHandler {
       case 400:
         return {
           type: 'VALIDATION_ERROR',
-          message: error.message || 'Invalid request data',
+          message: error.message || 'Données de requête invalides',
           status: 400,
         }
       case 401:
         return {
           type: 'AUTH_REQUIRED',
-          message: 'Your session has expired. Please login again.',
+          message: 'Votre session a expiré. Veuillez vous reconnecter.',
           status: 401,
         }
       case 403:
         return {
           type: 'FORBIDDEN',
-          message: 'You do not have permission to access this resource.',
+          message: "Vous n'avez pas la permission d'accéder à cette ressource.",
           status: 403,
         }
       case 404:
         return {
           type: 'NOT_FOUND',
-          message: 'The requested resource was not found.',
+          message: 'La ressource demandée est introuvable.',
           status: 404,
         }
       case 429:
         return {
           type: 'RATE_LIMIT_ERROR',
-          message: 'Too many requests. Please try again later.',
+          message: 'Trop de requêtes. Veuillez réessayer plus tard.',
           status: 429,
         }
       case 500:
@@ -119,19 +124,18 @@ export class ErrorHandler {
       case 503:
         return {
           type: 'SERVER_ERROR',
-          message: 'Server error. Please try again later.',
+          message: 'Erreur serveur. Veuillez réessayer plus tard.',
           status: error.status,
         }
       default:
         return {
           type: 'UNKNOWN',
-          message: error.message || 'An unexpected error occurred',
+          message: error.message || 'Une erreur inattendue est survenue',
           status: error.status,
         }
     }
   }
 }
-
 
 export function resolveErrorMessage(error: unknown, fallback: string): string {
   const response = ErrorHandler.handle(error)

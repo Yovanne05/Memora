@@ -11,7 +11,7 @@ export function UpcomingReviewsList({
   isLoading = false,
 }: Readonly<UpcomingReviewsListProps>) {
   if (isLoading) {
-    return <p className="text-muted-foreground">Loading reviews...</p>
+    return <p className="text-muted-foreground">Chargement des révisions...</p>
   }
 
   if (groups.length === 0) {
@@ -19,8 +19,8 @@ export function UpcomingReviewsList({
       <Card>
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">
-            No reviews scheduled yet. Complete some flashcards to start
-            reviewing!
+            Aucune révision planifiée pour le moment. Complétez des flashcards
+            pour commencer à réviser !
           </p>
         </CardContent>
       </Card>
@@ -36,7 +36,7 @@ export function UpcomingReviewsList({
               <span>📅</span>
               <span>{formatReviewDate(group.date)}</span>
               <span className="text-sm text-muted-foreground font-normal">
-                ({group.flashcards.length} review
+                ({group.flashcards.length} révision
                 {group.flashcards.length > 1 ? 's' : ''})
               </span>
             </CardTitle>
@@ -73,11 +73,11 @@ function formatReviewDate(dateString: string): string {
   const tomorrowOnly = tomorrow.toISOString().split('T')[0]
 
   if (dateOnly === todayOnly) {
-    return 'Today'
+    return "Aujourd'hui"
   } else if (dateOnly === tomorrowOnly) {
-    return 'Tomorrow'
+    return 'Demain'
   } else {
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('fr-FR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

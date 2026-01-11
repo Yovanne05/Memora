@@ -20,12 +20,12 @@ export function useReviewMutation() {
 
       // Show success toast based on correctness
       const intervalText =
-        review.intervalDays === 1 ? '1 day' : `${review.intervalDays} days`
+        review.intervalDays === 1 ? '1 jour' : `${review.intervalDays} jours`
 
       if (review.isCorrect) {
-        toast.success(`✅ Correct! Next review in ${intervalText}`)
+        toast.success(`✅ Correct ! Prochaine révision dans ${intervalText}`)
       } else {
-        toast.error(`❌ Incorrect. Next review in ${intervalText}`)
+        toast.error(`❌ Incorrect. Prochaine révision dans ${intervalText}`)
       }
 
       logger.info('Review submitted successfully', {
@@ -37,7 +37,7 @@ export function useReviewMutation() {
     },
 
     onError: (error) => {
-      toast.error('Failed to submit review. Please try again.')
+      toast.error('Échec de la soumission de la révision. Veuillez réessayer.')
       logger.error('Failed to submit review', error)
     },
   })

@@ -23,7 +23,7 @@ export function UserSearchCombobox({
   value,
   onChange,
   excludeUserIds = [],
-  placeholder = 'Search users...',
+  placeholder = 'Rechercher des utilisateurs...',
   disabled,
 }: Readonly<UserSearchComboboxProps>) {
   const [open, setOpen] = useState(false)

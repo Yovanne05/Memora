@@ -26,7 +26,7 @@ export default function RevisionPage() {
   if (isLoading) {
     return (
       <div className="container max-w-4xl mx-auto py-8">
-        <p>Loading reviews...</p>
+        <p>Chargement des révisions...</p>
       </div>
     )
   }
@@ -34,9 +34,9 @@ export default function RevisionPage() {
   return (
     <div className="container max-w-4xl mx-auto py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Reviews</h1>
+        <h1 className="text-3xl font-bold">Révisions</h1>
         <p className="text-muted-foreground">
-          Review your flashcards with spaced repetition
+          Révisez vos flashcards avec la répétition espacée
         </p>
       </div>
 
@@ -48,16 +48,16 @@ export default function RevisionPage() {
                 <div>
                   <h2 className="text-2xl font-bold">
                     📚 {totalReviewsCount} flashcard
-                    {totalReviewsCount > 1 ? 's' : ''} due
+                    {totalReviewsCount > 1 ? 's' : ''} à réviser
                   </h2>
                   {todayCount > 0 && (
                     <p className="text-sm text-muted-foreground">
-                      {todayCount} due today
+                      {todayCount} à réviser aujourd'hui
                     </p>
                   )}
                 </div>
                 <Button onClick={handleStartSession} size="lg">
-                  Start Review Session →
+                  Commencer la session →
                 </Button>
               </div>
             </CardContent>
@@ -65,7 +65,7 @@ export default function RevisionPage() {
 
           <div>
             <h2 className="text-xl font-semibold mb-4">
-              Upcoming Reviews by Date
+              Révisions à venir par date
             </h2>
             <UpcomingReviewsList
               groups={upcomingReviews ?? []}
@@ -77,9 +77,10 @@ export default function RevisionPage() {
         <Card>
           <CardContent className="pt-6 text-center space-y-4">
             <div className="text-6xl">🎉</div>
-            <h2 className="text-2xl font-bold">All caught up!</h2>
+            <h2 className="text-2xl font-bold">Tout est à jour !</h2>
             <p className="text-muted-foreground">
-              No reviews scheduled. Create flashcards to start learning!
+              Aucune révision planifiée. Créez des flashcards pour commencer à
+              apprendre !
             </p>
           </CardContent>
         </Card>
