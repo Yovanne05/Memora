@@ -96,7 +96,6 @@ def db_session(db_engine):
     transaction = connection.begin()
     session = Session(bind=connection)
 
-    old_session_factory = db_utils.SessionLocal.registry()
     db_utils.SessionLocal.registry.clear()
     db_utils.SessionLocal.configure(bind=connection)
 
@@ -151,12 +150,12 @@ class TestDataFactory:
             label = self.base_slug
 
         email = f"user-{label}@example.com"
-        password = f"TestPwd-{label}-1!"  # NOSONAR
+        password = f"TestPwd-{label}-1!"
 
         user = User(
             id=str(uuid4()),
             email=email,
-            password_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),  # NOSONAR
+            password_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),
             username=f"user-{label}",
             role=role,
         )
@@ -177,8 +176,12 @@ class TestDataFactory:
         response = self.client.post(
             "/sessions",
             json={
-                "identifier": f"user-{self.base_slug}@example.com" if user_id == self.owner_id else f"user-other@example.com",
-                "password": password,  # NOSONAR
+                "identifier": (
+                    f"user-{self.base_slug}@example.com"
+                    if user_id == self.owner_id
+                    else "user-other@example.com"
+                ),
+                "password": password,
             },
         )
         assert response.status_code == 200, response.get_data(as_text=True)
@@ -258,13 +261,6 @@ def test_factory(app_client):
             collection_id = test_factory.create_collection(owner_id=user_id)
     """
     return TestDataFactory(client=app_client)
-
-    def _delete_if_exists(self, path: str) -> None:
-        response = self.client.delete(path)
-        if response.status_code not in (204, 404):
-            raise AssertionError(
-                f"Cleanup failed for {path}: {response.status_code} {response.get_data(as_text=True)}"
-            )
 
 
 @pytest.fixture

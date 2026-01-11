@@ -24,7 +24,7 @@ class TestCollectionShareRepositoryDelete:
             user_id=user_id,
             permission=SharePermissionEnum.READ
         )
-        added = collection_share_repository.add(share)
+        collection_share_repository.add(share)
 
         # Act
         collection_share_repository.delete(collection_id, user_id)

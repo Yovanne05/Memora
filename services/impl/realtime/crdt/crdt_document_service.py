@@ -9,10 +9,9 @@ from services.interfaces.realtime.crdt_document_service_interface import (
 class CRDTDocumentService(CRDTDocumentServiceInterface):
     def build_document(self, initial_content: Optional[str]) -> Doc:
         doc = Doc()
-        text = Text()
-        doc["content"] = text
+        doc["content"] = Text()
         if initial_content:
-            self._seed_document(doc, text, initial_content)
+            self._seed_document(doc, initial_content)
         return doc
 
     def create_from_update(self, update: bytes) -> Doc:
@@ -27,9 +26,12 @@ class CRDTDocumentService(CRDTDocumentServiceInterface):
             return str(text)
         return None
 
-    def _seed_document(self, doc: Doc, text: Text, initial_content: str) -> None:
+    def _seed_document(self, doc: Doc, initial_content: str) -> None:
         content = initial_content.strip()
         if not content:
+            return
+        text = doc.get("content", type=Text)
+        if not isinstance(text, Text):
             return
         with doc.transaction():
             text += initial_content

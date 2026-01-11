@@ -64,7 +64,7 @@ class TestNoteFavoriteRepository:
         note_id = test_factory.create_note(owner_id=user_id, collection_id=collection_id)
 
         favorite = NoteFavorite(user_id=user_id, note_id=note_id)
-        added = note_favorite_repository.add(favorite)
+        note_favorite_repository.add(favorite)
 
         # Act
         note_favorite_repository.delete(user_id, note_id)

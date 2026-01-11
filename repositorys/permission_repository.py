@@ -40,6 +40,12 @@ class PermissionRepository:
         if not user:
             return None
 
+        share_permission = None
+        if share:
+            share_permission = share.permission
+        elif collection_share:
+            share_permission = collection_share.permission
+
         return PermissionContext(
             user_id=user_id,
             user_role=user.role,
@@ -47,9 +53,7 @@ class PermissionRepository:
             resource_type="note",
             owner_id=note.owner_id,
             visibility=note.visibility,
-            share_permission=share.permission if share else (
-                collection_share.permission if collection_share else None
-            ),
+            share_permission=share_permission,
             parent_collection_id=note.collection_id,
         )
 

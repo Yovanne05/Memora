@@ -23,9 +23,8 @@ class CollectionShareLinkService(CollectionShareLinkServiceInterface):
         self, params: CollectionShareLinkSearchParams
     ) -> Tuple[List[CollectionShareLinkDTO], int]:
         user = get_current_user()
-        share_links, total = collection_share_link_repository.find_many(params)
+        share_links, _ = collection_share_link_repository.find_many(params)
 
-        # Filter to only include links for collections owned by current user
         filtered_links = [
             link for link in share_links
             if self._user_owns_collection(user.id, link.collection_id)

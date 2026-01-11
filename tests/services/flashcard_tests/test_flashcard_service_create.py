@@ -122,7 +122,7 @@ class TestFlashcardServiceCreate:
 
         # Act & Assert
         with pytest.raises(ValidationError):
-            payload = FlashcardCreateDTO(question="Question?", answers=[])
+            FlashcardCreateDTO(question="Question?", answers=[])
 
     def test_create_flashcard_no_correct_answer_raises_exception(self, mock_flashcard_repository, mock_note_repository, monkeypatch):
         """Créer une flashcard sans réponse correcte lève FlashcardMustHaveAtLeastOneCorrectAnswer."""

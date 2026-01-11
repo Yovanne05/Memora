@@ -10,20 +10,13 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 
-# Le test_factory est hérité de tests/conftest.py
-# Aucune fixture supplémentaire n'est nécessaire pour l'instant
-
-# =============================================================================
-# FIXTURES UTILITAIRES POUR LES TESTS DE REPOSITORIES
-# =============================================================================
-
 @pytest.fixture
 def sample_user_data():
     """Données d'exemple pour créer un utilisateur."""
     return {
         "email": f"user-{uuid4().hex[:8]}@example.com",
         "username": f"user-{uuid4().hex[:6]}",
-        "password": "TestPassword1!"  # NOSONAR
+        "password": "TestPassword1!"
     }
 
 

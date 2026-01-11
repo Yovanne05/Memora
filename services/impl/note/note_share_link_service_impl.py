@@ -20,9 +20,8 @@ class NoteShareLinkService(NoteShareLinkServiceInterface):
         self, params: NoteShareLinkSearchParams
     ) -> Tuple[List[NoteShareLinkDTO], int]:
         user = get_current_user()
-        share_links, total = note_share_link_repository.find_many(params)
+        share_links, _ = note_share_link_repository.find_many(params)
 
-        # Filter to only include links for notes owned by current user
         filtered_links = [
             link for link in share_links
             if self._user_owns_note(user.id, link.note_id)

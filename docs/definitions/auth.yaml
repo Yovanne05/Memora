@@ -1,7 +1,7 @@
 definitions:
   Register:
     type: object
-    required: ["email", "password"] # NOSONAR
+    required: ["email", "password"]
     properties:
       email:
         type: string
@@ -29,7 +29,7 @@ definitions:
 
   Login:
     type: object
-    required: ["identifier", "password"] # NOSONAR
+    required: ["identifier", "password"]
     properties:
       identifier:
         type: string
