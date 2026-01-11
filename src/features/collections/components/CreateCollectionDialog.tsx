@@ -1,10 +1,10 @@
-import { useRouter } from "@tanstack/react-router"
-import { toast } from "sonner"
-import { CollectionFormDialog } from "./CollectionFormDialog"
-import { useCreateCollectionMutation } from "../hooks/useCreateCollectionMutation"
-import { useAuth } from "@/features/auth/hooks/useAuth"
-import type { CollectionFormValues } from "../types/collection-form.types"
-import { logger } from "@/lib/logger"
+import { useRouter } from '@tanstack/react-router'
+import { toast } from 'sonner'
+import { CollectionFormDialog } from './CollectionFormDialog'
+import { useCreateCollectionMutation } from '../hooks/useCreateCollectionMutation'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import type { CollectionFormValues } from '../types/collection-form.types'
+import { logger } from '@/lib/logger'
 
 interface CreateCollectionDialogProps {
   open: boolean
@@ -21,7 +21,7 @@ export function CreateCollectionDialog({
 
   const handleSubmit = async (values: CollectionFormValues) => {
     if (!user?.id) {
-      toast.error("Vous devez être connecté pour créer une collection")
+      toast.error('Vous devez être connecté pour créer une collection')
       return
     }
 
@@ -34,17 +34,14 @@ export function CreateCollectionDialog({
         tags: values.tags || [],
       })
 
-      toast.success("Collection créée avec succès")
       onOpenChange(false)
 
-      // Navigate to the new collection in workspace
-      router.navigate({
-        to: "/app/workspace/collections/$collectionId",
+      await router.navigate({
+        to: '/app/workspace/collections/$collectionId',
         params: { collectionId: newCollection.id },
       })
     } catch (error) {
-      toast.error("Impossible de créer la collection")
-      logger.error("Error creating collection:", error)
+      logger.error('Error creating collection:', error)
     }
   }
 

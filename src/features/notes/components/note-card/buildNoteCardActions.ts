@@ -1,10 +1,11 @@
-import type { ResourceCardAction } from "@/components/shared/ResourceCard"
-import type { Note } from "../../models/note.model"
+import type { ResourceCardAction } from '@/components/shared/ResourceCard'
+import type { Note } from '../../models/note.model'
 
 type BuildNoteCardActionsArgs = {
   note: Note
   onEdit?: (note: Note) => void
   onDelete?: (note: Note) => void
+  onReport?: (note: Note) => void
   showQuickActions: boolean
 }
 
@@ -12,6 +13,7 @@ export function buildNoteCardActions({
   note,
   onEdit,
   onDelete,
+  onReport,
   showQuickActions,
 }: BuildNoteCardActionsArgs) {
   const actions: ResourceCardAction[] = []
@@ -19,7 +21,7 @@ export function buildNoteCardActions({
   if (!showQuickActions) {
     if (onEdit) {
       actions.push({
-        label: "Modifier",
+        label: 'Modifier',
         onClick: (event) => {
           event.preventDefault()
           onEdit(note)
@@ -28,11 +30,20 @@ export function buildNoteCardActions({
     }
     if (onDelete) {
       actions.push({
-        label: "Supprimer",
-        variant: "destructive",
+        label: 'Supprimer',
+        variant: 'destructive',
         onClick: (event) => {
           event.preventDefault()
           onDelete(note)
+        },
+      })
+    }
+    if (onReport) {
+      actions.push({
+        label: 'Signaler',
+        onClick: (event) => {
+          event.preventDefault()
+          onReport(note)
         },
       })
     }

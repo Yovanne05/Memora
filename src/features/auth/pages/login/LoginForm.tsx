@@ -73,17 +73,15 @@ export function LoginForm({
             )}
           />
 
-          <div className="space-y-2">
-            <AuthPasswordField
-              control={form.control}
-              name="password"
-              label="Mot de passe"
-              placeholder="********"
-              autoComplete="current-password"
-              showPassword={showPassword}
-              onToggle={onTogglePassword}
-            />
-          </div>
+          <AuthPasswordField
+            control={form.control}
+            name="password"
+            label="Mot de passe"
+            placeholder="********"
+            autoComplete="current-password"
+            showPassword={showPassword}
+            onToggle={onTogglePassword}
+          />
 
           <Button type="submit" className="w-full" disabled={isLoggingIn}>
             {isLoggingIn ? 'Connexion en cours...' : 'Se connecter'}

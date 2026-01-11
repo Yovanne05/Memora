@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import type { Collection } from '@/features/collections/models/collection.model'
@@ -6,6 +7,7 @@ import { useWorkspaceNavigation } from '../../hooks/useWorkspaceNavigation'
 import { CollectionNotesEmpty } from './collection-tree-item/CollectionNotesEmpty'
 import { CollectionNotesList } from './collection-tree-item/CollectionNotesList'
 import { CollectionTreeHeader } from './collection-tree-item/CollectionTreeHeader'
+import { ReportDialog } from '@/features/report/components/ReportDialog'
 import type { DroppableCollectionData } from '@/features/notes/hooks/useDragAndDropNotes'
 
 type WorkspaceMode = 'default' | 'favorites'
@@ -31,6 +33,7 @@ export function CollectionTreeItem({
 }: CollectionTreeItemProps) {
   const { navigateToNote } = useWorkspaceNavigation(mode)
   const toggleFavorite = useToggleCollectionFavoriteMutation()
+  const [reportDialogOpen, setReportDialogOpen] = useState(false)
 
   const dropData: DroppableCollectionData = {
     collectionId: collection.id,
@@ -51,6 +54,12 @@ export function CollectionTreeItem({
     toggleFavorite.mutate({ collectionId: collection.id, next: !favorite })
   }
 
+  const handleReportClick = (event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setReportDialogOpen(true)
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -68,6 +77,7 @@ export function CollectionTreeItem({
         onToggle={onToggle}
         onSelect={onSelect}
         onToggleFavorite={handleFavoriteClick}
+        onOpenReport={handleReportClick}
         isFavoritePending={toggleFavorite.isPending}
       />
 
@@ -80,6 +90,14 @@ export function CollectionTreeItem({
       )}
 
       {isExpanded && notesCount === 0 && <CollectionNotesEmpty />}
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={setReportDialogOpen}
+        targetType="collection"
+        targetId={collection.id}
+        targetTitle={collection.name}
+      />
     </div>
   )
 }

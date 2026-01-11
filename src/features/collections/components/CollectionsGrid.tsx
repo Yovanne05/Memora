@@ -7,6 +7,7 @@ interface CollectionsGridProps {
   onShare?: (collection: Collection) => void
   onDelete?: (collection: Collection) => void
   compact?: boolean
+  showReportButton?: boolean
 }
 
 export function CollectionsGrid({
@@ -15,6 +16,7 @@ export function CollectionsGrid({
   onShare,
   onDelete,
   compact = false,
+  showReportButton = true,
 }: Readonly<CollectionsGridProps>) {
   return (
     <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -26,6 +28,7 @@ export function CollectionsGrid({
           onShare={onShare}
           onDelete={onDelete}
           compact={compact}
+          showReportButton={showReportButton}
         />
       ))}
     </section>

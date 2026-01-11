@@ -12,6 +12,7 @@ import { buildNoteCardActions } from './note-card/buildNoteCardActions'
 import { NoteCardFavoriteButton } from './note-card/NoteCardFavoriteButton'
 import { NoteCardMeta } from './note-card/NoteCardMeta'
 import type { DraggedNoteData } from '../hooks/useDragAndDropNotes'
+import { ReportDialog } from '@/features/report/components/ReportDialog'
 
 interface NoteCardProps {
   note: Note
@@ -19,6 +20,7 @@ interface NoteCardProps {
   onDelete?: (note: Note) => void
   showQuickActions?: boolean
   showFavoriteButton?: boolean
+  showReportButton?: boolean
 }
 
 export function NoteCard({
@@ -27,15 +29,23 @@ export function NoteCard({
   onDelete,
   showQuickActions = false,
   showFavoriteButton = false,
+  showReportButton = false,
 }: Readonly<NoteCardProps>) {
   const navigate = useNavigate()
   const location = useLocation()
   const [isInteracting, setIsInteracting] = useState(false)
+  const [reportDialogOpen, setReportDialogOpen] = useState(false)
   const favorite = note.isFavorite === true
+
+  const handleReport = useCallback(() => {
+    setReportDialogOpen(true)
+  }, [])
+
   const actions = buildNoteCardActions({
     note,
     onEdit,
     onDelete,
+    onReport: showReportButton ? handleReport : undefined,
     showQuickActions,
   })
 
@@ -91,17 +101,27 @@ export function NoteCard({
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <ResourceCard
-        id={note.id}
-        title={note.title}
-        description={contentPreview}
-        icon={FileText}
-        actions={actions}
-        headerActions={headerActions}
-        metadata={<NoteCardMeta note={note} />}
-        onClick={handleClick}
+    <>
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        <ResourceCard
+          id={note.id}
+          title={note.title}
+          description={contentPreview}
+          icon={FileText}
+          actions={actions}
+          headerActions={headerActions}
+          metadata={<NoteCardMeta note={note} />}
+          onClick={handleClick}
+        />
+      </div>
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={setReportDialogOpen}
+        targetType="note"
+        targetId={note.id}
+        targetTitle={note.title}
       />
-    </div>
+    </>
   )
 }

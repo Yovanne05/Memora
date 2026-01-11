@@ -6,6 +6,7 @@ import { NoteQuickActionsShareItem } from './NoteQuickActionsShareItem'
 import { NoteQuickActionsMoveSubmenu } from './NoteQuickActionsMoveSubmenu'
 import { NoteQuickActionsDuplicateItem } from './NoteQuickActionsDuplicateItem'
 import { NoteQuickActionsDeleteItem } from './NoteQuickActionsDeleteItem'
+import { NoteQuickActionsReportItem } from './NoteQuickActionsReportItem'
 
 type MenuItem = { key: string; node: ReactElement }
 
@@ -18,6 +19,7 @@ type UseNoteQuickActionsMenuItemsParams = {
   onOpenShare: () => void
   onDuplicate: () => void
   onOpenDelete: () => void
+  onOpenReport?: () => void
   canMove: boolean
   canToggleVisibility: boolean
   canShare: boolean
@@ -37,6 +39,7 @@ export function useNoteQuickActionsMenuItems(
     onOpenShare,
     onDuplicate,
     onOpenDelete,
+    onOpenReport,
     canMove,
     canToggleVisibility,
     canShare,
@@ -104,6 +107,18 @@ export function useNoteQuickActionsMenuItems(
         <NoteQuickActionsDeleteItem
           isPending={isPending}
           onOpenDelete={onOpenDelete}
+        />
+      ),
+    })
+  }
+
+  if (onOpenReport) {
+    menuItems.push({
+      key: 'report',
+      node: (
+        <NoteQuickActionsReportItem
+          isPending={isPending}
+          onOpenReport={onOpenReport}
         />
       ),
     })
