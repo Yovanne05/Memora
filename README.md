@@ -1,571 +1,881 @@
-# Mémora - Backend API
+# Backend Memora — Documentation développeur
 
-API REST Flask pour **Mémora**, une application web de prise de notes collaborative avec système de révision par flashcards et collaboration temps réel.
+## 1) Contexte rapide
 
-## Table des matières
+### Que fait ce backend ?
 
-- [Description](#description)
-- [Technologies](#technologies)
-- [Commandes rapides](#commandes-rapides)
-- [Prérequis](#prérequis)
-- [Installation](#installation)
-- [Lancer l'application](#lancer-lapplication)
-- [Documentation de l'API (Swagger)](#documentation-de-lapi-swagger)
-- [Tests](#tests)
-- [Structure du projet](#structure-du-projet)
-- [Architecture](#architecture)
-- [Fonctionnalités principales](#fonctionnalités-principales)
-- [Endpoints API](#endpoints-api)
-- [Collaboration temps réel - Architecture technique](#collaboration-temps-réel---architecture-technique)
-- [Dépannage](#dépannage)
+Backend Flask pour **Memora**, une application de prise de notes collaborative avec système de révision espacée et flashcards.
 
-## Description
+### Statut actuel
 
-Mémora est un projet étudiant (SAE S5) qui permet aux utilisateurs de :
-- **Créer et organiser des notes** en markdown avec support d'images
-- **Collaborer en temps réel** sur les notes avec d'autres utilisateurs (WebSocket + CRDT)
-- **Organiser les notes en collections** thématiques
-- **Créer des flashcards** pour la révision avec système de répétition espacée
-- **Partager des notes et collections** avec d'autres utilisateurs (permissions READ/WRITE)
-- **Lier des notes entre elles** pour créer un réseau de connaissances
-- **Marquer des favoris** pour un accès rapide
-- **Suivre ses statistiques** de révision et de progression
-- **Signaler du contenu** inapproprié (système de modération)
+**V2 actif** — Fonctionnalités principales implémentées, collaboration temps réel en production avec CRDT (Yjs).
 
-## Technologies
+### Périmètre exact
 
-- **Flask 3.0** - Framework web Python
-- **PostgreSQL / MySQL** - Base de données relationnelle
-- **SQLAlchemy 2.0** - ORM Python
-- **Pydantic 2.12** - Validation de données
-- **Flask-JWT-Extended** - Authentification par tokens JWT
-- **Flask-SocketIO** - Communication WebSocket bidirectionnelle
-- **pycrdt** - CRDT (Conflict-free Replicated Data Types) pour la collaboration temps réel
-- **Redis** - Gestion des sessions et synchronisation temps réel
-- **Flasgger** - Documentation Swagger/OpenAPI
-- **bcrypt** - Hachage des mots de passe
-- **SeaweedFS** - Stockage d'images (S3-compatible)
-- **Pytest** - Tests unitaires et d'intégration
+**Inclus** :
+- Authentification JWT + gestion utilisateurs
+- CRUD notes & collections (avec tags, visibilité, favoris)
+- Partage de notes/collections avec permissions granulaires (lecture/écriture/commentaire)
+- Liens publics de partage (share links)
+- Relations bidirectionnelles entre notes (note links)
+- Flashcards + algorithme de révision espacée
+- Statistiques utilisateur (temps de révision, taux de réussite)
+- Upload d'images (local ou S3-compatible)
+- Collaboration temps réel via WebSocket (Socket.IO + CRDT Yjs)
+- Rapports de contenu (signalements)
 
-## Commandes rapides
+**Exclu** :
+- Notifications push
+- Export PDF/Markdown
+- Intégrations tierces (Google Drive, Notion, etc.)
+- Interface d'administration web
+
+---
+
+## 2) Prérequis & versions
+
+### Versions requises
+
+- **Python** : `>= 3.11` (recommandé 3.12)
+- **Base de données** : PostgreSQL `>= 14` (production) ou SQLite (dev/test)
+- **Redis** : `>= 7.0` (obligatoire pour collaboration temps réel)
+
+### Dépendances système
+
+- **libpq-dev** (pour psycopg2 sur Linux/macOS)
+- **Redis Server** (pour sessions de collaboration et rate limiting)
+
+### Gestion d'environnement virtuel
+
+Utilisation de **venv** (standard Python) recommandée :
 
 ```bash
-# Installation
-pip install -r requirements.txt
-
-# Démarrer l'application
-python app.py  # http://localhost:5000
-
-# Tests
-pytest                    # Tous les tests
-pytest -v                 # Mode verbeux
-pytest tests/test_*.py    # Test spécifique
-
-# Git hooks
-git config core.hooksPath .githooks  # Active pytest pre-push
-
-# Scripts utilitaires
-python scripts/seed_db.py    # Initialise la base de données
-python scripts/init_s3.py    # Initialise S3 (optionnel)
+python -m venv venv
 ```
 
-## Prérequis
+---
 
-- Python 3.10 ou supérieur
-- PostgreSQL 12+ ou MySQL 8+
-- Redis (pour la collaboration temps réel)
-- pip et venv
-- (Optionnel) SeaweedFS pour le stockage d'images
+## 3) Installation
 
-## Installation
-
-### 1. Cloner le projet
+### Étapes d'installation
 
 ```bash
-git clone <url-du-repo>
-cd SAE_S5_MEMORA_BACKEND_PONNOU_AGOGUE_BOUQSI_FELLAH_SASIKUMAR
-```
+# 1. Cloner le dépôt (si nécessaire)
+cd memora_back
 
-### 2. Créer un environnement virtuel
+# 2. Créer l'environnement virtuel
+python -m venv venv
 
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Sur Linux/Mac
-# ou
-.venv\Scripts\activate  # Sur Windows
-```
+# 3. Activer l'environnement
+# Windows
+venv\Scripts\activate
+# Linux/macOS
+source venv/bin/activate
 
-### 3. Installer les dépendances
-
-```bash
+# 4. Installer les dépendances
 pip install -r requirements.txt
 ```
 
-### 4. Installer et configurer PostgreSQL
+### Fichiers à ignorer (.gitignore)
 
-#### Sur Linux (Ubuntu/Debian/Fedora)
+Le `.gitignore` est déjà configuré pour exclure :
+- `.env` (secrets)
+- `venv/`, `__pycache__/`, `.pytest_cache/`
+- `logs/`, `uploads/**`
+- `*.db` (bases SQLite locales)
 
-```bash
-# Ubuntu/Debian
-sudo apt update
-sudo apt install postgresql postgresql-contrib
+---
 
-# Fedora/RHEL
-sudo dnf install postgresql postgresql-server
-sudo postgresql-setup --initdb
+## 4) Configuration (.env)
 
-# Démarrer le service
-sudo systemctl start postgresql
-sudo systemctl enable postgresql  # Démarrage automatique
-```
+### Variables obligatoires
 
-**Configurer l'authentification :**
-
-Éditer le fichier de configuration :
-- Ubuntu/Debian : `/etc/postgresql/<version>/main/pg_hba.conf`
-- Fedora/RHEL : `/var/lib/pgsql/data/pg_hba.conf`
-
-Remplacer `peer` et `ident` par `md5` :
-
-```conf
-# "local" is for Unix domain socket connections only
-local   all             all                                     md5
-# IPv4 local connections:
-host    all             all             127.0.0.1/32            md5
-# IPv6 local connections:
-host    all             all             ::1/128                 md5
-```
-
-Redémarrer PostgreSQL :
+Copiez `.env.example` vers `.env` et configurez :
 
 ```bash
-sudo systemctl restart postgresql
+cp .env.example .env
 ```
 
-**Créer la base de données :**
+#### Variables critiques
+
+| Variable | Valeur par défaut | Description |
+|----------|------------------|-------------|
+| `APP_ENV` | `dev` | Environnement (`dev`, `test`, `prod`) |
+| `SQLALCHEMY_DATABASE_URI` | `postgresql+psycopg2://...` | URL de connexion PostgreSQL |
+| `JWT_SECRET_KEY` | `change-me` | **Obligatoire en prod** — Secret pour tokens JWT |
+| `COLLAB_API_KEY` | `change-me` | **Obligatoire** — Clé API pour collaboration WebSocket |
+| `ALLOWED_ORIGINS` | `http://localhost:5173` | Origines CORS autorisées (obligatoire en prod) |
+
+#### Redis (collaboration temps réel)
+
+| Variable | Valeur par défaut | Description |
+|----------|------------------|-------------|
+| `REDIS_HOST` | `localhost` | Hôte Redis |
+| `REDIS_PORT` | `6379` | Port Redis |
+| `REDIS_DB` | `0` | Index de base Redis |
+| `COLLAB_SESSION_TTL_SECONDS` | `86400` | Durée de vie des sessions (24h) |
+
+#### Upload d'images
+
+| Variable | Valeur par défaut | Description |
+|----------|------------------|-------------|
+| `STORAGE_DRIVER` | `local` | Mode de stockage (`local` ou `s3`) |
+| `UPLOAD_LOCAL_ROOT` | `uploads` | Répertoire local pour uploads |
+| `IMAGE_MAX_CONTENT_LENGTH_BYTES` | `5242880` | Taille max (5 Mo) |
+
+#### S3-compatible (SeaweedFS, MinIO, AWS S3)
+
+```env
+STORAGE_DRIVER=s3
+STORAGE_S3_BUCKET=memora-uploads
+STORAGE_S3_ENDPOINT_URL=http://localhost:8333
+STORAGE_S3_REGION=eu-west-1
+STORAGE_S3_ACCESS_KEY=seaweedfs
+STORAGE_S3_SECRET_KEY=seaweedfs
+STORAGE_S3_PUBLIC_BASE_URL=http://localhost:8333/memora-uploads
+```
+
+### Où placer le `.env` ?
+
+À la **racine du projet backend** (`memora_back/.env`). Il est chargé automatiquement via `python-dotenv` dans [config.py](config.py#L5).
+
+---
+
+## 5) Lancement en local
+
+### Démarrer le serveur (mode développement)
 
 ```bash
-# Se connecter à PostgreSQL
-sudo -u postgres psql
-
-# Dans psql, exécuter :
-ALTER USER postgres WITH PASSWORD 'root';
-CREATE DATABASE memora;
-\q
-```
-
-#### Sur Windows
-
-1. Télécharger PostgreSQL depuis [postgresql.org/download/windows](https://www.postgresql.org/download/windows/)
-2. Installer PostgreSQL avec l'installeur (garder le port 5432 par défaut)
-3. Pendant l'installation, définir le mot de passe `root` pour l'utilisateur `postgres`
-4. Ouvrir **pgAdmin 4** ou **SQL Shell (psql)** depuis le menu démarrer
-5. Se connecter et exécuter :
-
-```sql
-CREATE DATABASE memora;
-```
-
-### 5. Installer et configurer Redis
-
-Redis est nécessaire pour la collaboration temps réel.
-
-#### Sur Linux (Ubuntu/Debian)
-
-```bash
-sudo apt update
-sudo apt install redis-server
-sudo systemctl start redis
-sudo systemctl enable redis
-```
-
-#### Sur Windows
-
-1. Télécharger Redis depuis [github.com/microsoftarchive/redis/releases](https://github.com/microsoftarchive/redis/releases)
-2. Installer et démarrer le service Redis
-
-#### Vérifier que Redis fonctionne
-
-```bash
-redis-cli ping
-# Doit retourner: PONG
-```
-
-### 6. Configurer les variables d'environnement
-
-Créer un fichier `.env` à la racine du projet (voir `env.example` pour un exemple complet) :
-
-```bash
-# Environnement
-APP_ENV=dev
-
-# Base de données (PostgreSQL)
-SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora'
-
-# Base de données de test
-SQLALCHEMY_TEST_DATABASE_URI='postgresql+psycopg2://postgres:root@localhost:5432/memora_test'
-
-# JWT
-SECRET_KEY='votre_secret_key_ici'
-JWT_SECRET_KEY='votre_jwt_secret_key_ici'
-
-# Redis (pour la collaboration temps réel)
-REDIS_URL='redis://localhost:6379/0'
-
-# Swagger
-SWAGGER_ENABLED='1'
-
-# Stockage (optionnel - local par défaut)
-STORAGE_TYPE='local'  # ou 's3' pour SeaweedFS
-# S3_ENDPOINT_URL='http://localhost:8333'
-# S3_ACCESS_KEY='your_access_key'
-# S3_SECRET_KEY='your_secret_key'
-# S3_BUCKET_NAME='memora'
-```
-
-### 7. Initialiser la base de données
-
-```bash
-python scripts/seed_db.py
-```
-
-Ce script va :
-- Créer toutes les tables
-- Insérer des données de test
-
-**Utilisateurs de test créés :**
-- `superadmin@example.com` / `SuperAdminPass123!` (SUPER_ADMIN)
-- `admin@example.com` / `AdminPass123!` (ADMIN)
-- `client@example.com` / `ClientPass123!` (CLIENT)
-
-### 8. (Optionnel) Initialiser le stockage S3
-
-Si vous utilisez SeaweedFS pour le stockage d'images :
-
-```bash
-python scripts/init_s3.py
-```
-
-Assurez-vous que les variables S3 sont configurées dans `.env` et que le gateway SeaweedFS (port 8333) est démarré.
-
-## Lancer l'application
-
-### Mode développement
-
-```bash
+# Avec rechargement automatique (recommandé en dev)
 python app.py
 ```
 
-L'API sera accessible sur `http://localhost:5000`
+Le serveur démarre sur **`http://0.0.0.0:5000`** par défaut.
 
-> **Note:** L'environnement est déterminé par `APP_ENV` dans `.env` :
-> - `APP_ENV=test` → utilise `SQLALCHEMY_TEST_DATABASE_URI` et crée automatiquement les tables
-> - Autres environnements → utilise `SQLALCHEMY_DATABASE_URI`
+### Port d'écoute
 
+- **Port par défaut** : `5000`
+- **Modifiable** dans [app.py](app.py#L108) : `socketio_service.run_socketio(app, debug=True, host="0.0.0.0", port=5000)`
 
-## Documentation de l'API (Swagger)
+---
 
-Une fois l'application lancée, accédez à la documentation interactive Swagger :
+## 6) Architecture du code
 
-**URL:** `http://localhost:5000/api/docs`
+### Organisation par domaine
 
-La documentation Swagger vous permet de :
-- Visualiser tous les endpoints disponibles
-- Tester l'API directement depuis le navigateur
-- Voir les schémas de requêtes et réponses
-- Comprendre les codes d'erreur
-
-> **Note:** La documentation Swagger n'est disponible que si `SWAGGER_ENABLED='1'` dans le `.env`
-
-## Tests
-
-L'application utilise **pytest** pour les tests unitaires et d'intégration.
-
-### Lancer tous les tests
-
-```bash
-pytest
+```
+memora_back/
+├── controllers/           # Blueprints Flask (HTTP + WebSocket)
+│   ├── auth_controller.py
+│   ├── note_controller.py
+│   ├── collection_controller.py
+│   ├── flashcard_controller.py
+│   ├── realtime/          # Handlers WebSocket (collaboration CRDT)
+│   └── ...
+├── domain_services/       # Logique métier complexe (cross-entity)
+│   ├── collection_domain_service.py
+│   ├── flashcard_domain_service.py
+│   └── ...
+├── services/              # Services métier (business logic)
+│   ├── interfaces/        # Contrats d'interface
+│   └── impl/              # Implémentations
+│       ├── auth_service_impl.py
+│       ├── note/          # Services notes/flashcards/partage
+│       ├── collection/    # Services collections/partage
+│       ├── realtime/      # Services collaboration CRDT + WebSocket
+│       └── infrastructure/ # Redis, session store
+├── repositorys/           # Accès données (repositories pattern)
+│   ├── note_repository.py
+│   ├── collection_repository.py
+│   └── ...
+├── daos/                  # Modèles SQLAlchemy (entities)
+│   ├── user_dao.py
+│   ├── note_dao.py
+│   ├── collection_dao.py
+│   └── base_models.py     # Mixins (UUID, Timestamp, Owner...)
+├── dtos/                  # Data Transfer Objects (Pydantic)
+│   ├── note_dto.py
+│   ├── collection_dto.py
+│   └── ...
+├── mappers/               # Conversion DAO ↔ DTO
+│   ├── note_mapper.py
+│   ├── collection_mapper.py
+│   └── ...
+├── querys/                # Requêtes complexes isolées
+│   ├── note_query.py
+│   ├── collection_query.py
+│   └── ...
+├── exceptions/            # Exceptions métier custom
+│   ├── note_exception.py
+│   ├── collection_exception.py
+│   └── ...
+├── utils/                 # Utilitaires transverses
+│   ├── db.py              # Instance SQLAlchemy
+│   ├── jwt.py             # Configuration JWT
+│   ├── filter.py          # Error handler global
+│   ├── logger.py          # Logger centralisé
+│   ├── swagger.py         # Documentation API (Flasgger)
+│   └── ...
+├── tests/                 # Tests unitaires + intégration
+│   ├── controllers/
+│   ├── services/
+│   └── repositorys/
+└── scripts/               # Scripts utilitaires (init S3, seeds...)
 ```
 
-### Lancer les tests en mode verbeux
+### Patrons d'architecture (SOLID)
+
+#### Controller (Présentation HTTP)
+- Gère uniquement HTTP (request/response)
+- **Aucune logique métier**
+- Valide les inputs via **DTO Pydantic**
+- Appelle uniquement les **services** ou **domain_services**
+- Retourne des **DTO** sérialisés
+
+#### Service (Logique métier)
+- Contient la **logique applicative**
+- Indépendant du framework Flask
+- Appelle les **repositories** pour accéder aux données
+- Utilise les **mappers** pour convertir DAO ↔ DTO
+- Lève des **exceptions métier** explicites
+
+#### Domain Service (Logique transverse)
+- Orchestration de logique complexe impliquant **plusieurs entités**
+- Exemples : génération de flashcards depuis une note, calcul de statistiques de révision
+
+#### Repository (Accès données)
+- Encapsule les requêtes SQLAlchemy
+- Pas de logique métier
+- Retourne des **entités DAO** (modèles SQLAlchemy)
+- Supporte filtres/tri/pagination
+
+#### DAO (Modèle de données)
+- Entités SQLAlchemy (modèles de base de données)
+- Utilisent des **Mixins** pour partager des propriétés communes :
+  - `UUIDMixin` : ID au format UUID v4
+  - `TimestampMixin` : `created_at`, `updated_at`
+  - `OwnerMixin` : `owner_id` (FK vers `users`)
+  - `VisibilityMixin` : `visibility` (private/public)
+  - `TagsMixin` : `tags` (array PostgreSQL)
+
+#### DTO (Data Transfer Object)
+- Modèles **Pydantic** pour validation/sérialisation
+- Format API ↔ Client
+- Variantes : `CreateDTO`, `UpdateDTO`, `ReadDTO`
+
+#### Mapper
+- Conversion **DAO ↔ DTO**
+- Aucune logique métier
+- Méthodes statiques ou fonctions pures
+
+#### Query
+- Requêtes SQLAlchemy complexes isolées
+- Permet la réutilisation et le testing
+
+#### Exceptions
+- Héritent de **`werkzeug.exceptions.HTTPException`**
+- Codes HTTP explicites (404, 403, 409...)
+- Messages clairs et exploitables
+
+---
+
+## 7) Modèles & règles métier
+
+### Modèles SQLAlchemy principaux
+
+#### User ([user_dao.py](daos/user_dao.py))
+```python
+class User(UUIDMixin, CreatedAtMixin, Base):
+    email: str              # Unique, obligatoire
+    username: str | None    # Unique, optionnel
+    password_hash: str      # Hash bcrypt
+    role: RoleEnum          # 'client' ou 'admin'
+    last_login: datetime | None
+```
+
+#### Note ([note_dao.py](daos/note_dao.py))
+```python
+class Note(UUIDMixin, OwnerMixin, VisibilityMixin, TagsMixin, TimestampMixin, Base):
+    collection_id: str | None  # FK vers Collection
+    title: str                 # Max 255 caractères
+    content: str               # Texte riche (HTML/Markdown)
+    visibility: VisibilityEnum # 'private' | 'public'
+    tags: list[str]            # Array PostgreSQL
+```
+
+**Contraintes** :
+- Titre unique **par collection** (constraint `uniq_note_title_per_collection`)
+- Cascade delete si collection supprimée
+
+#### Collection ([collection_dao.py](daos/collection_dao.py))
+```python
+class Collection(UUIDMixin, OwnerMixin, VisibilityMixin, TagsMixin, TimestampMixin, Base):
+    title: str
+    description: str
+    color: str | None  # Code couleur hex (#FF5733)
+```
+
+#### Flashcard ([flashcard_dao.py](daos/flashcard_dao.py))
+```python
+class Flashcard(UUIDMixin, TimestampMixin, Base):
+    note_id: str         # FK vers Note
+    question: str
+    answer: str
+    difficulty: int      # Niveau de difficulté (1-5)
+```
+
+#### Review (système de révision espacée)
+```python
+class Review(UUIDMixin, CreatedAtMixin, Base):
+    user_id: str
+    flashcard_id: str
+    success: bool           # Réussite/échec
+    response_time_ms: int   # Temps de réponse
+```
+
+### Clés étrangères & contraintes importantes
+
+- **UUID v4** pour tous les IDs (via `UUIDMixin`)
+- **Cascade delete** sur tous les `ForeignKey` (`ondelete="CASCADE"`)
+- **Indexes** sur FK et champs fréquemment filtrés (`owner_id`, `collection_id`)
+- **UniqueConstraint** sur titre de note par collection
+
+---
+
+## 8) DTO & validation
+
+### DTO Pydantic
+
+Structure typique pour chaque entité :
+
+```python
+# Création (input)
+class NoteCreateDTO(BaseModel):
+    title: str = Field(..., min_length=1, max_length=255)
+    content: str = Field(default="")
+    collection_id: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    visibility: VisibilityEnum = VisibilityEnum.PRIVATE
+
+# Mise à jour (input partiel)
+class NoteUpdateDTO(BaseModel):
+    title: str | None = Field(None, min_length=1, max_length=255)
+    content: str | None = None
+    tags: list[str] | None = None
+    visibility: VisibilityEnum | None = None
+
+# Lecture (output)
+class NoteReadDTO(BaseModel):
+    id: str
+    title: str
+    content: str
+    owner_id: str
+    collection_id: str | None
+    tags: list[str]
+    visibility: VisibilityEnum
+    created_at: datetime
+    updated_at: datetime
+```
+
+### Validation automatique
+
+- Les **controllers** utilisent Pydantic pour valider les inputs
+- Erreurs de validation → **422 Unprocessable Entity**
+- Exemple : `NoteCreateDTO(**request.json)`
+
+### Dates
+
+- Format **ISO 8601** (`2025-01-11T18:30:00Z`)
+- Timezone **UTC** par défaut
+- Conversion automatique via Pydantic
+
+---
+
+## 9) Mappers
+
+### Localisation
+
+Fichiers dans [`mappers/`](mappers/) :
+- [`note_mapper.py`](mappers/note_mapper.py)
+- [`collection_mapper.py`](mappers/collection_mapper.py)
+- [`flashcard_mapper.py`](mappers/flashcard_mapper.py)
+- etc.
+
+### Exemple
+
+```python
+# DAO → DTO
+def note_dao_to_read_dto(note: Note) -> NoteReadDTO:
+    return NoteReadDTO(
+        id=note.id,
+        title=note.title,
+        content=note.content,
+        owner_id=note.owner_id,
+        collection_id=note.collection_id,
+        tags=note.tags,
+        visibility=note.visibility,
+        created_at=note.created_at,
+        updated_at=note.updated_at,
+    )
+```
+
+---
+
+## 10) Repositories (accès données)
+
+### Fonctionnalités
+
+Les repositories supportent :
+- **Filtres dynamiques** (ownership, visibilité, tags, recherche texte)
+- **Tri** (par date, titre, popularité)
+- **Pagination** (offset/limit)
+
+### Exemple — NoteRepository
+
+```python
+def find_many(
+    user_id: str,
+    collection_id: str | None = None,
+    tags: list[str] | None = None,
+    search: str | None = None,
+    sort_by: str = "updated_at",
+    order: str = "desc",
+    limit: int = 50,
+    offset: int = 0
+) -> list[Note]:
+    # ...
+```
+
+### Comportement en cas d'absence
+
+- **`find_by_id`** retourne `None` si non trouvé
+- Les **services** lèvent des **exceptions métier** (`NoteNotFound`, `CollectionNotFound`)
+
+---
+
+## 11) Contrôleurs (Flask)
+
+### Blueprints exposés
+
+Enregistrés dans [`app.py`](app.py#L83-L101) :
+
+| Blueprint | Préfixe | Description |
+|-----------|---------|-------------|
+| `bp_sessions` | `/api/sessions` | Authentification (login/logout) |
+| `bp_users` | `/api/users` | CRUD utilisateurs |
+| `bp_notes` | `/api/notes` | CRUD notes |
+| `bp_collections` | `/api/collections` | CRUD collections |
+| `bp_note_shares` | `/api/note-shares` | Partage de notes (permissions) |
+| `bp_note_share_links` | `/api/note-share-links` | Liens publics de notes |
+| `bp_flashcards` | `/api/flashcards` | CRUD flashcards |
+| `bp_reviews` | `/api/reviews` | Historique de révision |
+| `bp_user_statistics` | `/api/statistics` | Statistiques utilisateur |
+
+### Typage dans les routes
+
+Flask supporte les convertisseurs d'URL :
+
+```python
+@bp_notes.route("/api/notes/<uuid:note_id>", methods=["GET"])
+def get_note(note_id: str):
+    # note_id est automatiquement validé comme UUID
+```
+
+### Schémas d'entrée/sortie
+
+Documentés via **Swagger/Flasgger** (si `SWAGGER_ENABLED=1`).
+
+Accès à la doc : **`http://localhost:5000/apidocs`**
+
+---
+
+## 12) Gestion des erreurs
+
+### Error handler global
+
+Implémenté dans [`utils/filter.py`](utils/filter.py#L14-L45) :
+
+```python
+@app.errorhandler(Exception)
+def handle_any_exception(error: Exception):
+    if isinstance(error, HTTPException):
+        status_code = error.code
+        message = error.description
+    else:
+        status_code = 500
+        message = "Une erreur est survenue. Merci de réessayer plus tard."
+    return jsonify({"code": status_code, "message": message}), status_code
+```
+
+### Comportement
+
+- **`HTTPException`** → Retourne le code d'origine (404, 403, 409...)
+- **Autres exceptions** → **500** avec message générique (en prod)
+- **Rate limiting** → **429 Too Many Requests**
+- **Validation Pydantic** → **422 Unprocessable Entity**
+- **JWT invalide** → **401 Unauthorized**
+
+### Exceptions custom
+
+Héritent de `werkzeug.exceptions.HTTPException` :
+
+```python
+# exceptions/note_exception.py
+from werkzeug.exceptions import NotFound, Forbidden, Conflict
+
+class NoteNotFound(NotFound):
+    description = "Note introuvable"
+
+class NoteAccessDenied(Forbidden):
+    description = "Accès refusé à cette note"
+
+class NoteTitleConflict(Conflict):
+    description = "Une note avec ce titre existe déjà dans cette collection"
+```
+
+**Localisation** : [`exceptions/`](exceptions/)
+
+---
+
+## 13) Base de données
+
+### Moteur utilisé
+
+- **Développement** : PostgreSQL (`postgresql+psycopg2://...`)
+- **Tests** : SQLite en mémoire (`:memory:`)
+
+### URL de connexion
+
+Définie dans `.env` :
+
+```env
+SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres:root@localhost:5432/memora
+```
+
+### Création du schéma
+
+#### En développement
+
+Migrations manuelles (pour l'instant) :
+
+```bash
+# Option 1 : Via shell Python
+python
+>>> from utils.db import db, Base
+>>> db.create_all()
+```
+
+#### En test
+
+Création automatique via [`app.py`](app.py#L76-L78) :
+
+```python
+if config.APP_ENV == "test":
+    with app.app_context():
+        db.create_all()
+```
+
+### Données de démo (seeds)
+
+Non implémentées actuellement. À faire manuellement ou via script custom.
+
+---
+
+## 14) Tests
+
+### Stratégie de tests
+
+- **Tests unitaires** : Services, mappers, repositories
+- **Tests d'intégration** : Controllers (routes HTTP + WebSocket)
+
+### Exécuter les tests
+
+```bash
+# Tous les tests
+pytest
+
+# Avec verbosité
+pytest -v
+
+# Avec coverage
+pytest --cov=. --cov-report=html
+
+# Tests spécifiques
+pytest tests/controllers/note_tests/
+```
+
+### Configuration
+
+Fichier [`pytest.ini`](pytest.ini) :
+
+```ini
+[pytest]
+pythonpath = .
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+```
+
+### Base de données de test
+
+- **SQLite en mémoire** (`:memory:`)
+- Recréée automatiquement pour chaque session de test
+- Fixtures pytest pour setup/teardown
+
+---
+
+## 15) Qualité & style
+
+### Outils recommandés
+
+| Outil | Usage | Commande |
+|-------|-------|----------|
+| **black** | Formatage code | `black .` |
+| **ruff** | Linter (remplace flake8/pylint) | `ruff check .` |
+| **isort** | Tri des imports | `isort .` |
+| **mypy** | Type checking | `mypy .` (optionnel) |
+
+### Installation (dev)
+
+```bash
+pip install black ruff isort mypy
+```
+
+### Conventions de nommage
+
+- **Variables/fonctions** : `snake_case`
+- **Classes** : `PascalCase`
+- **Constantes** : `UPPER_SNAKE_CASE`
+- **Pas d'abréviations** sauf standards (`id`, `dto`, `dao`)
+- **Noms explicites** : `user_repository` > `user_repo`
+
+---
+
+## 16) Sécurité (minimum backend)
+
+### CORS
+
+Activé via **Flask-CORS** ([app.py](app.py#L40-L44)) :
+
+```python
+if config.ALLOWED_ORIGINS:
+    origins = config.ALLOWED_ORIGINS.split(',')
+    CORS(app, origins=origins, supports_credentials=True)
+else:
+    CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
+```
+
+**Origines autorisées** : Défini dans `.env` (`ALLOWED_ORIGINS`)
+
+### Données sensibles à ne pas committer
+
+- `.env` (déjà dans `.gitignore`)
+- `logs/` (fichiers de logs)
+- `uploads/` (images uploadées)
+- `*.db` (bases SQLite locales)
+
+### Politique d'erreurs
+
+- **En production** (`APP_ENV=prod`) : Messages génériques uniquement
+- **En dev** : Messages détaillés pour debugging
+- **Pas de stack traces** exposées au client
+
+### Authentification
+
+- **JWT** via Flask-JWT-Extended
+- Tokens expirés après **24h** par défaut (`JWT_ACCESS_TOKEN_EXPIRES_SECONDS`)
+- Rate limiting sur login/register (5 tentatives/min pour login)
+
+---
+
+## 17) Commandes utiles (dev)
+
+### Démarrer le serveur
+
+```bash
+flask run
+```
+
+### Reset DB (développement uniquement)
+
+```bash
+# Via shell Python
+python
+>>> from utils.db import db
+>>> db.drop_all()
+>>> db.create_all()
+```
+
+### Lancer tests
 
 ```bash
 pytest -v
 ```
 
-### Lancer un fichier de test spécifique
+### Formater le code
 
 ```bash
-pytest tests/test_note.py
+black .
+isort .
 ```
 
-### Lancer les tests en mode silencieux (utilisé par le hook pre-push)
+### Linter
 
 ```bash
-pytest -q
+ruff check .
 ```
 
-### Git hooks automatiques
-
-Pour activer les hooks pytest avant chaque push :
+### Initialiser S3 (SeaweedFS/MinIO)
 
 ```bash
-git config core.hooksPath .githooks
+python scripts/init_s3.py
 ```
 
-Le hook `.githooks/pre-push` exécutera automatiquement `pytest -q` avant chaque push et bloquera le push si les tests échouent.
+---
 
-## Structure du projet
+## 18) Déploiement (aperçu backend)
 
-```
-memora_back/
-├── app.py                      # Point d'entrée Flask (factory pattern)
-├── config.py                   # Configuration (DB, JWT, S3, Redis, etc.)
-├── conftest.py                 # Configuration pytest
-├── controllers/                # HTTP endpoints (Flask Blueprints)
-│   ├── auth_controller.py
-│   ├── note_controller.py
-│   ├── collection_controller.py
-│   ├── flashcard_controller.py
-│   ├── realtime_collaboration_controller.py  # WebSocket handlers
-│   └── ...
-├── domain_services/            # Logique métier
-├── repositorys/                # Accès base de données
-├── daos/                       # Data Access Objects (requêtes DB)
-├── querys/                     # Requêtes SQL complexes isolées
-├── dtos/                       # Data Transfer Objects (Pydantic)
-├── mappers/                    # Conversion DTO ↔ Entity/Domain
-├── exceptions/                 # Exceptions métier
-├── utils/                      # Helpers
-│   ├── db.py                  # Gestion base de données
-│   ├── jwt_utils.py           # Gestion JWT
-│   ├── logger.py              # Logger centralisé
-│   ├── swagger.py             # Configuration Swagger
-│   ├── crdt_service.py        # Service CRDT pour collaboration temps réel
-│   └── ...
-├── tests/                      # Tests pytest
-│   ├── conftest.py
-│   ├── test_note.py
-│   └── ...
-├── scripts/                    # Scripts utilitaires
-│   ├── seed_db.py             # Initialisation base de données
-│   └── init_s3.py             # Initialisation S3
-├── .githooks/                  # Git hooks (pre-push avec pytest)
-├── requirements.txt            # Dépendances Python
-└── env.example                 # Exemple de configuration .env
+### Méthode cible
+
+- **Recommandé** : Docker + Docker Compose
+- **Alternatives** : PaaS (Heroku, Render, Railway)
+
+### Variables d'environnement requises en prod
+
+```env
+APP_ENV=prod
+SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://user:password@host:5432/memora
+JWT_SECRET_KEY=<générer-secret-fort>
+COLLAB_API_KEY=<générer-secret-fort>
+ALLOWED_ORIGINS=https://app.memora.com
+REDIS_HOST=redis
+REDIS_PORT=6379
+STORAGE_DRIVER=s3
+STORAGE_S3_BUCKET=memora-uploads
+STORAGE_S3_ENDPOINT_URL=https://s3.amazonaws.com
+STORAGE_S3_ACCESS_KEY=<aws-access-key>
+STORAGE_S3_SECRET_KEY=<aws-secret-key>
 ```
 
-## Architecture
+### Docker (exemple)
 
-L'application suit une **architecture en couches** stricte (SOLID) :
-
-1. **Controllers** : Gèrent uniquement HTTP (request/response), appellent les domain_services
-2. **Domain Services** : Contiennent la logique métier, indépendants de Flask
-3. **Repositories** : Abstraient l'accès aux données
-4. **DAOs** : Data Access Objects - requêtes base de données
-5. **DTOs** : Transport de données uniquement (Pydantic pour validation)
-6. **Mappers** : Conversion DTO ↔ Entity/Domain
-7. **Exceptions** : Exceptions métier explicites avec gestion centralisée
-
-## Fonctionnalités principales
-
-### Authentification
-- Inscription et connexion avec JWT
-- Gestion des sessions
-- Hash sécurisé des mots de passe (bcrypt)
-- Endpoints : `/sessions`
-
-### Notes
-- CRUD complet sur les notes
-- Support du markdown avec éditeur Tiptap
-- Images attachées aux notes
-- Visibilité PUBLIC/PRIVATE
-- Tags et recherche
-- Liens entre notes (relations)
-- **Collaboration temps réel** avec WebSocket + CRDT
-- Endpoints : `/notes`, `/notes/<id>/relations`, `/notes/<id>/images`
-
-### Collaboration temps réel (WebSocket)
-- Namespace `/collaboration` avec Flask-SocketIO
-- **CRDT (pycrdt)** pour résolution automatique des conflits
-- Support OT (Operational Transformation) legacy
-- Synchronisation multi-utilisateurs en temps réel
-- Gestion de curseurs et statut de frappe
-- Handlers :
-  - `join_collaboration` / `leave_collaboration`
-  - `crdt_update` / `crdt_sync_request` (CRDT - recommandé)
-  - `send_operation` (OT - legacy)
-  - `cursor_position` / `typing_status`
-
-### Collections
-- Regroupement de notes
-- Partage de collections entières
-- Statistiques par collection
-- Endpoints : `/collections`
-
-### Flashcards
-- Création de flashcards depuis les notes
-- QCM et réponses multiples
-- Système de révision
-- Endpoints : `/flashcards`, `/notes/<id>/flashcards`
-
-### Reviews
-- Système de répétition espacée
-- Suivi de la progression
-- Statistiques de révision
-- Endpoints : `/reviews`
-
-### Partage
-- Partage de notes individuelles
-- Partage de collections
-- Permissions READ/WRITE
-- Liens de partage publics
-- Endpoints : `/note-shares`, `/collection-shares`, `/note-share-links`, `/collection-share-links`
-
-### Favoris
-- Marquer notes et collections en favoris
-- Endpoints : `/note-favorites`, `/collection-favorites`
-
-### Statistiques
-- Statistiques utilisateur (révisions, progression)
-- Endpoints : `/user-statistics`
-
-### Modération
-- Signalement de contenu
-- Système de reports avec raisons
-- Gestion administrative
-- Endpoints : `/reports`
-
-### Utilisateurs et Rôles
-- Gestion de profil utilisateur
-- Système de rôles hiérarchiques (CLIENT, ADMIN, SUPER_ADMIN)
-- Permissions granulaires selon les rôles
-- Endpoints : `/users`
-
-#### Rôles utilisateurs
-
-L'application supporte **trois rôles** avec des permissions différentes :
-
-1. **CLIENT** (rôle par défaut)
-   - Créer, modifier et supprimer ses propres notes et collections
-   - Créer et gérer ses flashcards
-   - Partager ses ressources avec d'autres utilisateurs
-   - Modifier son propre profil utilisateur
-   - Supprimer son propre compte
-
-2. **ADMIN** (administrateur)
-   - Toutes les permissions CLIENT
-   - Accès en lecture/écriture à toutes les ressources (notes, collections)
-   - Modifier et supprimer n'importe quel utilisateur CLIENT
-   - Gérer les reports et la modération
-   - **Ne peut PAS** attribuer ou modifier le rôle ADMIN
-   - **Ne peut PAS** modifier les utilisateurs SUPER_ADMIN
-
-3. **SUPER_ADMIN** (super administrateur)
-   - Toutes les permissions ADMIN
-   - **Seul rôle pouvant attribuer ou modifier le rôle ADMIN**
-   - Gestion complète des administrateurs
-   - Contrôle total sur tous les utilisateurs et ressources
-
-#### Règles de sécurité des rôles
-
-- **Création de compte** : Tous les nouveaux comptes sont créés avec le rôle CLIENT
-- **Changement de rôle** :
-  - CLIENT → ADMIN : Nécessite un SUPER_ADMIN
-  - CLIENT → SUPER_ADMIN : Nécessite un SUPER_ADMIN
-  - ADMIN → CLIENT : Nécessite un SUPER_ADMIN
-  - ADMIN → SUPER_ADMIN : Nécessite un SUPER_ADMIN
-  - Tout changement CLIENT → CLIENT : Nécessite un ADMIN ou SUPER_ADMIN
-- **Modification de profil** :
-  - Un utilisateur peut modifier son propre profil (sauf son rôle)
-  - Les ADMIN peuvent modifier les profils des utilisateurs CLIENT
-  - Les SUPER_ADMIN peuvent modifier tous les profils et tous les rôles
-- **Suppression de compte** :
-  - Un utilisateur peut supprimer son propre compte
-  - Les ADMIN peuvent supprimer les comptes CLIENT
-  - Les SUPER_ADMIN peuvent supprimer tous les comptes
-
-#### Restrictions d'accès aux endpoints
-
-Certains endpoints sont restreints selon les rôles pour des raisons de sécurité :
-
-**Endpoints réservés aux ADMIN et SUPER_ADMIN :**
-- `GET /users` - Lister tous les utilisateurs
-- `GET /reports` - Lister tous les signalements
-- `GET /reports/<id>` - Voir un signalement spécifique
-- `PATCH /reports/<id>` - Modifier un signalement (modération)
-
-**Endpoints avec accès self-or-admin :**
-- `GET /users/<id>` - Voir un utilisateur (soi-même ou admin)
-- `PATCH /users/<id>` - Modifier un utilisateur (soi-même ou admin)
-- `DELETE /users/<id>` - Supprimer un utilisateur (soi-même ou admin)
-
-**Endpoints publics (authentifiés) :**
-- `POST /notes/<id>/reports` - Signaler une note (tout utilisateur authentifié)
-- `POST /collections/<id>/reports` - Signaler une collection (tout utilisateur authentifié)
-
-## Endpoints API
-
-Tous les endpoints sont documentés dans Swagger : `http://localhost:5000/api/docs`
-
-**Registre des Blueprints (dans app.py)** :
-- Auth : `/sessions`
-- Users : `/users`
-- Notes : `/notes`, `/notes/<id>/relations`, `/notes/<id>/images`
-- Collections : `/collections`
-- Sharing : `/note-shares`, `/collection-shares`, `/note-share-links`, `/collection-share-links`
-- Favorites : `/note-favorites`, `/collection-favorites`
-- Flashcards : `/flashcards`, `/notes/<id>/flashcards`
-- Reviews : `/reviews`
-- Statistics : `/user-statistics`
-- Reports : `/reports`
-
-## Collaboration temps réel - Architecture technique :
-
-- **Backend** : Implémenté et prêt
-- **Frontend** : Implémenté et prêt
-- **Technologie** : pycrdt (basé sur Yrs/Yjs)
-- **Avantages** :
-  - Résolution automatique des conflits
-  - Latence minimale
-  - Pas de gestion de versions
-  - Synchronisation efficace avec vecteurs d'état
-
-### Flux CRDT
-
-```
-1. Client → join_collaboration → Serveur initialise document CRDT
-2. Client → crdt_update → Modifications propagées aux autres
-3. Client → crdt_sync_request → Reçoit delta depuis son état
-4. Fusion automatique sans conflits
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["gunicorn", "--worker-class=eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
 ```
 
-## Dépannage
+---
 
-### Redis non disponible
+## 19) Troubleshooting
 
-**Symptômes** : Erreurs de connexion Redis, sessions de collaboration ne persistent pas
+### Problème : Port 5000 déjà utilisé
+
+**Symptôme** : `Address already in use`
 
 **Solution** :
 ```bash
-# Vérifier Redis
-redis-cli ping  # Doit retourner PONG
+# Trouver le processus utilisant le port 5000
+# Windows
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
 
-# Vérifier configuration dans .env
-REDIS_URL='redis://localhost:6379/0'
+# Linux/macOS
+lsof -ti:5000 | xargs kill -9
 ```
 
-### Tests échouent avant push
+### Problème : `.env` manquant
+
+**Symptôme** : `JWT_SECRET_KEY must be set in production`
 
 **Solution** :
 ```bash
-pytest -v  # Mode verbeux pour voir détails
+cp .env.example .env
+# Éditer .env et changer les valeurs par défaut
 ```
 
-## Auteurs
+### Problème : Redis non disponible
 
-Projet réalisé par : Yovanne PONNOU, Armand AGOGUE, karim BOUQSI, Ariles FELLAH 🥵, Regan SASIKUMAR
+**Symptôme** : `Error connecting to Redis`
+
+**Solution** :
+```bash
+# Démarrer Redis (Linux/macOS)
+redis-server
+
+# Windows (via WSL ou Docker)
+docker run -d -p 6379:6379 redis:alpine
+```
+
+### Problème : Erreur de connexion PostgreSQL
+
+**Symptôme** : `could not connect to server`
+
+**Solution** :
+1. Vérifier que PostgreSQL est démarré
+2. Vérifier `SQLALCHEMY_DATABASE_URI` dans `.env`
+3. Tester la connexion :
+   ```bash
+   psql -h localhost -U postgres -d memora
+   ```
+
+### Diagnostic général
+
+1. **Activer DEBUG** : `APP_ENV=dev` dans `.env`
+2. **Vérifier les logs** : `tail -f logs/app.log`
+3. **Ping health endpoint** : `curl http://localhost:5000/health` (si implémenté)
+4. **Tester Redis** : `redis-cli ping` → `PONG`
+
+---
+
+## 20) Collaboration temps réel (CRDT)
+
+### Architecture
+
+- **WebSocket** : Socket.IO (namespace `/collaboration`)
+- **CRDT** : Yjs (encodage base64)
+- **Persistence** : Redis + snapshots PostgreSQL
+- **Background jobs** : Cleanup sessions + snapshots automatiques
+
+### Handlers WebSocket
+
+| Événement | Type | Description |
+|-----------|------|-------------|
+| `join_collaboration` | Emit | Rejoindre une session de collaboration |
+| `leave_collaboration` | Emit | Quitter une session |
+| `crdt_update` | Emit | Envoyer une mise à jour CRDT |
+| `crdt_sync_request` | Emit | Demander une synchronisation complète |
+| `collaboration_session` | Listen | État de la session (collaborateurs) |
+| `collaboration_event` | Listen | Événements en temps réel (updates, presence) |
+| `crdt_sync_reply` | Listen | Réponse de synchronisation |
+
+### Flux de collaboration
+
+1. Client rejoint avec `join_collaboration` + JWT collab
+2. Backend initialise document CRDT (Yjs) si nécessaire
+3. Client envoie modifications via `crdt_update`
+4. Backend propage aux autres clients via `collaboration_event`
+5. Résolution de conflits automatique (Yjs CRDT)
+6. Snapshots périodiques en PostgreSQL (toutes les 30s)
+
+### Fichiers clés
+
+- [`controllers/realtime/`](controllers/realtime/) : Handlers WebSocket
+- [`services/impl/realtime/crdt/`](services/impl/realtime/crdt/) : Services CRDT
+
+---
+
+## Ressources complémentaires
+
+- **Documentation API** : `http://localhost:5000/apidocs` (si Swagger activé)
+- **Issues GitHub** : [github.com/memora/issues](https://github.com/memora/issues)
+
+---
 
 ## Licence
 
-Projet étudiant - IUT SAE S5
+License — Projet étudiant IUT Montreuil (PONNOU Yovanne, FELLAH Arilès Fellah; BOUQSI Karim, AGOGUE Armand)
