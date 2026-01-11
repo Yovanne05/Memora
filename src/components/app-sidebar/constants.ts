@@ -5,7 +5,6 @@ import {
   Network,
   Search,
   GraduationCap,
-  History,
   Settings as SettingsIcon,
 } from 'lucide-react'
 
@@ -19,7 +18,6 @@ export const navigationItems = [
   },
   { title: 'Recherche', icon: Search, url: '/app/search' },
   { title: 'Révision', icon: GraduationCap, url: '/app/revision' },
-  { title: 'Statistiques', icon: History, url: '/app/statistics' },
 ]
 
 export const accountItems = [
