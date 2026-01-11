@@ -6,6 +6,7 @@ from werkzeug.exceptions import HTTPException
 from pydantic import ValidationError
 
 import config
+from exceptions.permission_exception import PermissionException
 
 GENERIC_MESSAGE = "Une erreur est survenue. Merci de réessayer plus tard."
 RATE_LIMIT_MESSAGE = "Trop de requetes. Reessayez plus tard."
@@ -20,6 +21,9 @@ def register_global_filter(app):
                 message = RATE_LIMIT_MESSAGE
             else:
                 message = error.description
+        elif isinstance(error, PermissionException):
+            status_code = int(HTTPStatus.FORBIDDEN)
+            message = str(error)
         elif isinstance(error, HTTPException):
             status_code = int(error.code)
             message = error.description
