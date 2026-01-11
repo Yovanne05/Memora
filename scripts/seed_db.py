@@ -37,6 +37,8 @@ from daos.note_image_dao import NoteImage
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
+from daos.crdt_snapshot_dao import CRDTSnapshot
+from daos.note_collaboration_dao import NoteCollaborationHistory
 from daos.review_dao import Review
 from daos.report_dao import Report
 
@@ -124,7 +126,8 @@ def seed() -> None:
             role=RoleEnum.CLIENT,
         )
 
-        session.add_all([super_admin, admin, client])
+        client = alice
+        session.add_all([super_admin, admin, alice, bob])
         session.flush()
         print("Users inserted.")
 
