@@ -79,17 +79,14 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         tags: payload.tags,
       })
 
-      toast.success('Note créée avec succès')
       actions.closeCreateNote()
 
-      // Navigate to edit the new note
       const path = payload.collectionId
         ? `/app/workspace/collections/${payload.collectionId}/notes/${newNote.id}`
         : `/app/workspace/notes/${newNote.id}`
 
       router.navigate({ to: path })
     } catch (error) {
-      toast.error('Impossible de créer la note')
       logger.error('Error creating note:', error)
     }
   }
