@@ -111,5 +111,10 @@ export function useRichTextEditor({
     }
   }, [content, editor])
 
+  useEffect(() => {
+    if (!editor) return
+    editor.setEditable(editable)
+  }, [editor, editable])
+
   return { editor }
 }
