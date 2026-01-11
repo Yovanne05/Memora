@@ -65,7 +65,7 @@ class TestAuthMe:
 
         # Arrange - Service returns UserDTO directly
         mock_auth_service.get_me.return_value = UserDTO(
-            id="test-user-id-123",
+            id="123e4567-e89b-12d3-a456-426614174000",
             email="test@example.com",
             username="testuser",
             role=RoleEnum.CLIENT,

@@ -15,9 +15,7 @@ from repositorys import user_repository
 from repositorys.user_repository import UserSearchParams
 from services.interfaces.user_service_interface import UserServiceInterface
 from utils.enums import RoleEnum
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class UserService(UserServiceInterface):

@@ -2,9 +2,7 @@ from services.impl.realtime.crdt.crdt_service_provider import get_crdt_service
 from services.impl.infrastructure.collaboration_session_store_impl import (
     collaboration_session_store,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class CRDTSnapshotJob:
@@ -22,7 +20,8 @@ class CRDTSnapshotJob:
                 if crdt_service.save_snapshot_to_database(note_id):
                     success_count += 1
             except Exception as exc:
-                logger.error(f"Failed to snapshot CRDT for note {note_id}: {exc}")
+                logger.error(
+                    f"Failed to snapshot CRDT for note {note_id}: {exc}")
 
         return success_count
 
@@ -39,11 +38,13 @@ class CollaborationSessionCleanupJob:
                 socket_ids = redis_client.smembers(key)
 
                 for socket_id in socket_ids:
-                    session = collaboration_session_store.get_session_by_socket(socket_id)
+                    session = collaboration_session_store.get_session_by_socket(
+                        socket_id)
                     if not session:
                         redis_client.srem(key, socket_id)
                         cleaned_count += 1
             except Exception as exc:
-                logger.warning(f"Failed to clean sessions for key {key}: {exc}")
+                logger.warning(
+                    f"Failed to clean sessions for key {key}: {exc}")
 
         return cleaned_count

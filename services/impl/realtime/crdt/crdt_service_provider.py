@@ -5,9 +5,7 @@ from services.impl.realtime.crdt.crdt_service_impl import CRDTService
 from services.interfaces.realtime.crdt_service_interface import (
     CRDTServiceInterface,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 _crdt_service: Optional[CRDTServiceInterface] = None
 _crdt_service_lock = threading.Lock()

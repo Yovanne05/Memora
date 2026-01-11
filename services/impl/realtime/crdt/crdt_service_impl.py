@@ -8,9 +8,7 @@ from services.impl.realtime.crdt.crdt_snapshot_service import CRDTSnapshotServic
 from services.interfaces.realtime.crdt_service_interface import (
     CRDTServiceInterface,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class CRDTService(CRDTServiceInterface):
@@ -144,5 +142,3 @@ class CRDTService(CRDTServiceInterface):
         self._redis_persistence.save(note_id, new_doc)
         logger.info(f"CRDT document resynced from note content: {note_id}")
         return new_doc
-
-

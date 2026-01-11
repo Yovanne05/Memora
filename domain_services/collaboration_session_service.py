@@ -3,9 +3,7 @@ from typing import Optional
 from services.impl.infrastructure.collaboration_session_store_impl import (
     collaboration_session_store,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class CollaborationSessionService:

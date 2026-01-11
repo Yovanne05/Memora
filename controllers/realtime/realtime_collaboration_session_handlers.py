@@ -13,10 +13,8 @@ from services.impl.realtime.realtime_collaboration_service_impl import (
     realtime_collaboration_service,
 )
 from services.impl.realtime.socketio_auth_service_impl import socketio_auth_service
-from utils.logger import get_logger
+from utils.logger import logger
 from utils.rate_limiter import socketio_rate_limit
-
-logger = get_logger(__name__)
 
 
 def register_collaboration_session_handlers(socketio):

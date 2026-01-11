@@ -152,7 +152,7 @@ def mock_current_user():
     from daos.user_dao import User
     from utils.enums import RoleEnum
     return User(
-        id="test-user-id-123",
+        id="123e4567-e89b-12d3-a456-426614174000",
         email="test@example.com",
         username="testuser",
         password_hash="hash",
@@ -171,6 +171,7 @@ def authenticated_client(app_client, mock_current_user, monkeypatch):
     # Mock get_current_user everywhere it's imported
     monkeypatch.setattr("utils.auth.get_current_user", lambda: mock_current_user)
     monkeypatch.setattr("utils.permission_decorators.get_current_user", lambda: mock_current_user)
+    monkeypatch.setattr("controllers.user_controller.get_current_user", lambda: mock_current_user)
 
     # Mock permission_domain_service to always allow access
     mock_permission = Mock()
@@ -182,7 +183,7 @@ def authenticated_client(app_client, mock_current_user, monkeypatch):
 
     # Créer un token JWT valide pour les tests
     with app_client.application.app_context():
-        access_token = create_access_token(identity="test-user-id-123")
+        access_token = create_access_token(identity="123e4567-e89b-12d3-a456-426614174000")
 
     # Créer un wrapper qui ajoute automatiquement le token aux headers
     class AuthenticatedClient:

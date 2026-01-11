@@ -7,9 +7,7 @@ from services.impl.infrastructure.redis_client_service_impl import (
 from services.interfaces.infrastructure.collaboration_session_store_interface import (
     CollaborationSessionStoreInterface,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class CollaborationSessionStore(CollaborationSessionStoreInterface):

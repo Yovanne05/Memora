@@ -8,9 +8,7 @@ from services.impl.realtime.crdt.crdt_document_service import CRDTDocumentServic
 from services.interfaces.realtime.crdt_cache_service_interface import (
     CRDTCacheServiceInterface,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class CRDTCacheService(CRDTCacheServiceInterface):
@@ -37,7 +35,8 @@ class CRDTCacheService(CRDTCacheServiceInterface):
             document_update = base64.b64decode(data["document_update"])
             return self._document_service.create_from_update(document_update)
         except Exception as exc:
-            logger.warning(f"Failed to load CRDT from Redis for note {note_id}: {exc}")
+            logger.warning(
+                f"Failed to load CRDT from Redis for note {note_id}: {exc}")
             return None
 
     def save(self, note_id: str, doc: Doc) -> None:
@@ -57,7 +56,8 @@ class CRDTCacheService(CRDTCacheServiceInterface):
                 self._build_key(note_id), self._ttl_seconds, json.dumps(data)
             )
         except Exception as exc:
-            logger.error(f"Failed to save CRDT to Redis for note {note_id}: {exc}")
+            logger.error(
+                f"Failed to save CRDT to Redis for note {note_id}: {exc}")
 
     def delete(self, note_id: str) -> None:
         if not self._redis_client:

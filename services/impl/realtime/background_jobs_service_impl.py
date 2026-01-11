@@ -9,9 +9,7 @@ from services.impl.realtime.background_jobs_tasks import (
     CollaborationSessionCleanupJob,
     CRDTSnapshotJob,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class BackgroundJobsScheduler(BackgroundJobsServiceInterface):

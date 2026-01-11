@@ -7,9 +7,7 @@ from services.impl.realtime.crdt.crdt_document_service import CRDTDocumentServic
 from services.interfaces.realtime.crdt_snapshot_service_interface import (
     CRDTSnapshotServiceInterface,
 )
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+from utils.logger import logger
 
 
 class CRDTSnapshotService(CRDTSnapshotServiceInterface):

@@ -13,15 +13,14 @@ from services.impl.realtime.realtime_collaboration_service_impl import (
     realtime_collaboration_service,
 )
 from services.impl.realtime.socketio_auth_service_impl import socketio_auth_service
-from utils.logger import get_logger
+from utils.logger import logger
 from utils.rate_limiter import socketio_rate_limit
-
-logger = get_logger(__name__)
 
 
 def register_collaboration_crdt_handlers(socketio):
     @socketio.on("crdt_update", namespace=COLLABORATION_NAMESPACE)
-    @socketio_rate_limit(max_requests=100, window_seconds=60)  # 100 updates per minute
+    # 100 updates per minute
+    @socketio_rate_limit(max_requests=100, window_seconds=60)
     def handle_crdt_update(data):
         user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         if not user_id:
@@ -33,14 +32,16 @@ def register_collaboration_crdt_handlers(socketio):
         try:
             crdt_update_dto = CRDTUpdateDTO.model_validate(data)
         except ValidationError as exc:
-            logger.error(f"Invalid CRDT update payload from user {user_id}: {exc}")
+            logger.error(
+                f"Invalid CRDT update payload from user {user_id}: {exc}")
             return
 
         event = realtime_collaboration_service.process_crdt_update(
             update_dto=crdt_update_dto,
             user_id=user_id,
             user_role=user_role,
-            username=realtime_collaboration_service.get_username_by_socket(request.sid),
+            username=realtime_collaboration_service.get_username_by_socket(
+                request.sid),
         )
 
         emit(
@@ -52,7 +53,8 @@ def register_collaboration_crdt_handlers(socketio):
         )
 
     @socketio.on("crdt_sync_request", namespace=COLLABORATION_NAMESPACE)
-    @socketio_rate_limit(max_requests=30, window_seconds=60)  # 30 sync requests per minute
+    # 30 sync requests per minute
+    @socketio_rate_limit(max_requests=30, window_seconds=60)
     def handle_crdt_sync_request(data):
         user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         if not user_id:
