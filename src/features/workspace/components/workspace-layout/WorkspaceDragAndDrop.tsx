@@ -5,6 +5,7 @@ import type {
   DragEndEvent,
   DragStartEvent,
   SensorDescriptor,
+  SensorOptions,
 } from '@dnd-kit/core'
 import type { Note } from '@/features/notes/models/note.model'
 import { NoteCard } from '@/features/notes/components/NoteCard'
@@ -12,7 +13,7 @@ import { NoteCard } from '@/features/notes/components/NoteCard'
 interface WorkspaceDragAndDropProps {
   children: ReactNode
   activeNote: Note | null
-  sensors: SensorDescriptor<unknown>[]
+  sensors: SensorDescriptor<SensorOptions>[]
   onDragStart: (event: DragStartEvent) => void
   onDragEnd: (event: DragEndEvent) => void
   onDragCancel: (event: DragCancelEvent) => void

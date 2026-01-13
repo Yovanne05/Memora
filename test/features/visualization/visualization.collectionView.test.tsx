@@ -139,7 +139,7 @@ vi.mock('reactflow', () => ({
       onClick={(e) => onPaneClick?.(e)}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
-          onPaneClick?.(event)
+          onPaneClick?.(event as unknown as ReactMouseEvent)
         }
       }}
     >
