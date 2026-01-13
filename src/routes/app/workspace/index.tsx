@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router"
-import NotesListView from "@/features/workspace/pages/NotesListView"
+import { createFileRoute } from '@tanstack/react-router'
+import FolderSystemView from '@/features/workspace/pages/FolderSystemView'
 
-export const Route = createFileRoute("/app/workspace/")({
-  component: NotesListView,
+export const Route = createFileRoute('/app/workspace/')({
+  component: FolderSystemView,
 })

@@ -15,10 +15,11 @@ const FETCH_LIMIT = 200
 interface UseWorkspaceNotesOptions {
   collectionId?: string
   favorites?: boolean
+  orphansOnly?: boolean
 }
 
 export function useWorkspaceNotes(options: UseWorkspaceNotesOptions = {}) {
-  const { collectionId, favorites } = options
+  const { collectionId, favorites, orphansOnly } = options
   const { state } = useWorkspaceContext()
   const {
     userId,
@@ -52,14 +53,26 @@ export function useWorkspaceNotes(options: UseWorkspaceNotesOptions = {}) {
     const items = notesQuery.data?.items ?? []
     if (!userId) return items
 
-    return items.filter((note) => {
+    let filtered = items.filter((note) => {
       if (note.ownerId === userId) return true
       if (note.collectionId && sharedCollectionIds.has(note.collectionId)) {
         return true
       }
       return sharedNoteIds.has(note.id)
     })
-  }, [notesQuery.data?.items, userId, sharedCollectionIds, sharedNoteIds])
+
+    if (orphansOnly) {
+      filtered = filtered.filter((note) => !note.collectionId)
+    }
+
+    return filtered
+  }, [
+    notesQuery.data?.items,
+    userId,
+    sharedCollectionIds,
+    sharedNoteIds,
+    orphansOnly,
+  ])
 
   const pagedNotes = useMemo(() => {
     const start = state.page * state.limit

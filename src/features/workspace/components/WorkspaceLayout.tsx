@@ -2,8 +2,6 @@ import type { ReactNode } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { getContextualErrorMessage } from '@/lib/error-context'
-import { WorkspaceSidebar } from './sidebar/WorkspaceSidebar'
-import { WorkspaceHeader } from './WorkspaceHeader'
 import { useWorkspaceContext } from '../context'
 import { useWorkspaceKeyboardShortcuts } from '../hooks/useWorkspaceKeyboardShortcuts'
 import { useCreateNoteMutation } from '@/features/notes/hooks/useCreateNoteMutation'
@@ -40,8 +38,8 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
       const collectionName = targetCollectionId
         ? 'la collection'
-        : 'aucune collection'
-      toast.success(`Note déplacée vers ${collectionName}`)
+        : 'les notes orphelines'
+      toast.success('Note déplacée vers ' + collectionName)
     } catch (error) {
       const message = getContextualErrorMessage(error, {
         operation: 'update',
@@ -83,9 +81,14 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
       actions.closeCreateNote()
 
+      const basePath = '/app/workspace/'
       const path = payload.collectionId
-        ? `/app/workspace/collections/${payload.collectionId}/notes/${newNote.id}`
-        : `/app/workspace/notes/${newNote.id}`
+        ? basePath +
+          'collections/' +
+          payload.collectionId +
+          '/notes/' +
+          newNote.id
+        : basePath + 'notes/' + newNote.id
 
       router.navigate({ to: path })
     } catch (error) {
@@ -103,13 +106,8 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
         onDragCancel={handleDragCancel}
       >
         <div className="flex h-[calc(100vh-4rem)] w-full">
-          <WorkspaceSidebar />
-
           <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-            <div className="flex-1 overflow-auto">
-              <WorkspaceHeader />
-              <div className="px-2 py-2 sm:px-4 sm:py-4">{children}</div>
-            </div>
+            <div className="flex-1 overflow-auto">{children}</div>
           </main>
         </div>
       </WorkspaceDragAndDrop>
