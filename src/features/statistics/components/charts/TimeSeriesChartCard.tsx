@@ -69,6 +69,22 @@ function ChartContent({
         />
         <YAxis allowDecimals={false} />
         <Tooltip
+          contentStyle={{
+            backgroundColor: 'hsl(var(--card))',
+            border: '1px solid hsl(var(--border))',
+            borderRadius: '8px',
+            padding: '12px',
+            boxShadow:
+              '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          }}
+          labelStyle={{
+            color: 'hsl(var(--foreground))',
+            fontWeight: '600',
+            marginBottom: '4px',
+          }}
+          itemStyle={{
+            color: 'hsl(var(--muted-foreground))',
+          }}
           labelFormatter={(label) => `Date: ${label}`}
           formatter={(value) => [value, 'Total']}
         />
