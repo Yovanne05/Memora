@@ -15,7 +15,6 @@ from services.impl.realtime.realtime_collaboration_service_impl import (
 )
 from services.impl.realtime.socketio_auth_service_impl import socketio_auth_service
 from utils.logger import logger
-from utils.rate_limiter import socketio_rate_limit
 
 
 def register_collaboration_session_handlers(socketio):
@@ -44,9 +43,6 @@ def register_collaboration_session_handlers(socketio):
             )
 
     @socketio.on("join_collaboration", namespace=COLLABORATION_NAMESPACE)
-    @socketio_rate_limit(
-        max_requests=100, window_seconds=60, disconnect_on_exceed=False
-    )  # 100 joins per minute
     def handle_join_collaboration(data):
         user_id, user_role = socketio_auth_service.get_current_user_context_from_socket()
         try:

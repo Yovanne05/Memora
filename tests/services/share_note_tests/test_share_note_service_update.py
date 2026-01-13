@@ -11,9 +11,8 @@ Les repositories sont MOCKÉS.
 """
 from datetime import datetime
 from uuid import uuid4
-from dtos.note_share_dto import NoteShareDTO, NoteShareCreateDTO, NoteShareUpdateDTO
+from dtos.note_share_dto import NoteShareDTO, NoteShareUpdateDTO
 from daos.note_dao import NoteShare
-from exceptions.note_share_exception import NoteShareNotFound
 
 
 class TestNoteShareServiceUpdate:

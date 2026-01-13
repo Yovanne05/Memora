@@ -13,7 +13,7 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
-from dtos.collection_dto import CollectionCreateDTO, CollectionUpdateDTO, CollectionDTO
+from dtos.collection_dto import CollectionDTO
 from dtos.user_access_dto import UserAccessDTO
 from utils.enums import SharePermissionEnum
 from daos.collection_dao import Collection

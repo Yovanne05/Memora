@@ -14,13 +14,12 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
-from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO, NoteDTO
+from dtos.note_dto import NoteDTO
 from dtos.user_access_dto import UserAccessDTO
 from utils.enums import SharePermissionEnum
 from daos.note_dao import Note
 from daos.user_dao import User
-from daos.collection_dao import Collection
-from exceptions.note_exception import NoteNotFound, NoteTitleConflict, NoteOwnerDoesNotExist
+from exceptions.note_exception import NoteNotFound
 from utils.enums import VisibilityEnum, RoleEnum
 
 

@@ -20,7 +20,6 @@ class TestReviewControllerFindMany:
         from dtos.review_dto import UpcomingReviewsGroupDTO, FlashcardWithReviewDTO
         from daos.user_dao import User
         from utils.enums import RoleEnum
-        from decimal import Decimal
 
         # Arrange
         user_id = str(uuid4())

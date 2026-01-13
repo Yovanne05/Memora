@@ -11,8 +11,6 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
-from dtos.note_share_link_dto import NoteShareLinkDTO, NoteShareLinkCreateDTO
-from daos.note_share_link_dao import NoteShareLink
 from exceptions.note_share_link_exception import NoteShareLinkNotFound
 
 

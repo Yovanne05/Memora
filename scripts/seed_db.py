@@ -4,7 +4,6 @@ Usage:
     python scripts/seed_db.py
 """
 import pathlib
-from datetime import datetime, timezone
 import sys
 
 import bcrypt
@@ -25,21 +24,14 @@ from utils.enums import (
     SharePermissionEnum,
     VisibilityEnum,
 )
-from utils.utils import generate_uuid
 
 # Import all DAO models so metadata is registered before create_all
 from daos.user_dao import User
 from daos.collection_dao import Collection, CollectionShare
-from daos.collection_share_link_dao import CollectionShareLink
 from daos.note_dao import Note, NoteLink, NoteShare
-from daos.note_share_link_dao import NoteShareLink
-from daos.note_image_dao import NoteImage
 from daos.favorite_dao import CollectionFavorite, NoteFavorite
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
-from daos.crdt_snapshot_dao import CRDTSnapshot
-from daos.note_collaboration_dao import NoteCollaborationHistory
-from daos.review_dao import Review
 from daos.report_dao import Report
 
 

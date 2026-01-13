@@ -9,7 +9,7 @@ Ces tests vérifient les requêtes SQL :
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
 from uuid import uuid4
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from decimal import Decimal
 from daos.review_dao import Review
 from repositorys import review_repository
