@@ -1,13 +1,13 @@
-import { MoreHorizontal } from "lucide-react"
+import { MoreVertical } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import type { ResourceCardAction } from "./types"
+} from '@/components/ui/dropdown-menu'
+import type { ResourceCardAction } from './types'
 
 type ResourceCardActionsProps = {
   actions: ResourceCardAction[]
@@ -44,7 +44,7 @@ export function ResourceCardActions({
               onClick={onStopPropagation}
               aria-label="Options"
             >
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
 
@@ -53,9 +53,9 @@ export function ResourceCardActions({
               <DropdownMenuItem
                 key={action.label}
                 className={`cursor-pointer ${
-                  action.variant === "destructive"
-                    ? "text-destructive focus:text-destructive"
-                    : ""
+                  action.variant === 'destructive'
+                    ? 'text-destructive focus:text-destructive'
+                    : ''
                 }`}
                 onClick={action.onClick}
               >
