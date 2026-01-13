@@ -7,7 +7,7 @@ import type {
   PaginatedSearchResponse,
 } from '../types/search.types'
 import type { SearchFilters } from '../types/search-query'
-import { logger } from "@/lib/logger"
+import { logger } from '@/lib/logger'
 
 export interface ISearchService {
   search(params: SearchFilters): Promise<PaginatedSearchResponse>
@@ -23,13 +23,14 @@ export function createSearchService(
       let totalCount = 0
 
       const searchType = params.type ?? 'all'
-      const isSearchingCollections = searchType === 'all' || searchType === 'collection'
+      const isSearchingCollections =
+        searchType === 'all' || searchType === 'collection'
       const isSearchingNotes = searchType === 'all' || searchType === 'note'
 
       const commonParams = {
+        includePublic: true,
         limit: params.limit,
         offset: params.offset,
-        visibility: 'public' as const,
         tags: params.tags?.length ? params.tags.join(',') : undefined,
       }
 
@@ -37,13 +38,21 @@ export function createSearchService(
         const collectionParams = {
           ...commonParams,
           titleContains: params.query,
-          sortBy: params.sortBy === 'alphabetical' ? ('title' as const) : ('created_at' as const),
+          sortBy:
+            params.sortBy === 'alphabetical'
+              ? ('title' as const)
+              : ('created_at' as const),
           sortDir: params.sortDir ?? ('desc' as const),
         }
 
         try {
           const collections = await collectionsApi.list(collectionParams)
-          results.push(...collections.items.map(item => ({ type: 'collection' as const, item })))
+          results.push(
+            ...collections.items.map((item) => ({
+              type: 'collection' as const,
+              item,
+            }))
+          )
           totalCount += collections.total
         } catch (error) {
           logger.error('Error fetching collections:', error)
@@ -55,13 +64,21 @@ export function createSearchService(
           ...commonParams,
           titleContains: params.query,
           contentContains: params.query,
-          sortBy: params.sortBy === 'alphabetical' ? ('title' as const) : ('created_at' as const),
+          sortBy:
+            params.sortBy === 'alphabetical'
+              ? ('title' as const)
+              : ('created_at' as const),
           sortDir: params.sortDir ?? ('desc' as const),
         }
 
         try {
           const paginatedNotes = await notesApi.list(noteParams)
-          results.push(...paginatedNotes.items.map(item => ({ type: 'note' as const, item })))
+          results.push(
+            ...paginatedNotes.items.map((item) => ({
+              type: 'note' as const,
+              item,
+            }))
+          )
           totalCount += paginatedNotes.total
         } catch (error) {
           logger.error('Error fetching notes:', error)
@@ -79,7 +96,10 @@ export function createSearchService(
       return {
         items: results,
         total: totalCount,
-        offset: params?.offset && params?.limit ? Math.floor(params.offset / params.limit) : 0,
+        offset:
+          params?.offset && params?.limit
+            ? Math.floor(params.offset / params.limit)
+            : 0,
         limit: params.limit ?? 50,
       }
     },
