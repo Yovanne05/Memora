@@ -1,16 +1,21 @@
 import { memo, type ReactNode } from 'react'
 import { DndContext, DragOverlay } from '@dnd-kit/core'
-import type { SensorDescriptor } from '@dnd-kit/core'
+import type {
+  DragCancelEvent,
+  DragEndEvent,
+  DragStartEvent,
+  SensorDescriptor,
+} from '@dnd-kit/core'
 import type { Note } from '@/features/notes/models/note.model'
 import { NoteCard } from '@/features/notes/components/NoteCard'
 
 interface WorkspaceDragAndDropProps {
   children: ReactNode
   activeNote: Note | null
-  sensors: SensorDescriptor<any>[]
-  onDragStart: (event: any) => void
-  onDragEnd: (event: any) => void
-  onDragCancel: () => void
+  sensors: SensorDescriptor<unknown>[]
+  onDragStart: (event: DragStartEvent) => void
+  onDragEnd: (event: DragEndEvent) => void
+  onDragCancel: (event: DragCancelEvent) => void
 }
 
 export const WorkspaceDragAndDrop = memo(function WorkspaceDragAndDrop({

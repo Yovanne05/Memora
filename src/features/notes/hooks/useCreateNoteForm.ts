@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCollectionsQuery } from '@/features/collections/hooks/useCollectionsQuery'
 import { filterManageableCollections } from '@/features/collections/lib/collection-permissions'
@@ -41,7 +41,10 @@ export function useCreateNoteForm({
     },
   })
 
-  const titleValue = form.watch('title')
+  const titleValue = useWatch({
+    control: form.control,
+    name: 'title',
+  })
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
     await onSubmit({
