@@ -44,7 +44,7 @@ export function useReviewSession() {
   // Rediriger si aucune flashcard à réviser
   useEffect(() => {
     if (upcomingReviews && flashcardQueue.length === 0) {
-      navigate({ to: '/app/revision' })
+      navigate({ to: '/app/review' })
     }
   }, [upcomingReviews, flashcardQueue.length, navigate])
 
@@ -86,7 +86,7 @@ export function useReviewSession() {
   }
 
   const handleExit = () => {
-    navigate({ to: '/app/revision' })
+    navigate({ to: '/app/review' })
   }
 
   return {

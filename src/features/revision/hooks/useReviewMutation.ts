@@ -24,9 +24,9 @@ export function useReviewMutation() {
         review.intervalDays === 1 ? '1 jour' : `${review.intervalDays} jours`
 
       if (review.isCorrect) {
-        toast.success(`✅ Correct ! Prochaine révision dans ${intervalText}`)
+        toast.success(`Correct ! Prochaine révision dans ${intervalText}`)
       } else {
-        toast.error(`❌ Incorrect. Prochaine révision dans ${intervalText}`)
+        toast.error(`Incorrect. Prochaine révision dans ${intervalText}`)
       }
 
       logger.info('Review submitted successfully', {

@@ -20,7 +20,7 @@ export default function RevisionPage() {
   const todayCount = todayReviews?.flashcards.length ?? 0
 
   const handleStartSession = () => {
-    navigate({ to: '/app/revision/session' })
+    navigate({ to: '/app/review/session' })
   }
 
   if (isLoading) {

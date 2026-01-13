@@ -17,7 +17,7 @@ export const navigationItems = [
     url: '/app/visualization',
   },
   { title: 'Recherche', icon: Search, url: '/app/search' },
-  { title: 'Révision', icon: GraduationCap, url: '/app/revision' },
+  { title: 'Révision', icon: GraduationCap, url: '/app/review' },
 ]
 
 export const accountItems = [

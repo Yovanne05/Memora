@@ -24,7 +24,7 @@ export function ReviewCompletionScreen({
       <Card>
         <CardHeader>
           <CardTitle className="text-center text-2xl">
-            🎉 Session de révision terminée !
+            Session de révision terminée !
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
