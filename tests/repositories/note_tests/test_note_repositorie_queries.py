@@ -9,9 +9,7 @@ Ces tests vérifient l'interaction avec la base de données :
 
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
-from datetime import datetime
 from uuid import uuid4
-from daos.note_dao import Note
 from repositorys import note_repository
 from repositorys.note_repository import NoteSearchParams
 from utils.enums import VisibilityEnum

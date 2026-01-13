@@ -18,16 +18,8 @@ from flask import g
 from utils import db as db_utils
 from utils.enums import RoleEnum, VisibilityEnum
 from daos.user_dao import User
-from daos.collection_dao import Collection, CollectionShare
-from daos.note_dao import Note, NoteShare
-from daos.flashcard_dao import Flashcard
-from daos.flashcard_answer_dao import FlashcardAnswer
-from daos.review_dao import Review
-from daos.report_dao import Report
-from daos.favorite_dao import NoteFavorite, CollectionFavorite
-from daos.note_image_dao import NoteImage
-from daos.note_share_link_dao import NoteShareLink
-from daos.collection_share_link_dao import CollectionShareLink
+from daos.collection_dao import Collection
+from daos.note_dao import Note
 from repositorys import user_repository, collection_repository, note_repository
 
 
@@ -68,12 +60,12 @@ def configure_test_env_session(db_engine):
     """Configure l'environnement de test au niveau session."""
     import os
     old_env = os.environ.copy()
-    os.environ["APP_ENV"] = "test"
+    os.environ["TESTING"] = "1"
     os.environ["SWAGGER_ENABLED"] = "0"
 
-    old_app_env = config.APP_ENV
     old_swagger = config.SWAGGER_ENABLED
-    config.APP_ENV = "test"
+    old_is_test = config.IS_TEST
+    config.IS_TEST = True
     config.SWAGGER_ENABLED = False
 
     old_engine = db_utils.engine
@@ -84,7 +76,7 @@ def configure_test_env_session(db_engine):
 
     os.environ.clear()
     os.environ.update(old_env)
-    config.APP_ENV = old_app_env
+    config.IS_TEST = old_is_test
     config.SWAGGER_ENABLED = old_swagger
     db_utils.engine = old_engine
 

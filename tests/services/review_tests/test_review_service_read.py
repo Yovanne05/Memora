@@ -9,13 +9,6 @@ Ces tests vérifient la logique métier :
 Les repositories sont MOCKÉS.
 """
 from uuid import uuid4
-from unittest.mock import Mock
-from decimal import Decimal
-from datetime import datetime, timezone
-from dtos.review_dto import ReviewDTO
-from daos.review_dao import Review
-from exceptions.review_exception import FlashcardNotFoundForReview, InvalidAnswerForFlashcard
-from utils.enums import ReviewDifficultyEnum
 
 
 class TestReviewServiceGetUpcoming:

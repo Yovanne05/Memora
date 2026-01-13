@@ -9,7 +9,6 @@ Ces tests vérifient :
 
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
-from datetime import datetime
 from uuid import uuid4
 from daos.note_share_link_dao import NoteShareLink
 from repositorys import note_share_link_repository

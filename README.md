@@ -44,7 +44,7 @@ Backend Flask pour **Memora**, une application de prise de notes collaborative a
 ### Dépendances système
 
 - **libpq-dev** (pour psycopg2 sur Linux/macOS)
-- **Redis Server** (pour sessions de collaboration et rate limiting)
+- **Redis Server** (pour sessions de collaboration)
 - **Docker & Docker Compose** (pour stockage S3 local via SeaweedFS)
 - **compilateur c/c++**
 
@@ -102,13 +102,13 @@ cp .env.example .env
 
 #### Variables critiques
 
-| Variable | Valeur par défaut | Description |
+| Variable | Valeur par defaut | Description |
 |----------|------------------|-------------|
-| `APP_ENV` | `dev` | Environnement (`dev`, `test`, `prod`) |
-| `SQLALCHEMY_DATABASE_URI` | `postgresql+psycopg2://...` | URL de connexion PostgreSQL |
-| `JWT_SECRET_KEY` | `change-me` | **Obligatoire en prod** — Secret pour tokens JWT |
-| `COLLAB_API_KEY` | `change-me` | **Obligatoire** — Clé API pour collaboration WebSocket |
-| `ALLOWED_ORIGINS` | `http://localhost:5173` | Origines CORS autorisées (obligatoire en prod) |
+| `SQLALCHEMY_DATABASE_URI` | `sqlite:///app.db` | URL de connexion BD (SQLite en dev par defaut, Postgres en prod) |
+| `JWT_SECRET_KEY` | `change-me` | **Obligatoire en prod** - Secret pour tokens JWT |
+| `JWT_ACCESS_TOKEN_EXPIRES_SECONDS` | `86400` | Duree de validite du token (en secondes) |
+| `ALLOWED_ORIGINS` | `http://localhost:5173` | Origines CORS autorisees (obligatoire en prod) |
+| `SWAGGER_ENABLED` | `1` | Active Swagger en dev/test (ignore en prod) |
 
 #### Redis (collaboration temps réel)
 
@@ -139,9 +139,9 @@ STORAGE_S3_SECRET_KEY=memora-secret
 STORAGE_S3_PUBLIC_BASE_URL=http://localhost:8333/memora-uploads
 ```
 
-### Où placer le `.env` ?
+### Ou placer le `.env` ?
 
-À la **racine du projet backend** (`memora_back/.env`). Il est chargé automatiquement via `python-dotenv` dans [config.py](config.py#L5).
+A la **racine du projet** (`.env`). Il est charge automatiquement via `python-dotenv` dans [config.py](config.py#L5).
 
 ---
 
@@ -786,22 +786,24 @@ class NoteTitleConflict(Conflict):
 
 ---
 
-## 14) Base de données
+## 14) Base de donnees
 
-### Moteur utilisé
+### Moteur utilise
 
-- **Développement** : PostgreSQL (`postgresql+psycopg2://...`)
-- **Tests** : SQLite en mémoire (`:memory:`)
+- **Developpement** : SQLite (`sqlite:///app.db`) par defaut (PostgreSQL possible)
+- **Tests** : SQLite en memoire (`:memory:`)
 
 ### URL de connexion
 
-Définie dans `.env` :
+Definie dans `.env` :
 
 ```env
-SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres:root@localhost:5432/memora
+SQLALCHEMY_DATABASE_URI=sqlite:///app.db
+# Exemple Postgres :
+# SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres:password@localhost:5432/memora
 ```
 
-### Création du schéma
+### Creation du schema
 
 #### En développement
 
@@ -819,7 +821,7 @@ python
 Création automatique via [`app.py`](app.py#L76-L78) :
 
 ```python
-if config.APP_ENV == "test":
+if config.IS_TEST:
     with app.app_context():
         db.create_all()
 ```
@@ -948,7 +950,7 @@ else:
 
 ### Politique d'erreurs
 
-- **En production** (`APP_ENV=prod`) : Messages génériques uniquement
+- **En production** : Messages génériques uniquement
 - **En dev** : Messages détaillés pour debugging
 - **Pas de stack traces** exposées au client
 
@@ -1034,10 +1036,8 @@ ruff check .
 ### Variables d'environnement requises en prod
 
 ```env
-APP_ENV=prod
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://user:password@host:5432/memora
 JWT_SECRET_KEY=<générer-secret-fort>
-COLLAB_API_KEY=<générer-secret-fort>
 ALLOWED_ORIGINS=https://app.memora.com
 REDIS_HOST=redis
 REDIS_PORT=6379
@@ -1153,12 +1153,11 @@ python scripts/init_s3.py
 curl http://localhost:8333
 ```
 
-### Diagnostic général
+### Diagnostic general
 
-1. **Activer DEBUG** : `APP_ENV=dev` dans `.env`
-2. **Vérifier les logs** : `tail -f logs/app.log`
-3. **Tester Redis** : `redis-cli ping` → `PONG`
-4. **Tester SeaweedFS** : `curl http://localhost:8333`
+1. **Verifier les logs** : `tail -f logs/app.log`
+2. **Tester Redis** : `redis-cli ping` -> `PONG`
+3. **Tester SeaweedFS** : `curl http://localhost:8333`
 
 ---
 

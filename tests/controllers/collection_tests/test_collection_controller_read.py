@@ -14,8 +14,7 @@ from http import HTTPStatus
 from datetime import datetime
 from dtos.collection_dto import CollectionDTO
 from utils.enums import VisibilityEnum
-from exceptions.user_exception import UserNotFound
-from exceptions.collection_exception import CollectionNotFound, CollectionTitleConflict
+from exceptions.collection_exception import CollectionNotFound
 
 
 class TestCollectionControllerList:

@@ -14,11 +14,10 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
-from dtos.user_dto import UserCreateDTO, UserUpdateDTO, UserDTO
+from dtos.user_dto import UserCreateDTO, UserDTO
 from daos.user_dao import User
-from exceptions.user_exception import UserNotFound, UserEmailConflict, UserUsernameConflict
+from exceptions.user_exception import UserEmailConflict, UserUsernameConflict
 from utils.enums import RoleEnum
-from repositorys.user_repository import UserSearchParams
 
 
 class TestUserServiceCreate:

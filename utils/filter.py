@@ -1,27 +1,18 @@
 from http import HTTPStatus
 from flask import jsonify, request, g
 from flask_jwt_extended.exceptions import JWTExtendedException
-from flask_limiter.errors import RateLimitExceeded
 from werkzeug.exceptions import HTTPException
 from pydantic import ValidationError
 
-import config
 from exceptions.permission_exception import PermissionException
 
 GENERIC_MESSAGE = "Une erreur est survenue. Merci de réessayer plus tard."
-RATE_LIMIT_MESSAGE = "Trop de requetes. Reessayez plus tard."
 
 
 def register_global_filter(app):
     @app.errorhandler(Exception)
     def handle_any_exception(error: Exception):
-        if isinstance(error, RateLimitExceeded):
-            status_code = int(HTTPStatus.TOO_MANY_REQUESTS)
-            if config.APP_ENV == "prod":
-                message = RATE_LIMIT_MESSAGE
-            else:
-                message = error.description
-        elif isinstance(error, PermissionException):
+        if isinstance(error, PermissionException):
             status_code = int(HTTPStatus.FORBIDDEN)
             message = str(error)
         elif isinstance(error, HTTPException):

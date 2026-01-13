@@ -7,7 +7,7 @@ sans dépendre de la base de données.
 """
 from datetime import datetime
 from uuid import uuid4
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 
 import pytest
 

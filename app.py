@@ -25,7 +25,6 @@ from controllers.review_controller import bp_reviews
 from controllers.report_controller import bp_reports
 from utils import db
 from utils.jwt import init_jwt
-from utils.http_rate_limiter import init_http_rate_limiter
 from utils.filter import register_global_filter
 from utils.logger import init_logger
 from utils.swagger import init_swagger
@@ -43,7 +42,6 @@ def create_app() -> Flask:
     else:
         CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 
-    app.config["RATELIMIT_HEADERS_ENABLED"] = config.APP_ENV != "prod"
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
     app.config["MAX_CONTENT_LENGTH"] = config.IMAGE_MAX_CONTENT_LENGTH
@@ -51,7 +49,6 @@ def create_app() -> Flask:
     init_jwt(app)
     init_swagger(app)
     init_logger(app)
-    init_http_rate_limiter(app)
 
     redis_client = redis_client_service.init_redis(
         host=config.REDIS_HOST,
@@ -61,7 +58,7 @@ def create_app() -> Flask:
 
     init_crdt_service(redis_client=redis_client)
 
-    if config.APP_ENV != "test":
+    if not config.IS_TEST:
         init_background_jobs(
             crdt_snapshot_interval=30,   # 30 seconds
             session_cleanup_interval=30, # 30 seconds
@@ -73,7 +70,7 @@ def create_app() -> Flask:
     )
 
 
-    if config.APP_ENV == "test":
+    if config.IS_TEST:
         with app.app_context():
             db.create_all()
             

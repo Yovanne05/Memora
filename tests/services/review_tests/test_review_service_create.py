@@ -10,7 +10,6 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
-from unittest.mock import Mock
 from decimal import Decimal
 from datetime import datetime, timezone
 from dtos.review_dto import ReviewDTO

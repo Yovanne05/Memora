@@ -13,9 +13,6 @@ from uuid import uuid4
 from dtos.note_favorite_dto import NoteFavoriteDTO
 from dtos.collection_favorite_dto import CollectionFavoriteDTO
 from daos.favorite_dao import NoteFavorite, CollectionFavorite
-from exceptions.favorite_exception import FavoriteNotFound
-from exceptions.note_exception import NoteNotFound
-from exceptions.collection_exception import CollectionNotFound
 
 
 class TestNoteFavoriteService:

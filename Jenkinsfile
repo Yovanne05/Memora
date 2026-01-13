@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        APP_ENV = 'test'
         SWAGGER_ENABLED = '0'
         SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+        TESTING = '1'
     }
 
     stages {

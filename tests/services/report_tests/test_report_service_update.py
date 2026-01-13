@@ -13,7 +13,7 @@ Les repositories sont MOCKÉS.
 import pytest
 from uuid import uuid4
 from datetime import datetime
-from dtos.report_dto import ReportDTO, ReportCreateDTO, ReportUpdateDTO
+from dtos.report_dto import ReportDTO, ReportUpdateDTO
 from daos.report_dao import Report
 from exceptions.report_exception import ReportNotFound
 

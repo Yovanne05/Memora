@@ -1,4 +1,4 @@
-from typing import List, Protocol
+from typing import Protocol
 
 from dtos.collection_share_dto import (
     CollectionShareCreateDTO,
