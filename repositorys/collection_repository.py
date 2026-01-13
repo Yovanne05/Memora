@@ -32,9 +32,9 @@ def _reload_with_relationships(session: Session, collection_id: str) -> Collecti
     return session.execute(stmt).scalar_one()
 
 
-def _scope_to_user(stmt: Select, user) -> Select:
+def _scope_to_user(stmt: Select, user, param: CollectionSearchParams) -> Select:
     accessible_ids = permission_domain_service.get_accessible_collection_ids(
-        user.id, user.role
+        user.id, user.role, include_public=param.include_public
     )
     if accessible_ids is None:
         return stmt
@@ -52,6 +52,7 @@ class CollectionSearchParams:
     tags: Optional[list[str]] = None
     shared_with_user_id: Optional[str] = None
     is_favorite: Optional[bool] = False
+    include_public: bool = False
 
     only_with_notes: bool = False
 
@@ -66,7 +67,7 @@ class CollectionSearchParams:
 def get_for_user(user, collection_id: str) -> Optional[Collection]:
     with get_db_session() as session:
         stmt = select(Collection).where(Collection.id == collection_id)
-        stmt = _scope_to_user(stmt, user)
+        stmt = _scope_to_user(stmt, user, CollectionSearchParams())
         stmt = _apply_eager_loading(stmt)
         return session.execute(stmt).scalar_one_or_none()
 
@@ -122,7 +123,7 @@ def list_for_user(
         return [], 0
 
     stmt = select(Collection).where(*filter_result.filters)
-    stmt = _scope_to_user(stmt, user)
+    stmt = _scope_to_user(stmt, user, param)
 
     order_expr = build_collection_order(param)
 

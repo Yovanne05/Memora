@@ -14,6 +14,7 @@ class NoteFindQuery(BaseModel):
     ids: Optional[list[UUID]] = None
     tags: Optional[list[str]] = None
     is_favorite: Optional[bool] = Field(default=None)
+    include_public: bool = Field(default=False)
 
     sort_by: Literal["title", "created_at", "updated_at"] = Field(
         default="created_at"
@@ -44,6 +45,7 @@ class NoteFindQuery(BaseModel):
             ids=[str(item) for item in self.ids] if self.ids else None,
             tags=self.tags,
             is_favorite=self.is_favorite,
+            include_public=self.include_public,
             sort_by=self.sort_by,
             sort_dir=self.sort_dir,
             limit=self.limit,

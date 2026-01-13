@@ -32,7 +32,7 @@ class NoteCrudService(NoteCrudServiceInterface):
     ) -> Tuple[List[NoteDTO], int]:
         user = get_current_user()
         accessible_note_ids = permission_domain_service.get_accessible_note_ids(
-            user.id, user.role
+            user.id, user.role, include_public=params.include_public if params else False
         )
         entities, total = note_repository.list_for_user(
             user, params, accessible_note_ids=accessible_note_ids
@@ -47,7 +47,7 @@ class NoteCrudService(NoteCrudServiceInterface):
     def find_one(self, note_id: str) -> NoteDTO:
         user = get_current_user()
         accessible_note_ids = permission_domain_service.get_accessible_note_ids(
-            user.id, user.role
+            user.id, user.role, include_public=False
         )
         note_entity = note_repository.get_for_user(
             note_id, accessible_note_ids=accessible_note_ids

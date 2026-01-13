@@ -14,6 +14,7 @@ class CollectionFindQuery(BaseModel) :
     tags : Optional[list[str]] = None
     only_with_notes : bool = Field(default = False)
     is_favorite: bool = Field(default=False)
+    include_public: bool = Field(default=False)
 
     sort_by : Literal["title", "created_at", "updated_at"] = Field(
         default = "created_at"
@@ -41,6 +42,7 @@ class CollectionFindQuery(BaseModel) :
             ids = [str(item) for item in self.ids] if self.ids else None,
             tags=self.tags,
             is_favorite=self.is_favorite,
+            include_public=self.include_public,
             sort_by = self.sort_by,
             sort_dir = self.sort_dir,
             limit = self.limit,

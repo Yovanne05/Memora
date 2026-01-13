@@ -23,6 +23,7 @@ class NoteSearchParams:
     ids: Optional[list[str]] = None
     tags: Optional[list[str]] = None
     is_favorite: Optional[bool] = False
+    include_public: bool = False
 
     sort_by: Literal["title", "created_at", "updated_at"] = "created_at"
     sort_dir: Literal["asc", "desc"] = "desc"
