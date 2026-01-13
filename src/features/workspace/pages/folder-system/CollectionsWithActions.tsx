@@ -4,7 +4,7 @@ import type { CollectionFormValues } from '@/features/collections/types/collecti
 import { CollectionCard } from '@/features/collections/components/CollectionCard'
 import { CollectionFormDialog } from '@/features/collections/components/CollectionFormDialog'
 import { CollectionShareDialog } from '@/features/collections/components/CollectionShareDialog'
-import { CollectionDeleteDialog } from '@/features/workspace/components/favorites/CollectionDeleteDialog'
+import { CollectionDeleteDialog } from '@/features/favorites/components/CollectionDeleteDialog'
 import { useUpdateCollectionMutation } from '@/features/collections/hooks/useUpdateCollectionMutation'
 import { useDeleteCollectionMutation } from '@/features/collections/hooks/useDeleteCollectionMutation'
 

@@ -5,12 +5,14 @@ import {
   Network,
   Search,
   GraduationCap,
+  Star,
   Settings as SettingsIcon,
 } from 'lucide-react'
 
 export const navigationItems = [
   { title: 'Tableau de bord', icon: LayoutDashboard, url: '/app/dashboard' },
   { title: 'Espace de travail', icon: LayoutGrid, url: '/app/workspace' },
+  { title: 'Favoris', icon: Star, url: '/app/favorites' },
   {
     title: 'Graphe de connaissances',
     icon: Network,

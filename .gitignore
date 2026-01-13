@@ -26,3 +26,6 @@ dist-ssr
 .env
 
 coverage
+
+# TanStack Router cache
+.tanstack

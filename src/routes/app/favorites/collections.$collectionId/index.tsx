@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router"
-import CollectionNotesView from "@/features/workspace/pages/CollectionNotesView"
+import { createFileRoute } from '@tanstack/react-router'
+import CollectionNotesView from '@/features/workspace/pages/CollectionNotesView'
 
 export const Route = createFileRoute(
-  "/app/workspace/favorites/collections/$collectionId/"
+  '/app/favorites/collections/$collectionId/'
 )({
   component: RouteComponent,
 })
