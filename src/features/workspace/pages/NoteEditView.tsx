@@ -42,15 +42,12 @@ export default function NoteEditView({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {note.collectionId && (
-        <Button variant="ghost" size="sm" className="gap-2" asChild>
-          <Link to={backUrl}>
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Retour à la collection</span>
-            <span className="sm:hidden">Retour</span>
-          </Link>
-        </Button>
-      )}
+      <Button variant="ghost" size="sm" className="gap-2" asChild>
+        <Link to={backUrl}>
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Link>
+      </Button>
       {isReadOnly && <NoteEditReadOnlyBanner />}
       <NoteEditForm
         note={note}

@@ -1,9 +1,9 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { TagInputField } from "./tag-input/TagInputField"
-import { TagInputMessages } from "./tag-input/TagInputMessages"
-import { TagList } from "./tag-input/TagList"
-import { useTagInput } from "./tag-input/useTagInput"
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+import { TagInputField } from './tag-input/TagInputField'
+import { TagInputMessages } from './tag-input/TagInputMessages'
+import { TagList } from './tag-input/TagList'
+import { useTagInput } from './tag-input/useTagInput'
 
 export interface TagInputProps {
   readonly value: string[]
@@ -19,7 +19,7 @@ export interface TagInputProps {
 export function TagInput({
   value = [],
   onChange,
-  placeholder = "Ajouter un tag...",
+  placeholder = 'Ajouter un tag...',
   maxTags = 20,
   className,
   disabled = false,
@@ -29,27 +29,39 @@ export function TagInput({
   const inputRef = React.useRef<HTMLInputElement>(null)
   const tagInputId = React.useId()
 
-  const { inputValue, setInputValue, handleKeyDown, handleInputBlur, removeTag } =
-    useTagInput({ value, onChange, maxTags, disabled })
+  const {
+    inputValue,
+    setInputValue,
+    handleKeyDown,
+    handleInputBlur,
+    removeTag,
+  } = useTagInput({ value, onChange, maxTags, disabled })
 
   const maxed = value.length >= maxTags
+  const inputId = id ?? tagInputId
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn('space-y-2', className)}>
       <label
+        htmlFor={inputId}
         className={cn(
-          "flex min-h-10 w-full flex-wrap items-center gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm transition-[color,box-shadow] outline-none cursor-text",
-          "focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
-          error && "border-destructive aria-invalid:ring-destructive/20",
-          disabled && "cursor-not-allowed opacity-50"
+          'flex min-h-10 w-full flex-wrap items-center gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm transition-[color,box-shadow] outline-none cursor-text',
+          'focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]',
+          error && 'border-destructive aria-invalid:ring-destructive/20',
+          disabled && 'cursor-not-allowed opacity-50'
         )}
       >
-        <TagList tags={value} disabled={disabled} onRemove={removeTag} id={tagInputId} />
+        <TagList
+          tags={value}
+          disabled={disabled}
+          onRemove={removeTag}
+          id={tagInputId}
+        />
         <TagInputField
-          id={id}
+          id={inputId}
           inputRef={inputRef}
           value={inputValue}
-          placeholder={value.length === 0 ? placeholder : ""}
+          placeholder={value.length === 0 ? placeholder : ''}
           disabled={disabled}
           maxed={maxed}
           onChange={setInputValue}

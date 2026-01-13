@@ -27,7 +27,7 @@ export function useFavoritesData() {
     []
   )
 
-  const notesQuery = useNotesQuery(1, 100, filters)
+  const notesQuery = useNotesQuery(0, 100, filters)
   const collectionsQuery = useCollectionsQuery(collectionFilters)
 
   const isLoading = notesQuery.isLoading || collectionsQuery.isLoading

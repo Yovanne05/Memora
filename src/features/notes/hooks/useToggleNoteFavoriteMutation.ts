@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { notesService } from '../services/notes.service'
+import { NOTES_QUERY_KEYS } from './notes.keys'
 
 export function useAddNoteFavoriteMutation() {
   const qc = useQueryClient()
@@ -9,8 +10,8 @@ export function useAddNoteFavoriteMutation() {
       await notesService.addFavorite(noteId)
     },
     onSettled: async () => {
-      await qc.invalidateQueries({ queryKey: ['notes'] })
-      await qc.invalidateQueries({ queryKey: ['note'] })
+      await qc.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
+      await qc.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.details() })
     },
   })
 }
@@ -23,8 +24,8 @@ export function useRemoveNoteFavoriteMutation() {
       await notesService.removeFavorite(noteId)
     },
     onSettled: async () => {
-      await qc.invalidateQueries({ queryKey: ['notes'] })
-      await qc.invalidateQueries({ queryKey: ['note'] })
+      await qc.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
+      await qc.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.details() })
     },
   })
 }
@@ -41,8 +42,8 @@ export function useToggleNoteFavoriteMutation() {
       }
     },
     onSettled: async () => {
-      await qc.invalidateQueries({ queryKey: ['notes'] })
-      await qc.invalidateQueries({ queryKey: ['note'] })
+      await qc.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.lists() })
+      await qc.invalidateQueries({ queryKey: NOTES_QUERY_KEYS.details() })
     },
   })
 }

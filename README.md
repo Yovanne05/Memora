@@ -148,17 +148,9 @@ Variables requises :
 VITE_API_URL=http://localhost:5000
 
 # WebSocket Collaboration
-VITE_COLLAB_WS_URL=ws://localhost:5000
 
 # Environnement
-VITE_APP_ENV=development
 
-# Sentry (optionnel en développement)
-VITE_SENTRY_DSN=https://your-sentry-dsn/
-VITE_SENTRY_ORG=your-sentry-org
-VITE_SENTRY_PROJECT=your-sentry-project
-VITE_SENTRY_AUTH_TOKEN=your-auth-token
-VITE_SENTRY_RELEASE=memora@1.0.0
 ```
 
 ### Configuration HTTP Client
