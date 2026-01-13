@@ -12,18 +12,14 @@ Les repositories sont MOCKÉS.
 """
 import pytest
 from uuid import uuid4
-from unittest.mock import Mock
 from datetime import datetime
-from dtos.flashcard_dto import FlashcardDTO, FlashcardCreateDTO, FlashcardUpdateDTO
+from dtos.flashcard_dto import FlashcardDTO, FlashcardCreateDTO
 from dtos.flashcard_answer_dto import FlashcardAnswerCreateDTO
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer
 from exceptions.flashcard_exception import (
-    FlashcardNotFound,
-    FlashcardMustHaveAnswers,
     FlashcardMustHaveAtLeastOneCorrectAnswer
 )
-from exceptions.note_exception import NoteNotFound
 
 
 class TestFlashcardServiceCreate:
@@ -83,7 +79,6 @@ class TestFlashcardServiceCreate:
     def test_create_flashcard_no_answers_raises_exception(self, mock_flashcard_repository, mock_note_repository, make_note, make_user, monkeypatch):
         """Créer une flashcard sans réponses lève une ValidationError (validation Pydantic)."""
         from pydantic import ValidationError
-        from services.impl.note.flashcard_service_impl import flashcard_service
         from utils.enums import RoleEnum
 
         # Arrange

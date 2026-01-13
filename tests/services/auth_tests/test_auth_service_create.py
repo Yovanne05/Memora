@@ -12,11 +12,8 @@ Les repositories et services sont MOCKÉS pour isoler la logique du service.
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
-from dtos.auth_dto import LoginDTO, RegisterDTO
+from dtos.auth_dto import RegisterDTO
 from dtos.user_dto import UserDTO
-from daos.user_dao import User
-from exceptions.auth_exception import InvalidCredentials
-from exceptions.user_exception import UserNotFound
 from utils.enums import RoleEnum
 
 

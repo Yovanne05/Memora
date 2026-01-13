@@ -11,15 +11,8 @@ Ces tests vérifient la logique métier du service note :
 Les repositories sont MOCKÉS pour isoler la logique du service.
 """
 import pytest
-from datetime import datetime
 from uuid import uuid4
-from unittest.mock import Mock
-from dtos.note_dto import NoteCreateDTO, NoteUpdateDTO, NoteDTO
-from daos.note_dao import Note
-from daos.user_dao import User
-from daos.collection_dao import Collection
-from exceptions.note_exception import NoteNotFound, NoteTitleConflict, NoteOwnerDoesNotExist
-from utils.enums import VisibilityEnum, RoleEnum
+from exceptions.note_exception import NoteNotFound
 
 
 class TestNoteServiceDelete:

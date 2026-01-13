@@ -13,7 +13,7 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
-from dtos.auth_dto import LoginDTO, RegisterDTO
+from dtos.auth_dto import LoginDTO
 from dtos.user_dto import UserDTO
 from daos.user_dao import User
 from exceptions.auth_exception import InvalidCredentials

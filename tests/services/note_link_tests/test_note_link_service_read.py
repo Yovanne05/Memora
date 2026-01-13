@@ -11,7 +11,6 @@ Les repositories sont MOCKÉS.
 """
 from uuid import uuid4
 from datetime import datetime
-from dtos.note_link_dto import NoteLinkDTO, NoteLinkCreateDTO
 from daos.note_dao import NoteLink
 
 

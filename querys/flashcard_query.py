@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from repositorys.flashcard_repository import FlashcardSearchParams
 

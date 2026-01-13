@@ -9,11 +9,10 @@ Ces tests vérifient :
 
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
-from datetime import datetime
 from uuid import uuid4
 from daos.report_dao import Report
 from repositorys import report_repository
-from utils.enums import ReportStatusEnum, ReportReasonEnum, ReportTargetEnum
+from utils.enums import ReportStatusEnum, ReportReasonEnum
 
 
 class TestReportRepositoryFind:

@@ -12,13 +12,11 @@ Les repositories sont MOCKÉS pour isoler la logique du service.
 from datetime import datetime
 from uuid import uuid4
 from unittest.mock import Mock
-from dtos.collection_dto import CollectionCreateDTO, CollectionUpdateDTO, CollectionDTO
+from dtos.collection_dto import CollectionCreateDTO, CollectionDTO
 from dtos.user_access_dto import UserAccessDTO
 from utils.enums import SharePermissionEnum
 from daos.collection_dao import Collection
 from utils.enums import VisibilityEnum
-from exceptions.collection_exception import CollectionNotFound
-from repositorys.collection_repository import CollectionSearchParams
 
 
 class TestCollectionServiceCreate:

@@ -10,7 +10,6 @@ Ces tests vérifient :
 
 La vraie base de données (SQLite in-memory) est utilisée via test_factory.
 """
-from datetime import datetime
 from uuid import uuid4
 from daos.flashcard_dao import Flashcard
 from daos.flashcard_answer_dao import FlashcardAnswer

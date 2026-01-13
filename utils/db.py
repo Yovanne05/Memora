@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session, Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from typing import Generator
 from config import SQLALCHEMY_DATABASE_URI
 
@@ -43,4 +43,12 @@ def create_all() -> None:
 
 
 def drop_all() -> None:
-    Base.metadata.drop_all(bind=engine)
+    with engine.begin() as conn:
+        result = conn.execute(text("""
+            SELECT tablename FROM pg_tables 
+            WHERE schemaname = 'public'
+        """))
+        tables = [row[0] for row in result]
+        
+        for table in tables:
+            conn.execute(text(f'DROP TABLE IF EXISTS "{table}" CASCADE'))

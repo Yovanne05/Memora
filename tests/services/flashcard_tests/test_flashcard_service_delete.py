@@ -11,18 +11,8 @@ Ces tests vérifient :
 Les repositories sont MOCKÉS.
 """
 from uuid import uuid4
-from unittest.mock import Mock
 from datetime import datetime
-from dtos.flashcard_dto import FlashcardDTO, FlashcardCreateDTO, FlashcardUpdateDTO
-from dtos.flashcard_answer_dto import FlashcardAnswerCreateDTO
 from daos.flashcard_dao import Flashcard
-from daos.flashcard_answer_dao import FlashcardAnswer
-from exceptions.flashcard_exception import (
-    FlashcardNotFound,
-    FlashcardMustHaveAnswers,
-    FlashcardMustHaveAtLeastOneCorrectAnswer
-)
-from exceptions.note_exception import NoteNotFound
 
 
 class TestFlashcardServiceDelete:
