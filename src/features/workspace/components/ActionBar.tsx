@@ -21,10 +21,11 @@ export function ActionBar({
 }: Readonly<ActionBarProps>) {
   if (variant === 'collection' && collectionId) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <QuickAddNote
           collectionId={collectionId}
           triggerVariant="default"
+          triggerSize="sm"
           showLabel
           disabled={!canAddNote}
         />

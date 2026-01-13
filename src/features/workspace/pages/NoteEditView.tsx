@@ -1,3 +1,6 @@
+import { ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Link } from '@tanstack/react-router'
 import { NoteEditForm } from '@/features/notes/components/NoteEditForm'
 import { NoteLinkManager } from '@/features/notes/components/NoteLinkManager'
 import { NoteEditError } from '../components/note-edit/NoteEditError'
@@ -33,8 +36,21 @@ export default function NoteEditView({
     return <NoteEditError />
   }
 
+  const backUrl = note.collectionId
+    ? `/app/workspace/collections/${note.collectionId}`
+    : '/app/workspace'
+
   return (
     <div className="space-y-4 sm:space-y-6">
+      {note.collectionId && (
+        <Button variant="ghost" size="sm" className="gap-2" asChild>
+          <Link to={backUrl}>
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Retour à la collection</span>
+            <span className="sm:hidden">Retour</span>
+          </Link>
+        </Button>
+      )}
       {isReadOnly && <NoteEditReadOnlyBanner />}
       <NoteEditForm
         note={note}

@@ -5,6 +5,8 @@ import type { CollectionFormValues } from '@/features/collections/types/collecti
 import type { Collection } from '@/features/collections/models/collection.model'
 import { NavigationHeader } from '../NavigationHeader'
 import { ActionBar } from '../ActionBar'
+import { GraphButton } from '../GraphButton'
+import { useWorkspaceContext } from '../../context'
 import { CollectionNotesLoading } from './CollectionNotesLoading'
 import { CollectionNotesContent } from './CollectionNotesContent'
 import { CollectionNotesDialogs } from './CollectionNotesDialogs'
@@ -73,6 +75,8 @@ export function CollectionNotesViewContent({
   onDeleteOpenChange,
   onDeleteConfirm,
 }: Readonly<CollectionNotesViewContentProps>) {
+  const { actions } = useWorkspaceContext()
+
   if (isCollectionError || isNotesError) {
     return (
       <ErrorHandling
@@ -88,16 +92,22 @@ export function CollectionNotesViewContent({
     return <CollectionNotesLoading />
   }
 
+  const handleOpenGraph = () => {
+    actions.selectCollection(collectionId)
+    actions.openGraphView()
+  }
+
   const headerActions = (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-1 sm:gap-2">
       <ActionBar
         collectionId={collectionId}
         variant="collection"
         canAddNote={canAddNote}
       />
+      <GraphButton onClick={handleOpenGraph} />
       <Button
         variant="outline"
-        size="default"
+        size="sm"
         onClick={onShare}
         className="gap-2"
         disabled={!canManage}
@@ -107,7 +117,7 @@ export function CollectionNotesViewContent({
       </Button>
       <Button
         variant="outline"
-        size="default"
+        size="sm"
         onClick={onEdit}
         className="gap-2"
         disabled={!canWrite}
@@ -117,7 +127,7 @@ export function CollectionNotesViewContent({
       </Button>
       <Button
         variant="destructive"
-        size="default"
+        size="sm"
         onClick={onDelete}
         className="gap-2"
         disabled={!canManage}
@@ -129,19 +139,15 @@ export function CollectionNotesViewContent({
   )
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       <NavigationHeader
         title={collection?.name || 'Collection'}
         description={collection?.description || undefined}
-        breadcrumbs={[
-          { label: 'Workspace', href: '/app/workspace' },
-          { label: collection?.name || 'Collection' },
-        ]}
         backHref="/app/workspace"
         actions={headerActions}
       />
 
-      <div className="p-6 space-y-6">
+      <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
         <CollectionNotesContent
           notes={notes}
           collectionId={collectionId}

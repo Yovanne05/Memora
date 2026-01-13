@@ -42,7 +42,7 @@ export function QuickAddNote({
         disabled={disabled}
       >
         <Plus className="h-4 w-4" />
-        {showLabel && 'Nouvelle note'}
+        {showLabel && <span className="hidden sm:inline">Nouvelle note</span>}
       </Button>
       <QuickAddNoteDialog
         open={open}

@@ -13,6 +13,7 @@ import type {
 import { REACT_FLOW_STYLES } from './visualization.constants'
 import { groupEdgesByConnection, calculateEdgeOffset } from './layoutEngine'
 import { logger } from '@/lib/logger'
+import { getLabelColor } from './edgeColors'
 
 export function transformNodesToReactFlow(
   nodes: GraphNode[],
@@ -78,8 +79,8 @@ export function transformEdgesToReactFlow(
           ? `e${edge.source}-${edge.target}`
           : `e${edge.source}-${edge.target}-${localIndex}`
 
-      // ✅ on récupère le label si présent
       const edgeLabel = (edge.label ?? '').trim()
+      const hasLabel = edgeLabel.length > 0
 
       reactFlowEdges.push({
         id: edgeId,
@@ -88,7 +89,9 @@ export function transformEdgesToReactFlow(
         sourceHandle: `${group.sourceSide}-source`,
         targetHandle: `${group.targetSide}-target`,
         style: {
-          stroke: REACT_FLOW_STYLES.EDGE_COLOR,
+          stroke: hasLabel
+            ? getLabelColor(edgeLabel)
+            : REACT_FLOW_STYLES.EDGE_COLOR,
           strokeWidth: REACT_FLOW_STYLES.EDGE_WIDTH,
         },
         data: {
@@ -96,15 +99,8 @@ export function transformEdgesToReactFlow(
             offset,
             borderRadius: REACT_FLOW_STYLES.EDGE_BORDER_RADIUS,
           },
+          label: hasLabel ? edgeLabel : undefined,
         },
-
-        // ✅ ReactFlow label
-        label: edgeLabel.length > 0 ? edgeLabel : undefined,
-        labelShowBg: edgeLabel.length > 0,
-        labelBgPadding: [6, 3],
-        labelBgBorderRadius: 6,
-        labelBgStyle: { fill: 'white' },
-        labelStyle: { fontSize: 12, fontWeight: 600 },
       })
     })
   })

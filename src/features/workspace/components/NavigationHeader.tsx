@@ -20,7 +20,6 @@ interface NavigationHeaderProps {
 export function NavigationHeader({
   title,
   description,
-  breadcrumbs,
   onBack,
   backHref,
   actions,
@@ -62,42 +61,25 @@ export function NavigationHeader({
 
   return (
     <header className="border-b bg-card">
-      <div className="p-4">
-        <div className="flex items-center gap-4">
+      <div className="p-3 sm:p-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           {renderBackButton()}
 
-          <div className="min-w-0 flex-1">
-            {breadcrumbs && breadcrumbs.length > 0 && (
-              <nav className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-                {breadcrumbs.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    {item.href ? (
-                      <Link
-                        to={item.href}
-                        className="hover:text-foreground transition-colors"
-                      >
-                        {item.label}
-                      </Link>
-                    ) : (
-                      <span>{item.label}</span>
-                    )}
-                    {index < breadcrumbs.length - 1 && (
-                      <span className="text-muted-foreground/50">/</span>
-                    )}
-                  </div>
-                ))}
-              </nav>
-            )}
-            <h1 className="text-2xl font-semibold truncate">{title}</h1>
+          <div className="min-w-0 flex-1 basis-full sm:basis-auto">
+            <h1 className="truncate text-xl font-semibold sm:text-2xl">
+              {title}
+            </h1>
             {description && (
-              <p className="mt-1 text-muted-foreground line-clamp-2">
+              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground sm:text-base">
                 {description}
               </p>
             )}
           </div>
 
           {actions && (
-            <div className="flex shrink-0 items-center gap-2">{actions}</div>
+            <div className="flex w-full shrink-0 items-center sm:w-auto">
+              {actions}
+            </div>
           )}
         </div>
       </div>

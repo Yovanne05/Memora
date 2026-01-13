@@ -31,6 +31,7 @@ export function CollectionVisualizationView({
     selectedNote,
     relatedNotes,
     sidebar,
+    edgeLabelFilter,
     handlers,
   } = useCollectionVisualizationInteractions({
     nodes,
@@ -63,6 +64,7 @@ export function CollectionVisualizationView({
         notesCount={connectedNotesCount}
         connectionsCount={collection.edges.length}
         onBack={onBack}
+        edgeLabelFilter={edgeLabelFilter}
       />
       <CollectionVisualizationCanvas
         nodes={styledNodes}

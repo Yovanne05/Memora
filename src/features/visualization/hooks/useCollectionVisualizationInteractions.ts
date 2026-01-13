@@ -1,13 +1,14 @@
-import { useCallback, useEffect } from "react"
-import type { MouseEvent } from "react"
-import type { Edge, Node } from "reactflow"
+import { useCallback, useEffect } from 'react'
+import type { MouseEvent } from 'react'
+import type { Edge, Node } from 'reactflow'
 
-import type { CustomNodeData } from "../types/visualization.type"
-import type { Collection } from "@/features/collections/models/collection.model"
-import { useNodeSelection } from "./useNodeSelection"
-import { useNoteSidebar } from "./useNoteSidebar"
-import { useRelatedNotes } from "./useRelatedNotes"
-import { useNoteQuery } from "@/features/notes/hooks/useNoteQuery"
+import type { CustomNodeData } from '../types/visualization.type'
+import type { Collection } from '@/features/collections/models/collection.model'
+import { useNodeSelection } from './useNodeSelection'
+import { useNoteSidebar } from './useNoteSidebar'
+import { useRelatedNotes } from './useRelatedNotes'
+import { useNoteQuery } from '@/features/notes/hooks/useNoteQuery'
+import { useEdgeLabelFilter } from './useEdgeLabelFilter'
 
 type UseCollectionVisualizationInteractionsArgs = {
   nodes: Node<CustomNodeData>[]
@@ -22,11 +23,25 @@ export function useCollectionVisualizationInteractions({
   orphanNodeIds,
   collection,
 }: UseCollectionVisualizationInteractionsArgs) {
-  const { selectedNodeId, styledNodes, styledEdges, selectNode, clearSelection } =
-    useNodeSelection(nodes, edges)
+  const {
+    selectedNodeId,
+    styledNodes: selectionStyledNodes,
+    styledEdges: selectionStyledEdges,
+    selectNode,
+    clearSelection,
+  } = useNodeSelection(nodes, edges)
   const sidebar = useNoteSidebar()
-  const { data: selectedNote } = useNoteQuery(sidebar.activeNoteId ?? "")
+  const { data: selectedNote } = useNoteQuery(sidebar.activeNoteId ?? '')
   const relatedNotes = useRelatedNotes(sidebar.activeNoteId, collection)
+
+  const {
+    selectedLabel,
+    availableLabels,
+    styledNodes,
+    styledEdges,
+    selectLabel,
+    clearFilter,
+  } = useEdgeLabelFilter(selectionStyledNodes, selectionStyledEdges)
 
   const handleNodeClick = useCallback(
     (_event: MouseEvent, node: Node<CustomNodeData>) => {
@@ -72,7 +87,11 @@ export function useCollectionVisualizationInteractions({
       return
     }
 
-    if (!selectedNodeId && sidebar.activeNoteId && !orphanNodeIds.has(sidebar.activeNoteId)) {
+    if (
+      !selectedNodeId &&
+      sidebar.activeNoteId &&
+      !orphanNodeIds.has(sidebar.activeNoteId)
+    ) {
       sidebar.close()
     }
   }, [selectedNodeId, sidebar, orphanNodeIds])
@@ -83,6 +102,12 @@ export function useCollectionVisualizationInteractions({
     selectedNote: selectedNote ?? null,
     relatedNotes,
     sidebar,
+    edgeLabelFilter: {
+      selectedLabel,
+      availableLabels,
+      selectLabel,
+      clearFilter,
+    },
     handlers: {
       handleNodeClick,
       handlePaneClick,
@@ -92,4 +117,3 @@ export function useCollectionVisualizationInteractions({
     },
   }
 }
-
