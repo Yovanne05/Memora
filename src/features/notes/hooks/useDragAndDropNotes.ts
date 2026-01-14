@@ -1,9 +1,4 @@
-import type {
-  DragEndEvent,
-  DragStartEvent,
-  SensorDescriptor,
-  SensorOptions,
-} from '@dnd-kit/core'
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useState } from 'react'
 import type { Note } from '../models/note.model'
@@ -22,7 +17,7 @@ export function useDragAndDropNotes(
 ) {
   const [activeNote, setActiveNote] = useState<Note | null>(null)
 
-  const sensors: SensorDescriptor<SensorOptions>[] = useSensors(
+  const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8, // Require 8px of movement before drag starts (prevents accidental drags on click)

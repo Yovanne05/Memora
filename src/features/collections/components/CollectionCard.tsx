@@ -1,6 +1,8 @@
 import { memo, useCallback, useState } from 'react'
-import { FileText } from 'lucide-react'
+import { Folder } from 'lucide-react'
 import { useRouter } from '@tanstack/react-router'
+import { useDroppable } from '@dnd-kit/core'
+import { cn } from '@/lib/utils'
 
 import type { Collection } from '../models/collection.model'
 import { ResourceCard } from '@/components/shared/ResourceCard'
@@ -10,6 +12,7 @@ import { CollectionCardFavoriteButton } from './collection-card/CollectionCardFa
 import { CollectionCardFooter } from './collection-card/CollectionCardFooter'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ReportDialog } from '@/features/report/components/ReportDialog'
+import type { DroppableCollectionData } from '@/features/notes/hooks/useDragAndDropNotes'
 
 interface CollectionCardProps {
   readonly collection: Collection
@@ -50,6 +53,16 @@ export const CollectionCard = memo(function CollectionCard({
     user?.role === 'super_admin'
   const canWrite = canManage || collection.userPermission === 'write'
 
+  const dropData: DroppableCollectionData = {
+    collectionId: collection.id,
+    collectionName: collection.name,
+  }
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'collection-' + collection.id,
+    data: dropData,
+  })
+
   const handleNavigate = useCallback(() => {
     router.navigate({
       to: '/app/workspace/collections/$collectionId',
@@ -79,29 +92,37 @@ export const CollectionCard = memo(function CollectionCard({
 
   return (
     <>
-      <ResourceCard
-        id={collection.id}
-        title={collection.name}
-        description={collection.description}
-        icon={FileText}
-        onClick={handleCardClick}
-        onToggleSelection={onToggleSelection}
-        actions={actions}
-        headerActions={
-          <CollectionCardFavoriteButton
-            collectionId={collection.id}
-            favorite={favorite}
-          />
-        }
-        isSelected={isSelected}
-        selectionMode={selectionMode}
-        compact={compact}
-        readOnly={readOnly}
-        badges={<CollectionCardBadges collection={collection} />}
-        footer={
-          <CollectionCardFooter collection={collection} compact={compact} />
-        }
-      />
+      <div
+        ref={setNodeRef}
+        className={cn(
+          'transition-all',
+          isOver && 'ring-2 ring-primary ring-offset-2 scale-[1.02]'
+        )}
+      >
+        <ResourceCard
+          id={collection.id}
+          title={collection.name}
+          description={collection.description}
+          icon={Folder}
+          onClick={handleCardClick}
+          onToggleSelection={onToggleSelection}
+          actions={actions}
+          headerActions={
+            <CollectionCardFavoriteButton
+              collectionId={collection.id}
+              favorite={favorite}
+            />
+          }
+          isSelected={isSelected}
+          selectionMode={selectionMode}
+          compact={compact}
+          readOnly={readOnly}
+          badges={<CollectionCardBadges collection={collection} />}
+          footer={
+            <CollectionCardFooter collection={collection} compact={compact} />
+          }
+        />
+      </div>
 
       <ReportDialog
         open={reportDialogOpen}
