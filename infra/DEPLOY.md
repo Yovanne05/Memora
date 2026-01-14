@@ -1,146 +1,91 @@
-# Memora – Guide de deploiement
+# DEPLOY.md
 
-Ce dossier contient un `docker-compose.yaml` avec l'image du frontend et du backend,
-plus des exemples de configuration pour stockage local ou S3 compatible (SeaweedFS).
-Le choix est exclusif: vous utilisez soit le stockage local, soit le S3 compatible.
+Guide de deploiement en environnement cible (VM, serveur, cloud).
+Pour l'installation locale, voir `INSTALL.md`. Pour l'exploitation, voir `EXPLOITATION.md`.
 
 ## Prerequis
 
-- Docker + Docker Compose
-- Acces aux images GHCR
-- Etre connecte a GHCR pour telecharger les images (ex: `docker login ghcr.io`)
+- Docker Engine + Docker Compose v2
+- Acces a un registre d'images (GHCR) ou capacite a build/push
+- Stockage persistant pour Postgres et uploads
+- Stockage S3 compatible si `STORAGE_DRIVER=s3`
 
-## TL;DR
+## Etapes de deploiement
 
-Suite de commandes pour demarrer rapidement en local :
+### 1) Choisir les images
 
-```bash
-# A la racine du projet
-cp .env.example .env
+Par defaut, `infra/docker-compose.yaml` reference :
+- `ghcr.io/dut-info-montreuil/memora-backend:latest`
+- `ghcr.io/dut-info-montreuil/memora-frontend:latest`
 
-# Demarrer les services
-docker compose -f infra/docker-compose.yaml up -d
-
-# Verifier que tout tourne
-docker compose -f infra/docker-compose.yaml ps
-```
-
-## Lancer en mode local (uploads locaux)
-
-1) Copier et adapter les variables (si besoin) dans `infra/docker-compose.yaml`
-   ou placer un fichier `.env` a la racine du projet (meme dossier que `.env.example`)
-2) Demarrer:
+Si GHCR n'est pas accessible, builder vos propres images :
 
 ```bash
-docker compose -f infra/docker-compose.yaml up -d
+docker build -t memora-backend:<tag> .
 ```
 
-Le frontend est expose sur `http://localhost:8080` et l'API sur `http://localhost:5000`.
+Le depot frontend n'est pas present ici. Il faut utiliser le repo frontend
+correspondant, puis mettre a jour l'image dans `infra/docker-compose.yaml`.
 
-## Verifier que tout roule
+### 2) Configurer les variables
 
-- Conteneurs up:
-  ```bash
-  docker compose -f infra/docker-compose.yaml ps
-  ```
-- Logs backend (demarrage OK, pas d'erreurs):
-  ```bash
-  docker compose -f infra/docker-compose.yaml logs -f backend
-  ```
-- Frontend reachable:
-  Ouvrez `http://localhost:8080`
-- API reachable:
-  ```bash
-  curl http://localhost:5000
-  ```
+Le compose embarque des valeurs par defaut. Pour la prod, modifiez
+`infra/docker-compose.yaml` ou externalisez via `env_file`.
+La liste complete des variables est dans `.env.example`.
 
-  (Si Swagger est active, la doc est sur `http://localhost:5000/apidocs`)
+Variables essentielles :
+- `JWT_SECRET_KEY`
+- `ALLOWED_ORIGINS`
+- `SQLALCHEMY_DATABASE_URI`
+- `SWAGGER_ENABLED=0`
 
-## Build local (images)
+Redis (collaboration temps reel) :
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `COLLAB_SESSION_TTL_SECONDS`
 
-Si vous voulez build les images localement (sans GHCR) :
+Stockage :
+- `STORAGE_DRIVER` = `local` ou `s3`
+- `UPLOAD_LOCAL_ROOT`, `UPLOAD_PUBLIC_BASE_URL`
+- `STORAGE_S3_BUCKET`, `STORAGE_S3_ENDPOINT_URL`, `STORAGE_S3_REGION`,
+  `STORAGE_S3_ACCESS_KEY`, `STORAGE_S3_SECRET_KEY`, `STORAGE_S3_PUBLIC_BASE_URL`
 
-```bash
-# Backend (depuis la racine du repo backend)
-docker build -t memora-backend:local .
+### 3) Adapter ports et volumes
 
-# Frontend (depuis le repo frontend)
-docker build -t memora-frontend:local .
-```
+Ports exposes par defaut :
+- API : 5000
+- Frontend : 8080
 
-Ensuite, modifiez `infra/docker-compose.yaml` :
+Volumes persistants :
+- `backend_data`
+- `backend_uploads`
+- `postgres_data`
 
-- `backend.image: memora-backend:local`
-- `frontend.image: memora-frontend:local`
+Si vous utilisez un Postgres/Redis externe, desactivez les services locaux
+du compose et adaptez les variables.
 
-## Quand utiliser le build local
+### 4) Demarrer sur la cible
 
-- Vous n'avez pas acces a GHCR (reseau ferme, credentials manquants).
-- Vous faites des changements sur le code backend ou frontend.
-- Vous devez build une image custom (config, patch, tag precis).
+Demarrer les services via Docker Compose en mode detache (voir `INSTALL.md`
+pour la commande exacte).
 
-## Guide frontend (court)
+Initialiser la base via `scripts/init_db.py` (voir `INSTALL.md`).
 
-- L'image utilisee est `ghcr.io/dut-info-montreuil/memora-frontend:latest`.
-- Le service est expose sur `http://localhost:8080` (port 80 dans le conteneur).
-- Si vous devez changer l'URL de l'API, reconstruisez l'image depuis le repo frontend
-  avec la variable/environnement attendu par ce projet, puis remplacez l'image dans
-  `infra/docker-compose.yaml`.
+## Differences dev / prod
 
-## Activer S3 / SeaweedFS
+- `SWAGGER_ENABLED=0` en prod
+- `JWT_SECRET_KEY` fort et unique
+- `ALLOWED_ORIGINS` restreint aux domaines reels
+- Postgres + Redis obligatoires en prod (pas de SQLite)
+- `STORAGE_DRIVER=s3` recommande en prod
 
-Optionnel mais recommande: utiliser un stockage S3 compatible (ex: SeaweedFS)
-plutot que le stockage local. Cela evite de perdre les fichiers en cas de
-recreation du container, facilite les sauvegardes et permet de scaler
-plus facilement.
-Dans `infra/docker-compose.yaml`:
+## Adaptation infra (VM, serveur, cloud)
 
-- Decommenter le service `seaweedfs`
-- Passer `STORAGE_DRIVER` a `s3`
-- Renseigner `STORAGE_S3_*` (voir bloc commente dans `backend.environment`)
-  Vous utilisez S3/SeaweedFS ou le stockage local, pas les deux.
+- Reverse proxy / TLS non fournis (a mettre en place sur la cible)
+- Strategie de sauvegarde a prevoir (Postgres + uploads/S3)
+- Monitoring et alerting a definir (voir `EXPLOITATION.md`)
 
-### Configuration S3
+## Informations manquantes dans le repo
 
-- Creer le bucket (`STORAGE_S3_BUCKET`) en lecture/ecriture pour l'application.
-  Le bucket ne doit pas etre en lecture seule: l'API doit pouvoir y ecrire.
-- Les credentials (`STORAGE_S3_ACCESS_KEY` / `STORAGE_S3_SECRET_KEY`) doivent
-  avoir au minimum les droits suivants: GetObject, PutObject, DeleteObject,
-  ListBucket sur le bucket.
-- Le bucket doit exposer une lecture publique des objets (GetObject) pour que
-  les URLs publiques fonctionnent sans authentification. Sans URLs signees,
-  seule la lecture publique doit etre autorisee.
-- `STORAGE_S3_ENDPOINT_URL` pointe vers l'endpoint S3 (ex: `http://seaweedfs:8333`).
-- `STORAGE_S3_PUBLIC_BASE_URL` est l'URL publique utilisee pour servir les fichiers
-  (ex: `http://localhost:8333/memora-uploads`). Si non defini, l'API servira les fichiers.
-
-Puis relancer:
-
-```bash
-docker compose -f infra/docker-compose.yaml up -d
-```
-
-## Notes de configuration
-
-- `ALLOWED_ORIGINS` accepte une liste CSV ou `*`.
-- `JWT_SECRET_KEY` doit etre change en production.
-- Postgres est inclus dans le compose: pensez a bien configurer `SQLALCHEMY_DATABASE_URI`
-  et les variables `POSTGRES_*` (utilisateur, mot de passe, base).
-- Les volumes `backend_data` et `backend_uploads` persistent les donnees.
-
-## Bonnes pratiques prod (rapide)
-
-- Secrets: changez `JWT_SECRET_KEY` et les credentials Postgres/S3.
-- CORS: fixez `ALLOWED_ORIGINS` sur le(s) domaine(s) exact(s).
-- Stockage: preferez S3/MinIO a `local` et pensez a des backups.
-- Reverse proxy: placez un proxy (Nginx/Traefik) avec TLS.
-- Observabilite: surveillez les logs et ajoutez de l'alerte basique.
-- Swagger: gardez `SWAGGER_ENABLED=0` en prod.
-
-## Ressources utiles
-
-- Docker Compose: https://docs.docker.com/compose/
-- GHCR: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
-- SeaweedFS (S3): https://github.com/seaweedfs/seaweedfs/wiki
-- Postgres: https://www.postgresql.org/docs/
-- Redis: https://redis.io/docs/
+- Pas de tags d'images versionnes (compose reference `:latest`)
+- Pas de configuration TLS/reverse proxy
+- Pas d'outil de migration de schema
+- Pas de procedure de backup/restore detaillee

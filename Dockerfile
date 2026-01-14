@@ -11,6 +11,7 @@ RUN addgroup --system appuser \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir gunicorn eventlet
 
 COPY . .
 

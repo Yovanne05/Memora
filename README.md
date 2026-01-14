@@ -77,6 +77,12 @@ source venv/bin/activate
 
 # 4. Installer les dépendances
 pip install -r requirements.txt
+
+# 5. Lancer le backend une premiere fois
+python app.py
+
+# 6. Initialiser la BD et creer le super_admin (apres le premier lancement)
+python scripts/init_db.py --email superadmin@example.com --username superadmin --password "SuperAdminPass123!"
 ```
 
 ### Fichiers à ignorer (.gitignore)
