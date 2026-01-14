@@ -37,6 +37,8 @@ services:
   frontend:
     image: ghcr.io/dut-info-montreuil/memora-frontend:latest
     restart: unless-stopped
+    environment:
+      - API_URL=https://yourdomain
     ports:
       - "8080:80"
     depends_on:
