@@ -1,16 +1,16 @@
-import { useId } from "react"
-import { Filter } from "lucide-react"
+import { useId } from 'react'
+import { Filter } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import type { SearchFilters as SearchFiltersType } from "../types/search-query"
-import { FilterSelectField } from "./search-filters/FilterSelectField"
-import { TagsFilter } from "./search-filters/TagsFilter"
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import type { SearchFilters as SearchFiltersType } from '../types/search-query'
+import { FilterSelectField } from './search-filters/FilterSelectField'
+import { TagsFilter } from './search-filters/TagsFilter'
 import {
   ORDER_OPTIONS,
   SORT_OPTIONS,
   TYPE_OPTIONS,
-} from "../types/search-filters.constants"
+} from '../types/search-filters.constants'
 
 interface SearchFiltersProps {
   readonly filters: SearchFiltersType
@@ -31,10 +31,10 @@ export function SearchFilters({
   const tagsId = useId()
 
   const hasActiveFilters =
-    filters.type !== "all" || (filters.tags && filters.tags.length > 0)
+    filters.type !== 'all' || (filters.tags && filters.tags.length > 0)
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Filter className="h-4 w-4" />
@@ -42,7 +42,7 @@ export function SearchFilters({
         </div>
         {hasActiveFilters && onReset && (
           <Button variant="ghost" size="sm" onClick={onReset}>
-            Réinitialiser
+            RÃ©initialiser
           </Button>
         )}
       </div>
@@ -51,31 +51,31 @@ export function SearchFilters({
         <FilterSelectField
           id={typeId}
           label="Type de contenu"
-          value={filters.type ?? "all"}
+          value={filters.type ?? 'all'}
           placeholder="Tous"
           options={TYPE_OPTIONS}
           onChange={(value) =>
-            onChange({ type: value as SearchFiltersType["type"] })
+            onChange({ type: value as SearchFiltersType['type'] })
           }
         />
         <FilterSelectField
           id={sortById}
           label="Trier par"
-          value={filters.sortBy ?? "date"}
+          value={filters.sortBy ?? 'date'}
           placeholder="Date"
           options={SORT_OPTIONS}
           onChange={(value) =>
-            onChange({ sortBy: value as SearchFiltersType["sortBy"] })
+            onChange({ sortBy: value as SearchFiltersType['sortBy'] })
           }
         />
         <FilterSelectField
           id={sortDirId}
           label="Ordre"
-          value={filters.sortDir ?? "desc"}
-          placeholder="Décroissant"
+          value={filters.sortDir ?? 'desc'}
+          placeholder="Dï¿½croissant"
           options={ORDER_OPTIONS}
           onChange={(value) =>
-            onChange({ sortDir: value as SearchFiltersType["sortDir"] })
+            onChange({ sortDir: value as SearchFiltersType['sortDir'] })
           }
         />
       </div>
@@ -88,6 +88,3 @@ export function SearchFilters({
     </div>
   )
 }
-
-
-
