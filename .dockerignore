@@ -1,0 +1,15 @@
+.git
+.githooks
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+venv
+logs
+tests
+app.db
+app_test.db
+.env
+README.md
