@@ -68,8 +68,11 @@ def create_app() -> Flask:
         )
 
 
+    socketio_async_mode = "threading" if config.IS_TEST else "gevent"
     socketio_service.init_socketio(
-        app, cors_allowed_origins=config.ALLOWED_ORIGINS, async_mode="eventlet"
+        app,
+        cors_allowed_origins=config.ALLOWED_ORIGINS,
+        async_mode=socketio_async_mode,
     )
 
 

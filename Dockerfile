@@ -11,7 +11,7 @@ RUN addgroup --system appuser \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir gunicorn eventlet
+RUN pip install --no-cache-dir gunicorn gevent gevent-websocket
 
 COPY . .
 
@@ -21,4 +21,4 @@ USER appuser
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-k", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "-k", "gevent", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]

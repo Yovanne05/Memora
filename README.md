@@ -1063,7 +1063,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-CMD ["gunicorn", "--worker-class=eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "--worker-class=gevent", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
 ```
 
 ---
