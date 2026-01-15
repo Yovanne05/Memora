@@ -6,7 +6,7 @@ export const INITIAL_STATE: WorkspaceState = {
   mode: 'notes',
   view: 'grid',
   sidebarExpanded: new Set<string>(),
-  sidebarOpen: false,
+  sidebarOpen: true,
   search: '',
   sort: 'recent',
   page: 0,
