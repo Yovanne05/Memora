@@ -33,6 +33,7 @@ def note_to_dto(
         "owner_id": note.owner_id,
         "owner_username": _safe_owner_username(note),
         "title": note.title,
+        "content": note.content or "",
         "visibility": note.visibility,
         "collection_id": note.collection_id,
         "tags": note.tags,
