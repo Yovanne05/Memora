@@ -89,3 +89,5 @@ Initialiser la base via `scripts/init_db.py` (voir `INSTALL.md`).
 - Pas de configuration TLS/reverse proxy
 - Pas d'outil de migration de schema
 - Pas de procedure de backup/restore detaillee
+
+

@@ -107,3 +107,5 @@ Note : le frontend n'est pas demarre par cette methode, il faut le deployer sepa
 
 - Aucun fichier systemd fourni (exemple ci-dessus a creer).
 - Aucune procedure officielle de gestion des secrets pour la prod (env_file/secret manager).
+
+
