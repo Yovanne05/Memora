@@ -1,5 +1,11 @@
 # Backend Memora — Documentation développeur
 
+## Documentations
+
+- Installation + mise en service : [infra/INSTALL.md](infra/INSTALL.md)
+- Deploiement cible : [infra/DEPLOY.md](infra/DEPLOY.md)
+- Exploitation / OPS : [infra/EXPLOITATION.md](infra/EXPLOITATION.md)
+
 ## 1) Contexte rapide
 
 ### Que fait ce backend ?
@@ -13,6 +19,7 @@ Backend Flask pour **Memora**, une application de prise de notes collaborative a
 ### Périmètre exact
 
 **Inclus** :
+
 - Authentification JWT + gestion utilisateurs
 - CRUD notes & collections (avec tags, visibilité, favoris)
 - Partage de notes/collections avec permissions granulaires (lecture/écriture/commentaire)
@@ -25,6 +32,7 @@ Backend Flask pour **Memora**, une application de prise de notes collaborative a
 - Rapports de contenu (signalements)
 
 **Exclu** :
+
 - Notifications push
 - Export PDF/Markdown
 - Intégrations tierces (Google Drive, Notion, etc.)
@@ -60,6 +68,8 @@ python -m venv venv
 
 ## 3) Installation
 
+Voir `infra/INSTALL.md` pour l'installation autonome et la mise en service.
+
 ### Étapes d'installation
 
 ```bash
@@ -77,11 +87,18 @@ source venv/bin/activate
 
 # 4. Installer les dépendances
 pip install -r requirements.txt
+
+# 5. Lancer le backend une premiere fois
+python app.py
+
+# 6. Initialiser la BD et creer le super_admin (apres le premier lancement)
+python scripts/init_db.py --email superadmin@example.com --username superadmin --password "SuperAdminPass123!"
 ```
 
 ### Fichiers à ignorer (.gitignore)
 
 Le `.gitignore` est déjà configuré pour exclure :
+
 - `.env` (secrets)
 - `venv/`, `__pycache__/`, `.pytest_cache/`
 - `logs/`, `uploads/**`
@@ -102,30 +119,30 @@ cp .env.example .env
 
 #### Variables critiques
 
-| Variable | Valeur par defaut | Description |
-|----------|------------------|-------------|
-| `SQLALCHEMY_DATABASE_URI` | `sqlite:///app.db` | URL de connexion BD (SQLite en dev par defaut, Postgres en prod) |
-| `JWT_SECRET_KEY` | `change-me` | **Obligatoire en prod** - Secret pour tokens JWT |
-| `JWT_ACCESS_TOKEN_EXPIRES_SECONDS` | `86400` | Duree de validite du token (en secondes) |
-| `ALLOWED_ORIGINS` | `http://localhost:5173` | Origines CORS autorisees (obligatoire en prod) |
-| `SWAGGER_ENABLED` | `1` | Active Swagger en dev/test (ignore en prod) |
+| Variable                             | Valeur par defaut         | Description                                                      |
+| ------------------------------------ | ------------------------- | ---------------------------------------------------------------- |
+| `SQLALCHEMY_DATABASE_URI`          | `sqlite:///app.db`      | URL de connexion BD (SQLite en dev par defaut, Postgres en prod) |
+| `JWT_SECRET_KEY`                   | `change-me`             | **Obligatoire en prod** - Secret pour tokens JWT           |
+| `JWT_ACCESS_TOKEN_EXPIRES_SECONDS` | `86400`                 | Duree de validite du token (en secondes)                         |
+| `ALLOWED_ORIGINS`                  | `http://localhost:5173` | Origines CORS autorisees (obligatoire en prod)                   |
+| `SWAGGER_ENABLED`                  | `1`                     | Active Swagger en dev/test (ignore en prod)                      |
 
 #### Redis (collaboration temps réel)
 
-| Variable | Valeur par défaut | Description |
-|----------|------------------|-------------|
-| `REDIS_HOST` | `localhost` | Hôte Redis |
-| `REDIS_PORT` | `6379` | Port Redis |
-| `REDIS_DB` | `0` | Index de base Redis |
-| `COLLAB_SESSION_TTL_SECONDS` | `86400` | Durée de vie des sessions (24h) |
+| Variable                       | Valeur par défaut | Description                      |
+| ------------------------------ | ------------------ | -------------------------------- |
+| `REDIS_HOST`                 | `localhost`      | Hôte Redis                      |
+| `REDIS_PORT`                 | `6379`           | Port Redis                       |
+| `REDIS_DB`                   | `0`              | Index de base Redis              |
+| `COLLAB_SESSION_TTL_SECONDS` | `86400`          | Durée de vie des sessions (24h) |
 
 #### Upload d'images
 
-| Variable | Valeur par défaut | Description |
-|----------|------------------|-------------|
-| `STORAGE_DRIVER` | `local` | Mode de stockage (`local` ou `s3`) |
-| `UPLOAD_LOCAL_ROOT` | `uploads` | Répertoire local pour uploads |
-| `IMAGE_MAX_CONTENT_LENGTH_BYTES` | `5242880` | Taille max (5 Mo) |
+| Variable                           | Valeur par défaut | Description                            |
+| ---------------------------------- | ------------------ | -------------------------------------- |
+| `STORAGE_DRIVER`                 | `local`          | Mode de stockage (`local` ou `s3`) |
+| `UPLOAD_LOCAL_ROOT`              | `uploads`        | Répertoire local pour uploads         |
+| `IMAGE_MAX_CONTENT_LENGTH_BYTES` | `5242880`        | Taille max (5 Mo)                      |
 
 #### S3-compatible (SeaweedFS, MinIO, AWS S3)
 
@@ -150,6 +167,7 @@ A la **racine du projet** (`.env`). Il est charge automatiquement via `python-do
 ### Pourquoi SeaweedFS ?
 
 SeaweedFS est un système de stockage distribué compatible S3, **gratuit et open-source**. Il permet de :
+
 - Stocker les images uploadées par les utilisateurs
 - Simuler un environnement S3 sans compte AWS
 - Tester le backend en conditions réelles
@@ -368,6 +386,7 @@ python app.py
 ### Utilisation en production
 
 Pour un déploiement production, **remplacez SeaweedFS par** :
+
 - **AWS S3** (recommandé)
 - **MinIO** (auto-hébergé, compatible S3)
 - **Backblaze B2** (moins cher qu'AWS)
@@ -475,6 +494,7 @@ memora_back/
 ### Patrons d'architecture (SOLID)
 
 #### Controller (Présentation HTTP)
+
 - Gère uniquement HTTP (request/response)
 - **Aucune logique métier**
 - Valide les inputs via **DTO Pydantic**
@@ -482,6 +502,7 @@ memora_back/
 - Retourne des **DTO** sérialisés
 
 #### Service (Logique métier)
+
 - Contient la **logique applicative**
 - Indépendant du framework Flask
 - Appelle les **repositories** pour accéder aux données
@@ -489,16 +510,19 @@ memora_back/
 - Lève des **exceptions métier** explicites
 
 #### Domain Service (Logique transverse)
+
 - Orchestration de logique complexe impliquant **plusieurs entités**
 - Exemples : génération de flashcards depuis une note, calcul de statistiques de révision
 
 #### Repository (Accès données)
+
 - Encapsule les requêtes SQLAlchemy
 - Pas de logique métier
 - Retourne des **entités DAO** (modèles SQLAlchemy)
 - Supporte filtres/tri/pagination
 
 #### DAO (Modèle de données)
+
 - Entités SQLAlchemy (modèles de base de données)
 - Utilisent des **Mixins** pour partager des propriétés communes :
   - `UUIDMixin` : ID au format UUID v4
@@ -508,20 +532,24 @@ memora_back/
   - `TagsMixin` : `tags` (array PostgreSQL)
 
 #### DTO (Data Transfer Object)
+
 - Modèles **Pydantic** pour validation/sérialisation
 - Format API ↔ Client
 - Variantes : `CreateDTO`, `UpdateDTO`, `ReadDTO`
 
 #### Mapper
+
 - Conversion **DAO ↔ DTO**
 - Aucune logique métier
 - Méthodes statiques ou fonctions pures
 
 #### Query
+
 - Requêtes SQLAlchemy complexes isolées
 - Permet la réutilisation et le testing
 
 #### Exceptions
+
 - Héritent de **`werkzeug.exceptions.HTTPException`**
 - Codes HTTP explicites (404, 403, 409...)
 - Messages clairs et exploitables
@@ -533,6 +561,7 @@ memora_back/
 ### Modèles SQLAlchemy principaux
 
 #### User ([user_dao.py](daos/user_dao.py))
+
 ```python
 class User(UUIDMixin, CreatedAtMixin, Base):
     email: str              # Unique, obligatoire
@@ -543,6 +572,7 @@ class User(UUIDMixin, CreatedAtMixin, Base):
 ```
 
 #### Note ([note_dao.py](daos/note_dao.py))
+
 ```python
 class Note(UUIDMixin, OwnerMixin, VisibilityMixin, TagsMixin, TimestampMixin, Base):
     collection_id: str | None  # FK vers Collection
@@ -553,10 +583,12 @@ class Note(UUIDMixin, OwnerMixin, VisibilityMixin, TagsMixin, TimestampMixin, Ba
 ```
 
 **Contraintes** :
+
 - Titre unique **par collection** (constraint `uniq_note_title_per_collection`)
 - Cascade delete si collection supprimée
 
 #### Collection ([collection_dao.py](daos/collection_dao.py))
+
 ```python
 class Collection(UUIDMixin, OwnerMixin, VisibilityMixin, TagsMixin, TimestampMixin, Base):
     title: str
@@ -565,6 +597,7 @@ class Collection(UUIDMixin, OwnerMixin, VisibilityMixin, TagsMixin, TimestampMix
 ```
 
 #### Flashcard ([flashcard_dao.py](daos/flashcard_dao.py))
+
 ```python
 class Flashcard(UUIDMixin, TimestampMixin, Base):
     note_id: str         # FK vers Note
@@ -574,6 +607,7 @@ class Flashcard(UUIDMixin, TimestampMixin, Base):
 ```
 
 #### Review (système de révision espacée)
+
 ```python
 class Review(UUIDMixin, CreatedAtMixin, Base):
     user_id: str
@@ -645,6 +679,7 @@ class NoteReadDTO(BaseModel):
 ### Localisation
 
 Fichiers dans [`mappers/`](mappers/) :
+
 - [`note_mapper.py`](mappers/note_mapper.py)
 - [`collection_mapper.py`](mappers/collection_mapper.py)
 - [`flashcard_mapper.py`](mappers/flashcard_mapper.py)
@@ -675,6 +710,7 @@ def note_dao_to_read_dto(note: Note) -> NoteReadDTO:
 ### Fonctionnalités
 
 Les repositories supportent :
+
 - **Filtres dynamiques** (ownership, visibilité, tags, recherche texte)
 - **Tri** (par date, titre, popularité)
 - **Pagination** (offset/limit)
@@ -708,17 +744,17 @@ def find_many(
 
 Enregistrés dans [`app.py`](app.py#L83-L101) :
 
-| Blueprint | Préfixe | Description |
-|-----------|---------|-------------|
-| `bp_sessions` | `/api/sessions` | Authentification (login/logout) |
-| `bp_users` | `/api/users` | CRUD utilisateurs |
-| `bp_notes` | `/api/notes` | CRUD notes |
-| `bp_collections` | `/api/collections` | CRUD collections |
-| `bp_note_shares` | `/api/note-shares` | Partage de notes (permissions) |
-| `bp_note_share_links` | `/api/note-share-links` | Liens publics de notes |
-| `bp_flashcards` | `/api/flashcards` | CRUD flashcards |
-| `bp_reviews` | `/api/reviews` | Historique de révision |
-| `bp_user_statistics` | `/api/statistics` | Statistiques utilisateur |
+| Blueprint               | Préfixe                  | Description                     |
+| ----------------------- | ------------------------- | ------------------------------- |
+| `bp_sessions`         | `/api/sessions`         | Authentification (login/logout) |
+| `bp_users`            | `/api/users`            | CRUD utilisateurs               |
+| `bp_notes`            | `/api/notes`            | CRUD notes                      |
+| `bp_collections`      | `/api/collections`      | CRUD collections                |
+| `bp_note_shares`      | `/api/note-shares`      | Partage de notes (permissions)  |
+| `bp_note_share_links` | `/api/note-share-links` | Liens publics de notes          |
+| `bp_flashcards`       | `/api/flashcards`       | CRUD flashcards                 |
+| `bp_reviews`          | `/api/reviews`          | Historique de révision         |
+| `bp_user_statistics`  | `/api/statistics`       | Statistiques utilisateur        |
 
 ### Typage dans les routes
 
@@ -842,12 +878,12 @@ python scripts/seed_db.py
 
 Le script crée 4 utilisateurs de test avec les identifiants suivants :
 
-| Email | Username | Password | Rôle |
-|-------|----------|----------|------|
+| Email                      | Username       | Password               | Rôle       |
+| -------------------------- | -------------- | ---------------------- | ----------- |
 | `superadmin@example.com` | `superadmin` | `SuperAdminPass123!` | SUPER_ADMIN |
-| `admin@example.com` | `admin` | `AdminPass123!` | ADMIN |
-| `alice@example.com` | `alice` | `AlicePass123!` | CLIENT |
-| `bob@example.com` | `bob` | `BobPass123!!` | CLIENT |
+| `admin@example.com`      | `admin`      | `AdminPass123!`      | ADMIN       |
+| `alice@example.com`      | `alice`      | `AlicePass123!`      | CLIENT      |
+| `bob@example.com`        | `bob`        | `BobPass123!!`       | CLIENT      |
 
 **Note** : Ces comptes sont à usage de développement uniquement. Ne jamais utiliser ces identifiants en production.
 
@@ -901,12 +937,12 @@ python_functions = test_*
 
 ### Outils recommandés
 
-| Outil | Usage | Commande |
-|-------|-------|----------|
-| **black** | Formatage code | `black .` |
-| **ruff** | Linter (remplace flake8/pylint) | `ruff check .` |
-| **isort** | Tri des imports | `isort .` |
-| **mypy** | Type checking | `mypy .` (optionnel) |
+| Outil           | Usage                           | Commande               |
+| --------------- | ------------------------------- | ---------------------- |
+| **black** | Formatage code                  | `black .`            |
+| **ruff**  | Linter (remplace flake8/pylint) | `ruff check .`       |
+| **isort** | Tri des imports                 | `isort .`            |
+| **mypy**  | Type checking                   | `mypy .` (optionnel) |
 
 ### Installation (dev)
 
@@ -1057,7 +1093,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-CMD ["gunicorn", "--worker-class=eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "--worker-class=gevent", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
 ```
 
 ---
@@ -1069,6 +1105,7 @@ CMD ["gunicorn", "--worker-class=eventlet", "-w", "1", "-b", "0.0.0.0:5000", "ap
 **Symptôme** : `Address already in use`
 
 **Solution** :
+
 ```bash
 # Trouver le processus utilisant le port 5000
 # Windows
@@ -1084,6 +1121,7 @@ lsof -ti:5000 | xargs kill -9
 **Symptôme** : `JWT_SECRET_KEY must be set in production`
 
 **Solution** :
+
 ```bash
 cp .env.example .env
 # Éditer .env et changer les valeurs par défaut
@@ -1094,6 +1132,7 @@ cp .env.example .env
 **Symptôme** : `Error connecting to Redis`
 
 **Solution** :
+
 ```bash
 # Démarrer Redis (Linux/macOS)
 redis-server
@@ -1107,6 +1146,7 @@ docker run -d -p 6379:6379 redis:alpine
 **Symptôme** : `could not connect to server`
 
 **Solution** :
+
 1. Vérifier que PostgreSQL est démarré
 2. Vérifier `SQLALCHEMY_DATABASE_URI` dans `.env`
 3. Tester la connexion :
@@ -1119,6 +1159,7 @@ docker run -d -p 6379:6379 redis:alpine
 **Symptôme** : Conteneur Docker en état `Restarting (255)`
 
 **Solution** :
+
 ```bash
 cd s3example
 
@@ -1139,6 +1180,7 @@ sudo docker-compose -f docker-compose.yaml up -d
 **Symptôme** : Upload réussit mais image retourne 404
 
 **Solution** :
+
 ```bash
 # 1. Vérifier que SeaweedFS tourne
 sudo docker ps | grep seaweedfs
@@ -1172,15 +1214,15 @@ curl http://localhost:8333
 
 ### Handlers WebSocket
 
-| Événement | Type | Description |
-|-----------|------|-------------|
-| `join_collaboration` | Emit | Rejoindre une session de collaboration |
-| `leave_collaboration` | Emit | Quitter une session |
-| `crdt_update` | Emit | Envoyer une mise à jour CRDT |
-| `crdt_sync_request` | Emit | Demander une synchronisation complète |
-| `collaboration_session` | Listen | État de la session (collaborateurs) |
-| `collaboration_event` | Listen | Événements en temps réel (updates, presence) |
-| `crdt_sync_reply` | Listen | Réponse de synchronisation |
+| Événement               | Type   | Description                                     |
+| ------------------------- | ------ | ----------------------------------------------- |
+| `join_collaboration`    | Emit   | Rejoindre une session de collaboration          |
+| `leave_collaboration`   | Emit   | Quitter une session                             |
+| `crdt_update`           | Emit   | Envoyer une mise à jour CRDT                   |
+| `crdt_sync_request`     | Emit   | Demander une synchronisation complète          |
+| `collaboration_session` | Listen | État de la session (collaborateurs)            |
+| `collaboration_event`   | Listen | Événements en temps réel (updates, presence) |
+| `crdt_sync_reply`       | Listen | Réponse de synchronisation                     |
 
 ### Flux de collaboration
 

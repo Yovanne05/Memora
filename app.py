@@ -37,8 +37,11 @@ from services.impl.realtime.background_jobs_service_impl import init_background_
 def create_app() -> Flask:
     app = Flask(__name__)
     if config.ALLOWED_ORIGINS:
-        origins = config.ALLOWED_ORIGINS.split(',')
-        CORS(app, origins=origins, supports_credentials=True)
+        raw_origins = [o.strip() for o in config.ALLOWED_ORIGINS.split(",") if o.strip()]
+        if "*" in raw_origins:
+            CORS(app, origins="*")
+        else:
+            CORS(app, origins=raw_origins, supports_credentials=True)
     else:
         CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 
@@ -65,8 +68,11 @@ def create_app() -> Flask:
         )
 
 
+    socketio_async_mode = "threading" if config.IS_TEST else "gevent"
     socketio_service.init_socketio(
-        app, cors_allowed_origins=config.ALLOWED_ORIGINS, async_mode="threading"
+        app,
+        cors_allowed_origins=config.ALLOWED_ORIGINS,
+        async_mode=socketio_async_mode,
     )
 
 
