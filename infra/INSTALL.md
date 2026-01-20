@@ -65,6 +65,7 @@ venv/bin/pip install -r requirements.txt
 2) Creer un fichier d'environnement, par exemple `/etc/memora/backend.env`,
    en vous basant sur `.env.example` (au minimum : `SQLALCHEMY_DATABASE_URI`,
    `JWT_SECRET_KEY`, `ALLOWED_ORIGINS`, `REDIS_HOST`, `REDIS_PORT`).
+   Ajoutez `SOCKETIO_PATH` si un reverse proxy ajoute un prefix (ex: `memora/api/socket.io`).
 
 3) Creer un service systemd (exemple a adapter) :
 

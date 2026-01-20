@@ -15,10 +15,14 @@ class SocketIOService(SocketIOServiceInterface):
         app: Flask,
         cors_allowed_origins: list[str] | str = "*",
         async_mode: str = "threading",
+        path: str | None = None,
     ) -> SocketIO:
         self._socketio = SocketIO()
         self._socketio.init_app(
-            app, cors_allowed_origins=cors_allowed_origins, async_mode=async_mode
+            app,
+            cors_allowed_origins=cors_allowed_origins,
+            async_mode=async_mode,
+            path=path,
         )
         return self._socketio
 

@@ -24,6 +24,7 @@ IMAGE_MAX_CONTENT_LENGTH = int(
 )
 
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
+SOCKETIO_PATH = os.getenv("SOCKETIO_PATH", "socket.io").lstrip("/")
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
