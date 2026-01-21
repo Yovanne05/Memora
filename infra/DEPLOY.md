@@ -36,6 +36,7 @@ La liste complete des variables est dans `.env.example`.
 Variables essentielles :
 - `JWT_SECRET_KEY`
 - `ALLOWED_ORIGINS`
+- `SOCKETIO_PATH` (si reverse proxy ajoute un prefix au WebSocket)
 - `SQLALCHEMY_DATABASE_URI`
 - `SWAGGER_ENABLED=0`
 

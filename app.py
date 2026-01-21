@@ -73,6 +73,7 @@ def create_app() -> Flask:
         app,
         cors_allowed_origins=config.ALLOWED_ORIGINS,
         async_mode=socketio_async_mode,
+        path=config.SOCKETIO_PATH,
     )
 
 

@@ -125,6 +125,7 @@ cp .env.example .env
 | `JWT_SECRET_KEY`                   | `change-me`             | **Obligatoire en prod** - Secret pour tokens JWT           |
 | `JWT_ACCESS_TOKEN_EXPIRES_SECONDS` | `86400`                 | Duree de validite du token (en secondes)                         |
 | `ALLOWED_ORIGINS`                  | `http://localhost:5173` | Origines CORS autorisees (obligatoire en prod)                   |
+| `SOCKETIO_PATH`                    | `socket.io`             | Chemin Socket.IO (utile si reverse proxy avec prefix)            |
 | `SWAGGER_ENABLED`                  | `1`                     | Active Swagger en dev/test (ignore en prod)                      |
 
 #### Redis (collaboration temps réel)
@@ -1075,6 +1076,7 @@ ruff check .
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://user:password@host:5432/memora
 JWT_SECRET_KEY=<générer-secret-fort>
 ALLOWED_ORIGINS=https://app.memora.com
+SOCKETIO_PATH=socket.io
 REDIS_HOST=redis
 REDIS_PORT=6379
 STORAGE_DRIVER=s3

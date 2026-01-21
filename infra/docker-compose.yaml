@@ -8,6 +8,7 @@ services:
       JWT_SECRET_KEY: "change-me"
       JWT_ACCESS_TOKEN_EXPIRES_SECONDS: "86400"
       ALLOWED_ORIGINS: "http://localhost:8080"
+      SOCKETIO_PATH: "socket.io"
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_DB: "0"
@@ -16,9 +17,6 @@ services:
       STORAGE_DRIVER: "local"
       UPLOAD_LOCAL_ROOT: "/app/uploads"
       UPLOAD_PUBLIC_BASE_URL: "http://localhost:5000/uploads"
-      # --- S3/SeaweedFS example ---
-      # STORAGE_DRIVER: "s3"
-      # UPLOAD_PUBLIC_BASE_URL: "http://localhost:8333/memora-uploads"
       # STORAGE_S3_BUCKET: "memora-uploads"
       # STORAGE_S3_ENDPOINT_URL: "http://seaweedfs:8333"
       # STORAGE_S3_REGION: "eu-west-1"
@@ -38,7 +36,9 @@ services:
     image: ghcr.io/dut-info-montreuil/memora-frontend:latest
     restart: unless-stopped
     environment:
-      - API_URL=http://localhost:5000
+      API_URL: "http://localhost:5000"
+      SOCKETIO_URL: "http://localhost:5000" # Origin URL for Socket.IO connection
+      SOCKETIO_PATH: "/socket.io"
     ports:
       - "8080:80"
     depends_on:

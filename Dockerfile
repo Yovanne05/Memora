@@ -21,4 +21,4 @@ USER appuser
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-k", "gevent", "-w", "1", "-b", "0.0.0.0:5000", "app:create_app()"]
+CMD ["gunicorn", "-k", "gevent","-w", "1","-b", "0.0.0.0:5000","--log-level", "info","--access-logfile", "-", "--error-logfile", "-", "--capture-output", "app:create_app()"]
