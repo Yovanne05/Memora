@@ -99,11 +99,21 @@ export function useSocket(options: UseSocketOptions): UseSocketReturn {
     })
     isDisconnectingRef.current = false
 
-    const apiUrl = config.apiUrl ?? 'http://localhost:5000'
-    const baseUrl = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl
-    const socketUrl = `${baseUrl}${SOCKET_PATH}`
+    const socketBaseUrl =
+      config.socketUrl ?? config.apiUrl ?? 'http://localhost:5000'
+    const normalizedSocketBase = socketBaseUrl.endsWith('/')
+      ? socketBaseUrl.slice(0, -1)
+      : socketBaseUrl
+    const socketUrl = `${normalizedSocketBase}${SOCKET_PATH}`
+    const rawSocketPath = config.socketPath?.trim()
+    const normalizedSocketPath = rawSocketPath
+      ? rawSocketPath.startsWith('/')
+        ? rawSocketPath
+        : `/${rawSocketPath}`
+      : '/socket.io'
 
     const newSocket = io(socketUrl, {
+      path: normalizedSocketPath,
       auth: { token: `Bearer ${token}` },
       reconnection: true,
       reconnectionDelay: RECONNECTION_DELAY,
