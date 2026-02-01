@@ -1,0 +1,16 @@
+tags:
+  - users
+summary: Supprimer un utilisateur
+description: Efface définitivement un compte utilisateur.
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant du compte à supprimer.
+responses:
+  204:
+    description: Compte supprimé.
+  404:
+    description: Utilisateur introuvable.

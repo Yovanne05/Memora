@@ -1,0 +1,87 @@
+tags:
+  - collections
+summary: Lister les collections
+description: >
+  Retourne la liste paginee des collections en appliquant des filtres facultatifs
+  (proprietaire, visibilite, texte).
+parameters:
+  - in: query
+    name: owner_id
+    type: string
+    format: uuid
+    required: false
+    description: Limite la recherche aux collections appartenant a cet utilisateur.
+  - in: query
+    name: shared_with_user_id
+    type: string
+    format: uuid
+    required: false
+    description: Retourne uniquement les collections partagees avec cet utilisateur.
+  - in: query
+    name: visibility
+    type: string
+    enum: ["private", "public"]
+    required: false
+    description: Filtre les collections selon leur niveau de partage.
+  - in: query
+    name: title_contains
+    type: string
+    required: false
+    description: Sous-chaine a rechercher dans le nom de la collection.
+  - in: query
+    name: ids
+    type: string
+    required: false
+    description: >
+      Liste CSV d'identifiants (ex. `uuid1,uuid2`) pour recuperer un sous-ensemble precis.
+  - in: query
+    name: tags
+    type: string
+    required: false
+    description: >
+      Liste CSV de tags (ex. `mathematiques,universite`) pour filtrer les collections par tags.
+  - in: query
+    name: is_favorite
+    type: boolean
+    required: false
+    description: >
+      Si `true`, ne renvoie que les collections favorites de l'utilisateur courant.
+  - in: query
+    name: only_with_notes
+    type: boolean
+    required: false
+    default: false
+    description: >
+      Si `true`, ne renvoie que les collections qui possedent au moins une note.
+  - in: query
+    name: sort_by
+    type: string
+    enum: ["title", "created_at", "updated_at"]
+    default: "created_at"
+    description: Champ utilise pour trier les resultats.
+  - in: query
+    name: sort_dir
+    type: string
+    enum: ["asc", "desc"]
+    default: "desc"
+    description: Ordre de tri.
+  - in: query
+    name: limit
+    type: integer
+    format: int32
+    default: 50
+    minimum: 1
+    maximum: 200
+    description: Nombre maximum d'elements renvoyes.
+  - in: query
+    name: offset
+    type: integer
+    format: int32
+    default: 0
+    minimum: 0
+    description: Decalage pour la pagination.
+responses:
+  200:
+    description: Liste paginee des collections.
+    schema:
+      $ref: "#/definitions/CollectionListResponse"

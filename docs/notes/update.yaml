@@ -1,0 +1,29 @@
+tags:
+  - notes
+summary: Mettre à jour une note
+description: >
+  Modifie les champs fournis d’une note existante. Les champs absents ne sont
+  pas altérés.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la note à modifier.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteUpdatePayload"
+responses:
+  200:
+    description: Note mise à jour.
+    schema:
+      $ref: "#/definitions/Note"
+  404:
+    description: Note introuvable.
+  409:
+    description: Le nouveau titre est déjà utilisé dans la collection ciblée.
+  422:
+    description: Référence de collection invalide ou payload incohérent.

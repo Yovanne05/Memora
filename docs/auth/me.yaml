@@ -1,0 +1,11 @@
+tags:
+  - sessions
+summary: Profil courant
+description: Retourne les informations du compte associé au token.
+responses:
+  200:
+    description: Profil en cours.
+    schema:
+      $ref: "#/definitions/AuthMeResponse"
+  401:
+    description: Token absent ou invalide.

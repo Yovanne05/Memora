@@ -1,0 +1,34 @@
+tags:
+  - note-images
+summary: Récupérer une pièce jointe de note
+description: >
+  Sert un fichier attaché à une note depuis le stockage local.
+
+  **Note:** Cet endpoint est uniquement disponible lorsque le driver de stockage est configuré en mode "local".
+
+  **Pas d'authentification requise** - endpoint public pour afficher les pièces jointes (images, etc.).
+
+  L'URL d'accès est fournie lors de l'upload via `POST /notes/{note_id}/attachments`.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: ID de la note propriétaire de la pièce jointe
+  - in: path
+    name: filename
+    type: string
+    required: true
+    description: 'Nom du fichier (ex: image.png)'
+responses:
+  200:
+    description: Fichier retourné avec succès
+    schema:
+      type: file
+  400:
+    description: Paramètres invalides
+  404:
+    description: Fichier non trouvé
+  503:
+    description: Service de stockage local non disponible

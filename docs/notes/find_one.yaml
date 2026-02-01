@@ -1,0 +1,18 @@
+tags:
+  - notes
+summary: Consulter une note
+description: Retourne le détail complet d’une note identifiée par son UUID.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+responses:
+  200:
+    description: Note trouvée.
+    schema:
+      $ref: "#/definitions/Note"
+  404:
+    description: Aucune note ne correspond à l’identifiant fourni.

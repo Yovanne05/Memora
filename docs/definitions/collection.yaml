@@ -1,0 +1,300 @@
+definitions:
+  Collection:
+    type: object
+    description: >
+      Représentation complète d'une collection dans MEMORA.
+
+      **Propriétaires multiples:** Une collection peut avoir plusieurs propriétaires :
+      - Le créateur original de la collection
+      - Tous les utilisateurs ayant reçu la permission WRITE via CollectionShare
+
+      Tous les propriétaires ont exactement les mêmes droits et sont indistinguables.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Unique identifier of the collection.
+        example: "2be69704-ec97-4dce-903f-1f1dd01bc172"
+      name:
+        type: string
+        description: Collection name, unique per owner.
+        example: "Mes cours de maths"
+      description:
+        type: string
+        nullable: true
+        description: Optional description.
+        example: "Collection de mes cours de maths"
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        description: Who can see the collection.
+        example: "private"
+      owners:
+        type: array
+        description: >
+          Liste de tous les propriétaires de la collection.
+          Inclut le créateur original ET tous les utilisateurs avec permission WRITE.
+        items:
+          $ref: "#/definitions/Owner"
+        example:
+          - user_id: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+            username: "jean.dupont"
+          - user_id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            username: "marie.martin"
+      tags:
+        type: array
+        description: Tags associated with this collection.
+        items:
+          type: string
+        example: ["mathゼmatiques", "algЁbre", "universitゼ"]
+      is_favorite:
+        type: boolean
+        description: Whether the collection is favorited by the current user.
+        example: true
+      created_at:
+        type: string
+        format: date-time
+        description: Creation date.
+        example: "2025-05-12T09:23:41Z"
+      updated_at:
+        type: string
+        format: date-time
+        description: Last update date.
+        example: "2025-05-15T16:02:07Z"
+      notes:
+        type: array
+        description: Notes linked to this collection.
+        items:
+          $ref: "#/definitions/Note"
+      edges:
+        type: array
+        description: Graph edges for visualization.
+        items:
+          type: object
+        example: []
+      nodes:
+        type: array
+        description: Graph nodes for visualization.
+        items:
+          type: object
+        example: []
+    required:
+      - id
+      - name
+      - visibility
+      - owners
+      - tags
+      - created_at
+      - updated_at
+      - notes
+      - edges
+      - nodes
+
+  Owner:
+    type: object
+    description: Représente un propriétaire (owner) d'une note ou collection.
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant unique de l'utilisateur.
+        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      username:
+        type: string
+        description: Nom d'utilisateur.
+        example: "jean.dupont"
+    required: ["user_id", "username"]
+
+  CollectionCreatePayload:
+    type: object
+    description: Data needed to create a collection.
+    required: ["name", "owner_id"]
+    properties:
+      name:
+        type: string
+        maxLength: 50
+        description: Collection name.
+        example: "Mes cours de maths"
+      description:
+        type: string
+        nullable: true
+        description: Optional description.
+        example: "Collection de mes cours de maths"
+      owner_id:
+        type: string
+        format: uuid
+        description: Identifier of the user creating the collection.
+        example: "7bf403d9-98d9-468e-91b1-8c1f9ac1846f"
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        default: "private"
+        description: Visibility level.
+        example: "private"
+      tags:
+        type: array
+        description: Tags to associate with the collection.
+        items:
+          type: string
+        example: ["mathゼmatiques", "universitゼ"]
+
+  CollectionUpdatePayload:
+    type: object
+    description: Fields that can be updated on a collection.
+    properties:
+      name:
+        type: string
+        maxLength: 50
+        description: New name.
+        example: "Mes cours d'algebre"
+      description:
+        type: string
+        nullable: true
+        description: New description.
+        example: "Collection mise a jour avec de nouveaux cours en algebre"
+      visibility:
+        type: string
+        enum: ["private", "public"]
+        description: New visibility.
+        example: "public"
+      tags:
+        type: array
+        description: New tags for the collection.
+        items:
+          type: string
+        example: ["algЁbre", "licence"]
+
+  CollectionListResponse:
+    type: object
+    description: Paginated response for collections.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Total number of collections matching the filter.
+        example: 42
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Collection"
+    required: ["total", "items"]
+
+  CollectionShare:
+    type: object
+    description: Sharing configuration for a collection.
+    properties:
+      collection_id:
+        type: string
+        format: uuid
+        description: Identifier of the shared collection.
+      user:
+        $ref: "#/definitions/User"
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Niveau d'acces partage.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de creation du partage.
+    required: ["collection_id", "user", "permission", "created_at"]
+
+  CollectionShareCreatePayload:
+    type: object
+    required: ["user_id", "permission"]
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant de l'utilisateur cible.
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Niveau d'acces souhaite.
+
+  CollectionShareUpdatePayload:
+    type: object
+    required: ["permission"]
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Nouveau niveau d'acces.
+
+  CollectionShareListResponse:
+    type: object
+    description: Liste paginee des partages d'une collection.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de partages.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/CollectionShare"
+    required: ["total", "items"]
+
+  CollectionFavorite:
+    type: object
+    description: Lien de favori entre un utilisateur et une collection.
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: Identifiant de l'utilisateur.
+      collection_id:
+        type: string
+        format: uuid
+        description: Identifiant de la collection.
+      created_at:
+        type: string
+        format: date-time
+        description: Date d'ajout aux favoris.
+    required: ["user_id", "collection_id", "created_at"]
+
+  CollectionShareLink:
+    type: object
+    description: Lien de partage public pour une collection (accessible via URL).
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: Identifiant unique du lien (utilisé dans l'URL publique).
+        example: "b2c3d4e5-6789-01bc-def0-234567890abc"
+      collection_id:
+        type: string
+        format: uuid
+        description: Identifiant de la collection partagée.
+      permission:
+        type: string
+        enum: ["read", "write"]
+        description: Niveau d'accès accordé via ce lien.
+      created_at:
+        type: string
+        format: date-time
+        description: Date de création du lien.
+    required: ["id", "collection_id", "permission", "created_at"]
+
+  CollectionShareLinkCreatePayload:
+    type: object
+    properties:
+      permission:
+        type: string
+        enum: ["read", "write"]
+        default: "read"
+        description: Niveau d'accès à accorder via le lien.
+
+  CollectionShareLinkListResponse:
+    type: object
+    description: Liste paginée des liens de partage d'une collection.
+    properties:
+      total:
+        type: integer
+        format: int32
+        description: Nombre total de liens.
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/CollectionShareLink"
+    required: ["total", "items"]

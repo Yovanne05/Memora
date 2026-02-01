@@ -1,0 +1,70 @@
+tags:
+  - reports
+summary: Lister les signalements (admin)
+description: >
+  Retourne les signalements filtrables par statut, raison, cible ou reporter.
+  Réservé aux admins.
+parameters:
+  - name: status
+    in: query
+    type: string
+    enum: ["pending", "in_progress", "resolved", "rejected"]
+    required: false
+  - name: reason
+    in: query
+    type: string
+    enum:
+      [
+        "illegal_content",
+        "shocking_or_inappropriate",
+        "harassment_or_abuse",
+        "rights_violation",
+        "spam_or_abuse",
+        "technical_issue",
+        "other",
+      ]
+  - name: target_type
+    in: query
+    type: string
+    enum: ["note", "collection"]
+  - name: reporter_id
+    in: query
+    type: string
+    format: uuid
+  - name: note_id
+    in: query
+    type: string
+    format: uuid
+  - name: collection_id
+    in: query
+    type: string
+    format: uuid
+  - name: sort_by
+    in: query
+    type: string
+    enum: ["created_at", "status"]
+    default: "created_at"
+  - name: sort_dir
+    in: query
+    type: string
+    enum: ["asc", "desc"]
+    default: "desc"
+  - name: limit
+    in: query
+    type: integer
+    format: int32
+    default: 50
+  - name: offset
+    in: query
+    type: integer
+    format: int32
+    default: 0
+responses:
+  200:
+    description: Liste paginée des signalements.
+    schema:
+      $ref: "#/definitions/ReportList"
+  401:
+    description: Non authentifié.
+  403:
+    description: Réservé aux admins.

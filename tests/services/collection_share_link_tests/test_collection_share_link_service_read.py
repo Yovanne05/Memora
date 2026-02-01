@@ -1,0 +1,62 @@
+"""
+Tests pour le service collection_share_link (logique métier).
+
+Ces tests vérifient :
+- Créer un lien public de partage de collection
+- Lister les liens publics d'une collection
+- Supprimer un lien public
+- Validation des permissions
+
+Les repositories sont MOCKÉS.
+"""
+from uuid import uuid4
+from datetime import datetime
+from daos.collection_share_link_dao import CollectionShareLink
+
+
+class TestCollectionShareLinkServiceList:
+    """Tests pour lister les liens publics"""
+
+    def test_find_many_filters_by_ownership(self, mock_collection_share_link_repository, mock_collection_repository, monkeypatch):
+        """Lister les liens filtre par propriétaire."""
+        from services.impl.collection.collection_share_link_service_impl import collection_share_link_service
+        from daos.collection_dao import Collection
+        from daos.user_dao import User
+        from utils.enums import RoleEnum, SharePermissionEnum
+        from repositorys.collection_share_link_repository import CollectionShareLinkSearchParams
+
+        # Arrange
+        owner_id = str(uuid4())
+        collection_id = str(uuid4())
+
+        current_user = User(
+            id=owner_id, email="owner@example.com", username="owner",
+            password_hash="hash", role=RoleEnum.CLIENT, created_at=datetime.now()
+        )
+        monkeypatch.setattr("services.impl.collection.collection_share_link_service_impl.get_current_user", lambda: current_user)
+
+        collection = Collection(
+            id=collection_id, name="Test Collection", owner_id=owner_id,
+            tags=[], notes=[], shares=[],
+            created_at=datetime.now(), updated_at=datetime.now()
+        )
+        mock_collection_repository.find_one_unscoped.return_value = collection
+
+        links = [
+            CollectionShareLink(
+                id=str(uuid4()),
+                collection_id=collection_id,
+                permission=SharePermissionEnum.READ,
+                created_at=datetime.now()
+            )
+        ]
+        mock_collection_share_link_repository.find_many.return_value = (links, 1)
+
+        params = CollectionShareLinkSearchParams(collection_id=collection_id)
+
+        # Act
+        result_links, total = collection_share_link_service.find_many(params)
+
+        # Assert
+        assert total == 1
+        assert len(result_links) == 1

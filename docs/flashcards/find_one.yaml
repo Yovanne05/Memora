@@ -1,0 +1,21 @@
+tags:
+  - flashcards
+summary: Obtenir une flashcard
+description: >
+  Récupère les détails d'une flashcard spécifique.
+  
+  **Permissions requises:** READ ou WRITE sur la note parente.
+parameters:
+  - in: path
+    name: flashcard_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la flashcard.
+responses:
+  200:
+    description: Flashcard récupérée avec succès.
+    schema:
+      $ref: "#/definitions/Flashcard"
+  404:
+    description: Flashcard introuvable ou permission insuffisante.

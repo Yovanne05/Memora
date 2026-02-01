@@ -1,0 +1,23 @@
+tags:
+  - shared-collections
+summary: Acceder a une collection via un lien public
+description: >
+  Recupere une collection en utilisant l'ID du lien public.
+  Aucune authentification n'est requise.
+parameters:
+  - in: path
+    name: link_id
+    type: string
+    format: uuid
+    required: true
+    description: ID du lien public (cle primaire).
+    example: "b2c3d4e5-6789-01bc-def0-234567890abc"
+responses:
+  200:
+    description: Collection recuperee avec succes.
+    schema:
+      $ref: "#/definitions/Collection"
+  404:
+    description: Lien public non trouve ou invalide.
+  422:
+    description: ID malforme.

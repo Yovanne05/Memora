@@ -1,0 +1,66 @@
+tags:
+  - users
+summary: Lister les utilisateurs
+description: >
+  Retourne une liste paginée d’utilisateurs avec des filtres sur l’e-mail,
+  le pseudo ou le nom d’affichage.
+parameters:
+  - in: query
+    name: email
+    type: string
+    format: email
+    required: false
+    description: Filtre par adresse e-mail exacte.
+  - in: query
+    name: username
+    type: string
+    required: false
+    description: Filtre sur un alias exact.
+  - in: query
+    name: username_contains
+    type: string
+    required: false
+    description: Recherche partielle dans les alias.
+  - in: query
+    name: role
+    type: string
+    enum: ["client", "admin", "super_admin"]
+    required: false
+    description: Filtre sur un rôle précis.
+  - in: query
+    name: ids
+    type: string
+    required: false
+    description: Liste CSV d’identifiants précis (uuid1,uuid2,...).
+  - in: query
+    name: sort_by
+    type: string
+    enum: ["email", "username", "created_at", "id"]
+    default: "created_at"
+    description: Champ utilisé pour le tri.
+  - in: query
+    name: sort_dir
+    type: string
+    enum: ["asc", "desc"]
+    default: "desc"
+    description: Ordre de tri.
+  - in: query
+    name: limit
+    type: integer
+    format: int32
+    default: 50
+    minimum: 1
+    maximum: 200
+    description: Taille de page.
+  - in: query
+    name: offset
+    type: integer
+    format: int32
+    default: 0
+    minimum: 0
+    description: Décalage pour la pagination.
+responses:
+  200:
+    description: Liste paginée des utilisateurs.
+    schema:
+      $ref: "#/definitions/UserListResponse"

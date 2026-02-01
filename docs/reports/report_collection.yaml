@@ -1,0 +1,24 @@
+tags:
+  - reports
+summary: Signaler une collection
+description: Soumet un signalement sur une collection (accès lecture requis). JWT obligatoire.
+parameters:
+  - name: collection_id
+    in: path
+    required: true
+    type: string
+    format: uuid
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/ReportCreatePayload"
+responses:
+  201:
+    description: Signalement créé.
+    schema:
+      $ref: "#/definitions/Report"
+  401:
+    description: Non authentifié.
+  403:
+    description: Accès interdit à la collection ciblée.

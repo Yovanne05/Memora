@@ -1,0 +1,29 @@
+tags:
+  - note-shares
+summary: Partager une note avec un utilisateur
+description: >
+  Crée une entrée de partage pour donner un accès en lecture ou écriture
+  à un autre utilisateur.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Note à partager.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteShareCreatePayload"
+responses:
+  201:
+    description: Partage créé.
+    schema:
+      $ref: "#/definitions/NoteShare"
+  404:
+    description: Note introuvable.
+  409:
+    description: Ce destinataire possède déjà un partage pour cette note.
+  422:
+    description: Utilisateur cible invalide ou tentative de partage avec le propriétaire.

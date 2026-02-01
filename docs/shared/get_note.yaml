@@ -1,0 +1,23 @@
+tags:
+  - shared-notes
+summary: Acceder a une note via un lien public
+description: >
+  Recupere une note en utilisant l'ID du lien public.
+  Aucune authentification n'est requise.
+parameters:
+  - in: path
+    name: link_id
+    type: string
+    format: uuid
+    required: true
+    description: ID du lien public (cle primaire).
+    example: "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+responses:
+  200:
+    description: Note recuperee avec succes.
+    schema:
+      $ref: "#/definitions/Note"
+  404:
+    description: Lien public non trouve ou invalide.
+  422:
+    description: ID malforme.

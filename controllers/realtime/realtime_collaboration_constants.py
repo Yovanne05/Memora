@@ -1,0 +1,5 @@
+COLLABORATION_NAMESPACE = "/collaboration"
+ROOM_PREFIX = "note_"
+EVENT_COLLABORATION = "collaboration_event"
+EVENT_SESSION = "collaboration_session"
+EVENT_CRDT_SYNC_REPLY = "crdt_sync_reply"

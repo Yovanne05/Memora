@@ -1,0 +1,20 @@
+tags:
+  - note-relations
+summary: Lister les relations d'une note
+description: >
+  Retourne toutes les notes associees a la note demandee.
+  Les relations sont limitees aux notes d'une meme collection.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+responses:
+  200:
+    description: Liste des relations.
+    schema:
+      $ref: "#/definitions/NoteLinkListResponse"
+  404:
+    description: Note introuvable.

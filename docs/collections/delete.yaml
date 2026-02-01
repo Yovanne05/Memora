@@ -1,0 +1,16 @@
+tags:
+  - collections
+summary: Supprimer une collection
+description: Efface définitivement une collection et ses éléments associés.
+parameters:
+  - in: path
+    name: collection_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de la collection à supprimer.
+responses:
+  204:
+    description: Collection supprimée (aucun contenu).
+  404:
+    description: Collection introuvable.

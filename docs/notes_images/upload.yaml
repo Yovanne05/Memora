@@ -1,0 +1,29 @@
+tags:
+  - note-images
+summary: Upload une image pour une note
+description: >
+  Permet d'uploader une image (JPEG, PNG, GIF, WebP) pour une note.
+  Taille maximale controlee par IMAGE_MAX_CONTENT_LENGTH_BYTES (par defaut 5MB).
+consumes:
+  - multipart/form-data
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant unique de la note.
+  - in: formData
+    name: image
+    type: file
+    required: true
+    description: Fichier image a uploader (JPG, PNG, GIF, WebP max 5MB).
+responses:
+  201:
+    description: Image uploadee avec succes.
+    schema:
+      $ref: "#/definitions/NoteImage"
+  400:
+    description: Requete invalide (pas de fichier, type non autorise, taille trop grande).
+  404:
+    description: Note introuvable.

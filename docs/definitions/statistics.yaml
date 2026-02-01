@@ -1,0 +1,134 @@
+definitions:
+  ContentStatistics:
+    type: object
+    description: Statistiques sur le contenu cree par l'utilisateur.
+    properties:
+      notes_created:
+        type: integer
+        format: int32
+        description: Nombre de notes creees par l'utilisateur.
+        example: 42
+      collections_created:
+        type: integer
+        format: int32
+        description: Nombre de collections creees par l'utilisateur.
+        example: 8
+      flashcards_created:
+        type: integer
+        format: int32
+        description: Nombre de flashcards creees par l'utilisateur.
+        example: 156
+      notes_shared_by_user:
+        type: integer
+        format: int32
+        description: Nombre de notes partagees avec d'autres utilisateurs.
+        example: 12
+      collections_shared_by_user:
+        type: integer
+        format: int32
+        description: Nombre de collections partagees avec d'autres utilisateurs.
+        example: 3
+    required:
+      - notes_created
+      - collections_created
+      - flashcards_created
+      - notes_shared_by_user
+      - collections_shared_by_user
+
+  ReviewStatistics:
+    type: object
+    description: Statistiques sur les revisions de flashcards.
+    properties:
+      total_reviews:
+        type: integer
+        format: int32
+        description: Nombre total de revisions effectuees.
+        example: 523
+      reviews_last_7_days:
+        type: integer
+        format: int32
+        description: Nombre de revisions dans les 7 derniers jours.
+        example: 45
+      reviews_last_30_days:
+        type: integer
+        format: int32
+        description: Nombre de revisions dans les 30 derniers jours.
+        example: 178
+      average_quality:
+        type: number
+        format: float
+        description: Moyenne des notes de qualite (0-5).
+        example: 3.8
+      quality_distribution:
+        type: object
+        description: Distribution des notes de qualite.
+        additionalProperties:
+          type: integer
+        example:
+          "0": 12
+          "1": 23
+          "2": 45
+          "3": 89
+          "4": 234
+          "5": 120
+    required:
+      - total_reviews
+      - reviews_last_7_days
+      - reviews_last_30_days
+      - average_quality
+      - quality_distribution
+
+  UserStatistics:
+    type: object
+    description: Statistiques globales de l'utilisateur.
+    properties:
+      content_statistics:
+        $ref: "#/definitions/ContentStatistics"
+      review_statistics:
+        $ref: "#/definitions/ReviewStatistics"
+        nullable: true
+        description: Statistiques de revision (null si non encore implementees).
+    required:
+      - content_statistics
+
+  TimeSeriesPoint:
+    type: object
+    description: Point de données dans une série temporelle.
+    properties:
+      date:
+        type: string
+        format: date
+        description: Date du point de données (format YYYY-MM-DD).
+        example: "2025-01-07"
+      value:
+        type: integer
+        format: int32
+        description: Valeur pour cette date.
+        example: 5
+    required:
+      - date
+      - value
+
+  UserStatisticsTimeSeries:
+    type: object
+    description: Série temporelle des statistiques utilisateur.
+    properties:
+      metric:
+        type: string
+        enum: [notes, collections, reviews]
+        description: Type de métrique.
+        example: "notes"
+      days:
+        type: integer
+        enum: [7, 30, 90]
+        description: Nombre de jours de la période.
+        example: 30
+      points:
+        type: array
+        description: Points de données de la série temporelle.
+        items:
+          $ref: "#/definitions/TimeSeriesPoint"
+    required:
+      - metric
+      - days
+      - points

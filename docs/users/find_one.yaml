@@ -1,0 +1,18 @@
+tags:
+  - users
+summary: Consulter un utilisateur
+description: Récupère le profil complet d’un utilisateur à partir de son UUID.
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    format: uuid
+    required: true
+    description: Identifiant de l’utilisateur.
+responses:
+  200:
+    description: Profil trouvé.
+    schema:
+      $ref: "#/definitions/User"
+  404:
+    description: Aucun utilisateur ne correspond à cet identifiant.

@@ -1,0 +1,29 @@
+tags:
+  - note-relations
+summary: Creer une relation entre deux notes
+description: >
+  Associe la note ciblee par l'URL a une autre note de la meme collection.
+  Impossible d'associer une note a elle-meme ou a une note d'une autre collection.
+parameters:
+  - in: path
+    name: note_id
+    type: string
+    format: uuid
+    required: true
+    description: Note de depart.
+  - in: body
+    name: payload
+    required: true
+    schema:
+      $ref: "#/definitions/NoteLinkCreatePayload"
+responses:
+  201:
+    description: Relation creee.
+    schema:
+      $ref: "#/definitions/NoteLink"
+  404:
+    description: Note introuvable.
+  409:
+    description: Une relation existe deja entre ces notes.
+  422:
+    description: Notes incompatibles (collections differentes ou meme note).

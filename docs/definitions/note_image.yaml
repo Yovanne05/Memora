@@ -1,0 +1,9 @@
+definitions:
+  NoteImage:
+    type: object
+    properties:
+      url:
+        type: string
+        example: "https://cdn.example.com/users/user-uuid/notes/note-uuid/image-uuid.jpg"
+    required:
+      - url
