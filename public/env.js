@@ -1,0 +1,5 @@
+window.ENV = {
+  API_URL: "${API_URL}",
+  SOCKETIO_URL: "${SOCKETIO_URL}",
+  SOCKETIO_PATH: "${SOCKETIO_PATH}",
+}
