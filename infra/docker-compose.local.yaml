@@ -1,0 +1,17 @@
+# Override pour construire les images depuis le code local (sans acces GHCR).
+# Usage : docker compose -f infra/docker-compose.yaml -f infra/docker-compose.local.yaml up -d --build
+# Frontend expose sur 8081 (8080 deja utilise en local).
+services:
+  backend:
+    image: memora-backend:local
+    build:
+      context: ../backend
+    environment:
+      ALLOWED_ORIGINS: "http://localhost:8081"
+
+  frontend:
+    image: memora-frontend:local
+    build:
+      context: ../frontend
+    ports: !override
+      - "8081:80"
